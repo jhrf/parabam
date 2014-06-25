@@ -2,17 +2,6 @@
 
 #Once upon a time...
 
-import pysam
-import pdb
-import time
-import sys
-import sh
-
-import Queue as Queue2
-import numpy as np
-import util as ut
-
-from multiprocessing import Queue,Process
 from abc import ABCMeta, abstractmethod
 
 class Interface(object):

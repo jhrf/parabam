@@ -1,14 +1,7 @@
 #!/usr/bin/env python
 #Once upon a time...
 
-import pysam
-import time
-import sys
-
-import Queue as Queue2
-import util as ut
-
-from multiprocessing import Queue,Process
+from multiprocessing import Process
 from abc import ABCMeta, abstractmethod
 
 class Task(Process):
