@@ -1,9 +1,11 @@
 #__init__.py
 
-import pysam
 import time
 import sys
 import Queue as Queue2
+
+import blessings
+import pysam
 
 from multiprocessing import Queue,Process
 from abc import ABCMeta, abstractmethod
@@ -64,7 +66,7 @@ class Handler(object):
 
 		self._stats = {}
 
-		self._updateFunc = self.__decideOutput__()
+		self._updateFunc = self.__blessingsOutput__ 
 
 	def listen(self,update):
 		destroy = False
@@ -77,6 +79,8 @@ class Handler(object):
 		curproc = 0
 
 		updateFunc = self._updateFunc #speedup alias
+
+		if self._verbose: print "\n\n"
 
 		while not destroy:
 			iterations += 1
@@ -107,27 +111,10 @@ class Handler(object):
 		self.periodicAction(iterations)
 		self.handlerExitFunc()
 
-	def __decideOutput__(self):
-		if self._report and self._verbose:
-			try:
-				globals()["blessings"] = __import__("blessings")
-				print "\n"
-				return self.__blessingsOutput__
-			except ImportError:
-				print "[Warning] merecat will use ugly output. Please install the package ``blessings`` to correct this."
-				return self.__standardOutput__
-		else:
-			return self.__standardOutput__
-
 	def __blessingsOutput__(self,outstr):
 		term = blessings.Terminal()
 		with term.location(0,term.height-3):
 			print outstr
-			sys.stdout.flush()
-
-	def __standardOutput__(self,outstr):
-		if self._verbose:
-			sys.stdout.write(outStr)
 			sys.stdout.flush()
 
 	def __formUpdateStr__(self,curproc,stTime):
@@ -171,7 +158,7 @@ class Handler(object):
 							mirror[k1] = res[k][k1]
 
 	def __secSince__(self,since):
-		return int(time.time() - srt)
+		return int(time.time() - since)
 
 	@abstractmethod
 	def periodicAction(self,iterations):
@@ -193,8 +180,9 @@ class Processor(object):
 
 	__metaclass__ = ABCMeta
 
-	def __init__(self,outqu,const):
+	def __init__(self,outqu,const,debug = False):
 		
+		self._debug = debug
 		self._masterFnm = const.masterFnm
 		self._verbose = const.verbose
 		self._outqu = outqu
@@ -208,10 +196,10 @@ class Processor(object):
 	#Find data pertaining to assocd and all reads 
 	#and divide pertaining to the chromosome that it is aligned to
 	def run(self,update):
+	
 		self.preProcActivity(self._masterFnm)
 
 		masterBam = self.__getMasterBam__(self._masterFnm)
-		getNextAlig = self.__getNextAlig__
 		collection = []
 		colCount = 0
 
@@ -219,7 +207,10 @@ class Processor(object):
 		addToCollection = self.addToCollection
 		sendProc = self.__sendProc__
 
-		for i,alig in enumerate(getNextAlig(masterBam)):
+		bam_iterator = self.__getNextAlig__(masterBam) if not self._debug \
+							else self.__getNextAligDebug__(masterBam)
+
+		for i,alig in enumerate(bam_iterator):
 
 			addToCollection(masterBam,alig,collection)
 			colCount += 1
@@ -234,7 +225,6 @@ class Processor(object):
 		sendProc(collection,destroy=True)
 
 		self.__endProcessing__(masterBam)
-
 
 	#__waitOnActiveProc__ controls the amount of currently running processors
 	#it waits until a processor is free and then allows the creation of a new
@@ -295,6 +285,13 @@ class Processor(object):
 	def __getNextAlig__(self,masterBam):
 		for alig in masterBam.fetch(until_eof=True):
 			yield alig
+
+	def __getNextAligDebug__(self,masterBam):
+		for i,alig in enumerate(masterBam.fetch(until_eof=True)):
+			if i < 1000000:
+				yield alig
+			else:
+				return
 
 	def __endProcessing__(self,master):
 		master.close()
