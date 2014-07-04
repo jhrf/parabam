@@ -36,9 +36,7 @@ class Task(Process):
 								curproc=self._curproc))
 
 	def __mkTmpName__(self,typ):
-		#---FIX---
-		#If run in parallel this could create two files of 
-		#exactly the same name, although unlikely.
+		#self.pid ensures that the temp names are unique.
 		return "%s/%s_%s_TmpTelbam.bam" % (self._tempDir,typ,self.pid)
 
 	def __getMate__(self,master,alig):
@@ -66,6 +64,7 @@ class Handler(object):
 
 		self._stats = {}
 
+		self._term = blessings.Terminal()
 		self._updateFunc = self.__blessingsOutput__ 
 
 	def listen(self,update):
@@ -80,7 +79,7 @@ class Handler(object):
 
 		updateFunc = self._updateFunc #speedup alias
 
-		if self._verbose: print "\n\n"
+		if self._verbose: print "\n"
 
 		while not destroy:
 			iterations += 1
@@ -112,8 +111,7 @@ class Handler(object):
 		self.handlerExitFunc()
 
 	def __blessingsOutput__(self,outstr):
-		term = blessings.Terminal()
-		with term.location(0,term.height-3):
+		with self._term.location(0,self._term.height-3):
 			print outstr
 			sys.stdout.flush()
 
@@ -207,6 +205,8 @@ class Processor(object):
 		addToCollection = self.addToCollection
 		sendProc = self.__sendProc__
 
+		#Insert a debug iterator into the processor, this workaround doesn't
+		#slow processing when not in debug mode.
 		bam_iterator = self.__getNextAlig__(masterBam) if not self._debug \
 							else self.__getNextAligDebug__(masterBam)
 
