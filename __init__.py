@@ -340,11 +340,12 @@ class Leviathon(object):
 class Interface(object):
 
 	__metaclass__ = ABCMeta
-	def __init__(self,tempDir):
+	def __init__(self,tempDir,exe_dir):
 		self._tempDir = tempDir
+		self._exe_dir = exe_dir
 
 	@abstractmethod
-	def run_cmd(self,parser,tempDir):
+	def run_cmd(self,parser):
 		#This is usualy just a function that
 		#takes an argparse parser and turns 
 		#passes the functions to the run function
