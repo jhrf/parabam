@@ -78,9 +78,6 @@ class Handler(object):
 		curproc = 0
 
 		updateFunc = self._updateFunc #speedup alias
-
-		if self._verbose: print "\n"
-
 		while not destroy:
 			iterations += 1
 			#Listen for a process coming in...
@@ -111,8 +108,8 @@ class Handler(object):
 		self.handlerExitFunc()
 
 	def __blessingsOutput__(self,outstr):
-		with self._term.location(0,self._term.height-3):
-			print outstr
+		with self._term.location(0,self._term.height-2):
+			print outstr 
 			sys.stdout.flush()
 
 	def __formUpdateStr__(self,curproc,stTime):
