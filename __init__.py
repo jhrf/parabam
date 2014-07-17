@@ -64,7 +64,7 @@ class Handler(object):
 
 		self._stats = {}
 
-		self._term = blessings.Terminal()
+		#self._term = blessings.Terminal()
 		self._updateFunc = self.__blessingsOutput__ 
 
 	def listen(self,update):
@@ -108,13 +108,8 @@ class Handler(object):
 		self.handlerExitFunc()
 
 	def __blessingsOutput__(self,outstr):
-		if self._term.height is not None:
-			with self._term.location(0,self._term.height-2):
-				print outstr 
-				sys.stdout.flush()
-		else: 
-			sys.stdout.write("\r" + outstr)
-			sys.stdout.flush()
+		sys.stdout.write("\r" + outstr)
+		sys.stdout.flush()
 
 	def __formUpdateStr__(self,curproc,stTime):
 		stats = []
