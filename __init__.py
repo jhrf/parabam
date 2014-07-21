@@ -154,8 +154,10 @@ class Handler(object):
 	def __secSince__(self,since):
 		return int(time.time() - since)
 
-	@abstractmethod
 	def periodicAction(self,iterations):
+		#Overwrite with something that needs
+		#to be done occasionally. For example
+		#merging telbams.
 		pass
 
 	@abstractmethod
