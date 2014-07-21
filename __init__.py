@@ -7,6 +7,8 @@ import Queue as Queue2
 import blessings
 import pysam
 
+import gc
+
 from multiprocessing import Queue,Process
 from abc import ABCMeta, abstractmethod
 
@@ -261,12 +263,18 @@ class Processor(object):
 				sys.stdout.write("\r[Status] Normal functioning resumed")
 
 	def __procUpdate__(self,activeProcs):
+		terminated_procs = []
 		for pr in activeProcs:
 			if not pr.is_alive():
 				pr.terminate()
-				activeProcs.remove(pr)
-				del pr			
+				terminated_procs.append(pr)
+		
+		for pr in terminated_procs:
+			activeProcs.remove(pr)
 
+		del terminated_procs
+		gc.collect()
+				
 	def __sendProc__(self,collection,destroy=False):
 		#self,taskSet,outqu,curproc,destroy,const
 		args = [collection,self._outqu,len(self._activeProcs)+1,destroy,self.const]
