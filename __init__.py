@@ -4,7 +4,7 @@ import time
 import sys
 import Queue as Queue2
 
-import blessings
+#import blessings
 import pysam
 
 import gc
