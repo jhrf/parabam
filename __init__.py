@@ -9,16 +9,20 @@ import pysam
 
 import gc
 
-from multiprocessing import Queue,Process
+import multiprocessing
 from abc import ABCMeta, abstractmethod
 
-class Task(Process):
+from guppy import hpy
+import resource
+
+
+
+class Task(multiprocessing.Process):
 
 	__metaclass__ = ABCMeta
 
 	def __init__(self,taskSet,outqu,curproc,destroy,const):
-		Process.__init__(self)
-
+		multiprocessing.Process.__init__(self)
 		self._taskSet = taskSet
 		self._outqu = outqu
 		self._curproc = curproc
@@ -27,6 +31,7 @@ class Task(Process):
 		self.const = const
 
 	def run(self):
+		start_useage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 		results = {}
 		if len(self._taskSet) > 0: #Empty tasks sent at destory sometimes
 			results = self.produceResultsDict()
@@ -36,6 +41,10 @@ class Task(Process):
 								results=results,
 								destroy=self._destroy,
 								curproc=self._curproc))
+
+		fin_useage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
+		print "Proc Useage %s (start/finish) : %d / %d" % (self.pid,start_useage,fin_useage)
 
 	def __mkTmpName__(self,typ):
 		#self.pid ensures that the temp names are unique.
@@ -273,10 +282,10 @@ class Processor(object):
 			activeProcs.remove(pr)
 
 		del terminated_procs
-		gc.collect()
+		#Force a collection, hopefully free memory from processes
+		gc.collect() 
 				
 	def __sendProc__(self,collection,destroy=False):
-		#self,taskSet,outqu,curproc,destroy,const
 		args = [collection,self._outqu,len(self._activeProcs)+1,destroy,self.const]
 		(taskClass,customargs) = self.getCustomTask()
 		args.extend(customargs)
@@ -308,7 +317,7 @@ class Processor(object):
 
 	@abstractmethod		
 	def getCustomTask(self):
-		#Must return class and dict of customargs
+		#Must return class and list of customargs
 		pass
 
 	@abstractmethod
@@ -324,15 +333,16 @@ class Leviathon(object):
 		self._update = update
 	
 	def run(self):
+		#We spawn processes rather than fork to save memory
 		procs = []
 
 		for p in self._processors:
-			ppr = Process(target=p.run,args=(self._update,))
+			ppr = multiprocessing.Process(target=p.run,args=(self._update,))
 			ppr.start()
 			procs.append(ppr)
 
 		for h in self._handlers:
-			hpr = Process(target=h.listen,args=(self._update,))
+			hpr = multiprocessing.Process(target=h.listen,args=(self._update,))
 			hpr.start()
 			procs.append(hpr)
 
