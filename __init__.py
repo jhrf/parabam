@@ -11,11 +11,7 @@ import gc
 
 import multiprocessing
 from abc import ABCMeta, abstractmethod
-
-from guppy import hpy
 import resource
-
-
 
 class Task(multiprocessing.Process):
 
