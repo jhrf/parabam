@@ -40,7 +40,8 @@ class Task(multiprocessing.Process):
 
 		fin_useage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
-		print "Proc Useage %s (start/finish) : %d / %d" % (self.pid,start_useage,fin_useage)
+		#Uncomment below for memory useage stats
+		#print "Proc Useage %s (start/finish) : %d / %d" % (self.pid,start_useage,fin_useage)
 
 	def __mkTmpName__(self,typ):
 		#self.pid ensures that the temp names are unique.
