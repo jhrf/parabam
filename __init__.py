@@ -116,8 +116,9 @@ class Handler(object):
 		self.handlerExitFunc()
 
 	def __blessingsOutput__(self,outstr):
-		sys.stdout.write("\r" + outstr)
-		sys.stdout.flush()
+		if self._verbose:
+			sys.stdout.write("\r" + outstr)
+			sys.stdout.flush()
 
 	def __formUpdateStr__(self,curproc,stTime):
 		stats = []
