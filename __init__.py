@@ -204,6 +204,7 @@ class Processor(object):
 	
 		self.preProcActivity(self._masterFnm)
 
+		print "MASTERFNM",self._masterFnm
 		masterBam = self.__getMasterBam__(self._masterFnm)
 		collection = []
 		colCount = 0
