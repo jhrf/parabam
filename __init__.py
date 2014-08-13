@@ -73,7 +73,7 @@ class Handler(object):
 		self._stats = {}
 
 		#self._term = blessings.Terminal()
-		self._updateFunc = self.__blessingsOutput__ 
+		self._updateFunc = self.__standarOutput__ 
 
 	def listen(self,update):
 		destroy = False
@@ -111,11 +111,11 @@ class Handler(object):
 				outstr = self.__formUpdateStr__(curproc,stTime)
 				updateFunc(outstr)
 				
-		if self._verbose: print "[Update] All reads processed succesfully."
+		if self._verbose and self._report: updateFunc("\n[Update] All reads processed succesfully.\n")
 		self.periodicAction(iterations)
 		self.handlerExitFunc()
 
-	def __blessingsOutput__(self,outstr):
+	def __standarOutput__(self,outstr):
 		if self._verbose:
 			sys.stdout.write("\r" + outstr)
 			sys.stdout.flush()
@@ -203,8 +203,6 @@ class Processor(object):
 	def run(self,update):
 	
 		self.preProcActivity(self._masterFnm)
-
-		print "MASTERFNM",self._masterFnm
 		masterBam = self.__getMasterBam__(self._masterFnm)
 		collection = []
 		colCount = 0
