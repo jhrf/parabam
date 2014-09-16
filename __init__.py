@@ -186,7 +186,7 @@ class Processor(object):
 	def __init__(self,outqu,const,TaskClass,task_args,debug = False):
 		
 		self._debug = debug
-		self.master_file_path = const.master_file_path
+		self._master_file_path = const.master_file_path
 		self._verbose = const.verbose
 		self._outqu = outqu
 		self._chunk = const.chunk
@@ -204,8 +204,8 @@ class Processor(object):
 	#and divide pertaining to the chromosome that it is aligned to
 	def run(self,update):
 	
-		self.preProcActivity(self.master_file_path)
-		masterBam = self.__getMasterBam__(self.master_file_path)
+		self.preProcActivity(self._master_file_path)
+		masterBam = self.__getMasterBam__(self._master_file_path)
 		collection = []
 		colCount = 0
 

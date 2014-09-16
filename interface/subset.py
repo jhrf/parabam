@@ -116,7 +116,7 @@ class HandlerSubset(parabam.Handler):
 			for merge_count,mT in enumerate(self._merge_types):
 				destroy = True if (src_count == last_source and merge_count == last_mrg) else False
 				self.__addMergeTask__(name=self._filenameOut[src][mT],
-									results=self._mrgStores[src][mT],mrgTyp=mT,
+									results=self._mrgStores[src][mT],merge_type=mT,
 									source=src,total=self._stats[src]["total"],
 									destroy=destroy)
 
@@ -160,10 +160,10 @@ class Interface(parabam.Interface):
 			user_engine = user_engine
 			)
 	
-	def run(self,input_bams,outputs,proc,chunk,verbose,merge_types,user_constants,user_engine):
+	def run(self,input_bams,outputs,proc,chunk,verbose,merge_types,user_constants,user_engine,multi=2):
 
 		if outputs == None or len(outputs) == len(input_bams): 
-			for input_group,output_group in self.__getGroup__(input_bams,outputs):
+			for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
 				
 				quPrim = Queue()
 				quMerg = Queue()
@@ -173,13 +173,8 @@ class Interface(parabam.Interface):
 
 				for mst,src in zip(input_group,output_group):
 					master_file_path[src] = mst
-					if len(merge_types) > 1: 
-						for typ in merge_types:
-							outFiles[src][typ] = "%s/%s_%s.bam" % (self._tempDir,src.replace(".bam",""),typ,)
-					else:
-						outFiles[src][merge_types[0]] = "%s/%s" % (self._tempDir,src,)
-						#This has been removed and the merger now looks after output
-						#ut.create_subset_bam(mst,outFiles[src][merge_types[0]])
+					for typ in merge_types:
+						outFiles[src][typ] = "%s/%s_%s.bam" % (self._tempDir,src.replace(".bam",""),typ,)
 						
 				if verbose: self.__reportFileNames__(outFiles)
 
@@ -217,7 +212,7 @@ class Interface(parabam.Interface):
 			print "[Error] `parabam subset` cannot continue"
 
 	def __reportFileNames__(self,outFiles):
-		print "[Update] parabam will output the following files:"
+		print "[Update] This run will output the following files:"
 		for src,mrgTypDict in outFiles.items():
 			for mrgTyp,outFilePath in mrgTypDict.items():
 				print "\t%s" % (outFilePath.split("/")[-1],)
@@ -236,7 +231,7 @@ class Interface(parabam.Interface):
 					print "\t\t%s" % (alt_filnm,)
 					shutil.move(outFilePath,alt_filnm)
 
-	def __getGroup__(self,bams,names,multi=2):
+	def __getGroup__(self,bams,names,multi):
 		for i in xrange(0,len(bams),multi):
 			yield (bams[i:i+multi],names[i:i+multi])
 
