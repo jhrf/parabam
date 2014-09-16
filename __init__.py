@@ -3,11 +3,9 @@
 import time
 import sys
 import Queue as Queue2
-
-#import blessings
-import pysam
-
 import gc
+
+import pysam
 
 import multiprocessing
 from abc import ABCMeta, abstractmethod
@@ -134,7 +132,7 @@ class Handler(object):
 				stats.append("%s: %d" % (k,self._stats[k]))
 
 		statstr = " ||| ".join(stats)
-		return "\r%s ||| [System] Active Procs: %d | Time: %d " %\
+		return "\r%s || [System] Active Procs: %d | Time: %d " %\
 				(statstr,curproc,self.__secSince__(stTime))
 
 	def __autoHandle__(self,res,deep=None):
@@ -185,10 +183,10 @@ class Processor(object):
 
 	__metaclass__ = ABCMeta
 
-	def __init__(self,outqu,const,debug = False):
+	def __init__(self,outqu,const,TaskClass,task_args,debug = False):
 		
 		self._debug = debug
-		self._masterFnm = const.masterFnm
+		self.master_file_path = const.master_file_path
 		self._verbose = const.verbose
 		self._outqu = outqu
 		self._chunk = const.chunk
@@ -196,14 +194,18 @@ class Processor(object):
 		self._proc = const.proc
 		self._tempDir = const.tempDir
 		self.const = const
+		#class which we wish to run on each read
+		self._TaskClass = TaskClass
+		#any additional arguments we wish to pass to the task
+		self._task_args = task_args 
 		self._activeProcs = []
 
 	#Find data pertaining to assocd and all reads 
 	#and divide pertaining to the chromosome that it is aligned to
 	def run(self,update):
 	
-		self.preProcActivity(self._masterFnm)
-		masterBam = self.__getMasterBam__(self._masterFnm)
+		self.preProcActivity(self.master_file_path)
+		masterBam = self.__getMasterBam__(self.master_file_path)
 		collection = []
 		colCount = 0
 
@@ -284,14 +286,13 @@ class Processor(object):
 				
 	def __sendProc__(self,collection,destroy=False):
 		args = [collection,self._outqu,len(self._activeProcs)+1,destroy,self.const]
-		(taskClass,customargs) = self.getCustomTask()
-		args.extend(customargs)
-		task = taskClass(*args)
+		args.extend(self._task_args)
+		task = self._TaskClass(*args)
 		task.start()
 		self._activeProcs.append(task)
 
-	def __getMasterBam__(self,masterFnm):
-		return pysam.Samfile(masterFnm,"rb") #Open telbam for analysis
+	def __getMasterBam__(self,master_file_path):
+		return pysam.Samfile(master_file_path,"rb") #Open telbam for analysis
 
 	#Should be over written if we don't want data from BAM file.
 	def __getNextAlig__(self,masterBam):
@@ -310,11 +311,6 @@ class Processor(object):
 
 	@abstractmethod
 	def preProcActivity(self,masterBam):
-		pass
-
-	@abstractmethod		
-	def getCustomTask(self):
-		#Must return class and list of customargs
 		pass
 
 	@abstractmethod
@@ -370,11 +366,10 @@ class Interface(object):
 
 class Const(object):
 	
-	def __init__(self,outFiles,tempDir,masterFnm,thresh,verbose,chunk,proc,**kwargs):
+	def __init__(self,outFiles,tempDir,master_file_path,verbose,chunk,proc,**kwargs):
 		self.outFiles = outFiles
 		self.tempDir = tempDir
-		self.masterFnm = masterFnm
-		self.thresh = thresh
+		self.master_file_path = master_file_path
 		self.verbose = verbose
 		self.chunk = chunk
 		self.proc = proc
