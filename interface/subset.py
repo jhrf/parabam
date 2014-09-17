@@ -34,15 +34,18 @@ class TaskSubset(parabam.Task):
 			temp_file_objects[mT]  = pysam.Samfile(temp_file_names[mT],"wb",template=master)
 			counts[mT] = 0
 
+		#Function and variable aliases -----
+		decision = self.single_subset if len(self._merge_types) == 1 else self.multi_subset
 		engine = self.const.user_engine
 		user_constants = self.const.user_constants
+		#-----------------------------------
 
 		for alig in iter(self._taskSet):
 			#If true, we will add this read to the output file
-			if engine(alig,user_constants,master):
-				#As this is a simpflified subsetter, we only have one merge_type
-				temp_file_objects[self._merge_types[0]].write(alig) #Write telomeric read to file
-				counts[self._merge_types[0]] += 1
+			read_decision = decision(engine(alig,user_constants,master))
+			if not read_decision == -1:
+				temp_file_objects[self._merge_types[read_decision]].write(alig)
+				counts[self._merge_types[read_decision]] += 1
 
 		master.close() #Close the master bamfile
 		map(lambda (mT,fil): fil.close(),temp_file_objects.items()) #close all the other bams
@@ -53,6 +56,13 @@ class TaskSubset(parabam.Task):
 		results["counts"] = counts
 
 		return results
+
+	def multi_subset(self,output):
+		return output
+
+	def single_subset(self,output):
+		#if false -1 if true 0
+		return int(output) - 1
 		
 class HandlerSubset(parabam.Handler):
 
@@ -144,23 +154,32 @@ class Interface(parabam.Interface):
 
 		cmd_args = parser.parse_args()
 
+		verbose = cmd_args.v
 		module = __import__(cmd_args.instruc, fromlist=[''])
 		user_engine = module.engine
 		user_constants = {}
 		module.set_constants(user_constants)
+
+		if hasattr(module,"get_subset_types"):
+			if verbose: 
+				print "[Status] Multiple subset type identified"
+			merge_types = module.get_subset_types()
+		else:
+			merge_types = ["subset"]
 
 		self.run(
 			input_bams=cmd_args.input,
 			outputs= cmd_args.output,
 			proc= cmd_args.p,
 			chunk= cmd_args.c,
-			verbose= cmd_args.v,
-			merge_types= ["subset"],
+			verbose= verbose,
+			merge_types= merge_types,
 			user_constants = user_constants,
-			user_engine = user_engine
+			user_engine = user_engine,
+			engine_is_class = False
 			)
 	
-	def run(self,input_bams,outputs,proc,chunk,verbose,merge_types,user_constants,user_engine,multi=2):
+	def run(self,input_bams,outputs,proc,chunk,verbose,merge_types,user_constants,user_engine,engine_is_class,multi=4):
 
 		if outputs == None or len(outputs) == len(input_bams): 
 			for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
@@ -193,10 +212,22 @@ class Interface(parabam.Interface):
 									user_engine=user_engine)
 
 				for src in output_group:
-					procrs.append(ProcessorSubset(outqu=quPrim,
+
+					if engine_is_class:
+						if not issubclass(user_engine,TaskSubset):
+							raise Exception("[Error]\tThe class provided to parabam multiset must be a subclass of\n"\
+											"\t\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
+						cur_args = list(user_constants)
+						cur_args.append(src)
+						procrs.append(ProcessorSubset(outqu=quPrim,
 												const=const,
-												TaskClass=TaskSubset,
-												task_args=[src]))
+												TaskClass=user_engine,
+												task_args=cur_args))
+					else:
+						procrs.append(ProcessorSubset(outqu=quPrim,
+													const=const,
+													TaskClass=TaskSubset,
+													task_args=[src]))
 
 				handls.append(HandlerSubset(inqu=quPrim,outqu=quMerg,const=const))
 				handls.append(merger.HandlerMerge(inqu=quMerg,const=const))
