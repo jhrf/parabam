@@ -10,8 +10,12 @@ from multiprocessing import Queue
 from parabam.interface import util as ut
 from parabam.interface import merger
 
+from abc import ABCMeta, abstractmethod
 
 class TaskSubset(parabam.Task):
+
+	__metaclass__ = ABCMeta
+
 	def __init__(self,taskSet,outqu,curproc,destroy,const,source):
 		super(TaskSubset, self).__init__(taskSet=taskSet,
 										outqu=outqu,
@@ -20,35 +24,27 @@ class TaskSubset(parabam.Task):
 										const=const)
 		self._source = source
 		self._master_file_path = const.master_file_path[self._source]
-		self._merge_types = const.merge_types
-		
+		self._subset_types = const.subset_types
+		self._counts = {}
+		self._temp_file_names = {}
+		self._temp_file_objects = {}
+
 	def produceResultsDict(self):
 		master = pysam.Samfile(self._master_file_path,"rb")
 
-		temp_file_names = {}
-		temp_file_objects = {}
-		counts = {}
+		temp_file_names = self._temp_file_names
+		temp_file_objects = self._temp_file_objects
+		counts = self._counts
 
-		for mT in self._merge_types:
-			temp_file_names[mT] = self.__mkTmpName__(mT)
-			temp_file_objects[mT]  = pysam.Samfile(temp_file_names[mT],"wb",template=master)
-			counts[mT] = 0
+		for subset in self._subset_types:
+			temp_file_names[subset] = self.__mkTmpName__(subset)
+			temp_file_objects[subset]  = pysam.Samfile(temp_file_names[subset],"wb",template=master)
+			counts[subset] = 0
 
-		#Function and variable aliases -----
-		decision = self.single_subset if len(self._merge_types) == 1 else self.multi_subset
-		engine = self.const.user_engine
-		user_constants = self.const.user_constants
-		#-----------------------------------
-
-		for alig in iter(self._taskSet):
-			#If true, we will add this read to the output file
-			read_decision = decision(engine(alig,user_constants,master))
-			if not read_decision == -1:
-				temp_file_objects[self._merge_types[read_decision]].write(alig)
-				counts[self._merge_types[read_decision]] += 1
+		self.handle_task_set(self._taskSet,master)
 
 		master.close() #Close the master bamfile
-		map(lambda (mT,fil): fil.close(),temp_file_objects.items()) #close all the other bams
+		map(lambda (subset,fil): fil.close(),temp_file_objects.items()) #close all the other bams
 
 		results = {}
 		results["source"] = self._source
@@ -57,12 +53,57 @@ class TaskSubset(parabam.Task):
 
 		return results
 
-	def multi_subset(self,output):
-		return output
+	def write_to_subset_bam(self,subset_type,read):
+		self._counts[subset_type] += 1
+		self._temp_file_objects[subset_type].write(read)
 
-	def single_subset(self,output):
-		#if false -1 if true 0
-		return int(output) - 1
+	@abstractmethod
+	def handle_task_set(self,task_set,master):
+		pass
+
+class MultiSet(TaskSubset):
+	def __init__(self,taskSet,outqu,curproc,destroy,const,source):
+		super(MultiSet, self).__init__(taskSet=taskSet,
+										outqu=outqu,
+										curproc=curproc,
+										destroy=destroy,
+										const=const,
+										source=source)
+	
+	def handle_task_set(self,task_set,master):
+
+		engine = self.const.user_engine
+		user_constants = self.const.user_constants
+		subset_write = self.write_to_subset_bam
+		subset_types = self.const.subset_types
+
+		for read in task_set:
+			subset_decision = engine(read,user_constants,master)
+			if type(subset_decision) == int:
+				if not subset_decision == -1:
+					subset_write(subset_types[subset_decision],read)
+			elif type(subset_decision) == tuple:
+				for subset in subset_decision:
+					subset_write(subset_types[subset],read)					
+
+class SingleSet(TaskSubset):
+	def __init__(self,taskSet,outqu,curproc,destroy,const,source):
+		super(SingleSet, self).__init__(taskSet=taskSet,
+										outqu=outqu,
+										curproc=curproc,
+										destroy=destroy,
+										const=const,
+										source=source)
+	
+	def handle_task_set(self,task_set,master):
+		engine = self.const.user_engine
+		user_constants = self.const.user_constants
+		subset_write = self.write_to_subset_bam
+		subset_types = self.const.subset_types
+
+		for read in task_set:
+			if engine(read,user_constants,master):
+				subset_write(subset_types[0],read)
 		
 class HandlerSubset(parabam.Handler):
 
@@ -70,13 +111,13 @@ class HandlerSubset(parabam.Handler):
 		super(HandlerSubset,self).__init__(inqu,const,maxDestroy=len(const.sources))
 
 		self._sources = const.sources
-		self._merge_types = const.merge_types
+		self._subset_types = const.subset_types
 
 		#Setup stores and connection to merge proc
 		self._mrgStores = {}
 		for src in self._sources:
 			self._mrgStores[src] = {} 
-			for mT in self._merge_types:
+			for mT in self._subset_types:
 				self._mrgStores[src][mT] = []
 
 		self._mergequeue = outqu
@@ -87,7 +128,7 @@ class HandlerSubset(parabam.Handler):
 		source = resDict["source"]
 		self.__autoHandle__(resDict,source)
 
-		for mT in self._merge_types:
+		for mT in self._subset_types:
 			if resDict["counts"][mT] > 0:
 				self._mrgStores[source][mT].append(resDict["filnms"][mT])
 			else:
@@ -95,21 +136,21 @@ class HandlerSubset(parabam.Handler):
 
 	def periodicAction(self,iterations):
 		for src in self._sources:
-			for mT in self._merge_types:
+			for mT in self._subset_types:
 				self.__testMergeStore__(self._filenameOut[src][mT],self._mrgStores[src][mT],src,mT)
 
 	def __testMergeStore__(self,outnm,store,src,mT):
 		if len(store) > 30:
 			sys.stdout.flush()
-			self.__addMergeTask__(name=outnm,results=store,merge_type=mT,source=src,total=self._stats[src]["total"])
+			self.__addMergeTask__(name=outnm,results=store,subset_type=mT,source=src,total=self._stats[src]["total"])
 			self._mergecount += 1
 			#Remove the temp file which has been merged
 			store[:] = [] #Wipe the store clean, these have been merged
 			sys.stdout.flush()
 
-	def __addMergeTask__(self,name,results,merge_type,source,total,destroy=False):
+	def __addMergeTask__(self,name,results,subset_type,source,total,destroy=False):
 		res = merger.ResultsMerge(name=name,results=list(results),
-							merge_type=merge_type,source=source,destroy=destroy,total=total)
+							subset_type=subset_type,source=source,destroy=destroy,total=total)
 		self._mergequeue.put(res)
 
 	def __totalSum__(self):
@@ -120,13 +161,13 @@ class HandlerSubset(parabam.Handler):
 		self._updateFunc("[Status] Waiting for merge operation to finish...\n")
 
 		last_source = len(self._sources) - 1
-		last_mrg = len(self._merge_types) - 1
+		last_mrg = len(self._subset_types) - 1
 
 		for src_count,src in enumerate(self._sources):
-			for merge_count,mT in enumerate(self._merge_types):
+			for merge_count,mT in enumerate(self._subset_types):
 				destroy = True if (src_count == last_source and merge_count == last_mrg) else False
 				self.__addMergeTask__(name=self._filenameOut[src][mT],
-									results=self._mrgStores[src][mT],merge_type=mT,
+									results=self._mrgStores[src][mT],subset_type=mT,
 									source=src,total=self._stats[src]["total"],
 									destroy=destroy)
 
@@ -163,9 +204,9 @@ class Interface(parabam.Interface):
 		if hasattr(module,"get_subset_types"):
 			if verbose: 
 				print "[Status] Multiple subset type identified"
-			merge_types = module.get_subset_types()
+			subset_types = module.get_subset_types()
 		else:
-			merge_types = ["subset"]
+			subset_types = ["subset"]
 
 		self.run(
 			input_bams=cmd_args.input,
@@ -173,13 +214,13 @@ class Interface(parabam.Interface):
 			proc= cmd_args.p,
 			chunk= cmd_args.c,
 			verbose= verbose,
-			merge_types= merge_types,
+			subset_types= subset_types,
 			user_constants = user_constants,
 			user_engine = user_engine,
 			engine_is_class = False
 			)
 	
-	def run(self,input_bams,outputs,proc,chunk,verbose,merge_types,user_constants,user_engine,engine_is_class,multi=4):
+	def run(self,input_bams,outputs,proc,chunk,verbose,subset_types,user_constants,user_engine,engine_is_class,multi=4):
 
 		if outputs == None or len(outputs) == len(input_bams): 
 			for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
@@ -192,7 +233,7 @@ class Interface(parabam.Interface):
 
 				for mst,src in zip(input_group,output_group):
 					master_file_path[src] = mst
-					for typ in merge_types:
+					for typ in subset_types:
 						outFiles[src][typ] = "%s/%s_%s.bam" % (self._tempDir,src.replace(".bam",""),typ,)
 						
 				if verbose: self.__reportFileNames__(outFiles)
@@ -205,14 +246,13 @@ class Interface(parabam.Interface):
 									master_file_path=master_file_path,
 									chunk=chunk,proc=(proc // len(input_group)),
 									verbose=verbose,thresh=0,
-									merge_types=merge_types,
+									subset_types=subset_types,
 									sources=output_group,
 									exe_dir=self._exe_dir,
 									user_constants=user_constants,
 									user_engine=user_engine)
 
 				for src in output_group:
-
 					if engine_is_class:
 						if not issubclass(user_engine,TaskSubset):
 							raise Exception("[Error]\tThe class provided to parabam multiset must be a subclass of\n"\
@@ -224,9 +264,13 @@ class Interface(parabam.Interface):
 												TaskClass=user_engine,
 												task_args=cur_args))
 					else:
+						if len(subset_types) == 1:
+							run_class = SingleSet
+						else:
+							run_class = MultiSet
 						procrs.append(ProcessorSubset(outqu=quPrim,
 													const=const,
-													TaskClass=TaskSubset,
+													TaskClass=run_class,
 													task_args=[src]))
 
 				handls.append(HandlerSubset(inqu=quPrim,outqu=quMerg,const=const))

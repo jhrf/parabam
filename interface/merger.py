@@ -20,9 +20,9 @@ from itertools import izip
 
 
 class ResultsMerge(parabam.Results):
-	def __init__(self,name,results,merge_type,source,destroy,total):
+	def __init__(self,name,results,subset_type,source,destroy,total):
 		super(ResultsMerge,self).__init__(name,results,destroy,total)
-		self.merge_type = merge_type
+		self.subset_type = subset_type
 		self.source = source
 
 class HandlerMerge(parabam.Handler):
@@ -31,7 +31,7 @@ class HandlerMerge(parabam.Handler):
 		super(HandlerMerge,self).__init__(inqu,const,report=False)
 		self._total = Counter()
 		self._sources = const.sources
-		self._merge_types = const.merge_types
+		self._subset_types = const.subset_types
 		self._out_file_objects = self.__get_out_file_objects__()
 
 	def __get_out_file_objects__(self):
@@ -40,7 +40,7 @@ class HandlerMerge(parabam.Handler):
 		for src in self._sources:
 			master = pysam.Samfile(self.const.master_file_path[src],"rb")
 			file_objects[src] = {}
-			for mrg in self._merge_types:
+			for mrg in self._subset_types:
 				cur_file_obj = pysam.Samfile(out_file_paths[src][mrg],"wb",template=master)
 				file_objects[src][mrg] = cur_file_obj
 			master.close()
@@ -51,15 +51,15 @@ class HandlerMerge(parabam.Handler):
 
 	def newResultAction(self,newResult,**kwargs):
 		#Handle the result. Result will always be of type framework.Result
-		merge_type = newResult.merge_type
+		subset_type = newResult.subset_type
 		source = newResult.source
-		self._total[merge_type] = newResult.curproc #hack to record size of parent BAM
+		self._total[subset_type] = newResult.curproc #hack to record size of parent BAM
 
 		if len(newResult.results) > 0: #Check that there are results to merge
 			for result_path in newResult.results:
 				result_obj = pysam.Samfile(result_path,"rb")
 				for alig in result_obj.fetch(until_eof=True):
-					self._out_file_objects[source][merge_type].write(alig)
+					self._out_file_objects[source][subset_type].write(alig)
 				result_obj.close()
 				os.remove(result_path)				
 
