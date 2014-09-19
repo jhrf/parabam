@@ -222,69 +222,72 @@ class Interface(parabam.Interface):
 	
 	def run(self,input_bams,outputs,proc,chunk,verbose,subset_types,user_constants,user_engine,engine_is_class,multi=4):
 
-		if outputs == None or len(outputs) == len(input_bams): 
-			for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
-				
-				quPrim = Queue()
-				quMerg = Queue()
+		if not outputs or not len(outputs) == len(input_bams):
+			print "[Update] Output files will use automatic default naming scheme \n"\
+			"\t\tTo specify output names ensure an output name is provided for each input BAM"
+			outputs = [ ut.get_bam_basename(b) for b in input_bams ]
 
-				outFiles = dict([(src,{}) for src in output_group])
-				master_file_path = {}
+		#AT SOME POINT WE SHOULD HANDLE UNSORTED BAMS. EITHER HERE OR AT THE PROCESSOR
 
-				for mst,src in zip(input_group,output_group):
-					master_file_path[src] = mst
-					for typ in subset_types:
-						outFiles[src][typ] = "%s/%s_%s.bam" % (self._tempDir,src.replace(".bam",""),typ,)
-						
-				if verbose: self.__reportFileNames__(outFiles)
+		for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
+			
+			quPrim = Queue()
+			quMerg = Queue()
 
-				procrs = []
-				handls = []
+			outFiles = dict([(src,{}) for src in output_group])
+			master_file_path = {}
 
-				const = parabam.Const(outFiles=outFiles,
-									tempDir=self._tempDir,
-									master_file_path=master_file_path,
-									chunk=chunk,proc=(proc // len(input_group)),
-									verbose=verbose,thresh=0,
-									subset_types=subset_types,
-									sources=output_group,
-									exe_dir=self._exe_dir,
-									user_constants=user_constants,
-									user_engine=user_engine)
+			for mst,src in zip(input_group,output_group):
+				master_file_path[src] = mst
+				for typ in subset_types:
+					outFiles[src][typ] = "%s/%s_%s.bam" % (self._tempDir,src.replace(".bam",""),typ,)
+					
+			if verbose: self.__reportFileNames__(outFiles)
 
-				for src in output_group:
-					if engine_is_class:
-						if not issubclass(user_engine,TaskSubset):
-							raise Exception("[Error]\tThe class provided to parabam multiset must be a subclass of\n"\
-											"\t\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
-						cur_args = list(user_constants)
-						cur_args.append(src)
-						procrs.append(ProcessorSubset(outqu=quPrim,
-												const=const,
-												TaskClass=user_engine,
-												task_args=cur_args))
+			procrs = []
+			handls = []
+
+			const = parabam.Const(outFiles=outFiles,
+								tempDir=self._tempDir,
+								master_file_path=master_file_path,
+								chunk=chunk,proc=(proc // len(input_group)),
+								verbose=verbose,thresh=0,
+								subset_types=subset_types,
+								sources=output_group,
+								exe_dir=self._exe_dir,
+								user_constants=user_constants,
+								user_engine=user_engine)
+
+			for src in output_group:
+				if engine_is_class:
+					if not issubclass(user_engine,TaskSubset):
+						raise Exception("[Error]\tThe class provided to parabam multiset must be a subclass of\n"\
+										"\t\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
+					cur_args = list(user_constants)
+					cur_args.append(src)
+					procrs.append(ProcessorSubset(outqu=quPrim,
+											const=const,
+											TaskClass=user_engine,
+											task_args=cur_args))
+				else:
+					if len(subset_types) == 1:
+						run_class = SingleSet
 					else:
-						if len(subset_types) == 1:
-							run_class = SingleSet
-						else:
-							run_class = MultiSet
-						procrs.append(ProcessorSubset(outqu=quPrim,
-													const=const,
-													TaskClass=run_class,
-													task_args=[src]))
+						run_class = MultiSet
+					procrs.append(ProcessorSubset(outqu=quPrim,
+												const=const,
+												TaskClass=run_class,
+												task_args=[src]))
 
-				handls.append(HandlerSubset(inqu=quPrim,outqu=quMerg,const=const))
-				handls.append(merger.HandlerMerge(inqu=quMerg,const=const))
+			handls.append(HandlerSubset(inqu=quPrim,outqu=quMerg,const=const))
+			handls.append(merger.HandlerMerge(inqu=quMerg,const=const))
 
-				lev = parabam.Leviathon(procrs,handls,100000)
-				lev.run()
+			lev = parabam.Leviathon(procrs,handls,100000)
+			lev.run()
 
-				#Move the complete telbams out of the tempdir to the working dir
-				#Only do this if we custom generated the file locations.
-				self.__moveOutputFiles__(outFiles)
-		else:
-			print "[Error] Please provide the same amount of output names as input files"
-			print "[Error] `parabam subset` cannot continue"
+			#Move the complete telbams out of the tempdir to the working dir
+			#Only do this if we custom generated the file locations.
+			self.__moveOutputFiles__(outFiles)
 
 	def __reportFileNames__(self,outFiles):
 		print "[Update] This run will output the following files:"

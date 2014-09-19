@@ -25,6 +25,12 @@ def default_parser():
 
 	return parser
 
+def get_bam_basename(path):
+	base = os.path.basename(path)
+	if "." in base:
+		base = base.rpartition(".")[0]
+	return base
+
 def create_dirs(dirs):
 	for i in dirs:
 		if i == "": continue
