@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+#main
+import sys
+import argparse
+import textwrap
+import signal
+import pdb
+import time
+import traceback
+import os
+
+from parabam.interface import util as ut
+
+#The following imports are a for pyinstaller. Don't remove
+import numpy 
+
+def keyboard_handler(sig, frame):#Catch keyboard interupt and end processors
+	sys.stdout.write("\r[ERROR] parabam interrupted by user")
+	sys.exit(0)
+
+#If invoked from the command line:
+if __name__ == "__main__":
+
+	signal.signal(signal.SIGINT, keyboard_handler) #Handle KeyboardInterrupt gracefully
+
+	argsLen = len(sys.argv) >= 2
+
+	progs = {"stat":"stat",
+			"subset":"subset",
+			"multi":""}
+
+	printInfo = False
+
+	if argsLen:
+
+		exe_dir,filnm = os.path.split(sys.argv[0])
+		command = sys.argv[1]
+
+		tempDir = "parabam-temp-%d" %(int(time.time()),)
+		ut.create_dirs([tempDir])
+
+		if command in progs:
+			#Load the command using the command line
+			module = __import__(progs[command], fromlist=[''])
+			sys.argv = sys.argv[1:] #Remove command from arguments.
+			try:
+				interface = module.Interface(tempDir,exe_dir)
+				interface.run_cmd(interface.getParser())
+			except SystemExit:
+				print "-"
+				print "[Status] parabam is quitting gracefully %d\n" % (time.time(),)
+			except BaseException as exception:
+				print "-"
+				print "[ERROR] parabam stopped unexpecedtly, sorry!"
+				traceback.print_exception(*sys.exc_info())
+				raise
+			ut.die_gracefully(tempDir)
+
+		else:
+			print "\nCommand not recognised. Refer to manual below:\n"
+			printInfo = True
+	else:
+		printInfo = True
+	
+	if printInfo:
+		print textwrap.dedent('''\
+		
+		parabam
+		----------------------------------------------------------------
+
+		About: 
+			Parabam - analyse bam file in parallel
+
+		Usage:
+			parabam <command> [options] instruction:{Python} input:{BAM} output:{BAM/CSV}
+
+		Command:
+			stat\t Genereate stats regarding the BAM file
+			subset\t Create a subsetted BAM file
+			multi\t Create multiple subsetted BAM files, each fulfilling separate criteria
+
+    	'''.expandtabs())
