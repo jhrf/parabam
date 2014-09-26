@@ -140,7 +140,9 @@ class HandlerSubset(parabam.Handler):
 				self.__testMergeStore__(self._filenameOut[src][mT],self._mrgStores[src][mT],src,mT)
 
 	def __testMergeStore__(self,outnm,store,src,mT):
-		if len(store) > 30:
+		if len(store) > 10:
+			print "**"
+			print "store size: %d | adding merge: %d " % (len(store),self._mergecount,)
 			sys.stdout.flush()
 			self.__addMergeTask__(name=outnm,results=store,subset_type=mT,source=src,total=self._stats[src]["total"])
 			self._mergecount += 1
@@ -150,7 +152,7 @@ class HandlerSubset(parabam.Handler):
 
 	def __addMergeTask__(self,name,results,subset_type,source,total,destroy=False):
 		res = merger.ResultsMerge(name=name,results=list(results),
-							subset_type=subset_type,source=source,destroy=destroy,total=total)
+							subset_type=subset_type,source=source,destroy=destroy,total=total,time_added=time.time())
 		self._mergequeue.put(res)
 
 	def __totalSum__(self):

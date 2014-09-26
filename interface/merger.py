@@ -20,10 +20,11 @@ from itertools import izip
 
 
 class ResultsMerge(parabam.Results):
-	def __init__(self,name,results,subset_type,source,destroy,total):
+	def __init__(self,name,results,subset_type,source,destroy,total,time_added):
 		super(ResultsMerge,self).__init__(name,results,destroy,total)
 		self.subset_type = subset_type
 		self.source = source
+		self.time_added = time_added
 
 class HandlerMerge(parabam.Handler):
 
@@ -33,6 +34,8 @@ class HandlerMerge(parabam.Handler):
 		self._sources = const.sources
 		self._subset_types = const.subset_types
 		self._out_file_objects = self.__get_out_file_objects__()
+		self._merged = 0
+		self._chilling = time.time()
 
 	def __get_out_file_objects__(self):
 		file_objects = {}
@@ -56,12 +59,17 @@ class HandlerMerge(parabam.Handler):
 		self._total[subset_type] = newResult.curproc #hack to record size of parent BAM
 
 		if len(newResult.results) > 0: #Check that there are results to merge
+			print "--"
+			print "since added to queue: %d | since last merge operation: %d | now merging: %d" % \
+			(int(time.time() - newResult.time_added),int(time.time() - self._chilling),self._merged)
 			for result_path in newResult.results:
 				result_obj = pysam.Samfile(result_path,"rb")
 				for alig in result_obj.fetch(until_eof=True):
 					self._out_file_objects[source][subset_type].write(alig)
 				result_obj.close()
-				os.remove(result_path)				
+				os.remove(result_path)	
+			self._merged += 1		
+			self._chilling = time.time()
 
 	def handlerExitFunc(self,**kwargs):
 		#When the handler finishes, add the total number of reads proc'd
