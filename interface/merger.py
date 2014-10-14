@@ -59,8 +59,8 @@ class HandlerMerge(parabam.Handler):
 		self._total[subset_type] = newResult.curproc #hack to record size of parent BAM
 
 		if len(newResult.results) > 0: #Check that there are results to merge
-			print "--"
-			print "since added to queue: %d | since last merge operation: %d | now merging: %d" % \
+			#print "--"
+			#print "since added to queue: %d | since last merge operation: %d | now merging: %d" % \
 			(int(time.time() - newResult.time_added),int(time.time() - self._chilling),self._merged)
 			for result_path in newResult.results:
 				result_obj = pysam.Samfile(result_path,"rb")

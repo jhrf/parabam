@@ -141,8 +141,6 @@ class HandlerSubset(parabam.Handler):
 
 	def __testMergeStore__(self,outnm,store,src,mT):
 		if len(store) > 10:
-			print "**"
-			print "store size: %d | adding merge: %d " % (len(store),self._mergecount,)
 			sys.stdout.flush()
 			self.__addMergeTask__(name=outnm,results=store,subset_type=mT,source=src,total=self._stats[src]["total"])
 			self._mergecount += 1
@@ -265,8 +263,7 @@ class Interface(parabam.Interface):
 					if not issubclass(user_engine,TaskSubset):
 						raise Exception("[Error]\tThe class provided to parabam multiset must be a subclass of\n"\
 										"\t\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
-					cur_args = list(user_constants)
-					cur_args.append(src)
+					cur_args = [src]
 					procrs.append(ProcessorSubset(outqu=quPrim,
 											const=const,
 											TaskClass=user_engine,
