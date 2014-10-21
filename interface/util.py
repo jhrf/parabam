@@ -19,7 +19,7 @@ def default_parser():
 		'to carry out on the input BAM.')
 	parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
 		,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
-	parser.add_argument('--output','-o',metavar='OUTPUT', nargs='+',required=True
+	parser.add_argument('--output','-o',metavar='OUTPUT', nargs='+',required=False
 		,help='The name of the output that we wish to create. Must be same amount of space \
 		separated entries as INPUT.')
 

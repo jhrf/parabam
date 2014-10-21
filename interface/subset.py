@@ -223,7 +223,7 @@ class Interface(parabam.Interface):
 	def run(self,input_bams,outputs,proc,chunk,verbose,subset_types,user_constants,user_engine,engine_is_class,multi=4):
 
 		if not outputs or not len(outputs) == len(input_bams):
-			print "[Update] Output files will use automatic default naming scheme \n"\
+			print "[Warning] Output files will use automatic default naming scheme \n"\
 			"\t\tTo specify output names ensure an output name is provided for each input BAM"
 			outputs = [ ut.get_bam_basename(b) for b in input_bams ]
 
@@ -261,8 +261,8 @@ class Interface(parabam.Interface):
 			for src in output_group:
 				if engine_is_class:
 					if not issubclass(user_engine,TaskSubset):
-						raise Exception("[Error]\tThe class provided to parabam multiset must be a subclass of\n"\
-										"\t\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
+						raise Exception("[ERROR]\tThe class provided to parabam multiset must be a subclass of\n"\
+										"\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
 					cur_args = [src]
 					procrs.append(ProcessorSubset(outqu=quPrim,
 											const=const,
