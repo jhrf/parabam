@@ -218,16 +218,25 @@ class Processor(object):
 		bam_iterator = self.__getNextAlig__(masterBam) if not self._debug \
 							else self.__getNextAligDebug__(masterBam)
 
+		collect_time = time.time()
+
 		for i,alig in enumerate(bam_iterator):
 
 			addToCollection(masterBam,alig,collection)
 			colCount += 1
 
 			if colCount == self._chunk:
+				'''print "+"
+				print "+ Time: %d Name#1: %s Name#2 %s Name#N %s" % (int(time.time() - collect_time),
+																	collection[0].qname,
+																	collection[1].qname,
+																	collection[-1].qname)'''
 				self.__waitOnActiveProc__(self._activeProcs,self._proc-2) # -2 for proc and handler 
 				sendProc(collection)					 				   # already running
 				collection = []
 				colCount = 0
+
+				collect_time = time.time()
 
 		self.__waitOnActiveProc__(self._activeProcs,0)
 		sendProc(collection,destroy=True)
