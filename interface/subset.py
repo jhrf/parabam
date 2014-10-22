@@ -117,8 +117,8 @@ class HandlerSubset(parabam.Handler):
 		self._mrgStores = {}
 		for src in self._sources:
 			self._mrgStores[src] = {} 
-			for mT in self._subset_types:
-				self._mrgStores[src][mT] = []
+			for subset in self._subset_types:
+				self._mrgStores[src][subset] = []
 
 		self._mergequeue = outqu
 		self._mergecount = 0
@@ -128,21 +128,21 @@ class HandlerSubset(parabam.Handler):
 		source = resDict["source"]
 		self.__autoHandle__(resDict,source)
 
-		for mT in self._subset_types:
-			if resDict["counts"][mT] > 0:
-				self._mrgStores[source][mT].append(resDict["filnms"][mT])
+		for subset in self._subset_types:
+			if resDict["counts"][subset] > 0:
+				self._mrgStores[source][subset].append(resDict["filnms"][subset])
 			else:
-				os.remove(resDict["filnms"][mT])
+				os.remove(resDict["filnms"][subset])
 
 	def periodicAction(self,iterations):
 		for src in self._sources:
-			for mT in self._subset_types:
-				self.__testMergeStore__(self._filenameOut[src][mT],self._mrgStores[src][mT],src,mT)
+			for subset in self._subset_types:
+				self.__testMergeStore__(self._filenameOut[src][subset],self._mrgStores[src][subset],src,subset)
 
-	def __testMergeStore__(self,outnm,store,src,mT):
+	def __testMergeStore__(self,outnm,store,src,subset):
 		if len(store) > 10:
 			sys.stdout.flush()
-			self.__addMergeTask__(name=outnm,results=store,subset_type=mT,source=src,total=self._stats[src]["total"])
+			self.__addMergeTask__(name=outnm,results=store,subset_type=subset,source=src,total=self._stats[src]["total"])
 			self._mergecount += 1
 			#Remove the temp file which has been merged
 			store[:] = [] #Wipe the store clean, these have been merged
@@ -287,30 +287,6 @@ class Interface(parabam.Interface):
 			#Move the complete telbams out of the tempdir to the working dir
 			#Only do this if we custom generated the file locations.
 			self.__moveOutputFiles__(outFiles)
-
-	def __reportFileNames__(self,outFiles):
-		print "[Update] This run will output the following files:"
-		for src,mrgTypDict in outFiles.items():
-			for mrgTyp,outFilePath in mrgTypDict.items():
-				print "\t%s" % (outFilePath.split("/")[-1],)
-		print ""
-
-	def __moveOutputFiles__(self,outFiles):
-		for src, mrgTypDict in outFiles.items():
-			for mrgTyp,outFilePath in mrgTypDict.items():
-				try:
-					shutil.move(outFilePath,"./") #./ being the current working dir
-				except shutil.Error,e:
-					alt_filnm = "./%s_%s_%d.bam" % (src,mrgTyp,time.time()) 
-					print "[Error] Output file may already exist, you may not" \
-					"have correct permissions for this file"
-					print "[Status]Trying to create using unique filename:"
-					print "\t\t%s" % (alt_filnm,)
-					shutil.move(outFilePath,alt_filnm)
-
-	def __getGroup__(self,bams,names,multi):
-		for i in xrange(0,len(bams),multi):
-			yield (bams[i:i+multi],names[i:i+multi])
 
 	def getParser(self):
 		#argparse imported in ./interface/parabam 

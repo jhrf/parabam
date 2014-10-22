@@ -362,6 +362,30 @@ class Interface(object):
 		self._tempDir = tempDir
 		self._exe_dir = exe_dir
 
+	def __reportFileNames__(self,outFiles):
+		print "[Update] This run will output the following files:"
+		for src,mrgTypDict in outFiles.items():
+			for mrgTyp,outFilePath in mrgTypDict.items():
+				print "\t%s" % (outFilePath.split("/")[-1],)
+		print ""
+
+	def __moveOutputFiles__(self,outFiles):
+		for src, mrgTypDict in outFiles.items():
+			for mrgTyp,outFilePath in mrgTypDict.items():
+				try:
+					shutil.move(outFilePath,"./") #./ being the current working dir
+				except shutil.Error,e:
+					alt_filnm = "./%s_%s_%d.bam" % (src,mrgTyp,time.time()) 
+					print "[Error] Output file may already exist, you may not" \
+					"have correct permissions for this file"
+					print "[Status]Trying to create using unique filename:"
+					print "\t\t%s" % (alt_filnm,)
+					shutil.move(outFilePath,alt_filnm)
+
+	def __getGroup__(self,bams,names,multi):
+		for i in xrange(0,len(bams),multi):
+			yield (bams[i:i+multi],names[i:i+multi])
+
 	@abstractmethod
 	def run_cmd(self,parser):
 		#This is usualy just a function that
