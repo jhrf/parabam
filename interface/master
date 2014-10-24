@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
 	progs = {"stat":"stat",
 			"subset":"subset",
-			"multi":""}
+			"range":"range"}
 
 	printInfo = False
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
 		if command in progs:
 			#Load the command using the command line
-			module = __import__(progs[command], fromlist=[''])
+			module = __import__("parabam.interface.%s" % (progs[command],), fromlist=[''])
 			sys.argv = sys.argv[1:] #Remove command from arguments.
 			try:
 				interface = module.Interface(tempDir,exe_dir)
@@ -77,6 +77,5 @@ if __name__ == "__main__":
 		Command:
 			stat\t Genereate stats regarding the BAM file
 			subset\t Create a subsetted BAM file
-			multi\t Create multiple subsetted BAM files, each fulfilling separate criteria
 
     	'''.expandtabs())

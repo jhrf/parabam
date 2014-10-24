@@ -4,6 +4,8 @@ import shutil
 import time
 import sys
 import os
+import copy
+import numpy as np
 
 from multiprocessing import Queue
 
@@ -25,73 +27,72 @@ class TaskStat(parabam.Task):
 		self._source = source
 		self._master_file_path = const.master_file_path[self._source]
 		self._counts = {}
-		self._temp_file_names = {}
-		self._temp_file_objects = {}
+		self._local_structures = {}
 
 	def produceResultsDict(self):
 		master = pysam.Samfile(self._master_file_path,"rb")
 
-		temp_file_names = self._temp_file_names
-		temp_file_objects = self._temp_file_objects
-		counts = self._counts
-
-		for subset in self._subset_types:
-			temp_file_names[subset] = self.__mkTmpName__(subset)
-			temp_file_objects[subset]  = pysam.Samfile(temp_file_names[subset],"wb",template=master)
-			counts[subset] = 0
+		for name,struct in self.const.user_structures.items():
+			self._local_structures[name] = struct.empty_clone()
+			self._counts[name] = 0
 
 		self.handle_task_set(self._taskSet,master)
 
 		master.close() #Close the master bamfile
-		map(lambda (subset,fil): fil.close(),temp_file_objects.items()) #close all the other bams
 
 		results = {}
 		results["source"] = self._source
-		results["filnms"] = temp_file_names
-		results["counts"] = counts
+		results["structures"] = self.unpack_structures(self._local_structures)
+		results["counts"] = self._counts
 
 		return results
 
-	def write_to_subset_bam(self,subset_type,read):
-		self._counts[subset_type] += 1
-		self._temp_file_objects[subset_type].write(read)
+	def unpack_structures(self,structures):
+		unpacked = []
+		for name,struc in structures.items():
+			unpacked.append( (name,struc.data) )
 
-	@abstractmethod
+		return unpacked
+
 	def handle_task_set(self,task_set,master):
-		pass
-		
+		engine = self.const.user_engine
+		constants = self.const.user_constants
+		local_structures = self._local_structures
+		for alig in task_set:
+			results = engine(alig,constants,master)
+			if results:
+				for name,package in results.items():
+					self._counts[name] += 1
+					local_structures[name].add(**package)
+
 class HandlerStat(parabam.Handler):
 
 	def __init__(self,inqu,const):
 		super(HandlerStat,self).__init__(inqu,const,maxDestroy=len(const.sources))
 
 		self._sources = const.sources
-		self._mergecount = 0
+		self._final_structures = {}
+
+		for source in self._sources:
+			self._final_structures[source] = {}
+			for name,struc in self.const.user_structures.items():
+				self._final_structures[source][struc.name] = struc.empty_clone() 
 
 	def newResultAction(self,newResult,**kwargs):
-		resDict = newResult.results
-		source = resDict["source"]
-		self.__autoHandle__(resDict,source)
-
-
+		results = newResult.results
+		source = results["source"]
+		self.__autoHandle__(results,source)
+		for name,data in results["structures"]:
+			final_struc = self._final_structures[source][name]
+			final_struc.merge(data)
 
 	def periodicAction(self,iterations):
 		pass
 
 	def handlerExitFunc(self,**kwargs):
-		self._updateFunc("[Result] Processed %d reads from bam files\n" % (self.__totalSum__(),))
-		self._updateFunc("[Status] Waiting for merge operation to finish...\n")
-
-		last_source = len(self._sources) - 1
-		last_mrg = len(self._subset_types) - 1
-
-		for src_count,src in enumerate(self._sources):
-			for merge_count,mT in enumerate(self._subset_types):
-				destroy = True if (src_count == last_source and merge_count == last_mrg) else False
-				self.__addMergeTask__(name=self._filenameOut[src][mT],
-									results=self._mrgStores[src][mT],subset_type=mT,
-									source=src,total=self._stats[src]["total"],
-									destroy=destroy)
+		for source in self._sources:
+			for name,struc in self._final_structures[source].items():
+				struc.write_to_csv(self.const.outFiles,source,self.const.outmode)
 
 class ProcessorStat(parabam.Processor):
 
@@ -109,65 +110,136 @@ class ProcessorStat(parabam.Processor):
 		pass
 
 class UserStructure(object):
-	def __init__(self,struc_type,record_type,data):
+
+	__metaclass__ = ABCMeta
+
+	def __init__(self,name,struc_type,store_method,data):
 		self.struc_type = struc_type
-		self.record_type = record_type 
+		self.store_method = store_method 
 		self.data = data
-		self.enter_data = None
+		self.org_data = copy.copy(data)
+		self.name = name
 
-	def max_decision(self,new,existing):
-		return new > existing
+		if store_method == "max":
+			self.add = self.add_max
+			self.merge = self.merge_max
+		elif store_method == "min":
+			self.add = self.add_min
+			self.merge = self.merge_min
+		else:
+			self.add = self.add_cumu
+			self.merge = self.merge_cumu
 
-	def min_decision(self,new,exisiting):
-		return new < existing
+	def max_decision(self,result,existing):
+		return max(result,existing)
+
+	def min_decision(self,result,exisiting):
+		return min(result,exisiting)
+
+	@abstractmethod
+	def empty_clone(self):
+		pass
+
+	@abstractmethod
+	def add_max(self,result):
+		pass
+
+	@abstractmethod
+	def add_min(self,result):
+		pass
+
+	@abstractmethod
+	def add_cumu(self,result):
+		pass
+
+	@abstractmethod
+	def merge_max(self,result):
+		pass
+
+	@abstractmethod
+	def merge_min(self,result):
+		pass
+
+	@abstractmethod
+	def merge_cumu(self,result):
+		pass
+
+	@abstractmethod
+	def write_to_csv(self,source):
+		pass
 
 class NumericStructure(UserStructure):
-	def __init__(self,struc_type,record_type,data,log_scaling=False):
-		super(NumericStructure,self).__init__(struc_type,record_type,data)
+	def __init__(self,name,struc_type,store_method,data,log_scaling=False):
+		super(NumericStructure,self).__init__(name,struc_type,store_method,data)
 		self.log_scaling = log_scaling
-		if record_type == "max":
-			self.enter_data = numeric_add_max
-		elif record_type == "max":
-			self.enter_data = numeric_add_min
-		else:
-			self.enter_data = numeric_add_cumu
 
-	def numeric_add_cumu(self,new):
-		data += new
+	def empty_clone(self):
+		return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)
 
-	def numeric_add_max(self,new):
-		if self.max_decision(new,data):
-			data = new
+	def add_cumu(self,result):
+		self.data += result
 
-	def numeric_add_min(self,new):
-		if self.min_decision(new,data):
-			data = new
+	def add_max(self,result):
+		self.data = self.max_decision(result,self.data)
+
+	def add_min(self,result):
+		self.data = self.min_decision(result,self.data)
+
+	def merge_max(self,result):
+		self.data = self.max_decision(self.data,result)
+		del result
+
+	def merge_min(self,result):
+		self.data = self.min_decision(self.data,result)
+		del result
+
+	def merge_cumu(self,result):
+		self.data += result
+		del result
+
+	def write_to_csv(self,out_paths,source,mode):
+		if mode == "a":
+			first_col=source
+		elif mode == "s":
+			first_col=self.name
+		write_line = "%s,%.3f\n" % (first_col,self.data,)
+
+		with open(out_paths[source][self.name],"a") as out_object:
+			out_object.write(write_line)
 
 class ArrayStructure(UserStructure):
-	def __init__(self,struc_type,record_type,data):
-		super(NumericStructure,self).__init__(struc_type,record_type,data)
+	def __init__(self,name,struc_type,store_method,data):
+		super(NumericStructure,self).__init__(name,struc_type,store_method,data)
 		self.log_scaling = log_scaling
 
-		if record_type == "max":
-			self.enter_data = numeric_add_max
-		elif record_type == "max":
-			self.enter_data = numeric_add_min
-		else:
-			self.enter_data = numeric_add_cumu
+	def empty_clone(self):
+		return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)
 
-	def array_add_max(self,new,coords):
+	def add_max(self,result,coords):
 		existing = data[coords]
-		if self.max_decision(new,existing):
-			data[coords] = new
+		self.data[coords] = self.max_decision(result,existing)
 
-	def array_add_min(self,new,coords):
+	def add_min(self,result,coords):
 		existing = data[coords]
-		if self.min_decision(new,existing):
-			data[coords] = new
+		self.data[coords] = self.min_decision(result,existing)
 
-	def array_add_cumu(self,new,coords):
-		data[coords] += new
+	def add_cumu(self,result,coords):
+		self.data[coords] += result
 
+	def merge_max(self,result):
+		self.data = np.maximum(self.data,result)
+		del result
+
+	def merge_min(self,result):
+		self.data = np.minimum(self.data,result)
+		del result
+
+	def merge_cumu(self,result):
+		self.data += result
+		del result
+
+	def write_to_csv(self,out_paths,source,mode):
+		np.savetxt(out_paths[source][self.name],self.data,fmt="%.3f",delimiter=",")
 
 class Interface(parabam.Interface):
 
@@ -182,59 +254,41 @@ class Interface(parabam.Interface):
 		module = __import__(cmd_args.instruc, fromlist=[''])
 		user_engine = module.engine
 		user_constants = {}
-		user_structures = {}
+		user_struc_blueprint = {}
 		module.set_constants(user_constants)
-		module.set_structures(user_structures)
-
-		if hasattr(module,"get_subset_types"):
-			if verbose: 
-				print "[Status] Multiple subset type identified"
-			subset_types = module.get_subset_types()
-		else:
-			subset_types = ["subset"]
+		module.set_structures(user_structures_blueprint)
 
 		self.run(
 			input_bams=cmd_args.input,
-			outputs= cmd_args.output,
 			proc= cmd_args.p,
 			chunk= cmd_args.c,
 			verbose= verbose,
 			user_constants = user_constants,
 			user_engine = user_engine,
-			user_structures = user_structures
-			engine_is_class = False
-			)
+			user_struc_blueprint = user_struc_blueprint,
+			engine_is_class = False,
+			outmode = cmd_args.outmode)
 	
-	def run(self,input_bams,outputs,proc,chunk,verbose,user_constants,
-			user_engine,engine_is_class,user_structures,multi=4):
+	def run(self,input_bams,proc,chunk,verbose,user_constants,
+			user_engine,engine_is_class,user_struc_blueprint,outmode,multi=4):
 
-		if not outputs or not len(outputs) == len(input_bams):
-			print "[Warning] Output files will use automatic default naming scheme \n"\
-			"\t\tTo specify output names ensure an output name is provided for each input BAM"
-			outputs = [ ut.get_bam_basename(b) for b in input_bams ]
-
-		#AT SOME POINT WE SHOULD HANDLE UNSORTED BAMS. EITHER HERE OR AT THE PROCESSOR
-
+		user_structures = self.create_structures(user_struc_blueprint)
+		outputs = [ ut.get_bam_basename(b) for b in input_bams ]
 		for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
 			
-			quPrim = Queue()
-			quMerg = Queue()
+			qu = Queue()
 
-			outFiles = dict([(src,{}) for src in output_group])
 			master_file_path = {}
 
-			for mst,src in zip(input_group,output_group):
-				master_file_path[src] = mst
-				for typ in subset_types:
-					outFiles[src][typ] = "%s/%s_%s.bam" % (self._tempDir,src.replace(".bam",""),typ,)
+			for master,source in zip(input_group,output_group):
+				master_file_path[source] = master
 					
-			if verbose: self.__reportFileNames__(outFiles)
-
 			procrs = []
 			handls = []
 
-			const = parabam.Const(outFiles=outFiles,
-								tempDir=self._tempDir,
+			out_paths = self.create_out_paths(outmode,output_group,user_structures)
+
+			const = parabam.Const(outFiles=out_paths,tempDir=self._tempDir,
 								master_file_path=master_file_path,
 								chunk=chunk,proc=(proc // len(input_group)),
 								verbose=verbose,thresh=0,
@@ -242,43 +296,74 @@ class Interface(parabam.Interface):
 								exe_dir=self._exe_dir,
 								user_constants=user_constants,
 								user_structures=user_structures,
-								user_engine=user_engine)
+								user_engine=user_engine,
+								outmode=outmode)
 
-			for src in output_group:
+			for source in output_group:
 				if engine_is_class:
 					if not issubclass(user_engine,TaskStat):
-						raise Exception("[ERROR]\tThe class provided to parabam multiset must be a subclass of\n"\
+						raise Exception("[ERROR]\tThe class provided to parabam must be a subclass of\n"\
 										"\tparabam.interface.subset.TaskStat. Please consult the parabam manual.")
-					cur_args = [src]
-					procrs.append(ProcessorStat(outqu=quPrim,
+					cur_args = [source]
+					procrs.append(ProcessorStat(outqu=qu,
 											const=const,
 											TaskClass=user_engine,
 											task_args=cur_args))
 				else:
-					if len(subset_types) == 1:
-						run_class = SingleSet
-					else:
-						run_class = MultiSet
-					procrs.append(ProcessorStat(outqu=quPrim,
+					procrs.append(ProcessorStat(outqu=qu,
 												const=const,
-												TaskClass=run_class,
-												task_args=[src]))
+												TaskClass=TaskStat,
+												task_args=[source]))
 
-			handls.append(HandlerStat(inqu=quPrim,const=const))
+			handls.append(HandlerStat(inqu=qu,const=const))
 
 			lev = parabam.Leviathon(procrs,handls,100000)
 			lev.run()
 
-			#Move the complete telbams out of the tempdir to the working dir
-			#Only do this if we custom generated the file locations.
-			self.__moveOutputFiles__(outFiles)
+			return out_paths
+
+	def create_out_paths(self,outmode,output_group,user_structures):
+		out_paths = {}
+		for source in output_group:
+			out_paths[source] = {}
+			for name,struc in user_structures.items():
+				if not struc.struc_type == np.ndarray:
+					header,out_path = self.format_path(outmode,source,name)
+					out_paths[source][name] = out_path
+					with open(out_path,"w") as out_object:
+						out_object.write(header)
+				else:
+					out_paths[source] = {name:""}
+		return out_paths
+
+	def format_path(self,mode,source,name):
+		if mode == "a":
+			header = "Sample,%s\n" % (self.name,)
+			out_path = "./%s.csv" % (self.name,)
+		elif mode == "s":
+			header = "Analysis,Value\n"
+			out_path = "./%s.csv" % (source,)
+
+		return (header,out_path)
+
+	def create_structures(self,user_structures_blueprint):
+		#(data,store_method,)
+		user_structures = {}
+		class_to_type_map = {int:NumericStructure,float:NumericStructure,np.ndarray:ArrayStructure}
+		for name,definition in user_structures_blueprint.items():
+			definition["name"] = name
+			definition["struc_type"] = type(definition["data"])
+			user_structures[name] = class_to_type_map[definition["struc_type"]](**definition)
+ 		return user_structures
 
 	def getParser(self):
 		#argparse imported in ./interface/parabam 
 		parser = ut.default_parser()
-
-		# parser.add_argument('-t',type=int,metavar="INT",nargs='?',default=2
-		# 	,help="How many TTAGGG sequences you wish to observe before" \
-		# 	" accepting a sequence as telomeric.")
-
+		parser.add_argument('--outmode', choices=['s','a'],default='s',
+			help='Indicate whether data grouped by sample or analysis:\
+			[s]ample: group output by sample,\
+			[a]nalysis: group output by analysis')
 		return parser 
+
+
+#...happily ever after

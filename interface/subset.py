@@ -1,6 +1,5 @@
 import pysam
 import parabam
-import shutil
 import time
 import sys
 import os
@@ -183,6 +182,14 @@ class ProcessorSubset(parabam.Processor):
 	def addToCollection(self,master,alig,collection):
 		collection.append(alig)
 
+	def __getNextAlig__(self,masterBam):
+		if not self.const.fetch_region:
+			for alig in masterBam.fetch(until_eof=True):
+				yield alig
+		else:
+			for alig in masterBam.fetch(region=self.const.fetch_region):
+				yield alig
+
 	def preProcActivity(self,master_file_path):
 		pass
 
@@ -217,10 +224,11 @@ class Interface(parabam.Interface):
 			subset_types= subset_types,
 			user_constants = user_constants,
 			user_engine = user_engine,
-			engine_is_class = False
+			engine_is_class = False,
+			fetch_region = cmd_args.region
 			)
 	
-	def run(self,input_bams,outputs,proc,chunk,verbose,subset_types,user_constants,user_engine,engine_is_class,multi=4):
+	def run(self,input_bams,outputs,proc,chunk,verbose,subset_types,user_constants,user_engine,engine_is_class,fetch_region,multi=4):
 
 		if not outputs or not len(outputs) == len(input_bams):
 			print "[Warning] Output files will use automatic default naming scheme \n"\
@@ -256,7 +264,8 @@ class Interface(parabam.Interface):
 								sources=output_group,
 								exe_dir=self._exe_dir,
 								user_constants=user_constants,
-								user_engine=user_engine)
+								user_engine=user_engine,
+								fetch_region=fetch_region)
 
 			for src in output_group:
 				if engine_is_class:
@@ -286,14 +295,15 @@ class Interface(parabam.Interface):
 
 			#Move the complete telbams out of the tempdir to the working dir
 			#Only do this if we custom generated the file locations.
-			self.__moveOutputFiles__(outFiles)
+			final_files = self.__moveOutputFiles__(outFiles)
+			return final_files
 
 	def getParser(self):
 		#argparse imported in ./interface/parabam 
 		parser = ut.default_parser()
 
-		# parser.add_argument('-t',type=int,metavar="INT",nargs='?',default=2
-		# 	,help="How many TTAGGG sequences you wish to observe before" \
-		# 	" accepting a sequence as telomeric.")
+		parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
+			,help="The subset process will be run only on reads from this region. \
+			Regions should be colon seperated as specifiec by samtools (eg \'chr1:1000,5000\')")
 
 		return parser 

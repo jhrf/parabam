@@ -4,6 +4,7 @@ import time
 import sys
 import Queue as Queue2
 import gc
+import shutil
 
 import pysam
 
@@ -27,16 +28,16 @@ class Task(multiprocessing.Process):
 	def run(self):
 		start_useage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 		results = {}
-		if len(self._taskSet) > 0: #Empty tasks sent at destory sometimes
-			results = self.produceResultsDict()
-			results["total"] = len(self._taskSet)
+		#if len(self._taskSet) > 0: #Empty tasks sent at destory sometimes
+		results = self.produceResultsDict()
+		results["total"] = len(self._taskSet)
 
 		self._outqu.put(Results(name=self.name,
 								results=results,
 								destroy=self._destroy,
 								curproc=self._curproc))
 
-		fin_useage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+		#fin_useage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
 		#Uncomment below for memory useage stats
 		#print "Proc Useage %s (start/finish) : %d / %d" % (self.pid,start_useage,fin_useage)
@@ -108,9 +109,18 @@ class Handler(object):
 			if self._verbose and self._report and iterations % update == 0:
 				outstr = self.__formUpdateStr__(curproc,stTime)
 				updateFunc(outstr)
-				
-		if self._verbose and self._report: updateFunc("\n[Update] All reads processed succesfully.\n")
+
+		# self.periodicAction(iterations)
+		# if dealt > 0:
+		# 	if self._verbose and self._report: updateFunc("\n[Update] All reads processed succesfully.\n")
+		# 	self.handlerExitFunc()
+		# else:
+		# 	if self._verbose and self._report: 
+		# 		updateFunc("\n[Update] No reads read from specified sample.\n")
+		# 		updateFunc("\n[Update] Handler \n")
+
 		self.periodicAction(iterations)
+		if self._verbose and self._report: updateFunc("\n[Update] All reads processed succesfully.\n")
 		self.handlerExitFunc()
 
 	def __standarOutput__(self,outstr):
@@ -370,10 +380,13 @@ class Interface(object):
 		print ""
 
 	def __moveOutputFiles__(self,outFiles):
+		final_files = []
 		for src, mrgTypDict in outFiles.items():
 			for mrgTyp,outFilePath in mrgTypDict.items():
 				try:
-					shutil.move(outFilePath,"./") #./ being the current working dir
+					move_location = outFilePath.replace(self._tempDir,".")
+					shutil.move(outFilePath,move_location) #./ being the current working dir
+					final_files.append(move_location) 
 				except shutil.Error,e:
 					alt_filnm = "./%s_%s_%d.bam" % (src,mrgTyp,time.time()) 
 					print "[Error] Output file may already exist, you may not" \
@@ -381,6 +394,8 @@ class Interface(object):
 					print "[Status]Trying to create using unique filename:"
 					print "\t\t%s" % (alt_filnm,)
 					shutil.move(outFilePath,alt_filnm)
+					final_files.append(alt_filnm)
+		return final_files
 
 	def __getGroup__(self,bams,names,multi):
 		for i in xrange(0,len(bams),multi):
