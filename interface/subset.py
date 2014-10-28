@@ -237,6 +237,8 @@ class Interface(parabam.Interface):
 
 		#AT SOME POINT WE SHOULD HANDLE UNSORTED BAMS. EITHER HERE OR AT THE PROCESSOR
 
+		final_files = []
+
 		for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
 			
 			quPrim = Queue()
@@ -295,8 +297,8 @@ class Interface(parabam.Interface):
 
 			#Move the complete telbams out of the tempdir to the working dir
 			#Only do this if we custom generated the file locations.
-			final_files = self.__moveOutputFiles__(outFiles)
-			return final_files
+			final_files.extend(self.__moveOutputFiles__(outFiles))
+		return final_files
 
 	def getParser(self):
 		#argparse imported in ./interface/parabam 

@@ -90,9 +90,28 @@ class HandlerStat(parabam.Handler):
 		pass
 
 	def handlerExitFunc(self,**kwargs):
-		for source in self._sources:
-			for name,struc in self._final_structures[source].items():
-				struc.write_to_csv(self.const.outFiles,source,self.const.outmode)
+		const = self.const
+		if const.outmode == "d":
+			for source in self._sources:
+				source_structures = self._final_structures[source]
+				data_str = self.get_data_str_from_names(const.analysis_names,source_structures)
+				with open(const.out_paths,"a") as out_object:
+					out_object.write("%s%s\n" % (source,data_str))
+				#don't forget array data!
+				for name,struc in source_structures:
+					if struc.struc_type == np.ndarray:
+						struc.write_to_csv(const.outFiles,source,const.outmode)
+		else:
+			for source in self._sources:
+				for name,struc in self._final_structures[source].items():
+					struc.write_to_csv(const.outFiles,source,const.outmode)
+
+	def get_data_str_from_names(self,names,user_structures):
+		data_str = ""
+		for name in names:
+			cur_data = user_structures[name].data
+			data_str += ",%.3f"
+		return data_str
 
 class ProcessorStat(parabam.Processor):
 
@@ -260,6 +279,7 @@ class Interface(parabam.Interface):
 
 		self.run(
 			input_bams=cmd_args.input,
+			output_path = cmd_args.output,
 			proc= cmd_args.p,
 			chunk= cmd_args.c,
 			verbose= verbose,
@@ -269,12 +289,22 @@ class Interface(parabam.Interface):
 			engine_is_class = False,
 			outmode = cmd_args.outmode)
 	
-	def run(self,input_bams,proc,chunk,verbose,user_constants,
+	def run(self,input_bams,output_path,proc,chunk,verbose,user_constants,
 			user_engine,engine_is_class,user_struc_blueprint,outmode,multi=4):
 
 		user_structures = self.create_structures(user_struc_blueprint)
-		outputs = [ ut.get_bam_basename(b) for b in input_bams ]
-		for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
+		super_sources = [ ut.get_bam_basename(b) for b in input_bams ]
+		if not output_path:
+			output_path = "parbam_stat_%d" % (int(time.time()),)
+
+		analysis_names = self.get_non_array_names(user_structures)
+		if outmode == "d":
+			out_obj = open(output_path,"w")
+			header = ",".join(analysis_names)
+			header += "\n"
+
+		master_out_paths = {}
+		for input_group,output_group in self.__getGroup__(input_bams,super_sources,multi=multi):
 			
 			qu = Queue()
 
@@ -286,7 +316,12 @@ class Interface(parabam.Interface):
 			procrs = []
 			handls = []
 
-			out_paths = self.create_out_paths(outmode,output_group,user_structures)
+			if outmode == "d":
+				out_paths = out_path
+				master_out_paths = output_path
+			else:
+				out_paths = self.create_out_paths(outmode,output_path,output_group,user_structures)
+				master_out_paths.update(out_paths)
 
 			const = parabam.Const(outFiles=out_paths,tempDir=self._tempDir,
 								master_file_path=master_file_path,
@@ -297,7 +332,8 @@ class Interface(parabam.Interface):
 								user_constants=user_constants,
 								user_structures=user_structures,
 								user_engine=user_engine,
-								outmode=outmode)
+								outmode=outmode,
+								analysis_names = analysis_names)
 
 			for source in output_group:
 				if engine_is_class:
@@ -320,7 +356,7 @@ class Interface(parabam.Interface):
 			lev = parabam.Leviathon(procrs,handls,100000)
 			lev.run()
 
-			return out_paths
+		return master_out_paths #this can output either a dict or simply a string
 
 	def create_out_paths(self,outmode,output_group,user_structures):
 		out_paths = {}
@@ -343,8 +379,15 @@ class Interface(parabam.Interface):
 		elif mode == "s":
 			header = "Analysis,Value\n"
 			out_path = "./%s.csv" % (source,)
-
 		return (header,out_path)
+
+	def get_non_array_names(self,user_structures):
+		names = []
+		for name,struc in user_structures:
+			if not struc.struc_type == np.ndarray:
+				names.append(name)
+		names.sort()
+		return names
 
 	def create_structures(self,user_structures_blueprint):
 		#(data,store_method,)
@@ -359,10 +402,15 @@ class Interface(parabam.Interface):
 	def getParser(self):
 		#argparse imported in ./interface/parabam 
 		parser = ut.default_parser()
-		parser.add_argument('--outmode', choices=['s','a'],default='s',
+		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='?',required=False
+		,help='Specify a name for the output CSV file. Only used with default `outmode`.\
+				If this argument is not supplied, the output will take the following form:\
+				parabam_stat_[UNIX_TIME].csv')
+		parser.add_argument('--outmode', choices=['d','s','a'],default='d',
 			help='Indicate whether data grouped by sample or analysis:\
-			[s]ample: group output by sample,\
-			[a]nalysis: group output by analysis')
+			[d]efault: a csv with a column for each analysis and row for each sample\
+			[s]ample: csv for each sample,\
+			[a]nalysis: csv for each analysis')
 		return parser 
 
 
