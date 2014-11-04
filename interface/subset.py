@@ -3,6 +3,7 @@ import parabam
 import time
 import sys
 import os
+import gc
 
 from multiprocessing import Queue
 
@@ -42,8 +43,10 @@ class TaskSubset(parabam.Task):
 
 		self.handle_task_set(self._taskSet,master)
 
-		master.close() #Close the master bamfile
-		map(lambda (subset,fil): fil.close(),temp_file_objects.items()) #close all the other bams
+		#Close the master bamfile
+		for subset,temp_obj in temp_file_objects.items():
+			temp_obj.close() #close all the other bams
+		master.close()
 
 		results = {}
 		results["source"] = self._source
@@ -172,8 +175,10 @@ class HandlerSubset(parabam.Handler):
 
 class ProcessorSubset(parabam.Processor):
 
-	def __init__(self,outqu,const,TaskClass,task_args):
-		super(ProcessorSubset,self).__init__(outqu,const,TaskClass,task_args)
+	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
+		# if const.fetch_region:
+		# 	debug = False 
+		super(ProcessorSubset,self).__init__(outqu,const,TaskClass,task_args,debug)
 		self._source = task_args[0] #Defined in the run function within Interface
 
 	def __getMasterBam__(self,master_file_path):
@@ -228,15 +233,16 @@ class Interface(parabam.Interface):
 			fetch_region = cmd_args.region
 			)
 	
-	def run(self,input_bams,outputs,proc,chunk,verbose,subset_types,user_constants,user_engine,engine_is_class,fetch_region,multi=4):
+	def run(self,input_bams,outputs,proc,chunk,subset_types,
+			user_constants,user_engine,fetch_region=None,
+			multi=4,keep_in_temp=False,engine_is_class=False,verbose=False):
 
 		if not outputs or not len(outputs) == len(input_bams):
-			print "[Warning] Output files will use automatic default naming scheme \n"\
-			"\t\tTo specify output names ensure an output name is provided for each input BAM"
+			print "[Warning] Output files will use default naming scheme \n"\
+			"\t\tTo specify output names ensure a name is provided for each input BAM"
 			outputs = [ ut.get_bam_basename(b) for b in input_bams ]
 
 		#AT SOME POINT WE SHOULD HANDLE UNSORTED BAMS. EITHER HERE OR AT THE PROCESSOR
-
 		final_files = []
 
 		for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
@@ -294,10 +300,19 @@ class Interface(parabam.Interface):
 
 			lev = parabam.Leviathon(procrs,handls,100000)
 			lev.run()
+			del lev
 
 			#Move the complete telbams out of the tempdir to the working dir
 			#Only do this if we custom generated the file locations.
-			final_files.extend(self.__moveOutputFiles__(outFiles))
+			if keep_in_temp:
+				for source,subset_paths in outFiles.items():
+					for subset,path in subset_paths.items():
+						final_files.append(path)
+			else:
+				final_files.extend(self.__moveOutputFiles__(outFiles))
+			
+			gc.collect()
+
 		return final_files
 
 	def getParser(self):

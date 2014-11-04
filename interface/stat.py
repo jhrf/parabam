@@ -95,10 +95,10 @@ class HandlerStat(parabam.Handler):
 			for source in self._sources:
 				source_structures = self._final_structures[source]
 				data_str = self.get_data_str_from_names(const.analysis_names,source_structures)
-				with open(const.out_paths,"a") as out_object:
+				with open(const.outFiles,"a") as out_object:
 					out_object.write("%s%s\n" % (source,data_str))
 				#don't forget array data!
-				for name,struc in source_structures:
+				for name,struc in source_structures.items():
 					if struc.struc_type == np.ndarray:
 						struc.write_to_csv(const.outFiles,source,const.outmode)
 		else:
@@ -110,7 +110,7 @@ class HandlerStat(parabam.Handler):
 		data_str = ""
 		for name in names:
 			cur_data = user_structures[name].data
-			data_str += ",%.3f"
+			data_str += ",%.3f" % (cur_data,)
 		return data_str
 
 class ProcessorStat(parabam.Processor):
@@ -289,20 +289,19 @@ class Interface(parabam.Interface):
 			engine_is_class = False,
 			outmode = cmd_args.outmode)
 	
-	def run(self,input_bams,output_path,proc,chunk,verbose,user_constants,
-			user_engine,engine_is_class,user_struc_blueprint,outmode,multi=4):
+	def run(self,input_bams,output_path,proc,chunk,user_constants,user_engine,
+			user_struc_blueprint,outmode,multi=4,verbose=False,engine_is_class=False):
 
 		user_structures = self.create_structures(user_struc_blueprint)
 		super_sources = [ ut.get_bam_basename(b) for b in input_bams ]
 		if not output_path:
-			output_path = "parbam_stat_%d" % (int(time.time()),)
+			output_path = "parabam_stat_%d.csv" % (int(time.time()),)
 
 		analysis_names = self.get_non_array_names(user_structures)
 		if outmode == "d":
-			out_obj = open(output_path,"w")
-			header = ",".join(analysis_names)
-			header += "\n"
-
+			header = "Sample,%s\n" % (",".join(analysis_names),)
+			with open(output_path,"w") as out_obj:
+				out_obj.write(header)
 		master_out_paths = {}
 		for input_group,output_group in self.__getGroup__(input_bams,super_sources,multi=multi):
 			
@@ -317,10 +316,10 @@ class Interface(parabam.Interface):
 			handls = []
 
 			if outmode == "d":
-				out_paths = out_path
+				out_paths = output_path
 				master_out_paths = output_path
 			else:
-				out_paths = self.create_out_paths(outmode,output_path,output_group,user_structures)
+				out_paths = self.create_out_paths(outmode,output_group,user_structures)
 				master_out_paths.update(out_paths)
 
 			const = parabam.Const(outFiles=out_paths,tempDir=self._tempDir,
@@ -383,7 +382,7 @@ class Interface(parabam.Interface):
 
 	def get_non_array_names(self,user_structures):
 		names = []
-		for name,struc in user_structures:
+		for name,struc in user_structures.items():
 			if not struc.struc_type == np.ndarray:
 				names.append(name)
 		names.sort()

@@ -121,6 +121,7 @@ class Handler(object):
 
 		self.periodicAction(iterations)
 		if self._verbose and self._report: updateFunc("\n[Update] All reads processed succesfully.\n")
+		self._inqu.close()
 		self.handlerExitFunc()
 
 	def __standarOutput__(self,outstr):
@@ -193,7 +194,7 @@ class Processor(object):
 
 	__metaclass__ = ABCMeta
 
-	def __init__(self,outqu,const,TaskClass,task_args,debug = False):
+	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
 		
 		self._debug = debug
 		self._master_file_path = const.master_file_path
@@ -320,13 +321,18 @@ class Processor(object):
 
 	def __getNextAligDebug__(self,masterBam):
 		for i,alig in enumerate(masterBam.fetch(until_eof=True)):
-			if i < 1000000:
+			if i < 10000000:
 				yield alig
 			else:
 				return
 
 	def __endProcessing__(self,master):
 		master.close()
+		for proc in self._activeProcs:
+			proc.join()
+			proc.terminate()
+		del self._activeProcs
+		gc.collect()
 
 	@abstractmethod
 	def preProcActivity(self,masterBam):
@@ -360,7 +366,10 @@ class Leviathon(object):
 
 		procs[-1].join() #Wait on the last handler that we started.
 
-		map(lambda pr :pr.terminate(),procs)
+		for proc in procs:
+			proc.join()
+			proc.terminate()
+
 		del self._processors
 		del self._handlers
 		del procs

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 #Once upon a time...
 
-#Create a bam file with all the putatative telomere reads
-
 import pdb,sys,os,argparse
 import pysam
 import time
@@ -17,7 +15,6 @@ import util as ut
 from collections import Counter
 from multiprocessing import Queue,Process
 from itertools import izip
-
 
 class ResultsMerge(parabam.Results):
 	def __init__(self,name,results,subset_type,source,destroy,total,time_added):
@@ -71,61 +68,41 @@ class HandlerMerge(parabam.Handler):
 			self._merged += 1		
 			self._chilling = time.time()
 
-	def handlerExitFunc(self,**kwargs):
-		#When the handler finishes, add the total number of reads proc'd
-		#to the telbamer header. Needed for later analysis
+	def add_source_to_header(self):
+		#This could be moved before processing to cut down on the pysam cat overhead.
+		for source in self._sources:
+			for subset in self._subset_types:
+				master_path = self.const.master_file_path[source]
+				telbam_path = self.const.outFiles[source][subset]
+				
+				telbam_object = pysam.Samfile(telbam_path,"rb")	
+				new_header = telbam_object.header
+				telbam_object.close()
+				
+				source_info = "parabam_source:%s" % (master_path,)
+				if 'CO' in new_header:
+					new_header['CO'].append(source_info)
+				else:
+					new_header['CO'] = [source_info]
 
-		# DON'T KNOW IF I STILL NEED TO DO THIS.....
+				header_temp_path = ut.get_unique_temp("header",tempDir=self.const.tempDir)
+				header_temp_object = pysam.Samfile(header_temp_path,"wb",header=new_header)
+				header_temp_object.close()
 
-		# for src in self.const.sources:
-		# 	curFilnm = self.const.outFiles[src][self.mrgTyp]
-		# 	hedFilnm = ut.get_unique_temp("hed",tempDir=self.const.tempDir)
-		# 	catFilnm = ut.get_unique_temp("cat",tempDir=self.const.tempDir)
+				cat_temp_path = ut.get_unique_temp("cat",tempDir=self.const.tempDir)
+				pysam.cat("-o",cat_temp_path,header_temp_path,telbam_path)
 
-		# 	curTelbam = pysam.Samfile(curFilnm,"rb")
-		# 	newheader = curTelbam.header
+				os.remove(header_temp_path)
+				os.remove(telbam_path)
+				os.rename(cat_temp_path,telbam_path)
 
-		# 	totalInfo = "parent_bam_total_count:%d" % (self._total[src],)
-
-		# 	if 'CO' in newheader:
-		# 		newheader['CO'].append(totalInfo)
-		# 	else:
-		# 		newheader['CO'] = [totalInfo]
-
-		# 	newTelbam = pysam.Samfile(hedFilnm,"wb",header=newheader)
-		# 	curTelbam.close()
-		# 	newTelbam.close()
-
-		# 	pysam.cat("-o",catFilnm,hedFilnm,curFilnm)
-
-		# 	os.remove(curFilnm)
-		# 	os.remove(hedFilnm)
-		# 	os.rename(catFilnm,curFilnm)
-
-		for src,file_dict in self._out_file_objects.items():
-			for typ,file_obj in file_dict.items():
+	def close_all_out_files(self):
+		for source,file_dict in self._out_file_objects.items():
+			for subset,file_obj in file_dict.items():
 				file_obj.close()
+		del self._out_file_objects
 
-	#Diagnostics function
-	def __storeDiag__(self,newResult):
-		dirDiag = os.listdir(self.const.tempDir)
+	def handlerExitFunc(self,**kwargs):
+		self.close_all_out_files()
+		self.add_source_to_header()
 
-		dirDiag = [x for x in dirDiag if newResult.mrgTyp in x]
-		storDiag = list(newResult.results)
-
-		dirDiag.insert(0,"dir")
-		storDiag.insert(0,"store")
-
-		lenDiff = len(storDiag) - len(dirDiag)
-
-		print lenDiff
-
-		if lenDiff < 0:
-			storDiag.extend(["LOL"] * abs(lenDiff))
-		elif lenDiff > 0:
-			dirDiag.extend(["LOL"] * lenDiff)
-		else:
-			"zero"
-
-		import pprint as pp
-		pp.pprint(izip(dirDiag,storDiag))
