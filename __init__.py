@@ -26,9 +26,7 @@ class Task(multiprocessing.Process):
 		self.const = const
 
 	def run(self):
-		start_useage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 		results = {}
-		#if len(self._taskSet) > 0: #Empty tasks sent at destory sometimes
 		results = self.produceResultsDict()
 		results["total"] = len(self._taskSet)
 
@@ -37,10 +35,8 @@ class Task(multiprocessing.Process):
 								destroy=self._destroy,
 								curproc=self._curproc))
 
-		#fin_useage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-
-		#Uncomment below for memory useage stats
-		#print "Proc Useage %s (start/finish) : %d / %d" % (self.pid,start_useage,fin_useage)
+		del self._taskSet #These commands go a long way 
+		gc.collect()	  #to controlling memory useage
 
 	def __mkTmpName__(self,typ):
 		#self.pid ensures that the temp names are unique.
@@ -104,20 +100,13 @@ class Handler(object):
 				#Queue empty. Continue with loop
 				pass
 
-			if iterations % 100000 == 0: self.periodicAction(iterations)
+			if iterations % 100000 == 0: 
+				self.periodicAction(iterations)
+				gc.collect()
 
 			if self._verbose and self._report and iterations % update == 0:
 				outstr = self.__formUpdateStr__(curproc,stTime)
 				updateFunc(outstr)
-
-		# self.periodicAction(iterations)
-		# if dealt > 0:
-		# 	if self._verbose and self._report: updateFunc("\n[Update] All reads processed succesfully.\n")
-		# 	self.handlerExitFunc()
-		# else:
-		# 	if self._verbose and self._report: 
-		# 		updateFunc("\n[Update] No reads read from specified sample.\n")
-		# 		updateFunc("\n[Update] Handler \n")
 
 		self.periodicAction(iterations)
 		if self._verbose and self._report: updateFunc("\n[Update] All reads processed succesfully.\n")
@@ -180,7 +169,7 @@ class Handler(object):
 
 	@abstractmethod
 	def newResultAction(self,newResult,**kwargs):
-		#Handle the result. Result will always be of type framework.Result
+		#Handle the result. Result will always be of type parabam.Result
 		#New results action should as call autoHandle
 		#self.__autoHandle__(newResult.results)
 		pass
