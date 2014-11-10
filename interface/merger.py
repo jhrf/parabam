@@ -4,7 +4,6 @@
 import pdb,sys,os,argparse
 import pysam
 import time
-import sh
 import parabam
 
 import time
