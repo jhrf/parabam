@@ -8,18 +8,14 @@ import copy
 import numpy as np
 
 from multiprocessing import Queue
-
-from parabam.interface import util as ut
-from parabam.interface import merger
-
 from abc import ABCMeta, abstractmethod
 
 class TaskStat(parabam.Task):
 
 	__metaclass__ = ABCMeta
 
-	def __init__(self,taskSet,outqu,curproc,destroy,const,source):
-		super(TaskStat, self).__init__(taskSet=taskSet,
+	def __init__(self,task_set,outqu,curproc,destroy,const,source):
+		super(TaskStat, self).__init__(task_set=task_set,
 										outqu=outqu,
 										curproc=curproc,
 										destroy=destroy,
@@ -29,32 +25,32 @@ class TaskStat(parabam.Task):
 		self._counts = {}
 		self._local_structures = {}
 
-	def produceResultsDict(self):
+	def __generate_results__(self):
 		master = pysam.Samfile(self._master_file_path,"rb")
 
 		for name,struct in self.const.user_structures.items():
 			self._local_structures[name] = struct.empty_clone()
 			self._counts[name] = 0
 
-		self.handle_task_set(self._taskSet,master)
+		self.__handle_task_set__(self._task_set,master)
 
 		master.close() #Close the master bamfile
 
 		results = {}
 		results["source"] = self._source
-		results["structures"] = self.unpack_structures(self._local_structures)
+		results["structures"] = self.__unpack_structures__(self._local_structures)
 		results["counts"] = self._counts
 
 		return results
 
-	def unpack_structures(self,structures):
+	def __unpack_structures__(self,structures):
 		unpacked = []
 		for name,struc in structures.items():
 			unpacked.append( (name,struc.data) )
 
 		return unpacked
 
-	def handle_task_set(self,task_set,master):
+	def __handle_task_set__(self,task_set,master):
 		engine = self.const.user_engine
 		constants = self.const.user_constants
 		local_structures = self._local_structures
@@ -68,7 +64,7 @@ class TaskStat(parabam.Task):
 class HandlerStat(parabam.Handler):
 
 	def __init__(self,inqu,const):
-		super(HandlerStat,self).__init__(inqu,const,maxDestroy=len(const.sources))
+		super(HandlerStat,self).__init__(inqu,const,destroy_limit=len(const.sources))
 
 		self._sources = const.sources
 		self._final_structures = {}
@@ -78,35 +74,37 @@ class HandlerStat(parabam.Handler):
 			for name,struc in self.const.user_structures.items():
 				self._final_structures[source][struc.name] = struc.empty_clone() 
 
-	def newResultAction(self,newResult,**kwargs):
-		results = newResult.results
+	def __new_package_action__(self,new_package,**kwargs):
+		results = new_package.results
 		source = results["source"]
-		self.__autoHandle__(results,source)
+		self.__auto_handle__(results,source)
 		for name,data in results["structures"]:
 			final_struc = self._final_structures[source][name]
 			final_struc.merge(data)
 
-	def periodicAction(self,iterations):
+	def __periodic_action__(self,iterations):
 		pass
 
-	def handlerExitFunc(self,**kwargs):
+	def __handler_exit__(self,**kwargs):
 		const = self.const
 		if const.outmode == "d":
 			for source in self._sources:
 				source_structures = self._final_structures[source]
-				data_str = self.get_data_str_from_names(const.analysis_names,source_structures)
-				with open(const.outFiles,"a") as out_object:
+				data_str = self.__get_data_str_from_names__(const.analysis_names,source_structures)
+				with open(const.output_paths,"a") as out_object:
 					out_object.write("%s%s\n" % (source,data_str))
-				#don't forget array data!
+
+				#Arrays can't be squished into unified output, so create a unique file path	
 				for name,struc in source_structures.items():
 					if struc.struc_type == np.ndarray:
-						struc.write_to_csv(const.outFiles,source,const.outmode)
+						array_path = const.output_paths.replace("%s/" % (const.temp_dir,),"./%s_" % (struc.name,))
+						struc.write_to_csv(array_path,source,const.outmode)
 		else:
 			for source in self._sources:
 				for name,struc in self._final_structures[source].items():
-					struc.write_to_csv(const.outFiles,source,const.outmode)
+					struc.write_to_csv(const.output_paths,source,const.outmode)
 
-	def get_data_str_from_names(self,names,user_structures):
+	def __get_data_str_from_names__(self,names,user_structures):
 		data_str = ""
 		for name in names:
 			cur_data = user_structures[name].data
@@ -119,13 +117,13 @@ class ProcessorStat(parabam.Processor):
 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
 		self._source = task_args[0] #Defined in the run function within Interface
 
-	def __getMasterBam__(self,master_file_path):
+	def __get_master_bam__(self,master_file_path):
 		return pysam.Samfile(master_file_path[self._source],"rb")
 
-	def addToCollection(self,master,alig,collection):
+	def __add_to_collection__(self,master,alig,collection):
 		collection.append(alig)
 
-	def preProcActivity(self,master_file_path):
+	def __pre_processor__(self,master_file_path):
 		pass
 
 class UserStructure(object):
@@ -228,11 +226,10 @@ class NumericStructure(UserStructure):
 
 class ArrayStructure(UserStructure):
 	def __init__(self,name,struc_type,store_method,data):
-		super(NumericStructure,self).__init__(name,struc_type,store_method,data)
-		self.log_scaling = log_scaling
+		super(ArrayStructure,self).__init__(name,struc_type,store_method,data)
 
 	def empty_clone(self):
-		return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)
+		return ArrayStructure(self.name,self.struc_type,self.store_method,self.org_data)
 
 	def add_max(self,result,coords):
 		existing = data[coords]
@@ -257,13 +254,13 @@ class ArrayStructure(UserStructure):
 		self.data += result
 		del result
 
-	def write_to_csv(self,out_paths,source,mode):
-		np.savetxt(out_paths[source][self.name],self.data,fmt="%.3f",delimiter=",")
+	def write_to_csv(self,out_path,source,mode):
+		np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
 
 class Interface(parabam.Interface):
 
-	def __init__(self,tempDir,exe_dir):
-		super(Interface,self).__init__(tempDir,exe_dir)
+	def __init__(self,temp_dir,exe_dir):
+		super(Interface,self).__init__(temp_dir,exe_dir)
 	
 	def run_cmd(self,parser):
 
@@ -273,7 +270,7 @@ class Interface(parabam.Interface):
 		module = __import__(cmd_args.instruc, fromlist=[''])
 		user_engine = module.engine
 		user_constants = {}
-		user_struc_blueprint = {}
+		user_structures_blueprint = {}
 		module.set_constants(user_constants)
 		module.set_structures(user_structures_blueprint)
 
@@ -285,27 +282,27 @@ class Interface(parabam.Interface):
 			verbose= verbose,
 			user_constants = user_constants,
 			user_engine = user_engine,
-			user_struc_blueprint = user_struc_blueprint,
+			user_struc_blueprint = user_structures_blueprint,
 			engine_is_class = False,
 			outmode = cmd_args.outmode)
 	
 	def run(self,input_bams,output_path,proc,chunk,user_constants,user_engine,
 			user_struc_blueprint,outmode,multi=4,verbose=False,engine_is_class=False):
 
-		user_structures = self.create_structures(user_struc_blueprint)
-		super_sources = [ ut.get_bam_basename(b) for b in input_bams ]
+		user_structures = self.__create_structures__(user_struc_blueprint)
+		super_sources = [ self.__get_basename__(b) for b in input_bams ]
 		if not output_path:
-			output_path = "parabam_stat_%d.csv" % (int(time.time()),)
+			output_path = "%s/parabam_stat_%d.csv" % (self._temp_dir,int(time.time()),)
 
-		analysis_names = self.get_non_array_names(user_structures)
+		analysis_names = self.__get_non_array_names__(user_structures)
 		if outmode == "d":
 			header = "Sample,%s\n" % (",".join(analysis_names),)
 			with open(output_path,"w") as out_obj:
 				out_obj.write(header)
 		master_out_paths = {}
-		for input_group,output_group in self.__getGroup__(input_bams,super_sources,multi=multi):
+		for input_group,output_group in self.__get_group__(input_bams,super_sources,multi=multi):
 			
-			qu = Queue()
+			task_qu = Queue()
 
 			master_file_path = {}
 
@@ -316,13 +313,13 @@ class Interface(parabam.Interface):
 			handls = []
 
 			if outmode == "d":
-				out_paths = output_path
-				master_out_paths = output_path
+				output_paths = output_path
+				master_output_paths = output_path
 			else:
-				out_paths = self.create_out_paths(outmode,output_group,user_structures)
-				master_out_paths.update(out_paths)
+				output_paths = self.__create_output_paths__(outmode,output_group,user_structures)
+				master_output_paths.update(output_paths)
 
-			const = parabam.Const(outFiles=out_paths,tempDir=self._tempDir,
+			const = parabam.Const(output_paths=output_paths,temp_dir=self._temp_dir,
 								master_file_path=master_file_path,
 								chunk=chunk,proc=(proc // len(input_group)),
 								verbose=verbose,thresh=0,
@@ -340,30 +337,31 @@ class Interface(parabam.Interface):
 						raise Exception("[ERROR]\tThe class provided to parabam must be a subclass of\n"\
 										"\tparabam.interface.subset.TaskStat. Please consult the parabam manual.")
 					cur_args = [source]
-					procrs.append(ProcessorStat(outqu=qu,
+					procrs.append(ProcessorStat(outqu=task_qu,
 											const=const,
 											TaskClass=user_engine,
 											task_args=cur_args))
 				else:
-					procrs.append(ProcessorStat(outqu=qu,
+					procrs.append(ProcessorStat(outqu=task_qu,
 												const=const,
 												TaskClass=TaskStat,
 												task_args=[source]))
 
-			handls.append(HandlerStat(inqu=qu,const=const))
+			handls.append(HandlerStat(inqu=task_qu,const=const))
 
 			lev = parabam.Leviathon(procrs,handls,100000)
 			lev.run()
 
-		return master_out_paths #this can output either a dict or simply a string
+		shutil.move(output_path,"./")
+		return master_output_paths #Depending on outmode this output a dict or string
 
-	def create_out_paths(self,outmode,output_group,user_structures):
+	def __create_output_paths__(self,outmode,output_group,user_structures):
 		out_paths = {}
 		for source in output_group:
 			out_paths[source] = {}
 			for name,struc in user_structures.items():
 				if not struc.struc_type == np.ndarray:
-					header,out_path = self.format_path(outmode,source,name)
+					header,out_path = self.__format_path__(outmode,source,name)
 					out_paths[source][name] = out_path
 					with open(out_path,"w") as out_object:
 						out_object.write(header)
@@ -371,7 +369,7 @@ class Interface(parabam.Interface):
 					out_paths[source] = {name:""}
 		return out_paths
 
-	def format_path(self,mode,source,name):
+	def __format_path__(self,mode,source,name):
 		if mode == "a":
 			header = "Sample,%s\n" % (self.name,)
 			out_path = "./%s.csv" % (self.name,)
@@ -380,7 +378,7 @@ class Interface(parabam.Interface):
 			out_path = "./%s.csv" % (source,)
 		return (header,out_path)
 
-	def get_non_array_names(self,user_structures):
+	def __get_non_array_names__(self,user_structures):
 		names = []
 		for name,struc in user_structures.items():
 			if not struc.struc_type == np.ndarray:
@@ -388,7 +386,7 @@ class Interface(parabam.Interface):
 		names.sort()
 		return names
 
-	def create_structures(self,user_structures_blueprint):
+	def __create_structures__(self,user_structures_blueprint):
 		#(data,store_method,)
 		user_structures = {}
 		class_to_type_map = {int:NumericStructure,float:NumericStructure,np.ndarray:ArrayStructure}
@@ -398,13 +396,19 @@ class Interface(parabam.Interface):
 			user_structures[name] = class_to_type_map[definition["struc_type"]](**definition)
  		return user_structures
 
-	def getParser(self):
+	def get_parser(self):
 		#argparse imported in ./interface/parabam 
-		parser = ut.default_parser()
+		parser = self.default_parser()
+
+		parser.add_argument('--instruc','-i',metavar='INSTRUCTION',required=True
+			,help='The instruction file, written in python, that we wish'\
+			'to carry out on the input BAM.')
+		parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
+			,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
 		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='?',required=False
 		,help='Specify a name for the output CSV file. Only used with default `outmode`.\
-				If this argument is not supplied, the output will take the following form:\
-				parabam_stat_[UNIX_TIME].csv')
+			If this argument is not supplied, the output will take the following form:\
+			parabam_stat_[UNIX_TIME].csv')
 		parser.add_argument('--outmode', choices=['d','s','a'],default='d',
 			help='Indicate whether data grouped by sample or analysis:\
 			[d]efault: a csv with a column for each analysis and row for each sample\

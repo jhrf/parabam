@@ -4,12 +4,10 @@ import sys
 import argparse
 import textwrap
 import signal
-import pdb
 import time
 import traceback
 import os
-
-from parabam.interface import util as ut
+import shutil
 
 #The following imports are a for pyinstaller. Don't remove
 import numpy 
@@ -18,12 +16,20 @@ def keyboard_handler(sig, frame):#Catch keyboard interupt and end processors
 	sys.stdout.write("\r[ERROR] parabam interrupted by user")
 	sys.exit(0)
 
-#If invoked from the command line:
+def create_dirs(dirs):
+	for i in dirs:
+		if i == "": continue
+		os.makedirs(i)
+
+def die_gracefully(temp_dir):
+	if not temp_dir == "." or not temp_dir == "": 
+		shutil.rmtree(temp_dir)
+
 if __name__ == "__main__":
 
 	signal.signal(signal.SIGINT, keyboard_handler) #Handle KeyboardInterrupt gracefully
 
-	argsLen = len(sys.argv) >= 2
+	argument_len = len(sys.argv) >= 2
 
 	progs = {"stat":"stat",
 			"subset":"subset",
@@ -31,30 +37,30 @@ if __name__ == "__main__":
 
 	printInfo = False
 
-	if argsLen:
+	if argument_len:
 
 		exe_dir,filnm = os.path.split(sys.argv[0])
 		command = sys.argv[1]
 
-		tempDir = "parabam-temp-%d" %(int(time.time()),)
-		ut.create_dirs([tempDir])
+		temp_dir = "parabam-temp-%d" %(int(time.time()),)
+		create_dirs([temp_dir])
 
 		if command in progs:
 			#Load the command using the command line
 			module = __import__("parabam.interface.%s" % (progs[command],), fromlist=[''])
 			sys.argv = sys.argv[1:] #Remove command from arguments.
 			try:
-				interface = module.Interface(tempDir,exe_dir)
-				interface.run_cmd(interface.getParser())
+				interface = module.Interface(temp_dir,exe_dir)
+				interface.run_cmd(interface.get_parser())
 			except SystemExit:
 				print "-"
 				print "[Status] parabam is quitting gracefully %d\n" % (time.time(),)
 			except BaseException as exception:
 				print "-"
 				print "[ERROR] parabam stopped unexpecedtly, sorry!"
-				traceback.print_exception(*sys.exc_info())
+				#traceback.print_exception(*sys.exc_info())
 				raise
-			ut.die_gracefully(tempDir)
+			die_gracefully(temp_dir)
 
 		else:
 			print "\nCommand not recognised. Refer to manual below:\n"

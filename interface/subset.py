@@ -4,10 +4,10 @@ import time
 import sys
 import os
 import gc
+import shutil
 
 from multiprocessing import Queue
 
-from parabam.interface import util as ut
 from parabam.interface import merger
 
 from abc import ABCMeta, abstractmethod
@@ -16,8 +16,8 @@ class TaskSubset(parabam.Task):
 
 	__metaclass__ = ABCMeta
 
-	def __init__(self,taskSet,outqu,curproc,destroy,const,source):
-		super(TaskSubset, self).__init__(taskSet=taskSet,
+	def __init__(self,task_set,outqu,curproc,destroy,const,source):
+		super(TaskSubset, self).__init__(task_set=task_set,
 										outqu=outqu,
 										curproc=curproc,
 										destroy=destroy,
@@ -26,57 +26,57 @@ class TaskSubset(parabam.Task):
 		self._master_file_path = const.master_file_path[self._source]
 		self._subset_types = const.subset_types
 		self._counts = {}
-		self._temp_file_names = {}
-		self._temp_file_objects = {}
+		self._temp_paths = {}
+		self._temp_objects = {}
 
-	def produceResultsDict(self):
+	def __generate_results__(self):
 		master = pysam.Samfile(self._master_file_path,"rb")
 
-		temp_file_names = self._temp_file_names
-		temp_file_objects = self._temp_file_objects
+		temp_paths = self._temp_paths
+		temp_objects = self._temp_objects
 		counts = self._counts
 
 		for subset in self._subset_types:
-			temp_file_names[subset] = self.__mkTmpName__(subset)
-			temp_file_objects[subset]  = pysam.Samfile(temp_file_names[subset],"wb",template=master)
+			temp_paths[subset] = self.__get_temp_path__(subset)
+			temp_objects[subset]  = pysam.Samfile(temp_paths[subset],"wb",template=master)
 			counts[subset] = 0
 
-		self.handle_task_set(self._taskSet,master)
+		self.__handle_task_set__(self._task_set,master)
 
 		#Close the master bamfile
-		for subset,temp_obj in temp_file_objects.items():
-			temp_obj.close() #close all the other bams
+		for subset,file_object in temp_objects.items():
+			file_object.close() #close all the other bams
 		master.close()
 
 		results = {}
 		results["source"] = self._source
-		results["filnms"] = temp_file_names
+		results["temp_paths"] = temp_paths
 		results["counts"] = counts
 
 		return results
 
-	def write_to_subset_bam(self,subset_type,read):
+	def __write_to_subset_bam__(self,subset_type,read):
 		self._counts[subset_type] += 1
-		self._temp_file_objects[subset_type].write(read)
+		self._temp_objects[subset_type].write(read)
 
 	@abstractmethod
-	def handle_task_set(self,task_set,master):
+	def __handle_task_set__(self,task_set,master):
 		pass
 
 class MultiSet(TaskSubset):
-	def __init__(self,taskSet,outqu,curproc,destroy,const,source):
-		super(MultiSet, self).__init__(taskSet=taskSet,
+	def __init__(self,task_set,outqu,curproc,destroy,const,source):
+		super(MultiSet, self).__init__(task_set=task_set,
 										outqu=outqu,
 										curproc=curproc,
 										destroy=destroy,
 										const=const,
 										source=source)
 	
-	def handle_task_set(self,task_set,master):
+	def __handle_task_set__(self,task_set,master):
 
 		engine = self.const.user_engine
 		user_constants = self.const.user_constants
-		subset_write = self.write_to_subset_bam
+		subset_write = self.__write_to_subset_bam__
 		subset_types = self.const.subset_types
 
 		for read in task_set:
@@ -89,18 +89,18 @@ class MultiSet(TaskSubset):
 					subset_write(subset_types[subset],read)					
 
 class SingleSet(TaskSubset):
-	def __init__(self,taskSet,outqu,curproc,destroy,const,source):
-		super(SingleSet, self).__init__(taskSet=taskSet,
+	def __init__(self,task_set,outqu,curproc,destroy,const,source):
+		super(SingleSet, self).__init__(task_set=task_set,
 										outqu=outqu,
 										curproc=curproc,
 										destroy=destroy,
 										const=const,
 										source=source)
 	
-	def handle_task_set(self,task_set,master):
+	def __handle_task_set__(self,task_set,master):
 		engine = self.const.user_engine
 		user_constants = self.const.user_constants
-		subset_write = self.write_to_subset_bam
+		subset_write = self.__write_to_subset_bam__
 		subset_types = self.const.subset_types
 
 		for read in task_set:
@@ -110,67 +110,67 @@ class SingleSet(TaskSubset):
 class HandlerSubset(parabam.Handler):
 
 	def __init__(self,inqu,outqu,const):
-		super(HandlerSubset,self).__init__(inqu,const,maxDestroy=len(const.sources))
+		super(HandlerSubset,self).__init__(inqu,const,destroy_limit=len(const.sources))
 
 		self._sources = const.sources
 		self._subset_types = const.subset_types
 
 		#Setup stores and connection to merge proc
-		self._mrgStores = {}
-		for src in self._sources:
-			self._mrgStores[src] = {} 
+		self._merge_stores = {}
+		for source in self._sources:
+			self._merge_stores[source] = {} 
 			for subset in self._subset_types:
-				self._mrgStores[src][subset] = []
+				self._merge_stores[source][subset] = []
 
 		self._mergequeue = outqu
 		self._mergecount = 0
 
-	def newResultAction(self,newResult,**kwargs):
-		resDict = newResult.results
-		source = resDict["source"]
-		self.__autoHandle__(resDict,source)
+	def __new_package_action__(self,new_package,**kwargs):
+		results = new_package.results
+		source = results["source"]
+		self.__auto_handle__(results,source)
 
 		for subset in self._subset_types:
-			if resDict["counts"][subset] > 0:
-				self._mrgStores[source][subset].append(resDict["filnms"][subset])
+			if results["counts"][subset] > 0:
+				self._merge_stores[source][subset].append(results["temp_paths"][subset])
 			else:
-				os.remove(resDict["filnms"][subset])
+				os.remove(results["temp_paths"][subset])
 
-	def periodicAction(self,iterations):
-		for src in self._sources:
+	def __periodic_action__(self,iterations):
+		for source in self._sources:
 			for subset in self._subset_types:
-				self.__testMergeStore__(self._filenameOut[src][subset],self._mrgStores[src][subset],src,subset)
+				self.__test_merge_store__(self._output_paths[source][subset],self._merge_stores[source][subset],source,subset)
 
-	def __testMergeStore__(self,outnm,store,src,subset):
+	def __test_merge_store__(self,outnm,store,source,subset):
 		if len(store) > 10:
 			sys.stdout.flush()
-			self.__addMergeTask__(name=outnm,results=store,subset_type=subset,source=src,total=self._stats[src]["total"])
+			self.__add_merge_task__(name=outnm,results=store,subset_type=subset,source=source,total=self._stats[source]["total"])
 			self._mergecount += 1
 			#Remove the temp file which has been merged
 			store[:] = [] #Wipe the store clean, these have been merged
 			sys.stdout.flush()
 
-	def __addMergeTask__(self,name,results,subset_type,source,total,destroy=False):
-		res = merger.ResultsMerge(name=name,results=list(results),
+	def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
+		res = merger.MergePackage(name=name,results=list(results),
 							subset_type=subset_type,source=source,destroy=destroy,total=total,time_added=time.time())
 		self._mergequeue.put(res)
 
-	def __totalSum__(self):
+	def __total_reads__(self):
 		return sum(map(lambda s : self._stats[s]["total"],self._sources))
 
-	def handlerExitFunc(self,**kwargs):
-		self._updateFunc("[Result] Processed %d reads from bam files\n" % (self.__totalSum__(),))
-		self._updateFunc("[Status] Waiting for merge operation to finish...\n")
+	def __handler_exit__(self,**kwargs):
+		self._update_output("[Result] Processed %d reads from bam files\n" % (self.__total_reads__(),))
+		self._update_output("[Status] Waiting for merge operation to finish...\n")
 
 		last_source = len(self._sources) - 1
 		last_mrg = len(self._subset_types) - 1
 
-		for src_count,src in enumerate(self._sources):
-			for merge_count,mT in enumerate(self._subset_types):
-				destroy = True if (src_count == last_source and merge_count == last_mrg) else False
-				self.__addMergeTask__(name=self._filenameOut[src][mT],
-									results=self._mrgStores[src][mT],subset_type=mT,
-									source=src,total=self._stats[src]["total"],
+		for source_count,source in enumerate(self._sources):
+			for merge_count,subset in enumerate(self._subset_types):
+				destroy = True if (source_count == last_source and merge_count == last_mrg) else False
+				self.__add_merge_task__(name=self._output_paths[source][subset],
+									results=self._merge_stores[source][subset],subset_type=subset,
+									source=source,total=self._stats[source]["total"],
 									destroy=destroy)
 
 class ProcessorSubset(parabam.Processor):
@@ -181,27 +181,27 @@ class ProcessorSubset(parabam.Processor):
 		super(ProcessorSubset,self).__init__(outqu,const,TaskClass,task_args,debug)
 		self._source = task_args[0] #Defined in the run function within Interface
 
-	def __getMasterBam__(self,master_file_path):
+	def __get_master_bam__(self,master_file_path):
 		return pysam.Samfile(master_file_path[self._source],"rb")
 
-	def addToCollection(self,master,alig,collection):
+	def __add_to_collection__(self,master,alig,collection):
 		collection.append(alig)
 
-	def __getNextAlig__(self,masterBam):
+	def __get_next_alig__(self,master_bam):
 		if not self.const.fetch_region:
-			for alig in masterBam.fetch(until_eof=True):
+			for alig in master_bam.fetch(until_eof=True):
 				yield alig
 		else:
-			for alig in masterBam.fetch(region=self.const.fetch_region):
+			for alig in master_bam.fetch(region=self.const.fetch_region):
 				yield alig
 
-	def preProcActivity(self,master_file_path):
+	def __pre_processor__(self,master_file_path):
 		pass
 
 class Interface(parabam.Interface):
 
-	def __init__(self,tempDir,exe_dir):
-		super(Interface,self).__init__(tempDir,exe_dir)
+	def __init__(self,temp_dir,exe_dir):
+		super(Interface,self).__init__(temp_dir,exe_dir)
 	
 	def run_cmd(self,parser):
 
@@ -240,31 +240,31 @@ class Interface(parabam.Interface):
 		if not outputs or not len(outputs) == len(input_bams):
 			print "[Warning] Output files will use default naming scheme \n"\
 			"\t\tTo specify output names ensure a name is provided for each input BAM"
-			outputs = [ ut.get_bam_basename(b) for b in input_bams ]
+			outputs = [ self.__get_basename__(b) for b in input_bams ]
 
 		#AT SOME POINT WE SHOULD HANDLE UNSORTED BAMS. EITHER HERE OR AT THE PROCESSOR
 		final_files = []
 
-		for input_group,output_group in self.__getGroup__(input_bams,outputs,multi=multi):
+		for input_group,output_group in self.__get_group__(input_bams,outputs,multi=multi):
 			
-			quPrim = Queue()
-			quMerg = Queue()
+			task_qu = Queue()
+			merge_qu = Queue()
 
-			outFiles = dict([(src,{}) for src in output_group])
+			output_paths = dict([(source,{}) for source in output_group])
 			master_file_path = {}
 
-			for mst,src in zip(input_group,output_group):
-				master_file_path[src] = mst
+			for mst,source in zip(input_group,output_group):
+				master_file_path[source] = mst
 				for typ in subset_types:
-					outFiles[src][typ] = "%s/%s_%s.bam" % (self._tempDir,src.replace(".bam",""),typ,)
+					output_paths[source][typ] = "%s/%s_%s.bam" % (self._temp_dir,source.replace(".bam",""),typ,)
 					
-			if verbose: self.__reportFileNames__(outFiles)
+			if verbose: self.__report_file_names__(output_paths)
 
 			procrs = []
 			handls = []
 
-			const = parabam.Const(outFiles=outFiles,
-								tempDir=self._tempDir,
+			const = parabam.Const(output_paths=output_paths,
+								temp_dir=self._temp_dir,
 								master_file_path=master_file_path,
 								chunk=chunk,proc=(proc // len(input_group)),
 								verbose=verbose,thresh=0,
@@ -275,13 +275,13 @@ class Interface(parabam.Interface):
 								user_engine=user_engine,
 								fetch_region=fetch_region)
 
-			for src in output_group:
+			for source in output_group:
 				if engine_is_class:
 					if not issubclass(user_engine,TaskSubset):
 						raise Exception("[ERROR]\tThe class provided to parabam multiset must be a subclass of\n"\
 										"\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
-					cur_args = [src]
-					procrs.append(ProcessorSubset(outqu=quPrim,
+					cur_args = [source]
+					procrs.append(ProcessorSubset(outqu=task_qu,
 											const=const,
 											TaskClass=user_engine,
 											task_args=cur_args))
@@ -290,37 +290,72 @@ class Interface(parabam.Interface):
 						run_class = SingleSet
 					else:
 						run_class = MultiSet
-					procrs.append(ProcessorSubset(outqu=quPrim,
+					procrs.append(ProcessorSubset(outqu=task_qu,
 												const=const,
 												TaskClass=run_class,
-												task_args=[src]))
+												task_args=[source]))
 
-			handls.append(HandlerSubset(inqu=quPrim,outqu=quMerg,const=const))
-			handls.append(merger.HandlerMerge(inqu=quMerg,const=const))
+			handls.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const))
+			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const))
 
 			lev = parabam.Leviathon(procrs,handls,100000)
 			lev.run()
 			del lev
 
-			#Move the complete telbams out of the tempdir to the working dir
+			#Move the complete telbams out of the temp_dir to the working dir
 			#Only do this if we custom generated the file locations.
 			if keep_in_temp:
-				for source,subset_paths in outFiles.items():
+				for source,subset_paths in output_paths.items():
 					for subset,path in subset_paths.items():
 						final_files.append(path)
 			else:
-				final_files.extend(self.__moveOutputFiles__(outFiles))
+				final_files.extend(self.__move_output_files__(output_paths))
 			
 			gc.collect()
 
 		return final_files
 
-	def getParser(self):
+	def __report_file_names__(self,output_paths):
+		print "[Update] This run will output the following files:"
+		for src,subset_paths in output_paths.items():
+			for mrgTyp,outFilePath in subset_paths.items():
+				print "\t%s" % (outFilePath.split("/")[-1],)
+		print ""
+
+	def __move_output_files__(self,output_paths):
+		final_files = []
+		for src, subset_paths in output_paths.items():
+			for mrgTyp,outFilePath in subset_paths.items():
+				try:
+					move_location = outFilePath.replace(self._temp_dir,".")
+					shutil.move(outFilePath,move_location) #./ being the current working dir
+					final_files.append(move_location) 
+				except shutil.Error,e:
+					alt_filnm = "./%s_%s_%d.bam" % (src,mrgTyp,time.time()) 
+					print "[Error] Output file may already exist, you may not" \
+					"have correct permissions for this file"
+					print "[Status]Trying to create using unique filename:"
+					print "\t\t%s" % (alt_filnm,)
+					shutil.move(outFilePath,alt_filnm)
+					final_files.append(alt_filnm)
+		return final_files
+
+	def get_parser(self):
 		#argparse imported in ./interface/parabam 
-		parser = ut.default_parser()
+		parser = self.default_parser()
 
 		parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
 			,help="The subset process will be run only on reads from this region. \
 			Regions should be colon seperated as specifiec by samtools (eg \'chr1:1000,5000\')")
+		parser.add_argument('--instruc','-i',metavar='INSTRUCTION',required=True
+			,help='The instruction file, written in python, that we wish'\
+			'to carry out on the input BAM.')
+		parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
+			,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
+		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='+',required=False
+			,help='The name of the output that we wish to create. Must be same amount of space \
+			separated entries as INPUT.')
 
 		return parser 
+
+#...happily ever after
