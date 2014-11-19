@@ -59,6 +59,11 @@ class TaskSubset(parabam.Task):
 		self._counts[subset_type] += 1
 		self._temp_objects[subset_type].write(read)
 
+	def __write_to_subset_bam_pair__(self,subset_type,reads):
+		for read in reads:
+			self._counts[subset_type] += 1
+			self._temp_objects[subset_type].write(read)
+
 	@abstractmethod
 	def __handle_task_set__(self,task_set,master):
 		pass
@@ -76,8 +81,11 @@ class MultiSet(TaskSubset):
 
 		engine = self.const.user_engine
 		user_constants = self.const.user_constants
-		subset_write = self.__write_to_subset_bam__
 		subset_types = self.const.subset_types
+
+		subset_write = self.__write_to_subset_bam__
+		if self.const.pair_process:
+			subset_write = self.__write_to_subset_bam_pair__
 
 		for read in task_set:
 			subset_decision = engine(read,user_constants,master)
@@ -100,8 +108,11 @@ class SingleSet(TaskSubset):
 	def __handle_task_set__(self,task_set,master):
 		engine = self.const.user_engine
 		user_constants = self.const.user_constants
-		subset_write = self.__write_to_subset_bam__
 		subset_types = self.const.subset_types
+
+		subset_write = self.__write_to_subset_bam__
+		if self.const.pair_process:
+			subset_write = self.__write_to_subset_bam_pair__
 
 		for read in task_set:
 			if engine(read,user_constants,master):
@@ -198,6 +209,29 @@ class ProcessorSubset(parabam.Processor):
 	def __pre_processor__(self,master_file_path):
 		pass
 
+class PairProcessor(ProcessorSubset):
+	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
+		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
+		self._loners = {}
+		self._loner_count = 0
+
+	def __add_to_collection__(self,master,item,collection):
+		loner_count = self._loner_count
+		loners = self._loners
+
+		try:
+			mate = loners[item.qname] 
+			del loners[item.qname]
+			loner_count -= 1
+			collection.append( (item,mate,) )
+
+		except KeyError:
+			#Could implement a system where by long standing
+			#unpaired reads are stored to be run at the end 
+			#of the program, otherwise we risk clogging memory
+			loners[item.qname] = item
+			loner_count += 1
+
 class Interface(parabam.Interface):
 
 	def __init__(self,temp_dir,exe_dir):
@@ -230,12 +264,14 @@ class Interface(parabam.Interface):
 			user_constants = user_constants,
 			user_engine = user_engine,
 			engine_is_class = False,
-			fetch_region = cmd_args.region
+			fetch_region = cmd_args.region,
+			pair_process=cmd_args.m
 			)
 	
 	def run(self,input_bams,outputs,proc,chunk,subset_types,
-			user_constants,user_engine,fetch_region=None,
-			multi=4,keep_in_temp=False,engine_is_class=False,verbose=False):
+			user_constants,user_engine,fetch_region=None,multi=4,
+			keep_in_temp=False,engine_is_class=False,verbose=False,
+			pair_process=False):
 
 		if not outputs or not len(outputs) == len(input_bams):
 			print "[Warning] Output files will use default naming scheme \n"\
@@ -273,15 +309,20 @@ class Interface(parabam.Interface):
 								exe_dir=self._exe_dir,
 								user_constants=user_constants,
 								user_engine=user_engine,
-								fetch_region=fetch_region)
+								fetch_region=fetch_region,
+								pair_process=pair_process)
 
 			for source in output_group:
+				processor_class = ProcessorSubset
+				if pair_process:
+					processor_class = PairProcessor
+
 				if engine_is_class:
 					if not issubclass(user_engine,TaskSubset):
 						raise Exception("[ERROR]\tThe class provided to parabam multiset must be a subclass of\n"\
 										"\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
 					cur_args = [source]
-					procrs.append(ProcessorSubset(outqu=task_qu,
+					procrs.append(processor_class(outqu=task_qu,
 											const=const,
 											TaskClass=user_engine,
 											task_args=cur_args))
@@ -290,7 +331,7 @@ class Interface(parabam.Interface):
 						run_class = SingleSet
 					else:
 						run_class = MultiSet
-					procrs.append(ProcessorSubset(outqu=task_qu,
+					procrs.append(processor_class(outqu=task_qu,
 												const=const,
 												TaskClass=run_class,
 												task_args=[source]))
@@ -355,6 +396,8 @@ class Interface(parabam.Interface):
 		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='+',required=False
 			,help='The name of the output that we wish to create. Must be same amount of space \
 			separated entries as INPUT.')
+		parser.add_argument('-m',action="store_true",default=False
+			,help='A pair processor is used instead of a conventional processor')
 
 		return parser 
 

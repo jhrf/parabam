@@ -343,6 +343,32 @@ class Processor(object):
 	def __add_to_collection__(self,master,item,collection):
 		pass
 
+class PairProcessor(Processor):
+	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
+		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
+		self._loners = {}
+		self._loner_count = 0
+
+	def __add_to_collection__(self,master,item,collection):
+		loner_count = self._loner_count
+		loners = self._loners
+
+		try:
+			mate = loners[item.qname] 
+			del loners[item.qname]
+			loner_count -= 1
+			collection.append( (alig,mate,) )
+
+		except KeyError:
+			#Could implement a system where by long standing
+			#unpaired reads are stored to be run at the end 
+			#of the program, otherwise we risk clogging memory
+			loners[item.qname] = item
+			loner_count += 1
+
+	def __pre_processor__(self,master_bam):
+		pass
+
 class Leviathon(object):
 	#Leviathon takes objects of processors and handlers and
 	#chains them together.
