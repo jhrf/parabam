@@ -442,6 +442,10 @@ class Interface(object):
 	def run(self):
 		pass
 
+	@abstractmethod
+	def get_parser(self):
+		pass
+
 class Const(object):
 	
 	def __init__(self,output_paths,temp_dir,master_file_path,verbose,chunk,proc,**kwargs):
