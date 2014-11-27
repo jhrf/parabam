@@ -91,13 +91,14 @@ class HandlerStat(parabam.Handler):
 			for source in self._sources:
 				source_structures = self._final_structures[source]
 				data_str = self.__get_data_str_from_names__(const.analysis_names,source_structures)
+
 				with open(const.output_paths,"a") as out_object:
 					out_object.write("%s%s\n" % (source,data_str))
 
 				#Arrays can't be squished into unified output, so create a unique file path	
 				for name,struc in source_structures.items():
 					if struc.struc_type == np.ndarray:
-						array_path = const.output_paths.replace("%s/" % (const.temp_dir,),"./%s_" % (struc.name,))
+						array_path = "%s_%s.csv" % (source,struc.name)
 						struc.write_to_csv(array_path,source,const.outmode)
 		else:
 			for source in self._sources:
@@ -291,14 +292,17 @@ class Interface(parabam.Interface):
 
 		user_structures = self.__create_structures__(user_struc_blueprint)
 		super_sources = [ self.__get_basename__(b) for b in input_bams ]
+		
 		if not output_path:
 			output_path = "%s/parabam_stat_%d.csv" % (self._temp_dir,int(time.time()),)
 
 		analysis_names = self.__get_non_array_names__(user_structures)
+
 		if outmode == "d":
 			header = "Sample,%s\n" % (",".join(analysis_names),)
 			with open(output_path,"w") as out_obj:
 				out_obj.write(header)
+
 		master_out_paths = {}
 		for input_group,output_group in self.__get_group__(input_bams,super_sources,multi=multi):
 			
@@ -352,7 +356,7 @@ class Interface(parabam.Interface):
 			lev = parabam.Leviathon(procrs,handls,100000)
 			lev.run()
 
-		shutil.move(output_path,"./")
+		if analysis_names:shutil.move(output_path,"./")
 		return master_output_paths #Depending on outmode this output a dict or string
 
 	def __create_output_paths__(self,outmode,output_group,user_structures):

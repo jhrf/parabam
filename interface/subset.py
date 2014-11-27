@@ -242,6 +242,9 @@ class Interface(parabam.Interface):
 		cmd_args = parser.parse_args()
 
 		verbose = cmd_args.v
+
+		if os.getcwd not in sys.path:
+			sys.path.append(os.getcwd())
 		module = __import__(cmd_args.instruc, fromlist=[''])
 		user_engine = module.engine
 		user_constants = {}

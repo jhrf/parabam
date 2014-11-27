@@ -134,15 +134,15 @@ class Handler(object):
 			if type(self._stats[stat_name]) is dict: #Account for divided stats.
 				stat_update_str = "[%s] " % (stat_name,)
 				for data in self._stats[stat_name]:
-					stat_update_str += "%s: %d " % (data,self._stats[stat_name][data])
+					stat_update_str += "%s:%d " % (data,self._stats[stat_name][data])
 				stat_update_str = stat_update_str[:-1] + " "
 
 				stats.append(stat_update_str)
 			else:
 				stats.append("%s: %d" % (stat_name,self._stats[stat_name]))
 
-		statstr = " | ".join(stats)
-		return "\r%s - [System] Active Procs: %d | Time: %d " %\
+		statstr = " ".join(stats)
+		return "\r%s | Time: %d " %\
 				(statstr,curproc,self.__secs_since__(start_time))
 
 	#This code is a little ugly. Essentially, given a results
