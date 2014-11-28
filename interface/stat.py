@@ -72,7 +72,7 @@ class HandlerStat(parabam.Handler):
 		for source in self._sources:
 			self._final_structures[source] = {}
 			for name,struc in self.const.user_structures.items():
-				self._final_structures[source][struc.name] = struc.empty_clone() 
+				self._final_structures[source][struc.name] = struc.empty_clone()
 
 	def __new_package_action__(self,new_package,**kwargs):
 		results = new_package.results
@@ -258,7 +258,7 @@ class ArrayStructure(UserStructure):
 	def write_to_csv(self,out_path,source,mode):
 		np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
 
-class Interface(parabam.Interface):
+class Interface(parabam.UserInterface):
 
 	def __init__(self,temp_dir,exe_dir):
 		super(Interface,self).__init__(temp_dir,exe_dir)
@@ -268,16 +268,13 @@ class Interface(parabam.Interface):
 		cmd_args = parser.parse_args()
 
 		verbose = cmd_args.v
-		module = __import__(cmd_args.instruc, fromlist=[''])
-		user_engine = module.engine
-		user_constants = {}
+		module,user_engine,user_constants = self.__get_module_and_vitals__(cmd_args.instruc)
 		user_structures_blueprint = {}
-		module.set_constants(user_constants)
 		module.set_structures(user_structures_blueprint)
 
 		self.run(
 			input_bams=cmd_args.input,
-			output_path = cmd_args.output,
+			user_specified_outpath = cmd_args.output,
 			proc= cmd_args.p,
 			chunk= cmd_args.c,
 			verbose= verbose,
@@ -287,43 +284,35 @@ class Interface(parabam.Interface):
 			engine_is_class = False,
 			outmode = cmd_args.outmode)
 	
-	def run(self,input_bams,output_path,proc,chunk,user_constants,user_engine,
+	def run(self,input_bams,user_specified_outpath,proc,chunk,user_constants,user_engine,
 			user_struc_blueprint,outmode,multi=4,verbose=False,engine_is_class=False):
 
 		user_structures = self.__create_structures__(user_struc_blueprint)
 		super_sources = [ self.__get_basename__(b) for b in input_bams ]
 		
-		if not output_path:
+		if not user_specified_outpath:
 			output_path = "%s/parabam_stat_%d.csv" % (self._temp_dir,int(time.time()),)
+		else:
+			output_path = user_specified_outpath
 
 		analysis_names = self.__get_non_array_names__(user_structures)
-
+		self.__create_output_files__(output_path,user_structures,outmode,analysis_names)
+		
 		if outmode == "d":
-			header = "Sample,%s\n" % (",".join(analysis_names),)
-			with open(output_path,"w") as out_obj:
-				out_obj.write(header)
+			master_output_paths = output_path
+		else:
+			master_output_paths = {}
 
-		master_out_paths = {}
+
 		for input_group,output_group in self.__get_group__(input_bams,super_sources,multi=multi):
 			
-			task_qu = Queue()
+			master_file_path = self.__create_master_file_paths__(input_group,output_group)
 
-			master_file_path = {}
+			if not outmode == "d":
+				output_path = self.__create_individual_output_files__(outmode,output_group,user_structures)
+				master_output_paths.update(output_path)
 
-			for master,source in zip(input_group,output_group):
-				master_file_path[source] = master
-					
-			procrs = []
-			handls = []
-
-			if outmode == "d":
-				output_paths = output_path
-				master_output_paths = output_path
-			else:
-				output_paths = self.__create_output_paths__(outmode,output_group,user_structures)
-				master_output_paths.update(output_paths)
-
-			const = parabam.Const(output_paths=output_paths,temp_dir=self._temp_dir,
+			const = parabam.Const(output_paths=output_path,temp_dir=self._temp_dir,
 								master_file_path=master_file_path,
 								chunk=chunk,proc=(proc // len(input_group)),
 								verbose=verbose,thresh=0,
@@ -335,31 +324,55 @@ class Interface(parabam.Interface):
 								outmode=outmode,
 								analysis_names = analysis_names)
 
-			for source in output_group:
+			task_qu = Queue()
+
+			processors = self.__create_proccessors__(task_qu,output_group,engine_is_class,user_engine,const)
+			handlers = self.__create_handlers__(task_qu,const)
+
+			lev = parabam.Leviathon(processors,handlers,100000)
+			lev.run()
+
+		if outmode == "d" and analysis_names and not user_specified_outpath: 
+			shutil.move(output_path,"./")
+		return master_output_paths #Depending on outmode this output a dict or string
+
+	def __create_output_files__(self,output_path,user_structures,outmode,analysis_names):
+		if outmode == "d":
+			header = "Sample,%s\n" % (",".join(analysis_names),)
+			with open(output_path,"w") as out_obj:
+				out_obj.write(header)
+
+
+	def __create_handlers__(self,task_qu,const):
+		return [HandlerStat(inqu=task_qu,const=const)]
+
+	def __create_proccessors__(self,task_qu,output_group,engine_is_class,user_engine,const):
+		processors = []
+
+		for source in output_group:
 				if engine_is_class:
 					if not issubclass(user_engine,TaskStat):
 						raise Exception("[ERROR]\tThe class provided to parabam must be a subclass of\n"\
 										"\tparabam.interface.subset.TaskStat. Please consult the parabam manual.")
 					cur_args = [source]
-					procrs.append(ProcessorStat(outqu=task_qu,
+					processors.append(ProcessorStat(outqu=task_qu,
 											const=const,
 											TaskClass=user_engine,
 											task_args=cur_args))
 				else:
-					procrs.append(ProcessorStat(outqu=task_qu,
+					processors.append(ProcessorStat(outqu=task_qu,
 												const=const,
 												TaskClass=TaskStat,
 												task_args=[source]))
+		return processors
+			
+	def __create_master_file_paths__(self,input_group,output_group):
+		master_file_path = {}
+		for master,source in zip(input_group,output_group):
+				master_file_path[source] = master
+		return master_file_path
 
-			handls.append(HandlerStat(inqu=task_qu,const=const))
-
-			lev = parabam.Leviathon(procrs,handls,100000)
-			lev.run()
-
-		if analysis_names:shutil.move(output_path,"./")
-		return master_output_paths #Depending on outmode this output a dict or string
-
-	def __create_output_paths__(self,outmode,output_group,user_structures):
+	def __create_individual_output_files__(self,outmode,output_group,user_structures):
 		out_paths = {}
 		for source in output_group:
 			out_paths[source] = {}
@@ -404,11 +417,6 @@ class Interface(parabam.Interface):
 		#argparse imported in ./interface/parabam 
 		parser = self.default_parser()
 
-		parser.add_argument('--instruc','-i',metavar='INSTRUCTION',required=True
-			,help='The instruction file, written in python, that we wish'\
-			'to carry out on the input BAM.')
-		parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
-			,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
 		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='?',required=False
 		,help='Specify a name for the output CSV file. Only used with default `outmode`.\
 			If this argument is not supplied, the output will take the following form:\

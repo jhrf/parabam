@@ -143,7 +143,7 @@ class Handler(object):
 
 		statstr = " ".join(stats)
 		return "\r%s | Time: %d " %\
-				(statstr,curproc,self.__secs_since__(start_time))
+				(statstr,self.__secs_since__(start_time))
 
 	#This code is a little ugly. Essentially, given a results
 	#dictionary, it will go through and create a sensible output
@@ -407,6 +407,7 @@ class Leviathon(object):
 class Interface(object):
 
 	__metaclass__ = ABCMeta
+
 	def __init__(self,temp_dir,exe_dir):
 		self._temp_dir = temp_dir
 		self._exe_dir = exe_dir
@@ -464,6 +465,49 @@ class Interface(object):
 		#passes the functions to the run function
 		pass
 
+	@abstractmethod
+	def run(self):
+		pass
+
+	@abstractmethod
+	def get_parser(self):
+		pass
+
+class UserInterface(Interface):
+
+	__metaclass__ = ABCMeta
+
+	def __init__(self,temp_dir,exe_dir):
+		super(UserInterface,self).__init__(temp_dir,exe_dir)
+
+	def __get_module_and_vitals__(self,code_path):
+		if os.getcwd not in sys.path:
+			sys.path.append(os.getcwd())
+		try:
+			module = __import__(code_path, fromlist=[''])
+
+		except ImportError:
+			sys.stderr.write("[ERROR] parabam can't find user module. Ensure code is in current working directory\n")
+			raise SystemExit
+
+		user_engine = module.engine
+		user_constants = {}
+		if hasattr(module,"set_constants"):
+			user_constants = module.set_constants(user_constants)
+
+		return module,user_engine,user_constants
+
+	def default_parser(self):
+		parser = super(UserInterface,self).default_parser()
+
+		parser.add_argument('--instruc','-i',metavar='INSTRUCTION',required=True
+			,help='The instruction file, written in python, that we wish'\
+			'to carry out on the input BAM.')
+		parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
+			,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
+
+		return parser
+		
 	@abstractmethod
 	def run(self):
 		pass

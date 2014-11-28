@@ -232,7 +232,7 @@ class PairProcessor(ProcessorSubset):
 			loners[item.qname] = item
 			loner_count += 1
 
-class Interface(parabam.Interface):
+class Interface(parabam.UserInterface):
 
 	def __init__(self,temp_dir,exe_dir):
 		super(Interface,self).__init__(temp_dir,exe_dir)
@@ -243,12 +243,7 @@ class Interface(parabam.Interface):
 
 		verbose = cmd_args.v
 
-		if os.getcwd not in sys.path:
-			sys.path.append(os.getcwd())
-		module = __import__(cmd_args.instruc, fromlist=[''])
-		user_engine = module.engine
-		user_constants = {}
-		module.set_constants(user_constants)
+		module,user_engine,user_constants = self.__get_module_and_vitals__(cmd_args.instruc)
 
 		if hasattr(module,"get_subset_types"):
 			if verbose: 
@@ -391,11 +386,6 @@ class Interface(parabam.Interface):
 		parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
 			,help="The subset process will be run only on reads from this region. \
 			Regions should be colon seperated as specifiec by samtools (eg \'chr1:1000,5000\')")
-		parser.add_argument('--instruc','-i',metavar='INSTRUCTION',required=True
-			,help='The instruction file, written in python, that we wish'\
-			'to carry out on the input BAM.')
-		parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
-			,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
 		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='+',required=False
 			,help='The name of the output that we wish to create. Must be same amount of space \
 			separated entries as INPUT.')

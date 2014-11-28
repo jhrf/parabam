@@ -59,6 +59,7 @@ if __name__ == "__main__":
 				print "-"
 				print "[ERROR] parabam stopped unexpecedtly, sorry!"
 				#traceback.print_exception(*sys.exc_info())
+				die_gracefully(temp_dir)
 				raise
 			die_gracefully(temp_dir)
 
