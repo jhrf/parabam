@@ -81,18 +81,18 @@ class HandlerMerge(parabam.Handler):
 				else:
 					new_header['CO'] = [source_info]
 
-				header_temp_path = self.__get_unique_temp__("header",temp_dir=self.const.temp_dir)
+				header_temp_path = self.__get_unique_temp_path__("header",temp_dir=self.const.temp_dir)
 				header_temp_object = pysam.Samfile(header_temp_path,"wb",header=new_header)
 				header_temp_object.close()
 
-				cat_temp_path = self.__get_unique_temp__("cat",temp_dir=self.const.temp_dir)
+				cat_temp_path = self.__get_unique_temp_path__("cat",temp_dir=self.const.temp_dir)
 				pysam.cat("-o",cat_temp_path,header_temp_path,telbam_path)
 
 				os.remove(header_temp_path)
 				os.remove(telbam_path)
 				os.rename(cat_temp_path,telbam_path)
 
-	def __get_unique_temp__(self,temp_type,temp_dir="."):
+	def __get_unique_temp_path__(self,temp_type,temp_dir="."):
 		return "%s/%sTEMP%d.bam" % (temp_dir,temp_type,int(time.time()),)
 
 	def __close_all_out_files__(self):

@@ -436,12 +436,17 @@ class Interface(object):
 	def __sort_and_index__(self,fnm,verbose=False,tempDir=".",name=False):
 		if not os.path.exists(fnm+".bai"):
 			if verbose: print "%s is not indexed. Sorting and creating index file." % (fnm,)
-			tempsort_path = get_unqiue_tmp_path("SORT",tempDir=tempDir)
+			tempsort_path = self.__get_unique_temp_path__("SORT",temp_dir=self._temp_dir)
 			optStr = "-nf" if name else "-f"
 			pysam.sort(optStr,fnm,tempsort_path)
 			os.remove(fnm)
 			os.rename(tempsort_path,fnm)
 			if not name: pysam.index(fnm)
+
+	def __get_unique_temp_path__(self,temp_type,temp_dir="."):
+		#TODO: Duplicated from parabam.interface.merger. Find a way to reformat code
+		#to remove this duplication
+		return "%s/%sTEMP%d.bam" % (temp_dir,temp_type,int(time.time()),)
 
 	def default_parser(self):
 

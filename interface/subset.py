@@ -269,7 +269,7 @@ class Interface(parabam.UserInterface):
 	def run(self,input_bams,outputs,proc,chunk,subset_types,
 			user_constants,user_engine,fetch_region=None,multi=4,
 			keep_in_temp=False,engine_is_class=False,verbose=False,
-			pair_process=False):
+			pair_process=False,debug=False):
 
 		if not outputs or not len(outputs) == len(input_bams):
 			print "[Warning] Output files will use default naming scheme \n"\
@@ -323,7 +323,8 @@ class Interface(parabam.UserInterface):
 					procrs.append(processor_class(outqu=task_qu,
 											const=const,
 											TaskClass=user_engine,
-											task_args=cur_args))
+											task_args=cur_args,
+											debug=debug))
 				else:
 					if len(subset_types) == 1:
 						run_class = SingleSet
@@ -332,7 +333,8 @@ class Interface(parabam.UserInterface):
 					procrs.append(processor_class(outqu=task_qu,
 												const=const,
 												TaskClass=run_class,
-												task_args=[source]))
+												task_args=[source],
+												debug = debug))
 
 			handls.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const))
 			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const))
