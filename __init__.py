@@ -348,6 +348,7 @@ class PairProcessor(Processor):
 		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
 		self._loners = {}
 		self._loner_count = 0
+		self._loners_object = pysam.Samfile("%s/loners" % (self._temp_dir,),"wb")
 
 	def __add_to_collection__(self,master,item,collection):
 		loner_count = self._loner_count
@@ -357,7 +358,7 @@ class PairProcessor(Processor):
 			mate = loners[item.qname] 
 			del loners[item.qname]
 			loner_count -= 1
-			collection.append( (alig,mate,) )
+			collection.append( (item,mate,) )
 
 		except KeyError:
 			#Could implement a system where by long standing
@@ -366,8 +367,21 @@ class PairProcessor(Processor):
 			loners[item.qname] = item
 			loner_count += 1
 
-	def __pre_processor__(self,master_bam):
-		pass
+		if loner_count > 10000:
+			self.__stash_loners__(loners)
+
+	def __stash_loners__(self,loners):
+		print "stashing loners"
+		for name,read in loners.items():
+			self._loners_object.write(read)
+		del self._loners
+		gc.collect()
+		self._loners = {}
+
+	def __end_processing__(self,master):
+		super(PairProcessor,self).__end_processing__(master)
+		self.__stash_loners__(self._loners)
+		self._loners_object.close()
 
 class Leviathon(object):
 	#Leviathon takes objects of processors and handlers and

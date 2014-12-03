@@ -209,29 +209,6 @@ class ProcessorSubset(parabam.Processor):
 	def __pre_processor__(self,master_file_path):
 		pass
 
-class PairProcessor(ProcessorSubset):
-	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
-		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
-		self._loners = {}
-		self._loner_count = 0
-
-	def __add_to_collection__(self,master,item,collection):
-		loner_count = self._loner_count
-		loners = self._loners
-
-		try:
-			mate = loners[item.qname] 
-			del loners[item.qname]
-			loner_count -= 1
-			collection.append( (item,mate,) )
-
-		except KeyError:
-			#Could implement a system where by long standing
-			#unpaired reads are stored to be run at the end 
-			#of the program, otherwise we risk clogging memory
-			loners[item.qname] = item
-			loner_count += 1
-
 class Interface(parabam.UserInterface):
 
 	def __init__(self,temp_dir,exe_dir):
@@ -313,7 +290,7 @@ class Interface(parabam.UserInterface):
 			for source in output_group:
 				processor_class = ProcessorSubset
 				if pair_process:
-					processor_class = PairProcessor
+					processor_class = parabam.PairProcessor
 
 				if engine_is_class:
 					if not issubclass(user_engine,TaskSubset):
