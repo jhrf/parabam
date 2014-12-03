@@ -322,7 +322,7 @@ class Processor(object):
 
 	def __get_next_alig_debug__(self,master_bam):
 		for i,alig in enumerate(master_bam.fetch(until_eof=True)):
-			if i < 10000000:
+			if i < 5000000:
 				yield alig
 			else:
 				return
@@ -424,6 +424,8 @@ class Interface(object):
 			+ datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
 	def __get_group__(self,bams,names,multi):
+		if multi == 0:
+			multi = 1
 		for i in xrange(0,len(bams),multi):
 			yield (bams[i:i+multi],names[i:i+multi])
 
@@ -498,7 +500,7 @@ class UserInterface(Interface):
 		user_engine = module.engine
 		user_constants = {}
 		if hasattr(module,"set_constants"):
-			user_constants = module.set_constants(user_constants)
+			module.set_constants(user_constants)
 
 		return module,user_engine,user_constants
 

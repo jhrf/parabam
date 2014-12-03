@@ -56,11 +56,22 @@ class HandlerMerge(parabam.Handler):
 		if len(new_package.results) > 0: #Check that there are results to merge
 			(int(time.time() - new_package.time_added),int(time.time() - self._chilling),self._merged)
 			for result_path in new_package.results:
-				result_obj = pysam.Samfile(result_path,"rb")
-				for alig in result_obj.fetch(until_eof=True):
-					self._out_file_objects[source][subset_type].write(alig)
-				result_obj.close()
-				os.remove(result_path)	
+				#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
+				try:
+					result_obj = pysam.Samfile(result_path,"rb")
+					for alig in result_obj.fetch(until_eof=True):
+						self._out_file_objects[source][subset_type].write(alig)
+					result_obj.close()
+					os.remove(result_path)
+				except IOError:
+					print "[ERROR] Merger error. Printing temp contents"
+					sys.stdout.write(os.listdir(self.const.temp_dir))
+					print "--"
+					print "Printing newpackage"
+					print newpackage
+					print "--"
+				#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
+					
 			self._merged += 1		
 			self._chilling = time.time()
 
