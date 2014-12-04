@@ -65,7 +65,7 @@ class HandlerMerge(parabam.Handler):
 					os.remove(result_path)
 				except IOError:
 					print "[ERROR] Merger error. Printing temp contents"
-					sys.stdout.write(os.listdir(self.const.temp_dir))
+					sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
 					print "--"
 					print "Printing newpackage"
 					print new_package

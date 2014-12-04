@@ -35,6 +35,7 @@ class Task(multiprocessing.Process):
 		results = {}
 		results = self.__generate_results__()
 		results["total"] = len(self._task_set)
+		#print len(self._task_set)
 
 		self._outqu.put(Package(name=self.name,
 								results=results,
@@ -50,9 +51,12 @@ class Task(multiprocessing.Process):
 		return "%s/%s_%s_parabam_temp.bam" % (self._temp_dir,typ,self.pid)
 
 	def __get_mate__(self,master,alig):
-		start = master.tell()
-		mate = master.mate(alig)
-		master.seek(start)
+		try:
+			start = master.tell()
+			mate = master.mate(alig)
+			master.seek(start)
+		except ValueError:
+			mate = None
 		return mate
 
 	#Generate a dictionary of results using self._task_set
@@ -342,46 +346,6 @@ class Processor(object):
 	@abstractmethod
 	def __add_to_collection__(self,master,item,collection):
 		pass
-
-class PairProcessor(Processor):
-	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
-		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
-		self._loners = {}
-		self._loner_count = 0
-		self._loners_object = pysam.Samfile("%s/loners" % (self._temp_dir,),"wb")
-
-	def __add_to_collection__(self,master,item,collection):
-		loner_count = self._loner_count
-		loners = self._loners
-
-		try:
-			mate = loners[item.qname] 
-			del loners[item.qname]
-			loner_count -= 1
-			collection.append( (item,mate,) )
-
-		except KeyError:
-			#Could implement a system where by long standing
-			#unpaired reads are stored to be run at the end 
-			#of the program, otherwise we risk clogging memory
-			loners[item.qname] = item
-			loner_count += 1
-
-		if loner_count > 10000:
-			self.__stash_loners__(loners)
-
-	def __stash_loners__(self,loners):
-		print "stashing loners"
-		for name,read in loners.items():
-			self._loners_object.write(read)
-		del self._loners
-		gc.collect()
-		self._loners = {}
-
-	def __end_processing__(self,master):
-		super(PairProcessor,self).__end_processing__(master)
-		self.__stash_loners__(self._loners)
-		self._loners_object.close()
 
 class Leviathon(object):
 	#Leviathon takes objects of processors and handlers and

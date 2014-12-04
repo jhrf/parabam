@@ -209,6 +209,48 @@ class ProcessorSubset(parabam.Processor):
 	def __pre_processor__(self,master_file_path):
 		pass
 
+class PairProcessor(ProcessorSubset):
+	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
+		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
+		self._loners = {}
+		self._loner_count = 0
+		master = pysam.Samfile(self._master_file_path[task_args[0]],"rb")
+		self._loners_object = pysam.Samfile("%s/loners" % (self._temp_dir,),"wb",template=master)
+		master.close()
+
+	def __add_to_collection__(self,master,item,collection):
+		loner_count = self._loner_count
+		loners = self._loners
+
+		try:
+			mate = loners[item.qname] 
+			del loners[item.qname]
+			loner_count -= 1
+			collection.append( (item,mate,) )
+		except KeyError:
+			#Could implement a system where by long standing
+			#unpaired reads are stored to be run at the end 
+			#of the program, otherwise we risk clogging memory
+			loners[item.qname] = item
+			loner_count += 1
+
+		# if loner_count > 10000:
+		# 	loner_count = 0
+		# 	self.__stash_loners__(loners)
+		# 	del self._loners
+		# 	gc.collect()
+		# 	self._loners = {}
+
+	def __stash_loners__(self,loners):
+		print "stashing loners"
+		for name,read in loners.items():
+			self._loners_object.write(read)
+
+	def __end_processing__(self,master):
+		super(PairProcessor,self).__end_processing__(master)
+		self.__stash_loners__(self._loners)
+		self._loners_object.close()
+
 class Interface(parabam.UserInterface):
 
 	def __init__(self,temp_dir,exe_dir):
@@ -290,7 +332,7 @@ class Interface(parabam.UserInterface):
 			for source in output_group:
 				processor_class = ProcessorSubset
 				if pair_process:
-					processor_class = parabam.PairProcessor
+					processor_class = PairProcessor
 
 				if engine_is_class:
 					if not issubclass(user_engine,TaskSubset):
