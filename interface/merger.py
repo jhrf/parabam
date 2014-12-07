@@ -67,9 +67,17 @@ class HandlerMerge(parabam.Handler):
 					print "[ERROR] Merger error. Printing temp contents"
 					sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
 					print "--"
+					print "--"
+					print "Printing working dir contents"
+					sys.stdout.write("\n".join(os.listdir("./")))
+					print "--"
+					print "--"
 					print "Printing newpackage"
 					print new_package
 					print "--"
+					print "--"
+
+					raise
 				#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
 					
 			self._merged += 1		

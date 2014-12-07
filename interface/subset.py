@@ -136,6 +136,31 @@ class HandlerSubset(parabam.Handler):
 		self._mergequeue = outqu
 		self._mergecount = 0
 
+		if const.verbose == 1:
+			self._verbose = True
+			self._update_output = self.__level_1_output__
+		elif const.verbose == 2 or const.verbose == True:
+			#In the case verbose is simply "True" or "level 2"
+			self._verbose = True
+			self._update_output = self.__standard_output__
+		else:#catching False and -v0
+			self._verbose = False
+			self._update_output = self.__standard_output__
+
+	def __level_1_output__(self,out_str):
+		total_procd = self.__get_total_processed_reads__()
+		time = out_str.partition("Time: ")[2]
+		sys.stdout.write("[Update] Processed: %d Time: %s\n" % (total_procd,time))
+		sys.stdout.flush()
+
+	def __get_total_processed_reads__(self):
+		total = 0
+		for source,deep_stat in self._stats.items():
+			for name,value in deep_stat.items():
+				if name == "total":
+					total += value
+		return total
+
 	def __new_package_action__(self,new_package,**kwargs):
 		results = new_package.results
 		source = results["source"]
@@ -170,8 +195,9 @@ class HandlerSubset(parabam.Handler):
 		return sum(map(lambda s : self._stats[s]["total"],self._sources))
 
 	def __handler_exit__(self,**kwargs):
-		self._update_output("[Result] Processed %d reads from bam files\n" % (self.__total_reads__(),))
-		self._update_output("[Status] Waiting for merge operation to finish...\n")
+		if self._verbose:
+			self.__standard_output__("[Result] Processed %d reads from bam files\n" % (self.__total_reads__(),))
+			self.__standard_output__("[Status] Waiting for merge operation to finish...\n")
 
 		last_source = len(self._sources) - 1
 		last_mrg = len(self._subset_types) - 1
@@ -358,7 +384,12 @@ class Interface(parabam.UserInterface):
 			handls.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const))
 			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const))
 
-			lev = parabam.Leviathon(procrs,handls,100000)
+			if verbose == 1: 
+				update_interval = 10000000
+			else:
+				update_interval = 100000
+
+			lev = parabam.Leviathon(procrs,handls,update_interval)
 			lev.run()
 			del lev
 
@@ -412,6 +443,11 @@ class Interface(parabam.UserInterface):
 			separated entries as INPUT.')
 		parser.add_argument('-m',action="store_true",default=False
 			,help='A pair processor is used instead of a conventional processor')
+		parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
+			help='Indicate the amount of information output by the program:\
+			0: No output [Default]\
+			1: Total Reads Processsed\
+			2: Detailed output')
 
 		return parser 
 

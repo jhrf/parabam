@@ -123,14 +123,12 @@ class Handler(object):
 				update_output(outstr)
 
 		self.__periodic_action__(iterations)
-		if self._verbose and self._report: update_output("\n[output_Update] All reads processed succesfully.\n")
 		self._inqu.close()
 		self.__handler_exit__()
 
 	def __standard_output__(self,outstr):
-		if self._verbose:
-			sys.stdout.write("\r" + outstr)
-			sys.stdout.flush()
+		sys.stdout.write("\r" + outstr)
+		sys.stdout.flush()
 
 	def __format_update__(self,curproc,start_time):
 		stats = []
