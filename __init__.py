@@ -116,7 +116,6 @@ class Handler(object):
 
 			if iterations % 100000 == 0: 
 				self.__periodic_action__(iterations)
-				gc.collect()
 
 			if self._verbose and self._report and iterations % update_interval == 0:
 				outstr = self.__format_update__(curproc,start_time)
@@ -269,29 +268,10 @@ class Processor(object):
 		if max_tasks > currently_active:
 			return
 
-		i = 0
-		report = False
-
 		while(max_tasks < currently_active):
 			currently_active = len(active_tasks)
 			update_tasks(active_tasks)
-			i += 1
-			if i % 100000 == 0 and self._verbose:
-				if not report: #Only say the following once
-					if max_tasks > 0:
-						sys.stdout.write("\r[Status] Processors all busy...waiting")
-						pass
-					elif max_tasks == 0:
-						sys.stdout.write("\r[Status] Waiting for current tasks to finish before sending last batch")
-				time.sleep(5)
-				report = True
-
-		if self._verbose and report: 
-			if max_tasks == 0: 
-				print "\r[Update] All tasks have finished, sending final task"
-			elif report:
-				sys.stdout.write("\r                                                           ")
-				sys.stdout.write("\r[Status] Normal functioning resumed")
+			time.sleep(5)
 
 	def __update_tasks__(self,active_tasks):
 		terminated_procs = []
@@ -303,9 +283,12 @@ class Processor(object):
 		for pr in terminated_procs:
 			active_tasks.remove(pr)
 
+		if len(terminated_procs) > 0:
+			#Only invoked the GC if there is the possibility of
+			#collecting any memory.
+			gc.collect()
+			
 		del terminated_procs
-		#Force a collection, hopefully free memory from processes
-		gc.collect() 
 				
 	def __start_task__(self,collection,destroy=False):
 		args = [collection,self._outqu,len(self._active_tasks)+1,destroy,self.const]

@@ -179,7 +179,6 @@ class HandlerSubset(parabam.Handler):
 
 	def __test_merge_store__(self,outnm,store,source,subset):
 		if len(store) > 10:
-			sys.stdout.flush()
 			self.__add_merge_task__(name=outnm,results=store,subset_type=subset,source=source,total=self._stats[source]["total"])
 			self._mergecount += 1
 			#Remove the temp file which has been merged
