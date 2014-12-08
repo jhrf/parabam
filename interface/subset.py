@@ -244,30 +244,30 @@ class PairProcessor(ProcessorSubset):
 		master.close()
 
 	def __add_to_collection__(self,master,item,collection):
-		loner_count = self._loner_count
 		loners = self._loners
 
 		try:
 			mate = loners[item.qname] 
 			del loners[item.qname]
-			loner_count -= 1
+			self._loner_count -= 1
 			collection.append( (item,mate,) )
 		except KeyError:
 			#Could implement a system where by long standing
 			#unpaired reads are stored to be run at the end 
 			#of the program, otherwise we risk clogging memory
 			loners[item.qname] = item
-			loner_count += 1
+			self._loner_count += 1
 
-		# if loner_count > 10000:
-		# 	loner_count = 0
-		# 	self.__stash_loners__(loners)
-		# 	del self._loners
-		# 	gc.collect()
-		# 	self._loners = {}
+		sys.stdout.write("\r %d" % (self._loner_count,))
+
+		if self._loner_count > 200000:
+		 	self._loner_count = 0
+		 	self.__stash_loners__(loners)
+		 	del self._loners
+		 	gc.collect()
+		 	self._loners = {}
 
 	def __stash_loners__(self,loners):
-		print "stashing loners"
 		for name,read in loners.items():
 			self._loners_object.write(read)
 
@@ -383,7 +383,7 @@ class Interface(parabam.UserInterface):
 			handls.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const))
 			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const))
 
-			if verbose == 1: 
+			if verbose == 1 and type(verbose) == int: 
 				update_interval = 10000000
 			else:
 				update_interval = 100000

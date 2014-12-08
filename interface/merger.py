@@ -30,7 +30,6 @@ class HandlerMerge(parabam.Handler):
 		self._subset_types = const.subset_types
 		self._out_file_objects = self.__get_out_file_objects__()
 		self._merged = 0
-		self._chilling = time.time()
 
 	def __get_out_file_objects__(self):
 		file_objects = {}
@@ -54,7 +53,6 @@ class HandlerMerge(parabam.Handler):
 		self._total[subset_type] = new_package.curproc #hack to record size of parent BAM
 
 		if len(new_package.results) > 0: #Check that there are results to merge
-			(int(time.time() - new_package.time_added),int(time.time() - self._chilling),self._merged)
 			for result_path in new_package.results:
 				#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
 				try:
@@ -81,7 +79,6 @@ class HandlerMerge(parabam.Handler):
 				#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
 					
 			self._merged += 1		
-			self._chilling = time.time()
 
 	def __add_source_to_header__(self):
 		#This could be moved before processing to cut down on the pysam cat overhead.
