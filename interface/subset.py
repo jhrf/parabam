@@ -383,8 +383,8 @@ class Interface(parabam.UserInterface):
 			handls.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const))
 			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const))
 
-			if verbose == 1 and type(verbose) == int: 
-				update_interval = 10000000
+			if verbose == 1: 
+				update_interval = 20000000
 			else:
 				update_interval = 100000
 

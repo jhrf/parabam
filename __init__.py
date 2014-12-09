@@ -269,8 +269,8 @@ class Processor(object):
 			return
 
 		while(max_tasks < currently_active):
-			currently_active = len(active_tasks)
 			update_tasks(active_tasks)
+			currently_active = len(active_tasks)
 			time.sleep(5)
 
 	def __update_tasks__(self,active_tasks):
@@ -286,9 +286,9 @@ class Processor(object):
 		if len(terminated_procs) > 0:
 			#Only invoked the GC if there is the possibility of
 			#collecting any memory.
+			del terminated_procs
 			gc.collect()
 			
-		del terminated_procs
 				
 	def __start_task__(self,collection,destroy=False):
 		args = [collection,self._outqu,len(self._active_tasks)+1,destroy,self.const]
