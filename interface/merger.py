@@ -23,8 +23,8 @@ class MergePackage(parabam.Package):
 
 class HandlerMerge(parabam.Handler):
 
-	def __init__(self,inqu,const):
-		super(HandlerMerge,self).__init__(inqu,const,report=False)
+	def __init__(self,inqu,const,destroy_limit=1):
+		super(HandlerMerge,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)
 		self._total = Counter()
 		self._sources = const.sources
 		self._subset_types = const.subset_types

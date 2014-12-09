@@ -120,8 +120,8 @@ class SingleSet(TaskSubset):
 		
 class HandlerSubset(parabam.Handler):
 
-	def __init__(self,inqu,outqu,const):
-		super(HandlerSubset,self).__init__(inqu,const,destroy_limit=len(const.sources))
+	def __init__(self,inqu,outqu,const,destroy_limit):
+		super(HandlerSubset,self).__init__(inqu,const,destroy_limit=destroy_limit)
 
 		self._sources = const.sources
 		self._subset_types = const.subset_types
@@ -198,16 +198,12 @@ class HandlerSubset(parabam.Handler):
 			self.__standard_output__("[Result] Processed %d reads from bam files\n" % (self.__total_reads__(),))
 			self.__standard_output__("[Status] Waiting for merge operation to finish...\n")
 
-		last_source = len(self._sources) - 1
-		last_mrg = len(self._subset_types) - 1
-
-		for source_count,source in enumerate(self._sources):
-			for merge_count,subset in enumerate(self._subset_types):
-				destroy = True if (source_count == last_source and merge_count == last_mrg) else False
+		for source in self._sources:
+			for subset in self._subset_types:
 				self.__add_merge_task__(name=self._output_paths[source][subset],
 									results=self._merge_stores[source][subset],subset_type=subset,
 									source=source,total=self._stats[source]["total"],
-									destroy=destroy)
+									destroy=True)
 
 class ProcessorSubset(parabam.Processor):
 
@@ -380,8 +376,9 @@ class Interface(parabam.UserInterface):
 												task_args=[source],
 												debug = debug))
 
-			handls.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const))
-			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const))
+			destroy_limit=len(const.sources)
+			handls.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const,destroy_limit=destroy_limit))
+			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
 
 			if verbose == 1: 
 				update_interval = 20000000
