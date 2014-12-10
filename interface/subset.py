@@ -167,10 +167,7 @@ class HandlerSubset(parabam.Handler):
 		self.__auto_handle__(results,source)
 
 		for subset in self._subset_types:
-			if results["counts"][subset] > 0:
-				self._merge_stores[source][subset].append(results["temp_paths"][subset])
-			else:
-				os.remove(results["temp_paths"][subset])
+			self._merge_stores[source][subset].append((results["counts"][subset],results["temp_paths"][subset],))
 
 	def __periodic_action__(self,iterations):
 		for source in self._sources:
@@ -183,7 +180,6 @@ class HandlerSubset(parabam.Handler):
 			self._mergecount += 1
 			#Remove the temp file which has been merged
 			store[:] = [] #Wipe the store clean, these have been merged
-			sys.stdout.flush()
 
 	def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
 		res = merger.MergePackage(name=name,results=list(results),
@@ -201,9 +197,9 @@ class HandlerSubset(parabam.Handler):
 		for source in self._sources:
 			for subset in self._subset_types:
 				self.__add_merge_task__(name=self._output_paths[source][subset],
-									results=self._merge_stores[source][subset],subset_type=subset,
-									source=source,total=self._stats[source]["total"],
-									destroy=True)
+								results=self._merge_stores[source][subset],subset_type=subset,
+								source=source,total=self._stats[source]["total"],
+								destroy=True)
 
 class ProcessorSubset(parabam.Processor):
 

@@ -111,8 +111,8 @@ class Handler(object):
 					dealt += 1
 
 			except Queue2.Empty:
-				#Queue empty. Continue with loop
-				pass
+				#Queue empty. Continue with loop after sleeping
+				time.sleep(3)
 
 			if iterations % 100000 == 0: 
 				self.__periodic_action__(iterations)
@@ -337,7 +337,6 @@ class Leviathon(object):
 		self._update = update
 	
 	def run(self):
-		#We spawn processes rather than fork to save memory
 		procs = []
 
 		for p in self._processors:

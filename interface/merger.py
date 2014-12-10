@@ -52,33 +52,36 @@ class HandlerMerge(parabam.Handler):
 		source = new_package.source
 		self._total[subset_type] = new_package.curproc #hack to record size of parent BAM
 
-		if len(new_package.results) > 0: #Check that there are results to merge
-			for result_path in new_package.results:
-				#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
-				try:
-					result_obj = pysam.Samfile(result_path,"rb")
+		#debug
+		print "Merge Recieved"
+		print new_package.source,new_package.subset
+		print new_package.results
+		print new_package.time_added
+		print "----"
+		sys.stdout.flush()
+
+		for merge_count,merge_path in new_package.results:
+			#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
+			try:
+				if merge_count > 0:
+					result_obj = pysam.Samfile(merge_path,"rb")
 					for alig in result_obj.fetch(until_eof=True):
 						self._out_file_objects[source][subset_type].write(alig)
 					result_obj.close()
-					os.remove(result_path)
-				except IOError:
-					print "FAILURE ON THIS PATH %s" % (result_path,)
+				os.remove(merge_path)
 
-					print "\nTEMP CONTENTS"
-					sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
-					print "--"
-					print "--"
-					print "WORKING DIR"
-					sys.stdout.write("\n".join(os.listdir("./")))
-					print "--"
-					print "--"
-					print "Printing newpackage.results"
-					print new_package.results
-					print "--"
-					print "--"
+			except IOError:
+				print "FAILURE ON THIS PATH %s" % (merge_path,)
 
-					raise
-				#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
+				print "\nTEMP CONTENTS"
+				sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
+				print "--"
+				print "Printing newpackage.results"
+				print new_package.results
+				print "--"
+
+				raise
+			#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
 					
 			self._merged += 1		
 
