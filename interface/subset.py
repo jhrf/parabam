@@ -378,9 +378,9 @@ class Interface(parabam.UserInterface):
 			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
 
 			if verbose == 1: 
-				update_interval = 20000000
+				update_interval = 10
 			else:
-				update_interval = 100000
+				update_interval = 1
 
 			lev = parabam.Leviathon(procrs,handls,update_interval)
 			lev.run()

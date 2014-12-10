@@ -114,7 +114,7 @@ class Handler(object):
 				#Queue empty. Continue with loop after sleeping
 				time.sleep(3)
 
-			if iterations % 100000 == 0: 
+			if iterations % 10 == 0: 
 				self.__periodic_action__(iterations)
 
 			if self._verbose and self._report and iterations % update_interval == 0:
