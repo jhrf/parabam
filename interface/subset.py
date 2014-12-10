@@ -175,11 +175,12 @@ class HandlerSubset(parabam.Handler):
 				self.__test_merge_store__(self._output_paths[source][subset],self._merge_stores[source][subset],source,subset)
 
 	def __test_merge_store__(self,outnm,store,source,subset):
-		if len(store) > 10:
+		if len(store) > 1:
 			self.__add_merge_task__(name=outnm,results=store,subset_type=subset,source=source,total=self._stats[source]["total"])
 			self._mergecount += 1
 			#Remove the temp file which has been merged
 			store[:] = [] #Wipe the store clean, these have been merged
+			gc.collect()
 
 	def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
 		res = merger.MergePackage(name=name,results=list(results),

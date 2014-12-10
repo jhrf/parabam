@@ -53,12 +53,12 @@ class HandlerMerge(parabam.Handler):
 		self._total[subset_type] = new_package.curproc #hack to record size of parent BAM
 
 		#debug
-		print "Merge Recieved"
-		print new_package.source,new_package.subset
-		print new_package.results
-		print new_package.time_added
-		print "----"
-		sys.stdout.flush()
+		# print "Merge Recieved"
+		# print new_package.source,new_package.subset_type
+		# print new_package.results
+		# print new_package.time_added
+		# print "----"
+		# sys.stdout.flush()
 
 		for merge_count,merge_path in new_package.results:
 			#DEBUG FOR FAILED MERGING WITNESSED ON CLUSTER
