@@ -98,7 +98,7 @@ class Handler(object):
 			iterations += 1
 			#Listen for a process coming in...
 			try:
-				new_package = self._inqu.get(False)
+				new_package = self._inqu.get(3)
 				if new_package.destroy:
 					#destroy limit allows for multiple processors
 					destroy_count += 1
@@ -111,8 +111,8 @@ class Handler(object):
 					dealt += 1
 
 			except Queue2.Empty:
-				#Queue empty. Continue with loop after sleeping
-				time.sleep(3)
+				#Queue empty. Continue with loop
+				pass
 
 			if iterations % 10 == 0: 
 				self.__periodic_action__(iterations)
