@@ -46,6 +46,7 @@ class TaskSubset(parabam.Task):
 		#Close the master bamfile
 		for subset,file_object in temp_objects.items():
 			file_object.close() #close all the other bams
+		del self._temp_objects
 		master.close()
 
 		results = {}
@@ -378,9 +379,9 @@ class Interface(parabam.UserInterface):
 			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
 
 			if verbose == 1: 
-				update_interval = 100
+				update_interval = 200
 			else:
-				update_interval = 1
+				update_interval = 10
 
 			lev = parabam.Leviathon(procrs,handls,update_interval)
 			lev.run()
