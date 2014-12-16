@@ -271,12 +271,15 @@ class PairProcessor(ProcessorSubset):
 		self._loners_object.close()
 
 class Interface(parabam.UserInterface):
+	"""The interface to parabam subset.
+	Users will primarily make use of the ``run`` function."""
 
 	def __init__(self,temp_dir,exe_dir):
 		super(Interface,self).__init__(temp_dir,exe_dir)
 	
 	def run_cmd(self,parser):
-
+		"""This function is not intended to be run by users and is utilised by the parabam
+		command line interface."""
 		cmd_args = parser.parse_args()
 
 		verbose = cmd_args.v
@@ -403,25 +406,25 @@ class Interface(parabam.UserInterface):
 	def __report_file_names__(self,output_paths):
 		print "[Update] This run will output the following files:"
 		for src,subset_paths in output_paths.items():
-			for mrgTyp,outFilePath in subset_paths.items():
-				print "\t%s" % (outFilePath.split("/")[-1],)
+			for subset,output_path in subset_paths.items():
+				print "\t%s" % (output_path.split("/")[-1],)
 		print ""
 
 	def __move_output_files__(self,output_paths):
 		final_files = []
 		for src, subset_paths in output_paths.items():
-			for mrgTyp,outFilePath in subset_paths.items():
+			for subset,output_path in subset_paths.items():
 				try:
-					move_location = outFilePath.replace(self._temp_dir,".")
-					shutil.move(outFilePath,move_location) #./ being the current working dir
+					move_location = output_path.replace(self._temp_dir,".")
+					shutil.move(output_path,move_location) #./ being the current working dir
 					final_files.append(move_location) 
 				except shutil.Error,e:
-					alt_filnm = "./%s_%s_%d.bam" % (src,mrgTyp,time.time()) 
+					alt_filnm = "./%s_%s_%d.bam" % (src,subset,time.time()) 
 					print "[Error] Output file may already exist, you may not" \
 					"have correct permissions for this file"
 					print "[Status]Trying to create using unique filename:"
 					print "\t\t%s" % (alt_filnm,)
-					shutil.move(outFilePath,alt_filnm)
+					shutil.move(output_path,alt_filnm)
 					final_files.append(alt_filnm)
 		return final_files
 
