@@ -257,8 +257,6 @@ class Interface(parabam.UserInterface):
 		module,user_engine,user_constants = self.__get_module_and_vitals__(cmd_args.instruc)
 
 		if hasattr(module,"get_subset_types"):
-			if verbose: 
-				print "[Status] Multiple subset type identified"
 			subset_types = module.get_subset_types()
 		else:
 			subset_types = ["subset"]
