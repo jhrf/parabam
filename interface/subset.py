@@ -14,8 +14,6 @@ from abc import ABCMeta, abstractmethod
 
 class TaskSubset(parabam.Task):
 
-	__metaclass__ = ABCMeta
-
 	def __init__(self,task_set,outqu,curproc,destroy,const,source):
 		super(TaskSubset, self).__init__(task_set=task_set,
 										outqu=outqu,
@@ -65,19 +63,6 @@ class TaskSubset(parabam.Task):
 			self._counts[subset_type] += 1
 			self._temp_objects[subset_type].write(read)
 
-	@abstractmethod
-	def __handle_task_set__(self,task_set,master):
-		pass
-
-class MultiSet(TaskSubset):
-	def __init__(self,task_set,outqu,curproc,destroy,const,source):
-		super(MultiSet, self).__init__(task_set=task_set,
-										outqu=outqu,
-										curproc=curproc,
-										destroy=destroy,
-										const=const,
-										source=source)
-	
 	def __handle_task_set__(self,task_set,master):
 
 		engine = self.const.user_engine
@@ -95,29 +80,10 @@ class MultiSet(TaskSubset):
 					subset_write(subset_types[subset_decision],read)
 			elif type(subset_decision) == tuple:
 				for subset in subset_decision:
-					subset_write(subset_types[subset],read)					
-
-class SingleSet(TaskSubset):
-	def __init__(self,task_set,outqu,curproc,destroy,const,source):
-		super(SingleSet, self).__init__(task_set=task_set,
-										outqu=outqu,
-										curproc=curproc,
-										destroy=destroy,
-										const=const,
-										source=source)
-	
-	def __handle_task_set__(self,task_set,master):
-		engine = self.const.user_engine
-		user_constants = self.const.user_constants
-		subset_types = self.const.subset_types
-
-		subset_write = self.__write_to_subset_bam__
-		if self.const.pair_process:
-			subset_write = self.__write_to_subset_bam_pair__
-
-		for read in task_set:
-			if engine(read,user_constants,master):
-				subset_write(subset_types[0],read)
+					subset_write(subset_types[subset],read)
+			elif type(subset_decision) == bool:
+				if subset_decision:
+					subset_write(subset_types[0],read)			
 		
 class HandlerSubset(parabam.Handler):
 
@@ -367,13 +333,9 @@ class Interface(parabam.UserInterface):
 											task_args=cur_args,
 											debug=debug))
 				else:
-					if len(subset_types) == 1:
-						run_class = SingleSet
-					else:
-						run_class = MultiSet
 					procrs.append(processor_class(outqu=task_qu,
 												const=const,
-												TaskClass=run_class,
+												TaskClass=TaskSubset,
 												task_args=[source],
 												debug = debug))
 

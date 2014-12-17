@@ -5,11 +5,11 @@ setup(name='parabam',
 	  description='Parallel BAM File Analysis',
       version='0.1dev',
       author="JHR Farmery",
-      licsense='BSD',
+      license='BSD',
       author_email = 'jhrf2@cam.ac.uk',
       package_dir = {'parabam': '','parabam.interface': 'interface'},
       packages = ['parabam','parabam.interface'],
-      requires = ['numpy','argparse'],
+      requires = ['numpy','argparse','pysam'],
       package_data = {'parabam.interface':['master',]},
       scripts = ['bin/parabam']
       )
