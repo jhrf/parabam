@@ -75,15 +75,19 @@ class TaskSubset(parabam.Task):
 
 		for read in task_set:
 			subset_decision = engine(read,user_constants,master)
-			if type(subset_decision) == int:
-				if not subset_decision == -1:
-					subset_write(subset_types[subset_decision],read)
+			
+			if type(subset_decision) == bool:
+				if subset_decision:
+					subset_write(subset_types[0],read)			
+			elif type(subset_decision) == list:
+				for subset,cur_read in subset_decision:
+					subset_write(subset,cur_read)
 			elif type(subset_decision) == tuple:
 				for subset in subset_decision:
 					subset_write(subset_types[subset],read)
-			elif type(subset_decision) == bool:
-				if subset_decision:
-					subset_write(subset_types[0],read)			
+			elif type(subset_decision) == int:
+				if not subset_decision == -1:
+					subset_write(subset_types[subset_decision],read)
 		
 class HandlerSubset(parabam.Handler):
 
