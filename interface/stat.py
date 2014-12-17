@@ -418,14 +418,14 @@ class Interface(parabam.UserInterface):
 		parser = self.default_parser()
 
 		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='?',required=False
-		,help='Specify a name for the output CSV file. Only used with default `outmode`.\
-			If this argument is not supplied, the output will take the following form:\
-			parabam_stat_[UNIX_TIME].csv')
+		,help="Specify a name for the output CSV file. Only used with default `outmode`.\n"\
+			"If this argument is not supplied, the output will take the following form:\n"\
+			"parabam_stat_[UNIX_TIME].csv")
 		parser.add_argument('--outmode', choices=['d','s','a'],default='d',
-			help='Indicate whether data grouped by sample or analysis:\
-			[d]efault: a csv with a column for each analysis and row for each sample\
-			[s]ample: csv for each sample,\
-			[a]nalysis: csv for each analysis')
+			help="Indicate whether data grouped by sample or analysis:\n"\
+			"[d]efault: a csv with a column for each analysis and row for each sample\n"\
+			"[s]ample: csv for each sample"\
+			"[a]nalysis: csv for each analysis")
 		return parser 
 
 

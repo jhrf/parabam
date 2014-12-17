@@ -82,7 +82,26 @@ class Handler(object):
 
 		self._stats = {}
 
-		self._update_output = self.__standard_output__ 
+		if const.verbose == 1:
+			self._verbose = True
+			self._update_output = self.__level_1_output__
+		elif const.verbose == 2 or const.verbose == True:
+			#In the case verbose is simply "True" or "level 2"
+			self._verbose = True
+			self._update_output = self.__standard_output__
+		else:#catching False and -v0
+			self._verbose = False
+			self._update_output = self.__standard_output__
+
+	def __level_1_output__(self,out_str):
+		total_procd = self.__get_total_processed_reads__()
+		time = out_str.partition("Time: ")[2]
+		sys.stdout.write("[Update] Processed: %d Time: %s\n" % (total_procd,time))
+		sys.stdout.flush()
+
+	def __standard_output__(self,outstr):
+		sys.stdout.write("\r" + outstr)
+		sys.stdout.flush()
 
 	def listen(self,update_interval):
 		destroy = False
@@ -98,7 +117,7 @@ class Handler(object):
 			iterations += 1
 			#Listen for a process coming in...
 			try:
-				new_package = self._inqu.get(3)
+				new_package = self._inqu.get(False)
 				if new_package.destroy:
 					#destroy limit allows for multiple processors
 					destroy_count += 1
@@ -112,7 +131,7 @@ class Handler(object):
 
 			except Queue2.Empty:
 				#Queue empty. Continue with loop
-				pass
+				time.sleep(1)
 
 			if iterations % 10 == 0: 
 				self.__periodic_action__(iterations)
@@ -125,12 +144,9 @@ class Handler(object):
 		self._inqu.close()
 		self.__handler_exit__()
 
-	def __standard_output__(self,outstr):
-		sys.stdout.write("\r" + outstr)
-		sys.stdout.flush()
-
 	def __format_update__(self,curproc,start_time):
 		stats = []
+
 		for stat_name in self._stats:
 			if type(self._stats[stat_name]) is dict: #Account for divided stats.
 				stat_update_str = "[%s] " % (stat_name,)
@@ -143,8 +159,8 @@ class Handler(object):
 				stats.append("%s: %d" % (stat_name,self._stats[stat_name]))
 
 		statstr = " ".join(stats)
-		return "\r%s | Time: %d " %\
-				(statstr,self.__secs_since__(start_time))
+		return "\r%s | Tasks: %d Time: %d " %\
+				(statstr,curproc,self.__secs_since__(start_time),)
 
 	#This code is a little ugly. Essentially, given a results
 	#dictionary, it will go through and create a sensible output
@@ -271,7 +287,7 @@ class Processor(object):
 		while(max_tasks < currently_active):
 			update_tasks(active_tasks)
 			currently_active = len(active_tasks)
-			time.sleep(5)
+			time.sleep(1)
 
 	def __update_tasks__(self,active_tasks):
 		terminated_procs = []
@@ -291,7 +307,7 @@ class Processor(object):
 			
 				
 	def __start_task__(self,collection,destroy=False):
-		args = [collection,self._outqu,len(self._active_tasks)+1,destroy,self.const]
+		args = [collection,self._outqu,len(self._active_tasks),destroy,self.const]
 		args.extend(self._task_args)
 		task = self._TaskClass(*args)
 		task.start()
@@ -410,17 +426,17 @@ class Interface(object):
 
 	def default_parser(self):
 
-		parser = argparse.ArgumentParser(conflict_handler='resolve')
+		parser = argparse.ArgumentParser(conflict_handler='resolve',
+					formatter_class=argparse.RawTextHelpFormatter)
 
-		parser.add_argument('-p',type=int,nargs='?',default=8
-			,help="The amount of processors you wish the program to use."\
-					" Ignored if argument 's' is provided")
-		parser.add_argument('-c',type=int,nargs='?',default=25000
-			,help="How many arguments the preprocesor should store before"\
-			"sending to the analysis module")
+		parser.add_argument('-p',type=int,nargs='?',default=4
+			,help="The maximum amount of tasks run concurrently. This number should\n"\
+			"be less than or equal to the amount of cores on your machine [Default: 4]")
+		parser.add_argument('-c',type=int,nargs='?',default=100000
+			,help="How many reads each parallel task is given. A higher number\n"\
+			"will mean faster analysis but also a greater burden on memory [Default:100000]")
 		parser.add_argument('-v',action="store_true",default=False
 			,help='If set the program will output more information to terminal')
-
 		return parser
 
 	@abstractmethod
@@ -470,7 +486,6 @@ class UserInterface(Interface):
 			'to carry out on the input BAM.')
 		parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
 			,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
-
 		return parser
 		
 	@abstractmethod

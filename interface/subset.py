@@ -17,7 +17,7 @@ class TaskSubset(parabam.Task):
 	def __init__(self,task_set,outqu,curproc,destroy,const,source):
 		super(TaskSubset, self).__init__(task_set=task_set,
 										outqu=outqu,
-										curproc=curproc,
+										curproc=curproc*len(const.subset_types),
 										destroy=destroy,
 										const=const)
 		self._source = source
@@ -107,23 +107,6 @@ class HandlerSubset(parabam.Handler):
 		self._mergequeue = outqu
 		self._mergecount = 0
 
-		if const.verbose == 1:
-			self._verbose = True
-			self._update_output = self.__level_1_output__
-		elif const.verbose == 2 or const.verbose == True:
-			#In the case verbose is simply "True" or "level 2"
-			self._verbose = True
-			self._update_output = self.__standard_output__
-		else:#catching False and -v0
-			self._verbose = False
-			self._update_output = self.__standard_output__
-
-	def __level_1_output__(self,out_str):
-		total_procd = self.__get_total_processed_reads__()
-		time = out_str.partition("Time: ")[2]
-		sys.stdout.write("[Update] Processed: %d Time: %s\n" % (total_procd,time))
-		sys.stdout.flush()
-
 	def __get_total_processed_reads__(self):
 		total = 0
 		for source,deep_stat in self._stats.items():
@@ -163,7 +146,7 @@ class HandlerSubset(parabam.Handler):
 
 	def __handler_exit__(self,**kwargs):
 		if self._verbose:
-			self.__standard_output__("[Result] Processed %d reads from bam files\n" % (self.__total_reads__(),))
+			self.__standard_output__("\n[Status] Processed %d reads from bam files\n" % (self.__total_reads__(),))
 			self.__standard_output__("[Status] Waiting for merge operation to finish...\n")
 
 		for source in self._sources:
@@ -272,23 +255,24 @@ class Interface(parabam.UserInterface):
 			user_engine = user_engine,
 			engine_is_class = False,
 			fetch_region = cmd_args.region,
-			pair_process=cmd_args.m
+			pair_process=cmd_args.m,
+			side_by_side = cmd_args.s,
+			debug = cmd_args.debug
 			)
 	
 	def run(self,input_bams,outputs,proc,chunk,subset_types,
-			user_constants,user_engine,fetch_region=None,multi=4,
+			user_constants,user_engine,fetch_region=None,side_by_side=2,
 			keep_in_temp=False,engine_is_class=False,verbose=False,
 			pair_process=False,debug=False):
 
 		if not outputs or not len(outputs) == len(input_bams):
-			print "[Warning] Output files will use default naming scheme \n"\
-			"\t\tTo specify output names ensure a name is provided for each input BAM"
+			print "[Status] Using default naming scheme."
 			outputs = [ self.__get_basename__(b) for b in input_bams ]
 
 		#AT SOME POINT WE SHOULD HANDLE UNSORTED BAMS. EITHER HERE OR AT THE PROCESSOR
 		final_files = []
 
-		for input_group,output_group in self.__get_group__(input_bams,outputs,multi=multi):
+		for input_group,output_group in self.__get_group__(input_bams,outputs,multi=side_by_side):
 			
 			task_qu = Queue()
 			merge_qu = Queue()
@@ -346,9 +330,9 @@ class Interface(parabam.UserInterface):
 			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
 
 			if verbose == 1: 
-				update_interval = 200
+				update_interval = 100
 			else:
-				update_interval = 10
+				update_interval = 1
 
 			lev = parabam.Leviathon(procrs,handls,update_interval)
 			lev.run()
@@ -368,7 +352,7 @@ class Interface(parabam.UserInterface):
 		return final_files
 
 	def __report_file_names__(self,output_paths):
-		print "[Update] This run will output the following files:"
+		print "[Status] This run will output the following files:"
 		for src,subset_paths in output_paths.items():
 			for subset,output_path in subset_paths.items():
 				print "\t%s" % (output_path.split("/")[-1],)
@@ -384,31 +368,35 @@ class Interface(parabam.UserInterface):
 					final_files.append(move_location) 
 				except shutil.Error,e:
 					alt_filnm = "./%s_%s_%d.bam" % (src,subset,time.time()) 
-					print "[Error] Output file may already exist, you may not" \
+					print "[Warning] Output file may already exist, you may not" \
 					"have correct permissions for this file"
-					print "[Status]Trying to create using unique filename:"
+					print "[Update]Trying to create output using unique filename:"
 					print "\t\t%s" % (alt_filnm,)
 					shutil.move(output_path,alt_filnm)
 					final_files.append(alt_filnm)
 		return final_files
 
 	def get_parser(self):
-		#argparse imported in ./interface/parabam 
+		#argparse imported in ./interface/parabam
 		parser = self.default_parser()
 
 		parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
-			,help="The subset process will be run only on reads from this region. \
-			Regions should be colon seperated as specifiec by samtools (eg \'chr1:1000,5000\')")
+			,help="The subset process will be run only on reads from this region\n"\
+			"Regions should be colon seperated as specified by samtools (eg \'chr1:1000,5000\')")
 		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='+',required=False
-			,help='The name of the output that we wish to create. Must be same amount of space \
-			separated entries as INPUT.')
+			,help="The name of the output that we wish to create. Must be same amount of space"\
+			" separated entries as INPUT.")
+		parser.add_argument('-s',type=int,metavar="INT",nargs='?',default=2
+			,help="Further parralise subset by running this many samples side-by-side. [Default 2]")
+		parser.add_argument('--debug',action="store_true",default=False,
+			help="Only the first 5million reads will be processed")
 		parser.add_argument('-m',action="store_true",default=False
-			,help='A pair processor is used instead of a conventional processor')
+			,help="A pair processor is used instead of a conventional processor")
 		parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
-			help='Indicate the amount of information output by the program:\
-			0: No output [Default]\
-			1: Total Reads Processsed\
-			2: Detailed output')
+			help="Indicate the amount of information output by the program:\n"\
+			"\t0: No output [Default]\n"\
+			"\t1: Total Reads Processsed\n"\
+			"\t2: Detailed output")
 
 		return parser 
 
