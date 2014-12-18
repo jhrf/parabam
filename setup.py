@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(name='parabam',
 	  description='Parallel BAM File Analysis',
-      version='0.1.1dev',
+      version='0.1.2dev',
       author="JHR Farmery",
       license='BSD',
       author_email = 'jhrf2@cam.ac.uk',
