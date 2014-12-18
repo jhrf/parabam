@@ -58,11 +58,6 @@ class TaskSubset(parabam.Task):
 		self._counts[subset_type] += 1
 		self._temp_objects[subset_type].write(read)
 
-	def __write_to_subset_bam_pair__(self,subset_type,reads):
-		for read in reads:
-			self._counts[subset_type] += 1
-			self._temp_objects[subset_type].write(read)
-
 	def __handle_task_set__(self,task_set,master):
 
 		engine = self.const.user_engine
@@ -70,8 +65,6 @@ class TaskSubset(parabam.Task):
 		subset_types = self.const.subset_types
 
 		subset_write = self.__write_to_subset_bam__
-		if self.const.pair_process:
-			subset_write = self.__write_to_subset_bam_pair__
 
 		for read in task_set:
 			subset_decision = engine(read,user_constants,master)
@@ -82,12 +75,12 @@ class TaskSubset(parabam.Task):
 			elif type(subset_decision) == list:
 				for subset,cur_read in subset_decision:
 					subset_write(subset,cur_read)
-			elif type(subset_decision) == tuple:
-				for subset in subset_decision:
-					subset_write(subset_types[subset],read)
 			elif type(subset_decision) == int:
 				if not subset_decision == -1:
 					subset_write(subset_types[subset_decision],read)
+			else:
+				sys.stdout.write("[ERROR] Unrecognised return type from user engine!")
+				sys.stdout.flush()
 		
 class HandlerSubset(parabam.Handler):
 
@@ -192,7 +185,6 @@ class PairProcessor(ProcessorSubset):
 
 	def __add_to_collection__(self,master,item,collection):
 		loners = self._loners
-
 		if not item.is_secondary:
 			try:
 				mate = loners[item.qname] 
