@@ -10,9 +10,12 @@ from multiprocessing import Queue
 
 from parabam.interface import merger
 
+from parabam.tools import Processor
+from parabam.pair import PairProcessor,ProcessorSubset
+
 from abc import ABCMeta, abstractmethod
 
-class TaskSubset(parabam.tools.Task):
+class TaskSubset(parabam.Task):
 
 	def __init__(self,task_set,outqu,curproc,destroy,const,source):
 		super(TaskSubset, self).__init__(task_set=task_set,
@@ -149,72 +152,7 @@ class HandlerSubset(parabam.tools.Handler):
 								source=source,total=self._stats[source]["total"],
 								destroy=True)
 
-class ProcessorSubset(parabam.tools.Processor):
-
-	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
-		# if const.fetch_region:
-		# 	debug = False 
-		super(ProcessorSubset,self).__init__(outqu,const,TaskClass,task_args,debug)
-		self._source = task_args[0] #Defined in the run function within Interface
-
-	def __get_master_bam__(self,master_file_path):
-		return pysam.Samfile(master_file_path[self._source],"rb")
-
-	def __add_to_collection__(self,master,alig,collection):
-		collection.append(alig)
-
-	def __get_next_alig__(self,master_bam):
-		if not self.const.fetch_region:
-			for alig in master_bam.fetch(until_eof=True):
-				yield alig
-		else:
-			for alig in master_bam.fetch(region=self.const.fetch_region):
-				yield alig
-
-	def __pre_processor__(self,master_file_path):
-		pass
-
-class PairProcessor(ProcessorSubset):
-	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
-		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
-		self._loners = {}
-		self._loner_count = 0
-		master = pysam.Samfile(self._master_file_path[task_args[0]],"rb")
-		self._loners_object = pysam.Samfile("%s/loners" % (self._temp_dir,),"wb",template=master)
-		master.close()
-
-	def __add_to_collection__(self,master,item,collection):
-		loners = self._loners
-		if not item.is_secondary:
-			try:
-				mate = loners[item.qname] 
-				del loners[item.qname]
-				self._loner_count -= 1
-				collection.append( (item,mate,) )
-			except KeyError:
-				#Could implement a system where by long standing
-				#unpaired reads are stored to be run at the end 
-				#of the program, otherwise we risk clogging memory
-				loners[item.qname] = item
-				self._loner_count += 1
-
-			if self._loner_count > 200000:
-			 	self._loner_count = 0
-			 	self.__stash_loners__(loners)
-			 	del self._loners
-			 	gc.collect()
-			 	self._loners = {}
-
-	def __stash_loners__(self,loners):
-		for name,read in loners.items():
-			self._loners_object.write(read)
-
-	def __end_processing__(self,master):
-		super(PairProcessor,self).__end_processing__(master)
-		self.__stash_loners__(self._loners)
-		self._loners_object.close()
-
-class Interface(parabam.tools.UserInterface):
+class Interface(parabam.UserInterface):
 	"""The interface to parabam subset.
 	Users will primarily make use of the ``run`` function."""
 
@@ -295,7 +233,7 @@ class Interface(parabam.tools.UserInterface):
 			procrs = []
 			handls = []
 
-			const = parabam.tools.Const(output_paths=output_paths,
+			const = parabam.Const(output_paths=output_paths,
 								temp_dir=self._temp_dir,
 								master_file_path=master_file_path,
 								chunk=chunk,proc=(proc // len(input_group)),
@@ -316,7 +254,7 @@ class Interface(parabam.tools.UserInterface):
 				if engine_is_class:
 					if not issubclass(user_engine,TaskSubset):
 						raise Exception("[ERROR]\tThe class provided to parabam multiset must be a subclass of\n"\
-										"\tparabam.tools.interface.subset.TaskSubset. Please consult the parabam manual.")
+										"\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
 					cur_args = [source]
 					procrs.append(processor_class(outqu=task_qu,
 											const=const,
@@ -339,7 +277,7 @@ class Interface(parabam.tools.UserInterface):
 			else:
 				update_interval = 1
 
-			lev = parabam.tools.Leviathon(procrs,handls,update_interval)
+			lev = parabam.Leviathon(procrs,handls,update_interval)
 			lev.run()
 			del lev
 
