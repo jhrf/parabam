@@ -304,8 +304,7 @@ class Processor(object):
 			#collecting any memory.
 			del terminated_procs
 			gc.collect()
-			
-				
+					
 	def __start_task__(self,collection,destroy=False):
 		args = [collection,self._outqu,len(self._active_tasks),destroy,self.const]
 		args.extend(self._task_args)

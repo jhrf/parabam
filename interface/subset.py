@@ -193,26 +193,25 @@ class PairProcessor(ProcessorSubset):
 	def __add_to_collection__(self,master,item,collection):
 		loners = self._loners
 
-		try:
-			mate = loners[item.qname] 
-			del loners[item.qname]
-			self._loner_count -= 1
-			collection.append( (item,mate,) )
-		except KeyError:
-			#Could implement a system where by long standing
-			#unpaired reads are stored to be run at the end 
-			#of the program, otherwise we risk clogging memory
-			loners[item.qname] = item
-			self._loner_count += 1
+		if not item.is_secondary:
+			try:
+				mate = loners[item.qname] 
+				del loners[item.qname]
+				self._loner_count -= 1
+				collection.append( (item,mate,) )
+			except KeyError:
+				#Could implement a system where by long standing
+				#unpaired reads are stored to be run at the end 
+				#of the program, otherwise we risk clogging memory
+				loners[item.qname] = item
+				self._loner_count += 1
 
-		sys.stdout.write("\r %d" % (self._loner_count,))
-
-		if self._loner_count > 200000:
-		 	self._loner_count = 0
-		 	self.__stash_loners__(loners)
-		 	del self._loners
-		 	gc.collect()
-		 	self._loners = {}
+			if self._loner_count > 200000:
+			 	self._loner_count = 0
+			 	self.__stash_loners__(loners)
+			 	del self._loners
+			 	gc.collect()
+			 	self._loners = {}
 
 	def __stash_loners__(self,loners):
 		for name,read in loners.items():
