@@ -12,7 +12,7 @@ from parabam.interface import merger
 
 from abc import ABCMeta, abstractmethod
 
-class TaskSubset(parabam.Task):
+class TaskSubset(parabam.tools.Task):
 
 	def __init__(self,task_set,outqu,curproc,destroy,const,source):
 		super(TaskSubset, self).__init__(task_set=task_set,
@@ -82,7 +82,7 @@ class TaskSubset(parabam.Task):
 				sys.stdout.write("[ERROR] Unrecognised return type from user engine!")
 				sys.stdout.flush()
 		
-class HandlerSubset(parabam.Handler):
+class HandlerSubset(parabam.tools.Handler):
 
 	def __init__(self,inqu,outqu,const,destroy_limit):
 		super(HandlerSubset,self).__init__(inqu,const,destroy_limit=destroy_limit)
@@ -149,7 +149,7 @@ class HandlerSubset(parabam.Handler):
 								source=source,total=self._stats[source]["total"],
 								destroy=True)
 
-class ProcessorSubset(parabam.Processor):
+class ProcessorSubset(parabam.tools.Processor):
 
 	def __init__(self,outqu,const,TaskClass,task_args,debug=False):
 		# if const.fetch_region:
@@ -214,7 +214,7 @@ class PairProcessor(ProcessorSubset):
 		self.__stash_loners__(self._loners)
 		self._loners_object.close()
 
-class Interface(parabam.UserInterface):
+class Interface(parabam.tools.UserInterface):
 	"""The interface to parabam subset.
 	Users will primarily make use of the ``run`` function."""
 
@@ -295,7 +295,7 @@ class Interface(parabam.UserInterface):
 			procrs = []
 			handls = []
 
-			const = parabam.Const(output_paths=output_paths,
+			const = parabam.tools.Const(output_paths=output_paths,
 								temp_dir=self._temp_dir,
 								master_file_path=master_file_path,
 								chunk=chunk,proc=(proc // len(input_group)),
@@ -316,7 +316,7 @@ class Interface(parabam.UserInterface):
 				if engine_is_class:
 					if not issubclass(user_engine,TaskSubset):
 						raise Exception("[ERROR]\tThe class provided to parabam multiset must be a subclass of\n"\
-										"\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
+										"\tparabam.tools.interface.subset.TaskSubset. Please consult the parabam manual.")
 					cur_args = [source]
 					procrs.append(processor_class(outqu=task_qu,
 											const=const,
@@ -339,7 +339,7 @@ class Interface(parabam.UserInterface):
 			else:
 				update_interval = 1
 
-			lev = parabam.Leviathon(procrs,handls,update_interval)
+			lev = parabam.tools.Leviathon(procrs,handls,update_interval)
 			lev.run()
 			del lev
 

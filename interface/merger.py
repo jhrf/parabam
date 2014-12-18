@@ -14,14 +14,17 @@ from collections import Counter
 from multiprocessing import Queue,Process
 from itertools import izip
 
-class MergePackage(parabam.Package):
+from parabam.tools import Package
+from parabam.tools import Handler
+
+class MergePackage(Package):
 	def __init__(self,name,results,subset_type,source,destroy,total,time_added):
 		super(MergePackage,self).__init__(name,results,destroy,total)
 		self.subset_type = subset_type
 		self.source = source
 		self.time_added = time_added
 
-class HandlerMerge(parabam.Handler):
+class HandlerMerge(Handler):
 
 	def __init__(self,inqu,const,destroy_limit=1):
 		super(HandlerMerge,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)

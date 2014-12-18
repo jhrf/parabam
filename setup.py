@@ -1,5 +1,6 @@
 import os
 from distutils.core import setup
+from Cython.Build import cythonize
 
 setup(name='parabam',
 	  description='Parallel BAM File Analysis',
@@ -11,5 +12,6 @@ setup(name='parabam',
       packages = ['parabam','parabam.interface'],
       requires = ['numpy','argparse','pysam'],
       package_data = {'parabam.interface':['master',]},
-      scripts = ['bin/parabam']
+      scripts = ['bin/parabam'],
+      ext_modules=cythonize("tools.py")
       )
