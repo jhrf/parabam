@@ -229,10 +229,8 @@ class Interface(parabam.UserInterface):
 
 	def __init__(self,temp_dir,exe_dir):
 		super(Interface,self).__init__(temp_dir,exe_dir)
-	
+
 	def run_cmd(self,parser):
-		"""This function is not intended to be run by users and is utilised by the parabam
-		command line interface."""
 		cmd_args = parser.parse_args()
 
 		verbose = cmd_args.v
@@ -264,6 +262,22 @@ class Interface(parabam.UserInterface):
 			user_constants,user_engine,fetch_region=None,side_by_side=2,
 			keep_in_temp=False,engine_is_class=False,verbose=False,
 			pair_process=False,debug=False):
+
+		"""This is function is invoked in order to run parabam subset programatically.
+
+		Arguments:
+			input_bams (list): BAM Files we wish to analyse
+			outputs (list): Names for the output files. If not specified <bam_name>_<subset_types>.bam convention will be used
+			proc (int): The maximum number of tasks that will be run at one time
+			chunk (int): The amount of reads that a task will hold
+			subset_types (list): A list of names which correspond to the subset types
+			user_constants (dict): A dictionary initialised with object referenced by the user engine
+			user_engine (function): A function or class to be run on each read
+			verbose (int): Expects an int from 0 to 2. The level of output produced by parabam
+			keep_in_temp (bool): Files will be kept in temp file after processing. Useful for incorporation into pipelines
+			side_by_side (int): The amount of BAMs to be run in side-by-side mode. Further concurrency
+			pair_process (bool): Pair processing mode will be initialised (feature in beta)
+			debug (bool): subset will only process the first 5million reads from the BAM files."""
 
 		if not outputs or not len(outputs) == len(input_bams):
 			print "[Status] Using default naming scheme."
