@@ -7,16 +7,12 @@ import gc
 import shutil
 
 from multiprocessing import Queue
-
-from parabam.interface import merger
-
-from parabam.pair import PairProcessor,ProcessorSubset
-
 from abc import ABCMeta, abstractmethod
+from parabam.support import HandlerMerge,MergePackage
 
-class TaskSubset(parabam.Task):
+class TaskSubset(parabam.core.Task):
 
-	def __init__(self,task_set,outqu,curproc,destroy,const,source):
+	def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
 		super(TaskSubset, self).__init__(task_set=task_set,
 										outqu=outqu,
 										curproc=curproc*len(const.subset_types),
@@ -32,9 +28,9 @@ class TaskSubset(parabam.Task):
 	def __generate_results__(self):
 		master = pysam.Samfile(self._master_file_path,"rb")
 
-		temp_paths = self._temp_paths
-		temp_objects = self._temp_objects
-		counts = self._counts
+		cdef dict temp_paths = self._temp_paths
+		cdef dict temp_objects = self._temp_objects
+		cdef dict counts = self._counts
 
 		for subset in self._subset_types:
 			temp_paths[subset] = self.__get_temp_path__(subset)
@@ -86,7 +82,7 @@ class TaskSubset(parabam.Task):
 		
 class HandlerSubset(parabam.core.Handler):
 
-	def __init__(self,inqu,outqu,const,destroy_limit):
+	def __init__(self,object inqu,object outqu,object const,object destroy_limit):
 		super(HandlerSubset,self).__init__(inqu,const,destroy_limit=destroy_limit)
 
 		self._sources = const.sources
@@ -132,7 +128,7 @@ class HandlerSubset(parabam.core.Handler):
 			gc.collect()
 
 	def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
-		res = merger.MergePackage(name=name,results=list(results),
+		res = MergePackage(name=name,results=list(results),
 							subset_type=subset_type,source=source,destroy=destroy,total=total,time_added=time.time())
 		self._mergequeue.put(res)
 
@@ -151,7 +147,92 @@ class HandlerSubset(parabam.core.Handler):
 								source=source,total=self._stats[source]["total"],
 								destroy=True)
 
-class Interface(parabam.UserInterface):
+class ProcessorSubset(parabam.core.Processor):
+
+	def __init__(self,object outqu,object const,object TaskClass,object task_args,object debug=False):
+		# if const.fetch_region:
+		# 	debug = False 
+		super(ProcessorSubset,self).__init__(outqu,const,TaskClass,task_args,debug)
+		self._source = task_args[0] #Defined in the run function within Interface
+
+	def __get_master_bam__(self,master_file_path):
+		return pysam.Samfile(master_file_path[self._source],"rb")
+
+	def __add_to_collection__(self,master,alig,collection):
+		collection.append(alig)
+
+	def __get_next_alig__(self,master_bam):
+		if not self.const.fetch_region:
+			for alig in master_bam.fetch(until_eof=True):
+				yield alig
+		else:
+			for alig in master_bam.fetch(region=self.const.fetch_region):
+				yield alig
+
+	def __pre_processor__(self,master_file_path):
+		pass
+
+class PairProcessor(ProcessorSubset):
+
+	def __init__(self,object outqu,object const,object TaskClass,object task_args,object debug=False):
+		
+		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
+		
+		self._loners = {}
+		self._loner_count = 0
+		self._stash_count = 0
+
+		self._terminal_loners = self.__get_loner_object__("terminal_loners")
+		self._loners_object = self.__get_loner_object__("halfway_loners")
+
+	def __get_loner_object__(self,loner_type):
+		master_path = self._master_file_path[self._task_args[0]]
+		path = self.__get_loner_path__(loner_type,master_path)
+		master = pysam.AlignmentFile(master_path,"rb")
+		alig_object = pysam.AlignmentFile(path,"wb",template=master)
+		master.close()
+		return alig_object
+
+	def __get_loner_path__(self,loner_type,master_path):
+		return "%s/%s_%d_%s" % (self._temp_dir,loner_type,time.time(),os.path.basename(master_path))
+
+	def __add_to_collection__(self,master,item,collection):
+		cdef dict loners = self._loners
+		cdef int temp_count = self._loner_count
+		if not item.is_secondary:
+			try:
+				mate = loners[item.qname] 
+				del loners[item.qname]
+				temp_count -= 1
+				collection.append( (item,mate,) )
+			except KeyError:
+				#Could implement a system where by long standing
+				#unpaired reads are stored to be run at the end 
+				#of the program, otherwise we risk clogging memory
+				loners[item.qname] = item
+				temp_count += 1
+
+		if temp_count > 100000:
+			temp_count = 0
+			self.__stash_loners__(loners)
+			del self._loners
+			del loners
+			self._loners = {}
+			gc.collect()
+		self._loner_count = temp_count
+
+	def __stash_loners__(self,loners):
+		self._stash_count += 1
+		for name,read in loners.items():
+			self._loners_object.write(read)
+
+	def __end_processing__(self,master):
+		super(PairProcessor,self).__end_processing__(master)
+		self.__stash_loners__(self._loners)
+		self._loners_object.close()
+		self._terminal_loners.close()
+
+class Interface(parabam.core.UserInterface):
 	"""The interface to parabam subset.
 	Users will primarily make use of the ``run`` function."""
 
@@ -232,7 +313,7 @@ class Interface(parabam.UserInterface):
 			procrs = []
 			handls = []
 
-			const = parabam.Const(output_paths=output_paths,
+			const = parabam.core.Const(output_paths=output_paths,
 								temp_dir=self._temp_dir,
 								master_file_path=master_file_path,
 								chunk=chunk,proc=(proc // len(input_group)),
@@ -269,14 +350,14 @@ class Interface(parabam.UserInterface):
 
 			destroy_limit=len(const.sources)
 			handls.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const,destroy_limit=destroy_limit))
-			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
+			handls.append(HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
 
 			if verbose == 1: 
 				update_interval = 199
 			else:
 				update_interval = 1
 
-			lev = parabam.Leviathon(procrs,handls,update_interval)
+			lev = parabam.core.Leviathon(procrs,handls,update_interval)
 			lev.run()
 			del lev
 

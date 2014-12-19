@@ -10,11 +10,11 @@ import numpy as np
 from multiprocessing import Queue
 from abc import ABCMeta, abstractmethod
 
-class TaskStat(parabam.Task):
+class TaskStat(parabam.core.Task):
 
 	__metaclass__ = ABCMeta
 
-	def __init__(self,task_set,outqu,curproc,destroy,const,source):
+	def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
 		super(TaskStat, self).__init__(task_set=task_set,
 										outqu=outqu,
 										curproc=curproc,
@@ -61,9 +61,9 @@ class TaskStat(parabam.Task):
 					self._counts[name] += 1
 					local_structures[name].add(**package)
 
-class HandlerStat(parabam.Handler):
+class HandlerStat(parabam.core.Handler):
 
-	def __init__(self,inqu,const):
+	def __init__(self,object inqu,object const):
 		super(HandlerStat,self).__init__(inqu,const,destroy_limit=len(const.sources))
 
 		self._sources = const.sources
@@ -112,9 +112,9 @@ class HandlerStat(parabam.Handler):
 			data_str += ",%.3f" % (cur_data,)
 		return data_str
 
-class ProcessorStat(parabam.Processor):
+class ProcessorStat(parabam.core.Processor):
 
-	def __init__(self,outqu,const,TaskClass,task_args):
+	def __init__(self,object outqu,object const,object TaskClass,str task_args):
 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
 		self._source = task_args[0] #Defined in the run function within Interface
 
@@ -233,11 +233,11 @@ class ArrayStructure(UserStructure):
 		return ArrayStructure(self.name,self.struc_type,self.store_method,self.org_data)
 
 	def add_max(self,result,coords):
-		existing = data[coords]
+		existing = self.data[coords]
 		self.data[coords] = self.max_decision(result,existing)
 
 	def add_min(self,result,coords):
-		existing = data[coords]
+		existing = self.data[coords]
 		self.data[coords] = self.min_decision(result,existing)
 
 	def add_cumu(self,result,coords):
@@ -258,7 +258,7 @@ class ArrayStructure(UserStructure):
 	def write_to_csv(self,out_path,source,mode):
 		np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
 
-class Interface(parabam.UserInterface):
+class Interface(parabam.core.UserInterface):
 
 	def __init__(self,temp_dir,exe_dir):
 		super(Interface,self).__init__(temp_dir,exe_dir)
@@ -312,7 +312,7 @@ class Interface(parabam.UserInterface):
 				output_path = self.__create_individual_output_files__(outmode,output_group,user_structures)
 				master_output_paths.update(output_path)
 
-			const = parabam.Const(output_paths=output_path,temp_dir=self._temp_dir,
+			const = parabam.core.Const(output_paths=output_path,temp_dir=self._temp_dir,
 								master_file_path=master_file_path,
 								chunk=chunk,proc=(proc // len(input_group)),
 								verbose=verbose,thresh=0,
@@ -329,7 +329,7 @@ class Interface(parabam.UserInterface):
 			processors = self.__create_proccessors__(task_qu,output_group,engine_is_class,user_engine,const)
 			handlers = self.__create_handlers__(task_qu,const)
 
-			lev = parabam.Leviathon(processors,handlers,100000)
+			lev = parabam.core.Leviathon(processors,handlers,100000)
 			lev.run()
 
 		if outmode == "d" and analysis_names and not user_specified_outpath: 
@@ -342,11 +342,10 @@ class Interface(parabam.UserInterface):
 			with open(output_path,"w") as out_obj:
 				out_obj.write(header)
 
-
-	def __create_handlers__(self,task_qu,const):
+	def __create_handlers__(self,task_qu,object const):
 		return [HandlerStat(inqu=task_qu,const=const)]
 
-	def __create_proccessors__(self,task_qu,output_group,engine_is_class,user_engine,const):
+	def __create_proccessors__(self,task_qu,output_group,engine_is_class,user_engine,object const):
 		processors = []
 
 		for source in output_group:
@@ -411,7 +410,7 @@ class Interface(parabam.UserInterface):
 			definition["name"] = name
 			definition["struc_type"] = type(definition["data"])
 			user_structures[name] = class_to_type_map[definition["struc_type"]](**definition)
- 		return user_structures
+		return user_structures
 
 	def get_parser(self):
 		#argparse imported in ./interface/parabam 

@@ -225,6 +225,7 @@ cdef class Processor:
 		self._task_args = task_args 
 
 		self._active_tasks = []
+		self._active_count = 0
 
 	#Find data pertaining to assocd and all reads 
 	#and divide pertaining to the chromosome that it is aligned to
@@ -275,6 +276,7 @@ cdef class Processor:
 		update_tasks = self.__update_tasks__ #optimising alias
 		update_tasks(active_tasks)
 		cdef int currently_active = len(active_tasks)
+		self._active_count = currently_active
 
 		if max_tasks > currently_active:
 			return
@@ -303,7 +305,7 @@ cdef class Processor:
 			gc.collect()
 					
 	def __start_task__(self,collection,destroy=False):
-		args = [collection,self._outqu,self._loner_count,destroy,self.const]
+		args = [collection,self._outqu,self._active_count,destroy,self.const]
 		args.extend(self._task_args)
 		task = self._TaskClass(*args)
 		task.start()
@@ -338,7 +340,7 @@ cdef class Processor:
 	def __add_to_collection__(self,master,item,collection):
 		pass
 
-cdef class Leviathon:
+class Leviathon(object):
 	#Leviathon takes objects of processors and handlers and
 	#chains them together.
 	def __init__(self,list processors,list handlers,int update=10000000):
