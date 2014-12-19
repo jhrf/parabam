@@ -10,8 +10,8 @@ setup(name='parabam',
       author_email = 'jhrf2@cam.ac.uk',
       package_dir = {'parabam': '','parabam.interface': 'interface'},
       packages = ['parabam','parabam.interface'],
-      requires = ['numpy','argparse','pysam'],
+      requires = ['cython','numpy','argparse','pysam'],
       package_data = {'parabam.interface':['master',]},
       scripts = ['bin/parabam'],
-      ext_modules=cythonize(("pair.pyx","tools.pyx"))
+      ext_modules=cythonize(("core.pyx","pair.pyx"))
       )

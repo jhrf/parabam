@@ -13,6 +13,54 @@ import multiprocessing
 from abc import ABCMeta, abstractmethod
 import resource
 
+#Tasks are started by parabam.Processor. Once started 
+#they will carryout a predefined task on the provided
+#subset of reads (task_set).
+class Task(multiprocessing.Process):
+
+	__metaclass__ = ABCMeta
+
+	def __init__(self,list task_set,object outqu,int curproc,object destroy,object const):
+		multiprocessing.Process.__init__(self)
+		self._task_set = task_set
+		self._outqu = outqu
+		self._curproc = curproc
+		self._temp_dir = const.temp_dir
+		self._destroy = destroy
+		self.const = const
+
+	def run(self):
+		cdef dict results = self.__generate_results__()
+		results["total"] = len(self._task_set)
+
+		self._outqu.put(Package(name=self.name,
+								results=results,
+								destroy=self._destroy,
+								curproc=self._curproc))
+
+		#Trying to control mem useage
+		del self._task_set
+		gc.collect()
+
+	def __get_temp_path__(self,typ):
+		#self.pid ensures that the temp names are unique.
+		return "%s/%s_%s_parabam_temp.bam" % (self._temp_dir,typ,self.pid)
+
+	def __get_mate__(self,master,alig):
+		try:
+			start = master.tell()
+			mate = master.mate(alig)
+			master.seek(start)
+		except ValueError:
+			mate = None
+		return mate
+
+	#Generate a dictionary of results using self._task_set
+	@abstractmethod
+	def __generate_results__(self):
+		#Should always return a dictionary
+		pass
+
 cdef class Handler:
 
 	cdef int _destroy_limit
@@ -255,7 +303,7 @@ cdef class Processor:
 			gc.collect()
 					
 	def __start_task__(self,collection,destroy=False):
-		args = [collection,self._outqu,len(self._active_tasks),destroy,self.const]
+		args = [collection,self._outqu,self._loner_count,destroy,self.const]
 		args.extend(self._task_args)
 		task = self._TaskClass(*args)
 		task.start()
@@ -289,3 +337,177 @@ cdef class Processor:
 
 	def __add_to_collection__(self,master,item,collection):
 		pass
+
+cdef class Leviathon:
+	#Leviathon takes objects of processors and handlers and
+	#chains them together.
+	def __init__(self,list processors,list handlers,int update=10000000):
+		self._processors = processors 
+		self._handlers	= handlers
+		self._update = update
+	
+	def run(self):
+		procs = []
+
+		for p in self._processors:
+			ppr = multiprocessing.Process(target=p.run,args=(self._update,))
+			ppr.start()
+			procs.append(ppr)
+
+		for h in self._handlers:
+			hpr = multiprocessing.Process(target=h.listen,args=(self._update,))
+			hpr.start()
+			procs.append(hpr)
+
+		procs[-1].join() #Wait on the last handler that we started.
+
+		for proc in procs:
+			proc.join()
+			proc.terminate()
+
+		del self._processors
+		del self._handlers
+		del procs
+
+#Provides a conveinant way for providing an Interface to parabam
+#programs. Includes default command_args and framework for 
+#command-line and programatic invocation. 
+class Interface(object):
+
+	__metaclass__ = ABCMeta
+
+	def __init__(self,temp_dir,exe_dir):
+		self._temp_dir = temp_dir
+		self._exe_dir = exe_dir
+
+	def __introduce__(self,name):
+		intro =  "%s has started. Start Time: " % (name,)\
+			+ datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+		underline = "-" * len(intro)
+		print intro
+		print underline
+
+	def __goodbye__(self,name):
+		print "%s has finished. End Time: " % (name,)\
+			+ datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+
+	def __get_group__(self,bams,names,multi):
+		if multi == 0:
+			multi = 1
+		for i in xrange(0,len(bams),multi):
+			yield (bams[i:i+multi],names[i:i+multi])
+
+	def __get_basename__(self,path):
+		base = os.path.basename(path)
+		if "." in base:
+			base = base.rpartition(".")[0]
+		return base
+
+	def __sort_and_index__(self,fnm,verbose=False,tempDir=".",name=False):
+		if not os.path.exists(fnm+".bai"):
+			if verbose: print "%s is not indexed. Sorting and creating index file." % (fnm,)
+			tempsort_path = self.__get_unique_temp_path__("SORT",temp_dir=self._temp_dir)
+			optStr = "-nf" if name else "-f"
+			pysam.sort(optStr,fnm,tempsort_path)
+			os.remove(fnm)
+			os.rename(tempsort_path,fnm)
+			if not name: pysam.index(fnm)
+
+	def __get_unique_temp_path__(self,temp_type,temp_dir="."):
+		#TODO: Duplicated from parabam.interface.merger. Find a way to reformat code
+		#to remove this duplication
+		return "%s/%sTEMP%d.bam" % (temp_dir,temp_type,int(time.time()),)
+
+	def default_parser(self):
+
+		parser = argparse.ArgumentParser(conflict_handler='resolve',
+					formatter_class=argparse.RawTextHelpFormatter)
+
+		parser.add_argument('-p',type=int,nargs='?',default=4
+			,help="The maximum amount of tasks run concurrently. This number should\n"\
+			"be less than or equal to the amount of cores on your machine [Default: 4]")
+		parser.add_argument('-c',type=int,nargs='?',default=100000
+			,help="How many reads each parallel task is given. A higher number\n"\
+			"will mean faster analysis but also a greater burden on memory [Default:100000]")
+		parser.add_argument('-v',action="store_true",default=False
+			,help='If set the program will output more information to terminal')
+		return parser
+
+	@abstractmethod
+	def run_cmd(self,parser):
+		#This is usualy just a function that
+		#takes an argparse parser and turns 
+		#passes the functions to the run function
+		pass
+
+	@abstractmethod
+	def run(self):
+		pass
+
+	@abstractmethod
+	def get_parser(self):
+		pass
+
+class UserInterface(Interface):
+
+	__metaclass__ = ABCMeta
+
+	def __init__(self,temp_dir,exe_dir):
+		super(UserInterface,self).__init__(temp_dir,exe_dir)
+
+	def __get_module_and_vitals__(self,code_path):
+		if os.getcwd not in sys.path:
+			sys.path.append(os.getcwd())
+		try:
+			module = __import__(code_path, fromlist=[''])
+
+		except ImportError:
+			sys.stderr.write("[ERROR] parabam can't find user module. Ensure code is in current working directory\n")
+			raise SystemExit
+
+		user_engine = module.engine
+		user_constants = {}
+		if hasattr(module,"set_constants"):
+			module.set_constants(user_constants)
+
+		return module,user_engine,user_constants
+
+	def default_parser(self):
+		parser = super(UserInterface,self).default_parser()
+
+		parser.add_argument('--instruc','-i',metavar='INSTRUCTION',required=True
+			,help='The instruction file, written in python, that we wish'\
+			'to carry out on the input BAM.')
+		parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
+			,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
+		return parser
+		
+	@abstractmethod
+	def run(self):
+		pass
+
+	@abstractmethod
+	def get_parser(self):
+		pass
+
+class Const(object):
+	
+	def __init__(self,output_paths,temp_dir,master_file_path,verbose,chunk,proc,**kwargs):
+		self.output_paths = output_paths
+		self.temp_dir = temp_dir
+		self.master_file_path = master_file_path
+		self.verbose = verbose
+		self.chunk = chunk
+		self.proc = proc
+
+		for key, val in kwargs.items():
+			setattr(self,key,val)
+
+class Package(object):
+	def __init__(self,name,results,destroy,curproc):
+		self.name = name
+		self.results = results
+		self.destroy = destroy
+		self.curproc = curproc
+
+#And they all lived happily ever after...

@@ -10,7 +10,6 @@ from multiprocessing import Queue
 
 from parabam.interface import merger
 
-from parabam.tools import Processor
 from parabam.pair import PairProcessor,ProcessorSubset
 
 from abc import ABCMeta, abstractmethod
@@ -85,7 +84,7 @@ class TaskSubset(parabam.Task):
 				sys.stdout.write("[ERROR] Unrecognised return type from user engine!")
 				sys.stdout.flush()
 		
-class HandlerSubset(parabam.tools.Handler):
+class HandlerSubset(parabam.core.Handler):
 
 	def __init__(self,inqu,outqu,const,destroy_limit):
 		super(HandlerSubset,self).__init__(inqu,const,destroy_limit=destroy_limit)
@@ -273,7 +272,7 @@ class Interface(parabam.UserInterface):
 			handls.append(merger.HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
 
 			if verbose == 1: 
-				update_interval = 100
+				update_interval = 199
 			else:
 				update_interval = 1
 

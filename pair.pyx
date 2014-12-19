@@ -14,7 +14,7 @@ import multiprocessing
 from abc import ABCMeta, abstractmethod
 import resource
 
-class ProcessorSubset(parabam.tools.Processor):
+class ProcessorSubset(parabam.core.Processor):
 
 	def __init__(self,object outqu,object const,object TaskClass,object task_args,object debug=False):
 		# if const.fetch_region:
@@ -42,17 +42,19 @@ class ProcessorSubset(parabam.tools.Processor):
 class PairProcessor(ProcessorSubset):
 
 	def __init__(self,object outqu,object const,object TaskClass,object task_args,object debug=False):
-		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
-		self._loners = {}
 		
+		super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug=False)
+		
+		self._loners = {}
 		self._loner_count = 0
+
 		master = pysam.Samfile(self._master_file_path[task_args[0]],"rb")
 		self._loners_object = pysam.Samfile("%s/loners" % (self._temp_dir,),"wb",template=master)
 		master.close()
 
 	def __add_to_collection__(self,master,item,collection):
-		loners = self._loners
-		cdef temp_count = self._loner_count
+		cdef dict loners = self._loners
+		cdef int temp_count = self._loner_count
 		if not item.is_secondary:
 			try:
 				mate = loners[item.qname] 
@@ -67,11 +69,13 @@ class PairProcessor(ProcessorSubset):
 				temp_count += 1
 
 		if temp_count > 200000:
-			self._loner_count = 0
+			temp_count = 0
 			self.__stash_loners__(loners)
 			del self._loners
-			gc.collect()
+			del loners
 			self._loners = {}
+			gc.collect()
+
 		self._loner_count = temp_count
 
 	def __stash_loners__(self,loners):
@@ -82,3 +86,6 @@ class PairProcessor(ProcessorSubset):
 		super(PairProcessor,self).__end_processing__(master)
 		self.__stash_loners__(self._loners)
 		self._loners_object.close()
+
+
+#...happily ever after

@@ -14,8 +14,8 @@ from collections import Counter
 from multiprocessing import Queue,Process
 from itertools import izip
 
-from parabam import Package
-from parabam import Handler
+from parabam.core import Package
+from parabam.core import Handler
 
 class MergePackage(Package):
 	def __init__(self,name,results,subset_type,source,destroy,total,time_added):

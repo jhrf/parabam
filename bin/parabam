@@ -16,10 +16,21 @@ def keyboard_handler(sig, frame):#Catch keyboard interupt and end processors
 	sys.stdout.write("\r[ERROR] parabam interrupted by user")
 	sys.exit(0)
 
-def create_dirs(dirs):
-	for i in dirs:
-		if i == "": continue
-		os.makedirs(i)
+def get_unique_tempdir():
+	i = 0
+	path = ""
+	while True:
+		path = get_candidate_temp_path(i)
+		if not os.path.exists(path):
+			return path	
+		i += 1
+
+def get_candidate_dir_path(unique):
+	prefix = "parabam-temp-%d" % (int(time.time(),)
+	if unique == 0:
+		return "%s" % (prefix,)
+	else:
+		return "%s-%d" %(prefix,unique,)
 
 def die_gracefully(temp_dir):
 	if not temp_dir == "." or not temp_dir == "": 
@@ -42,8 +53,8 @@ if __name__ == "__main__":
 		exe_dir,filnm = os.path.split(sys.argv[0])
 		command = sys.argv[1]
 
-		temp_dir = "parabam-temp-%d" %(int(time.time()),)
-		create_dirs([temp_dir])
+		temp_dir = get_unique_tempdir()
+		os.makedirs(temp_dir)
 
 		if command in progs:
 			#Load the command using the command line
@@ -61,7 +72,8 @@ if __name__ == "__main__":
 				#traceback.print_exception(*sys.exc_info())
 				die_gracefully(temp_dir)
 				raise
-			die_gracefully(temp_dir)
+		
+		die_gracefully(temp_dir)
 
 		else:
 			print "\nCommand not recognised. Refer to manual below:\n"
