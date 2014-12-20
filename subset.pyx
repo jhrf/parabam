@@ -5,6 +5,7 @@ import sys
 import os
 import gc
 import shutil
+import gzip
 
 from multiprocessing import Queue
 from abc import ABCMeta, abstractmethod
@@ -182,26 +183,24 @@ class PairProcessor(ProcessorSubset):
 		self._loner_count = 0
 		self._stash_count = 0
 
-		self._terminal_loners = self.__get_loner_object__("terminal_loners")
-		self._loners_object = self.__get_loner_object__("halfway_loners")
+		self._loners_object = self.__get_loner_object__("loners")
 
 	def __get_loner_object__(self,loner_type):
-		master_path = self._master_file_path[self._task_args[0]]
-		path = self.__get_loner_path__(loner_type,master_path)
-		master = pysam.AlignmentFile(master_path,"rb")
-		alig_object = pysam.AlignmentFile(path,"wb",template=master)
-		master.close()
-		return alig_object
+		path = self.__get_loner_path__(loner_type)
+		loner_object = gzip.open(path,"wb")
+		return loner_object
 
 	def __get_loner_path__(self,loner_type,master_path):
-		return "%s/%s_%d_%s" % (self._temp_dir,loner_type,time.time(),os.path.basename(master_path))
+		path = "%s/%s_%d_%s" % (self._temp_dir,loner_type,time.time(),os.path.basename(master_path))
+		path.replace(".bam",".gz")
+		return path
 
 	def __add_to_collection__(self,master,item,collection):
 		cdef dict loners = self._loners
 		cdef int temp_count = self._loner_count
 		if not item.is_secondary:
 			try:
-				mate = loners[item.qname] 
+				mate,index = loners[item.qname]
 				del loners[item.qname]
 				temp_count -= 1
 				collection.append( (item,mate,) )
@@ -209,7 +208,7 @@ class PairProcessor(ProcessorSubset):
 				#Could implement a system where by long standing
 				#unpaired reads are stored to be run at the end 
 				#of the program, otherwise we risk clogging memory
-				loners[item.qname] = item
+				loners[item.qname] = (item,master.tell(),)
 				temp_count += 1
 
 		if temp_count > 100000:
@@ -223,8 +222,8 @@ class PairProcessor(ProcessorSubset):
 
 	def __stash_loners__(self,loners):
 		self._stash_count += 1
-		for name,read in loners.items():
-			self._loners_object.write(read)
+		for name,(read,index) in loners.items():
+			self._loners_object.write(index+"\n")
 
 	def __end_processing__(self,master):
 		super(PairProcessor,self).__end_processing__(master)

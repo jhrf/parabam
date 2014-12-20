@@ -26,11 +26,11 @@ def get_unique_tempdir():
 		i += 1
 
 def get_candidate_dir_path(unique):
-	prefix = "parabam-temp-%d" % (int(time.time(),)
+	prefix = "parabam-temp-%d" % (int(time.time()),)
 	if unique == 0:
 		return "%s" % (prefix,)
 	else:
-		return "%s-%d" %(prefix,unique,)
+		return "%s-%d" % (prefix,unique,)
 
 def die_gracefully(temp_dir):
 	if not temp_dir == "." or not temp_dir == "": 
@@ -72,12 +72,10 @@ if __name__ == "__main__":
 				#traceback.print_exception(*sys.exc_info())
 				die_gracefully(temp_dir)
 				raise
-		
-		die_gracefully(temp_dir)
-
 		else:
 			print "\nCommand not recognised. Refer to manual below:\n"
 			printInfo = True
+		die_gracefully(temp_dir)
 	else:
 		printInfo = True
 	
