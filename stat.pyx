@@ -114,7 +114,7 @@ class HandlerStat(parabam.core.Handler):
 
 class ProcessorStat(parabam.core.Processor):
 
-	def __init__(self,object outqu,object const,object TaskClass,str task_args):
+	def __init__(self,object outqu,object const,object TaskClass,list task_args):
 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
 		self._source = task_args[0] #Defined in the run function within Interface
 

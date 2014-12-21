@@ -5109,7 +5109,7 @@ static PyObject *__pyx_pf_7parabam_4stat_11HandlerStat_8__get_data_str_from_name
 /* "parabam/stat.pyx":117
  * class ProcessorStat(parabam.core.Processor):
  * 
- * 	def __init__(self,object outqu,object const,object TaskClass,str task_args):             # <<<<<<<<<<<<<<
+ * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):             # <<<<<<<<<<<<<<
  * 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
  * 		self._source = task_args[0] #Defined in the run function within Interface
  */
@@ -5196,7 +5196,7 @@ static PyObject *__pyx_pw_7parabam_4stat_13ProcessorStat_1__init__(PyObject *__p
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_task_args), (&PyString_Type), 1, "task_args", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_task_args), (&PyList_Type), 1, "task_args", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7parabam_4stat_13ProcessorStat___init__(__pyx_self, __pyx_v_self, __pyx_v_outqu, __pyx_v_const, __pyx_v_TaskClass, __pyx_v_task_args);
 
   /* function exit code */
@@ -5223,7 +5223,7 @@ static PyObject *__pyx_pf_7parabam_4stat_13ProcessorStat___init__(CYTHON_UNUSED 
 
   /* "parabam/stat.pyx":118
  * 
- * 	def __init__(self,object outqu,object const,object TaskClass,str task_args):
+ * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):
  * 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)             # <<<<<<<<<<<<<<
  * 		self._source = task_args[0] #Defined in the run function within Interface
  * 
@@ -5280,13 +5280,17 @@ static PyObject *__pyx_pf_7parabam_4stat_13ProcessorStat___init__(CYTHON_UNUSED 
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "parabam/stat.pyx":119
- * 	def __init__(self,object outqu,object const,object TaskClass,str task_args):
+ * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):
  * 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
  * 		self._source = task_args[0] #Defined in the run function within Interface             # <<<<<<<<<<<<<<
  * 
  * 	def __get_master_bam__(self,master_file_path):
  */
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_task_args, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  if (unlikely(__pyx_v_task_args == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_task_args, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_1);
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_source_2, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5294,7 +5298,7 @@ static PyObject *__pyx_pf_7parabam_4stat_13ProcessorStat___init__(CYTHON_UNUSED 
   /* "parabam/stat.pyx":117
  * class ProcessorStat(parabam.core.Processor):
  * 
- * 	def __init__(self,object outqu,object const,object TaskClass,str task_args):             # <<<<<<<<<<<<<<
+ * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):             # <<<<<<<<<<<<<<
  * 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
  * 		self._source = task_args[0] #Defined in the run function within Interface
  */
@@ -15173,7 +15177,7 @@ static int __Pyx_InitCachedConstants(void) {
   /* "parabam/stat.pyx":117
  * class ProcessorStat(parabam.core.Processor):
  * 
- * 	def __init__(self,object outqu,object const,object TaskClass,str task_args):             # <<<<<<<<<<<<<<
+ * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):             # <<<<<<<<<<<<<<
  * 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
  * 		self._source = task_args[0] #Defined in the run function within Interface
  */
@@ -16172,7 +16176,7 @@ PyMODINIT_FUNC PyInit_stat(void)
  * 
  * class ProcessorStat(parabam.core.Processor):             # <<<<<<<<<<<<<<
  * 
- * 	def __init__(self,object outqu,object const,object TaskClass,str task_args):
+ * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):
  */
   __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_parabam); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -16195,7 +16199,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   /* "parabam/stat.pyx":117
  * class ProcessorStat(parabam.core.Processor):
  * 
- * 	def __init__(self,object outqu,object const,object TaskClass,str task_args):             # <<<<<<<<<<<<<<
+ * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):             # <<<<<<<<<<<<<<
  * 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
  * 		self._source = task_args[0] #Defined in the run function within Interface
  */
@@ -16245,7 +16249,7 @@ PyMODINIT_FUNC PyInit_stat(void)
  * 
  * class ProcessorStat(parabam.core.Processor):             # <<<<<<<<<<<<<<
  * 
- * 	def __init__(self,object outqu,object const,object TaskClass,str task_args):
+ * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):
  */
   __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_ProcessorStat, __pyx_t_2, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
