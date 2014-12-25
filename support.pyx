@@ -26,10 +26,9 @@ class MergePackage(Package):
         self.time_added = time_added
 
 class HandlerMerge(Handler):
-    def __init__(self,object inqu,object const,int destroy_limit=1,list merge_types = []):
+    def __init__(self,object inqu,object const,int destroy_limit=1):
         super(HandlerMerge,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)
         
-        self._merge_types = merge_types
         self._total = Counter()
         self._sources = const.sources
         self._subset_types = const.subset_types
@@ -43,7 +42,7 @@ class HandlerMerge(Handler):
             master = pysam.Samfile(self.const.master_file_path[src],"rb")
             file_objects[src] = {}
             for subset in self._subset_types:
-                merge_type = self.__get_subset_merge_type__(subset)
+                merge_type = self.__get_subset_merge_type__(output_paths[src][subset])
                 cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_paths[src][subset],master)
                 file_objects[src][subset] = cur_file_obj
             master.close()
@@ -56,10 +55,12 @@ class HandlerMerge(Handler):
             return open(path,"w")
         return pysam.AlignmentFile(path,"wb",template=master)
 
-    def __get_subset_merge_type__(self,subset):
-        for name,merge_type in self._merge_types:
-            if name == subset:
-                return merge_type
+    def __get_subset_merge_type__(self,path):
+        root,extension = os.path.splitext(path)
+        if extension == ".gzip" or extension == ".gz":
+            return "gzip"
+        elif extension == ".txt":
+            return "txt"
         return "pysam"
 
     def __periodic_action__(self,iterations):
@@ -89,12 +90,13 @@ class HandlerMerge(Handler):
                 print "--"
 
                 raise
-                    
+                
             self._merged += 1       
 
     def __get_entries_from_file__(self,path,subset):
-        merge_type = self.__get_subset_merge_type__(subset)
-
+        merge_type = self.__get_subset_merge_type__(path)
+        print path
+        print merge_type
         if merge_type == "pysam":
             file_object = pysam.AlignmentFile(path,"rb")
             for read in file_object.fetch(until_eof=True):
@@ -116,29 +118,29 @@ class HandlerMerge(Handler):
         #This could be moved before processing to cut down on the pysam cat overhead.
         for source in self._sources:
             for subset in self._subset_types:
-                master_path = self.const.master_file_path[source]
                 telbam_path = self.const.output_paths[source][subset]
-                
-                telbam_object = pysam.Samfile(telbam_path,"rb") 
-                new_header = telbam_object.header
-                telbam_object.close()
-                
-                source_info = "parabam_source:%s" % (master_path,)
-                if 'CO' in new_header:
-                    new_header['CO'].append(source_info)
-                else:
-                    new_header['CO'] = [source_info]
+                if self.__get_subset_merge_type__(telbam_path) == "pysam":
+                    master_path = self.const.master_file_path[source]
+                    telbam_object = pysam.Samfile(telbam_path,"rb") 
+                    new_header = telbam_object.header
+                    telbam_object.close()
+                    
+                    source_info = "parabam_source:%s" % (master_path,)
+                    if 'CO' in new_header:
+                        new_header['CO'].append(source_info)
+                    else:
+                        new_header['CO'] = [source_info]
 
-                header_temp_path = self.__get_unique_temp_path__("header",temp_dir=self.const.temp_dir)
-                header_temp_object = pysam.Samfile(header_temp_path,"wb",header=new_header)
-                header_temp_object.close()
+                    header_temp_path = self.__get_unique_temp_path__("header",temp_dir=self.const.temp_dir)
+                    header_temp_object = pysam.Samfile(header_temp_path,"wb",header=new_header)
+                    header_temp_object.close()
 
-                cat_temp_path = self.__get_unique_temp_path__("cat",temp_dir=self.const.temp_dir)
-                pysam.cat("-o",cat_temp_path,header_temp_path,telbam_path)
+                    cat_temp_path = self.__get_unique_temp_path__("cat",temp_dir=self.const.temp_dir)
+                    pysam.cat("-o",cat_temp_path,header_temp_path,telbam_path)
 
-                os.remove(header_temp_path)
-                os.remove(telbam_path)
-                os.rename(cat_temp_path,telbam_path)
+                    os.remove(header_temp_path)
+                    os.remove(telbam_path)
+                    os.rename(cat_temp_path,telbam_path)
 
     def __get_unique_temp_path__(self,temp_type,temp_dir="."):
         return "%s/%sTEMP%d.bam" % (temp_dir,temp_type,int(time.time()),)

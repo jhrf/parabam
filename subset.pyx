@@ -1,4 +1,5 @@
 import pysam
+import pdb
 import parabam
 import time
 import sys
@@ -34,8 +35,9 @@ class TaskSubset(parabam.core.Task):
         cdef dict counts = self._counts
 
         for subset in self._subset_types:
-            temp_paths[subset] = self.__get_temp_path__(subset)
-            temp_objects[subset]  = pysam.Samfile(temp_paths[subset],"wb",template=master)
+            ext = self.__get_extension__(self.const.output_paths[self._source][subset])
+            temp_paths[subset] = self.__get_temp_path__(subset,ext)
+            temp_objects[subset] = self.__get_temp_object__(temp_paths[subset],ext,master)
             counts[subset] = 0
 
         self.__handle_task_set__(self._task_set,master)
@@ -53,13 +55,25 @@ class TaskSubset(parabam.core.Task):
 
         return results
 
+    def __get_temp_object__(self,path,ext,master):
+        if ext == ".gz" or ext == ".gzip":
+            return gzip.open(path,"wb")
+        elif ext == ".txt":
+            return open(path,"w")
+        else:
+            return pysam.Samfile(path,"wb",template=master)
+
+    def __get_extension__(self,path):
+        root,extension = os.path.splitext(path)
+        return extension
+
     def __write_to_subset_bam__(self,subset_type,read):
         self._counts[subset_type] += 1
         self._temp_objects[subset_type].write(read)
 
     def __handle_task_set__(self,task_set,master):
 
-        engine = self.const.user_engine
+        engine = self.__engine__
         user_constants = self.const.user_constants
         subset_types = self.const.subset_types
 
@@ -80,7 +94,78 @@ class TaskSubset(parabam.core.Task):
             else:
                 sys.stdout.write("[ERROR] Unrecognised return type from user engine!")
                 sys.stdout.flush()
+
+    def __engine__(self,read,user_constants,master):
+        self.const.user_engine(read,user_constants,master)
         
+class PairTaskSubset(TaskSubset):
+
+    def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
+        super(PairTaskSubset, self).__init__(task_set=task_set,
+                                        outqu=outqu,
+                                        curproc=curproc*len(const.subset_types),
+                                        destroy=destroy,
+                                        const=const,
+                                        source=source)
+        self.engine = self.const.user_engine
+
+    def __handle_task_set__(self,task_set,master):
+        engine = self.__engine__
+        user_constants = self.const.user_constants
+
+        loners = {}
+
+        if type(task_set) == dict:
+            self.__handle_dict_task_set__(task_set,engine,user_constants,master)
+
+        elif type(task_set) == list:
+            self.__handle_list_task_set__(task_set,engine,user_constants,master)
+
+    def __handle_dict_task_set__(self,task_set,engine,user_constants,master):
+        user_constants = self.const.user_constants
+        for qname,(read1,read2) in task_set.items():
+            self.__read_pair_decision__(read1,read2,user_constants,master)
+
+    def __handle_list_task_set__(self,task_set,engine,user_constants,master):
+        user_constants = self.const.user_constants
+        subset_types = self.const.subset_types
+
+        subset_write = self.__write_to_subset_bam__
+        query_loners = self.__query_loners__ 
+        read_pair_decision = self.__read_pair_decision__
+
+        loners = {}
+
+        for read,index in task_set:
+            read1,read2 = query_loners(read,index,loners)
+            if read1:
+                read_pair_decision(read1,read2,engine,user_constants,master)
+
+        for read,index in loners.items():
+            subset_write("index",read)
+        del loners
+
+    def __read_pair_decision__(self,read1,read2,engine,user_constants,master):
+        subset_decision = engine((read1,read2),user_constants,master)
+        if type(subset_decision) == list:
+            for subset,cur_read in subset_decision:
+                subset_write(subset,cur_read)
+        else:
+            sys.stdout.write("[ERROR] Unrecognised return type from user engine!\n")
+            sys.stdout.write("[ERROR] In paired subset mode engine must return like-so:\n")
+            sys.stdout.write("\t[ (subset_type,read), ... ]")
+            sys.stdout.flush()
+
+    def __query_loners__(self,read,index,loners):
+        try:
+            mate = loners[read.qname][0]
+            del loners[read.qname]
+            return read,mate
+
+        except KeyError:
+            loners[read.qname] = (read,index,)
+            return None,None
+
 class HandlerSubset(parabam.core.Handler):
 
     def __init__(self,object inqu,object outqu,object const,object destroy_limit):
@@ -118,19 +203,23 @@ class HandlerSubset(parabam.core.Handler):
     def __periodic_action__(self,iterations):
         for source in self._sources:
             for subset in self._subset_types:
-                self.__test_merge_store__(self._output_paths[source][subset],self._merge_stores[source][subset],source,subset)
+                self.__test_merge_store__(self._output_paths[source][subset],
+                            self._merge_stores[source][subset],source,subset)
 
     def __test_merge_store__(self,outnm,store,source,subset):
         if len(store) > 1:
-            self.__add_merge_task__(name=outnm,results=store,subset_type=subset,source=source,total=self._stats[source]["total"])
+            self.__add_merge_task__(name=outnm,results=store,subset_type=subset
+                            ,source=source,total=self._stats[source]["total"])
             self._mergecount += 1
             #Remove the temp file which has been merged
             store[:] = [] #Wipe the store clean, these have been merged
             gc.collect()
 
     def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
+        
         res = MergePackage(name=name,results=list(results),
-                            subset_type=subset_type,source=source,destroy=destroy,total=total,time_added=time.time())
+                            subset_type=subset_type,source=source,
+                            destroy=destroy,total=total,time_added=time.time())
         self._mergequeue.put(res)
 
     def __total_reads__(self):
@@ -176,68 +265,10 @@ class ProcessorSubset(parabam.core.Processor):
 class PairProcessor(ProcessorSubset):
 
     def __init__(self,object outqu,object const,object TaskClass,object task_args,object debug=False):
-        
         super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug)
         
-        self._loners = {}
-        self._loner_count = 0
-        self._stash_count = 0
-
-        self._loners_object_index = self.__get_loner_object__("loners")
-
-    def __get_loner_object__(self,loner_type):
-        path = self.__get_loner_path__(loner_type,self._master_file_path[self._task_args[0]])
-        loner_object = gzip.open(path,"wb",compresslevel=9)
-        return loner_object
-
-    def __get_loner_path__(self,loner_type,master_path):
-        path = "%s/%s_%d_%s" % (self._temp_dir,loner_type,time.time(),os.path.basename(master_path))
-        return path.replace(".bam",".gz")
-
     def __add_to_collection__(self,master,item,collection):
-        cdef dict loners = self._loners
-        cdef int temp_count = self._loner_count
-        if not item.is_secondary:
-            try:
-                mate,index = loners[item.qname]
-                del loners[item.qname]
-                temp_count -= 1
-                collection.append( (item,mate,) )
-            except KeyError:
-                #Could implement a system where by long standing
-                #unpaired reads are stored to be run at the end 
-                #of the program, otherwise we risk clogging memory
-                loners[item.qname] = (item,self._prev,)
-                temp_count += 1
-
-        if temp_count > 100000:
-            temp_count = 0
-            self.__stash_loners__(loners)
-            del self._loners
-            del loners
-            self._loners = {}
-            gc.collect()
-        self._loner_count = temp_count
-
-    def __stash_loners__(self,loners):
-        self._stash_count += 1
-        for chunk in self.__generate_loner_chunk__(loners):
-            self._loners_object_index.write("%s" % (chunk,) )
-
-    def __generate_loner_chunk__(self,loners):
-        chunk = ""
-        for i,(name,(read,index)) in enumerate(loners.items()):
-            if i % 10000 == 0 and not i == 0:
-                yield_val = chunk
-                chunk = ""
-                yield yield_val
-            chunk += "%d\n" % (index,)
-        yield chunk
-  
-    def __end_processing__(self,master):
-        super(PairProcessor,self).__end_processing__(master)
-        self.__stash_loners__(self._loners)
-        self._loners_object_index.close()
+        collection.append((item,self._prev,))
 
 class Interface(parabam.core.UserInterface):
     """The interface to parabam subset.
@@ -279,22 +310,6 @@ class Interface(parabam.core.UserInterface):
             keep_in_temp=False,engine_is_class=False,verbose=False,
             pair_process=False,debug=False):
 
-        """This is function is invoked in order to run parabam subset programatically.
-
-        Arguments:
-            input_bams (list): BAM Files we wish to analyse
-            outputs (list): Names for the output files. If not specified <bam_name>_<subset_types>.bam convention will be used
-            proc (int): The maximum number of tasks that will be run at one time
-            chunk (int): The amount of reads that a task will hold
-            subset_types (list): A list of names which correspond to the subset types
-            user_constants (dict): A dictionary initialised with object referenced by the user engine
-            user_engine (function): A function or class to be run on each read
-            verbose (int): Expects an int from 0 to 2. The level of output produced by parabam
-            keep_in_temp (bool): Files will be kept in temp file after processing. Useful for incorporation into pipelines
-            side_by_side (int): The amount of BAMs to be run in side-by-side mode. Further concurrency
-            pair_process (bool): Pair processing mode will be initialised (feature in beta)
-            debug (bool): subset will only process the first 5million reads from the BAM files."""
-
         if not outputs or not len(outputs) == len(input_bams):
             print "[Status] Using default naming scheme."
             outputs = [ self.__get_basename__(b) for b in input_bams ]
@@ -304,9 +319,6 @@ class Interface(parabam.core.UserInterface):
 
         for input_group,output_group in self.__get_group__(input_bams,outputs,multi=side_by_side):
             
-            task_qu = Queue()
-            merge_qu = Queue()
-
             output_paths = dict([(source,{}) for source in output_group])
             master_file_path = {}
 
@@ -314,11 +326,15 @@ class Interface(parabam.core.UserInterface):
                 master_file_path[source] = mst
                 for typ in subset_types:
                     output_paths[source][typ] = "%s/%s_%s.bam" % (self._temp_dir,source.replace(".bam",""),typ,)
+                if pair_process:
+                    output_paths[source]["index"] = "%s/%s_index.gz" % (self._temp_dir,source.replace(".bam",""),)
+
+            if pair_process:
+                #This index subset records the failed attempts to find mates
+                #if we are pair processing
+                subset_types.append("index")
                     
             if verbose: self.__report_file_names__(output_paths)
-
-            procrs = []
-            handls = []
 
             const = parabam.core.Const(output_paths=output_paths,
                                 temp_dir=self._temp_dir,
@@ -333,53 +349,91 @@ class Interface(parabam.core.UserInterface):
                                 fetch_region=fetch_region,
                                 pair_process=pair_process)
 
-            for source in output_group:
-                processor_class = ProcessorSubset
-                if pair_process:
-                    processor_class = PairProcessor
-
-                if engine_is_class:
-                    if not issubclass(user_engine,TaskSubset):
-                        raise Exception("[ERROR]\tThe class provided to parabam multiset must be a subclass of\n"\
-                                        "\tparabam.interface.subset.TaskSubset. Please consult the parabam manual.")
-                    cur_args = [source]
-                    procrs.append(processor_class(outqu=task_qu,
-                                            const=const,
-                                            TaskClass=user_engine,
-                                            task_args=cur_args,
-                                            debug=debug))
-                else:
-                    procrs.append(processor_class(outqu=task_qu,
-                                                const=const,
-                                                TaskClass=TaskSubset,
-                                                task_args=[source],
-                                                debug = debug))
-
-            destroy_limit=len(const.sources)
-            handls.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const,destroy_limit=destroy_limit))
-            handls.append(HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
+            task_qu = Queue()
+            processors = self.__create_processors__(task_qu,const,debug,engine_is_class)
+            handlers = self.__create_handlers__(task_qu,const)
 
             if verbose == 1: 
                 update_interval = 199
             else:
                 update_interval = 1
 
-            lev = parabam.core.Leviathon(procrs,handls,update_interval)
+            lev = parabam.core.Leviathon(processors,handlers,update_interval)
             lev.run()
             del lev
 
-            #Move the complete telbams out of the temp_dir to the working dir
+            if pair_process:
+                index_paths,subset_paths = self.__seperate_subset_and_index__(output_paths)
+
+                handle_index()
+
+            #Move the complete BAMs etc out of the temp_dir to the working dir
             #Only do this if we custom generated the file locations.
             if keep_in_temp:
                 for source,subset_paths in output_paths.items():
                     for subset,path in subset_paths.items():
-                        final_files.append(path)
+                            final_files.append(path)
             else:
                 final_files.extend(self.__move_output_files__(output_paths))
             
             gc.collect()
 
         return final_files
+
+    def __seperate_subset_and_index__(self,output_paths):
+        index_paths = {}
+        subset_paths = {}
+        for source,subset_paths in output_paths.items():
+            index_paths[source] = {}
+            subset_paths[source] = {}
+            for subset,path in subset_paths.items():
+                if "subset" == "index":
+                    index_paths[source][subset] = path
+                else:
+                    subset_paths[source][subset] = path
+        return index_paths,subset_paths
+
+    def __create_handlers__(self,task_qu,object const):
+        handlers = []
+
+        destroy_limit=len(const.sources)
+        merge_qu = Queue()
+        handlers.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const,destroy_limit=destroy_limit))
+        handlers.append(HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
+
+        return handlers
+
+    def __create_processors__(self,task_qu,object const,debug,engine_is_class):
+        processors = []
+        for source in const.sources:
+            if const.pair_process:
+                processor_class = PairProcessor
+                task_class = PairTaskSubset
+            else:
+                processor_class = ProcessorSubset
+                task_class = TaskSubset
+
+            if engine_is_class:
+
+                if not const.pair_process and not issubclass(const.user_engine,TaskSubset):
+                    raise_exception = True
+                elif const.pair_process and not issubclass(const.user_engine,PairTaskSubset):
+                    raise_exception = True
+                else:
+                    raise_exception = False
+                    
+                if raise_exception:
+                    raise Exception("[ERROR]\tUser engine class must inherit %s\n" \
+                        % (processor_class.__class__,))
+                else:
+                    task_class = const.user_engine
+                                        
+            processors.append(processor_class(outqu=task_qu,
+                            const=const,
+                            TaskClass=task_class,
+                            task_args=[source],
+                            debug = debug))
+        return processors
 
     def __report_file_names__(self,output_paths):
         print "[Status] This run will output the following files:"
@@ -429,5 +483,121 @@ class Interface(parabam.core.UserInterface):
             "\t2: Detailed output")
 
         return parser 
+
+class TaskIndex(PairTaskSubset):
+
+    def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
+        super(TaskIndex, self).__init__(task_set=task_set,
+                                        outqu=outqu,
+                                        curproc=curproc*len(const.subset_types),
+                                        destroy=destroy,
+                                        const=const,
+                                        source=source)
+        
+    def __handle_task_set__(self,task_set,master):
+        engine = self.__engine__
+        user_constants = self.const.user_constants
+        subset_types = self.const.subset_types
+
+        subset_write = self.__write_to_subset_bam__
+
+        loners = {}
+        pairs = {}
+
+        #Find pairs in index chunk
+        for index in task_set:
+            master.seek(int(index))
+            read = master.next()
+            read1,read2 = self.__query_loners__(read,index,loners)
+            if read1:
+                pairs = {read1.qname:(read1,read2)}
+        
+        #Assign reads that are still loners to loners file
+        for read,index in loners.items():
+            subset_write("index",read)
+        del loners
+
+        #Send pairs onto the subset decision
+        self.__launch_child_task__()
+
+    def __launch_child_task__(self,task_set):
+        pass
+
+class ProcessorIndex(parabam.core.Processor):
+
+    def __init__(self,object outqu,object const,object TaskClass,object debug=False):
+        # if const.fetch_region:
+        #   debug = False 
+        super(ProcessorIndex,self).__init__(outqu,const,TaskClass,task_args,debug)
+
+    def __get_master_bam__(self,master_file_path):
+        return gzip.open(,"rb")
+
+    def __add_to_collection__(self,master,alig,collection):
+        collection.append(alig)
+
+    def __get_next_alig__(self,master_bam):
+        for alig in master_bam:
+            yield alig
+
+    def __pre_processor__(self,master_file_path):
+        pass
+
+class IndexInterface(Interface):
+    """The interface to parabam subset.
+    Users will primarily make use of the ``run`` function."""
+
+    def __init__(self,temp_dir,exe_dir):
+        super(IndexInterface,self).__init__(temp_dir,exe_dir)
+
+    def run_cmd(self,parser):
+        print "[Error] This module cannot be run from the command line."
+        pass
+    
+    def run(self,master_file_paths,index_path,proc,
+            chunk,const,user_constants,user_engine,
+            subset_types,task_class,
+            source,verbose=False,debug=False,):
+
+        run = 0
+        while True:
+            basename,ext = os.path.splitext(os.path.basename(master_file_path[source]))
+            output_paths = self.__get_output_paths__(source,subset_types,basename,run)
+            subset_types.append("index")
+                    
+            const.add("task_class",task_class)
+            const.add("index_path",index_path)
+            const.add("source",source)
+
+            task_qu = Queue()
+
+            # outqu,const,TaskClass,debug=False
+            processors = [ProcessorIndex(Queue,const,)]
+            handlers = self.__create_handlers__(task_qu,const)
+
+            if verbose == 1: 
+                update_interval = 199
+            else:
+                update_interval = 1
+
+            lev = parabam.core.Leviathon(processors,handlers,update_interval)
+            lev.run()
+            del lev
+            
+            gc.collect()
+            run += 1
+
+            pdb.set_trace()
+
+        return final_files
+
+    def __get_output_paths__(self,source,subset_types,basename,run):
+        paths = {source:{}}
+        replace_string = (self._temp_dir,subset,basename,run)
+        for subset in subset_types:
+            paths[source][subset] = "%s/index_%s_%s_%d.bam" % replace_string
+        paths[source]["index"] = "%s/leftovers_%s_%s_%d.gz" % replace_string
+
+        return paths
 
 #...happily ever after

@@ -42,9 +42,9 @@ class Task(multiprocessing.Process):
         del self._task_set
         gc.collect()
 
-    def __get_temp_path__(self,typ):
+    def __get_temp_path__(self,typ,ext=".bam"):
         #self.pid ensures that the temp names are unique.
-        return "%s/%s_%s_parabam_temp.bam" % (self._temp_dir,typ,self.pid)
+        return "%s/%s_%s_parabam_temp%s" % (self._temp_dir,typ,self.pid,ext)
 
     def __get_mate__(self,master,alig):
         try:
@@ -507,6 +507,9 @@ class Const(object):
 
         for key, val in kwargs.items():
             setattr(self,key,val)
+
+    def add(self,key,val):
+        setattr(self,key,val)
 
 class Package(object):
     def __init__(self,name,results,destroy,curproc):
