@@ -20,7 +20,7 @@ class Task(multiprocessing.Process):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self,list task_set,object outqu,int curproc,object destroy,object const):
+    def __init__(self,object task_set,object outqu,int curproc,object destroy,object const):
         multiprocessing.Process.__init__(self)
         self._task_set = task_set
         self._outqu = outqu

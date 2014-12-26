@@ -95,8 +95,6 @@ class HandlerMerge(Handler):
 
     def __get_entries_from_file__(self,path,subset):
         merge_type = self.__get_subset_merge_type__(path)
-        print path
-        print merge_type
         if merge_type == "pysam":
             file_object = pysam.AlignmentFile(path,"rb")
             for read in file_object.fetch(until_eof=True):

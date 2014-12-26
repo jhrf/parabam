@@ -17,7 +17,7 @@ class TaskSubset(parabam.core.Task):
     def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
         super(TaskSubset, self).__init__(task_set=task_set,
                                         outqu=outqu,
-                                        curproc=curproc*len(const.subset_types),
+                                        curproc=curproc*len(const.sources),
                                         destroy=destroy,
                                         const=const)
         self._source = source
@@ -103,7 +103,7 @@ class PairTaskSubset(TaskSubset):
     def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
         super(PairTaskSubset, self).__init__(task_set=task_set,
                                         outqu=outqu,
-                                        curproc=curproc*len(const.subset_types),
+                                        curproc=curproc*len(const.sources),
                                         destroy=destroy,
                                         const=const,
                                         source=source)
@@ -122,17 +122,17 @@ class PairTaskSubset(TaskSubset):
             self.__handle_list_task_set__(task_set,engine,user_constants,master)
 
     def __handle_dict_task_set__(self,task_set,engine,user_constants,master):
-        user_constants = self.const.user_constants
         for qname,(read1,read2) in task_set.items():
-            self.__read_pair_decision__(read1,read2,user_constants,master)
+            self.__read_pair_decision__(read1,read2,engine,user_constants,master)
 
     def __handle_list_task_set__(self,task_set,engine,user_constants,master):
         user_constants = self.const.user_constants
         subset_types = self.const.subset_types
 
-        subset_write = self.__write_to_subset_bam__
+        #speedup
         query_loners = self.__query_loners__ 
         read_pair_decision = self.__read_pair_decision__
+        #speedup
 
         loners = {}
 
@@ -141,15 +141,19 @@ class PairTaskSubset(TaskSubset):
             if read1:
                 read_pair_decision(read1,read2,engine,user_constants,master)
 
-        for read,index in loners.items():
-            subset_write("index",read)
+        self.__stash_loners__(loners)
         del loners
+
+    def __stash_loners__(self,loners):
+        subset_write = self.__write_to_subset_bam__
+        for qname,(read,index) in loners.items():
+            subset_write("index","%d\n" % (index,))
 
     def __read_pair_decision__(self,read1,read2,engine,user_constants,master):
         subset_decision = engine((read1,read2),user_constants,master)
         if type(subset_decision) == list:
             for subset,cur_read in subset_decision:
-                subset_write(subset,cur_read)
+                self.__write_to_subset_bam__(subset,cur_read)
         else:
             sys.stdout.write("[ERROR] Unrecognised return type from user engine!\n")
             sys.stdout.write("[ERROR] In paired subset mode engine must return like-so:\n")
@@ -356,7 +360,7 @@ class Interface(parabam.core.UserInterface):
             if verbose == 1: 
                 update_interval = 199
             else:
-                update_interval = 1
+                update_interval = 3
 
             lev = parabam.core.Leviathon(processors,handlers,update_interval)
             lev.run()
@@ -365,7 +369,15 @@ class Interface(parabam.core.UserInterface):
             if pair_process:
                 index_paths,subset_paths = self.__seperate_subset_and_index__(output_paths)
 
-                handle_index()
+                index_interface = IndexInterface(self._temp_dir,self._exe_dir)
+                
+                if engine_is_class:
+                    task_class = user_engine
+                else:
+                    task_class = PairTaskSubset
+
+                for source,index_dict in index_paths.items():
+                    index_interface.run(index_dict["index"],const,task_class,source,debug=debug)
 
             #Move the complete BAMs etc out of the temp_dir to the working dir
             #Only do this if we custom generated the file locations.
@@ -387,7 +399,7 @@ class Interface(parabam.core.UserInterface):
             index_paths[source] = {}
             subset_paths[source] = {}
             for subset,path in subset_paths.items():
-                if "subset" == "index":
+                if subset == "index":
                     index_paths[source][subset] = path
                 else:
                     subset_paths[source][subset] = path
@@ -395,11 +407,9 @@ class Interface(parabam.core.UserInterface):
 
     def __create_handlers__(self,task_qu,object const):
         handlers = []
-
-        destroy_limit=len(const.sources)
         merge_qu = Queue()
-        handlers.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const,destroy_limit=destroy_limit))
-        handlers.append(HandlerMerge(inqu=merge_qu,const=const,destroy_limit=destroy_limit))
+        handlers.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,const=const,destroy_limit=len(const.sources)))
+        handlers.append(HandlerMerge(inqu=merge_qu,const=const,destroy_limit=len(const.subset_types)))
 
         return handlers
 
@@ -414,7 +424,6 @@ class Interface(parabam.core.UserInterface):
                 task_class = TaskSubset
 
             if engine_is_class:
-
                 if not const.pair_process and not issubclass(const.user_engine,TaskSubset):
                     raise_exception = True
                 elif const.pair_process and not issubclass(const.user_engine,PairTaskSubset):
@@ -499,42 +508,41 @@ class TaskIndex(PairTaskSubset):
         user_constants = self.const.user_constants
         subset_types = self.const.subset_types
 
-        subset_write = self.__write_to_subset_bam__
-
         loners = {}
         pairs = {}
 
         #Find pairs in index chunk
         for index in task_set:
-            master.seek(int(index))
+            master.seek(index)
             read = master.next()
             read1,read2 = self.__query_loners__(read,index,loners)
             if read1:
-                pairs = {read1.qname:(read1,read2)}
+                pairs[read1.qname] = (read1,read2)
         
         #Assign reads that are still loners to loners file
-        for read,index in loners.items():
-            subset_write("index",read)
+        self.__stash_loners__(loners)
         del loners
 
         #Send pairs onto the subset decision
-        self.__launch_child_task__()
+        self.__launch_child_task__(pairs)
 
     def __launch_child_task__(self,task_set):
-        pass
+        args = [task_set,self._outqu,0,False,self.const]
+        args.extend([self.const.source])
+        task = self.const.task_class(*args)
+        task.start()
+        task.join()
 
 class ProcessorIndex(parabam.core.Processor):
 
-    def __init__(self,object outqu,object const,object TaskClass,object debug=False):
-        # if const.fetch_region:
-        #   debug = False 
+    def __init__(self,object outqu,object const,object TaskClass,list task_args,object debug=False):
         super(ProcessorIndex,self).__init__(outqu,const,TaskClass,task_args,debug)
 
     def __get_master_bam__(self,master_file_path):
-        return gzip.open(,"rb")
+        return gzip.open(self.const.index_path,"rb")
 
     def __add_to_collection__(self,master,alig,collection):
-        collection.append(alig)
+        collection.append(int(alig))
 
     def __get_next_alig__(self,master_bam):
         for alig in master_bam:
@@ -554,49 +562,46 @@ class IndexInterface(Interface):
         print "[Error] This module cannot be run from the command line."
         pass
     
-    def run(self,master_file_paths,index_path,proc,
-            chunk,const,user_constants,user_engine,
-            subset_types,task_class,
-            source,verbose=False,debug=False,):
-
-        run = 0
+    def run(self,index_path,object const,task_class,
+            source,verbose=False,debug=False):
+        runs = 0
+        run_path = index_path
         while True:
-            basename,ext = os.path.splitext(os.path.basename(master_file_path[source]))
-            output_paths = self.__get_output_paths__(source,subset_types,basename,run)
-            subset_types.append("index")
+            basename,ext = os.path.splitext(os.path.basename(const.master_file_path[source]))
+            output_paths = self.__get_output_paths__(source,const.subset_types,basename,runs)
                     
+            const.add("output_paths",output_paths)
             const.add("task_class",task_class)
-            const.add("index_path",index_path)
+            const.add("index_path",run_path)
             const.add("source",source)
+            const.add("chunk",const.chunk+50000)
 
             task_qu = Queue()
 
-            # outqu,const,TaskClass,debug=False
-            processors = [ProcessorIndex(Queue,const,)]
+            processors = [ProcessorIndex(task_qu,const,TaskIndex,[source],debug)]
             handlers = self.__create_handlers__(task_qu,const)
 
             if verbose == 1: 
                 update_interval = 199
             else:
-                update_interval = 1
-
+                update_interval = 3
             lev = parabam.core.Leviathon(processors,handlers,update_interval)
             lev.run()
             del lev
             
             gc.collect()
-            run += 1
+            runs += 1
 
             pdb.set_trace()
+            run_path = output_paths[source]["index"]
 
-        return final_files
+        return []
 
     def __get_output_paths__(self,source,subset_types,basename,run):
         paths = {source:{}}
-        replace_string = (self._temp_dir,subset,basename,run)
         for subset in subset_types:
-            paths[source][subset] = "%s/index_%s_%s_%d.bam" % replace_string
-        paths[source]["index"] = "%s/leftovers_%s_%s_%d.gz" % replace_string
+            paths[source][subset] = "%s/index_%s_%s_%d.bam" % (self._temp_dir,subset,basename,run)
+        paths[source]["index"] = "%s/leftovers_index_%s_%d.gz" % (self._temp_dir,basename,run)
 
         return paths
 
