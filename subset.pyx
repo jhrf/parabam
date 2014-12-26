@@ -377,7 +377,7 @@ class Interface(parabam.core.UserInterface):
                     task_class = PairTaskSubset
 
                 for source,index_dict in index_paths.items():
-                    index_interface.run(index_dict["index"],const,task_class,source,debug=debug)
+                    index_interface.run(index_dict["index"],const,task_class,source)
 
             #Move the complete BAMs etc out of the temp_dir to the working dir
             #Only do this if we custom generated the file locations.
@@ -563,7 +563,7 @@ class IndexInterface(Interface):
         pass
     
     def run(self,index_path,object const,task_class,
-            source,verbose=False,debug=False):
+            source,verbose=False):
         runs = 0
         run_path = index_path
         while True:
@@ -578,7 +578,7 @@ class IndexInterface(Interface):
 
             task_qu = Queue()
 
-            processors = [ProcessorIndex(task_qu,const,TaskIndex,[source],debug)]
+            processors = [ProcessorIndex(task_qu,const,TaskIndex,[source])]
             handlers = self.__create_handlers__(task_qu,const)
 
             if verbose == 1: 
