@@ -271,6 +271,7 @@ class HandlerIndex(parabam.core.Handler):
 
         for num,path in results:
             self._index_paths[source].appendleft(path)
+            print "Store Size: ", len(self._index_paths[source])
 
     def __periodic_action__(self,iterations):
         for source,qu in self._index_paths.items():
@@ -323,8 +324,7 @@ class TaskIndex(Process):
             if read1:
                 pairs[read1.qname] = (read1,read2)
 
-        print "Rescued: ",len(pairs)
-        print "Loners: ",len(loners)
+        print "Rescued: ",len(pairs)," Loners: ",len(loners)
 
         stash_count = self.__stash_loners__(loners,loner_object,[path1,path2])
         del loners
