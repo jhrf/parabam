@@ -26,7 +26,7 @@ class MergePackage(Package):
         self.time_added = time_added
 
 class HandlerMerge(Handler):
-    def __init__(self,object inqu,object const,int destroy_limit=1):
+    def __init__(self,object inqu, object outqu, object const,int destroy_limit=1):
         super(HandlerMerge,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)
         
         self._total = Counter()
@@ -72,26 +72,29 @@ class HandlerMerge(Handler):
         source = new_package.source
         self._total[subset_type] = new_package.curproc #hack to record size of parent BAM
 
-        for merge_count,merge_path in new_package.results:
-            try:
-                if merge_count > 0:
-                    for item in self.__get_entries_from_file__(merge_path,subset_type):
-                        self._out_file_objects[source][subset_type].write(item)
-                os.remove(merge_path)
+        if subset_type == "index":
+            self._outqu.put(new_package)
+        else:
+            for merge_count,merge_path in new_package.results:
+                try:
+                    if merge_count > 0:
+                        for item in self.__get_entries_from_file__(merge_path,subset_type):
+                            self._out_file_objects[source][subset_type].write(item)
+                    os.remove(merge_path)
 
-            except IOError:
-                print "FAILURE ON THIS PATH %s" % (merge_path,)
+                except IOError:
+                    print "FAILURE ON THIS PATH %s" % (merge_path,)
 
-                print "\nTEMP CONTENTS"
-                sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
-                print "--"
-                print "Printing newpackage.results"
-                print new_package.results
-                print "--"
+                    print "\nTEMP CONTENTS"
+                    sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
+                    print "--"
+                    print "Printing newpackage.results"
+                    print new_package.results
+                    print "--"
 
-                raise
-                
-            self._merged += 1       
+                    raise
+                    
+                self._merged += 1       
 
     def __get_entries_from_file__(self,path,subset):
         merge_type = self.__get_subset_merge_type__(path)

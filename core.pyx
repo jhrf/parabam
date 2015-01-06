@@ -258,7 +258,7 @@ cdef class Processor:
                 wait_for_tasks(self._active_tasks,self._proc) # -2 for proc and handler 
                 start_task(collection)      
                 del collection
-                collection = []                            # already running
+                collection = [] # already running
                 collection_count = 0
             self._prev = master_bam.tell()
 
