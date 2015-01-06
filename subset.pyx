@@ -335,6 +335,8 @@ class TaskIndex(Process):
         
         os.remove(path1)
         os.remove(path2)
+        os.remove(path1+".bai")
+        os.remove(path2+".bai")
 
         loner_pack = MergePackage(name="index",results=[(stash_count,loner_path)],
                 subset_type="index",source=self._source,

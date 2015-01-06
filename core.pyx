@@ -134,7 +134,6 @@ cdef class Handler:
                 outstr = self.__format_update__(curproc,start_time)
                 update_output(outstr)
 
-        self.__periodic_action__(iterations)
         self._inqu.close()
         self.__handler_exit__()
 
