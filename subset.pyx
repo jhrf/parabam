@@ -94,7 +94,10 @@ class TaskSubset(parabam.core.Task):
                 if not subset_decision == -1:
                     subset_write(subset_types[subset_decision],read)
             else:
-                sys.stdout.write("[ERROR] Unrecognised return type from user engine!")
+                sys.stdout.write("[ERROR] Unrecognised return type from user engine!\n")
+                print subset_decision
+                print type(subset_decision)
+                print self.__class__
                 sys.stdout.flush()
 
     def __engine__(self,read,user_constants,master):
@@ -109,7 +112,6 @@ class PairTaskSubset(TaskSubset):
                                         destroy=destroy,
                                         const=const,
                                         source=source)
-        self.engine = self.const.user_engine
 
     def __handle_task_set__(self,task_set,master):
         engine = self.__engine__
@@ -250,7 +252,7 @@ class HandlerSubset(parabam.core.Handler):
 class HandlerIndex(parabam.core.Handler):
 
     def __init__(self,object inqu,object mainqu,object const,object destroy_limit, object TaskClass):
-        super(HandlerSubset,self).__init__(inqu,const,destroy_limit=destroy_limit)
+        super(HandlerIndex,self).__init__(inqu,const,destroy_limit=destroy_limit)
 
         self._sources = const.sources
         self._subset_types = const.subset_types
@@ -263,39 +265,24 @@ class HandlerIndex(parabam.core.Handler):
         for source in self._sources:
             self._index_paths[source] = deque()
 
-        self.new_task_const = parabam.core.Const(output_paths=const.output_paths,
-                                temp_dir=self._temp_dir,
-                                master_file_path=const.master_file_path,
-                                chunk=const.chunk,proc=const.proc,
-                                verbose=const.verbose,thresh=0,
-                                subset_types=const.subset_types,
-                                sources=const.output_group,
-                                exe_dir=const._exe_dir,
-                                user_constants=const.user_constants,
-                                user_engine=const.user_engine,
-                                fetch_region=const.fetch_region,
-                                pair_process=const.pair_process)
-
     def __new_package_action__(self,new_package,**kwargs):
         results = new_package.results
-        source = results["source"]
+        source = new_package.source
 
-        paths = results[""]
-        for path in paths:
+        for num,path in results:
             self._index_paths[source].appendleft(path)
-            print self._index_paths[source]
 
     def __periodic_action__(self,iterations):
         for source,qu in self._index_paths.items():
             try:
                 path_1 = qu.pop()
-                path_2 = qu.popleft()
+                #path_2 = qu.popleft()
+                path_2 = qu.pop()
 
-                new_task_const = new_task_const
-                new_task_const.subset_types = [path_1,path_2] 
-                new_task = TaskIndex([],self._inqu,666,False,self.new_task_const,source,
+                new_task = TaskIndex([path_1,path_2,],self._inqu,self.const,source,
                                     {"queue":self._mainqu,"const":self.const,
                                      "task_args":[source],"TaskClass":self._TaskClass})
+                new_task.run()
 
             except IndexError:
                 print "Not enough paths in path queue"
@@ -303,30 +290,30 @@ class HandlerIndex(parabam.core.Handler):
                 pass
 
     def __handler_exit__(self,**kwargs):
-        print "WE NEED TO DO SOMETHING HERE"
+        print "Exiting..."
 
-class TaskIndex(PairTaskSubset):
+class TaskIndex(Process):
 
-    def __init__(self,object task_set,object outqu,object curproc,object destroy,
-                object const,str source,object child_package):
-        super(TaskIndex, self).__init__(task_set=task_set,
-                                        outqu=outqu,
-                                        curproc=0,
-                                        destroy=False,
-                                        const=const,
-                                        source=source)
-
+    def __init__(self,object index_paths,object outqu,object const,str source,object child_package):
+        Process.__init__(self)
+        
         self._child_package = child_package
+        self._index_paths = index_paths
+        self._outqu = outqu
+        self._source = source
 
-    def __handle_task_set__(self,task_set,master):
-        #speedup
-        #loner_write = self.__mix_and_match__
-        loner_write = self.__no_mix__
+        self.const = const
 
-        path1,path2 = self.const.subset_types
+    def run(self):
+        path1,path2 = self._index_paths
+        loner_path = "%s/loner_temp_%d_%s.bam" % (self.const.temp_dir,time.time(),self.pid,)
 
-        path1_object = pysam.AlignedFile(path1,"rb")
-        path2_object = pysam.AlignedFile(path2,"rb")
+        self.__sort_and_index__(path1)
+        self.__sort_and_index__(path2)
+
+        path1_object = pysam.AlignmentFile(path1,"rb")
+        path2_object = pysam.AlignmentFile(path2,"rb")
+        loner_object = pysam.AlignmentFile(loner_path,"wb",template=path1_object)
 
         pairs,loners = self.__instalise_loners_and_pairs__(path1_object)
 
@@ -336,17 +323,36 @@ class TaskIndex(PairTaskSubset):
             if read1:
                 pairs[read1.qname] = (read1,read2)
 
-        stash_counts = self.__stash_loners__(loners,loner_write,[path1,path2])
+        print "Rescued: ",len(pairs)
+        print "Loners: ",len(loners)
+
+        stash_count = self.__stash_loners__(loners,loner_object,[path1,path2])
         del loners
 
         path1_object.close()
         path2_object.close()
+        loner_object.close()
+        
         os.remove(path1)
         os.remove(path2)
 
+        loner_pack = MergePackage(name="index",results=[(stash_count,loner_path)],
+                subset_type="index",source=self._source,
+                destroy=False,total=0,time_added=time.time())
+
         #Send pairs onto the subset decision
-        print "Rescued: ",len(pairs)
         self.__launch_child_task__(pairs)
+        self._outqu.put(loner_pack)
+
+    def __sort_and_index__(self,path):
+        temp_path = "sort_temp_%d_%s" % (time.time(),self.pid)
+        pysam.sort(path,temp_path)
+        temp_path += ".bam"
+
+        os.remove(path)
+        os.rename(temp_path,path)
+
+        pysam.index(path)
 
     def __launch_child_task__(self,pairs):
         child_pack = self._child_package
@@ -355,18 +361,12 @@ class TaskIndex(PairTaskSubset):
         task = child_pack["TaskClass"](*args)
         task.start()
 
-    def __stash_loners__(self,loners,loner_write,subset_types):
-        stashed = Counter()
+    def __stash_loners__(self,loners,loner_object,subset_types):
+        stashed = 0
         for qname,(read,subset_num) in loners.items():
-            stashed[subset_num] += 1
-            loner_write(subset_num,subset_types,read)
-
-    def __mix_and_match__(self,subset_num,subset_types,read):
-        #needs some random element to select subset file
-        self.__write_to_subset_bam__(subset_types[0],read)
-
-    def __no_mix__(self,subset_num,subset_types,read):
-        self.__write_to_subset_bam__(subset_types[subset_num],read)
+            stashed += 1
+            loner_object.write(read)
+        return stashed
 
     def __query_loners__(self,read,loners,subset_num):
         try:
@@ -422,7 +422,7 @@ class PairProcessor(ProcessorSubset):
         super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug)
         
     def __add_to_collection__(self,master,item,collection):
-        collection.append((item,self._prev,))
+        collection.append(item)
 
 class Interface(parabam.core.UserInterface):
     """The interface to parabam subset.
@@ -548,12 +548,12 @@ class Interface(parabam.core.UserInterface):
         handlers.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,
                         const=const,destroy_limit=len(const.sources)))
 
-        handlers.append(HandlerMerge(inqu=merge_qu,outque=merge_qu,
+        handlers.append(HandlerMerge(inqu=merge_qu,outqu=merge_out,
                         const=const,destroy_limit=len(const.sources)*len(const.subset_types)))
 
         if const.pair_process:
             handlers.append(HandlerIndex(inqu=merge_out,mainqu=task_qu,
-                        const=const,destroy_limit=len(const.source),TaskClass=task_class))
+                        const=const,destroy_limit=len(const.sources),TaskClass=task_class))
 
         return handlers
 

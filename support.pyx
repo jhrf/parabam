@@ -34,6 +34,8 @@ class HandlerMerge(Handler):
         self._subset_types = const.subset_types
         self._out_file_objects = self.__get_out_file_objects__()
         self._merged = 0
+        self._outqu = outqu #only used in pairprocess mode to handle index files
+
 
     def __get_out_file_objects__(self):
         file_objects = {}
