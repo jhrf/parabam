@@ -252,14 +252,16 @@ class HandlerSubset(parabam.core.Handler):
 class HandlerIndex(parabam.core.Handler):
 
     def __init__(self,object inqu,object mainqu,object const,object destroy_limit, object TaskClass):
-        super(HandlerIndex,self).__init__(inqu,const,destroy_limit=destroy_limit)
+        super(HandlerIndex,self).__init__(inqu,const,destroy_limit=destroy_limit,report=False)
 
         self._sources = const.sources
         self._subset_types = const.subset_types
-
+        
         self._mainqu = mainqu
-
         self._TaskClass = TaskClass
+
+        self._rescue_count = 0
+        self._total_loners = 0
 
         self._index_paths = {}
         for source in self._sources:
@@ -269,12 +271,21 @@ class HandlerIndex(parabam.core.Handler):
         results = new_package.results
         source = new_package.source
 
-        for num,path in results:
+        cur_loner_count = 0
+
+        for loner_count,path in results:
+            if type(loner_count) == tuple:
+                cur_loner_count = loner_count[0]
+                self._rescue_count += loner_count[1]
+            else:
+                self._total_loners += loner_count
+
             self._index_paths[source].appendleft(path)
-            print "Store Size: ", len(self._index_paths[source])
 
     def __periodic_action__(self,iterations):
-        for x in xrange(3):
+        print "Rescue: ",self._rescue_count," Total Loners: ",self._total_loners
+
+        for x in xrange(6):
             for source,qu in self._index_paths.items():
                 try:
                     path_1 = qu.pop()
@@ -287,8 +298,6 @@ class HandlerIndex(parabam.core.Handler):
                     new_task.start()
 
                 except IndexError:
-                    print "Not enough paths in path queue"
-                    print source
                     pass
 
     def __handler_exit__(self,**kwargs):
@@ -303,7 +312,6 @@ class TaskIndex(Process):
         self._index_paths = index_paths
         self._outqu = outqu
         self._source = source
-
         self.const = const
 
     def run(self):
@@ -325,10 +333,7 @@ class TaskIndex(Process):
             if read1:
                 pairs[read1.qname] = (read1,read2)
 
-        print "Rescued: ",len(pairs)," Loners: ",len(loners)
-
         stash_count = self.__stash_loners__(loners,loner_object,[path1,path2])
-        del loners
 
         path1_object.close()
         path2_object.close()
@@ -339,13 +344,17 @@ class TaskIndex(Process):
         os.remove(path1+".bai")
         os.remove(path2+".bai")
 
-        loner_pack = MergePackage(name="index",results=[(stash_count,loner_path)],
-                subset_type="index",source=self._source,
-                destroy=False,total=0,time_added=time.time())
+        if len(loners) > 0:
+            loner_pack = MergePackage(name="index",results=[((stash_count,len(pairs)),loner_path),],
+                    subset_type="index",source=self._source,
+                    destroy=False,total=0,time_added=time.time())
+            self._outqu.put(loner_pack)
 
-        #Send pairs onto the subset decision
-        self.__launch_child_task__(pairs)
-        self._outqu.put(loner_pack)
+        if len(pairs) > 0:
+            #Send pairs onto the subset decision
+            self.__launch_child_task__(pairs)
+
+        del loners
 
     def __sort_and_index__(self,path):
         temp_path = "sort_temp_%d_%s" % (time.time(),self.pid)
@@ -359,7 +368,7 @@ class TaskIndex(Process):
 
     def __launch_child_task__(self,pairs):
         child_pack = self._child_package
-        args = [pairs,child_pack["queue"],666,False,child_pack["const"]]
+        args = [pairs,child_pack["queue"],0,False,child_pack["const"]]
         args.extend(child_pack["task_args"])
         task = child_pack["TaskClass"](*args)
         task.start()
