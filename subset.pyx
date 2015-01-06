@@ -274,21 +274,22 @@ class HandlerIndex(parabam.core.Handler):
             print "Store Size: ", len(self._index_paths[source])
 
     def __periodic_action__(self,iterations):
-        for source,qu in self._index_paths.items():
-            try:
-                path_1 = qu.pop()
-                #path_2 = qu.popleft()
-                path_2 = qu.pop()
+        for x in xrange(3):
+            for source,qu in self._index_paths.items():
+                try:
+                    path_1 = qu.pop()
+                    #path_2 = qu.popleft()
+                    path_2 = qu.pop()
 
-                new_task = TaskIndex([path_1,path_2,],self._inqu,self.const,source,
-                                    {"queue":self._mainqu,"const":self.const,
-                                     "task_args":[source],"TaskClass":self._TaskClass})
-                new_task.run()
+                    new_task = TaskIndex([path_1,path_2,],self._inqu,self.const,source,
+                                        {"queue":self._mainqu,"const":self.const,
+                                         "task_args":[source],"TaskClass":self._TaskClass})
+                    new_task.run()
 
-            except IndexError:
-                print "Not enough paths in path queue"
-                print source
-                pass
+                except IndexError:
+                    print "Not enough paths in path queue"
+                    print source
+                    pass
 
     def __handler_exit__(self,**kwargs):
         print "Exiting..."
