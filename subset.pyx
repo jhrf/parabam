@@ -284,7 +284,7 @@ class HandlerIndex(parabam.core.Handler):
                     new_task = TaskIndex([path_1,path_2,],self._inqu,self.const,source,
                                         {"queue":self._mainqu,"const":self.const,
                                          "task_args":[source],"TaskClass":self._TaskClass})
-                    new_task.run()
+                    new_task.start()
 
                 except IndexError:
                     print "Not enough paths in path queue"
