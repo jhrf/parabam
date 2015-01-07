@@ -19,11 +19,12 @@ from parabam.core import Package
 from parabam.core import Handler
 
 class MergePackage(Package):
-    def __init__(self,str name,list results,str subset_type,str source,object destroy,int total,int time_added):
-        super(MergePackage,self).__init__(name,results,destroy,total)
+    def __init__(self,str name,object results,str subset_type,str source,object destroy,int total,int time_added):
+        super(MergePackage,self).__init__(name,results,destroy,0)
         self.subset_type = subset_type
         self.source = source
         self.time_added = time_added
+        self.total = total
 
 class HandlerMerge(Handler):
     def __init__(self,object inqu, object outqu, object const,int destroy_limit=1):

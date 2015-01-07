@@ -259,54 +259,103 @@ class HandlerIndex(parabam.core.Handler):
         
         self._mainqu = mainqu
         self._TaskClass = TaskClass
+        
+        self._index_paths = self.__instalise_index_queues__()
 
-        self._rescue_count = 0
+        self._periodic_interval = 1
+
         self._total_loners = 0
+        self._rescued = 0
 
-        self._index_paths = {}
-        for source in self._sources:
-            self._index_paths[source] = deque()
+    def __instalise_index_queues__(self):
+        loner_types = ["both_mapped","both_unmapped","one_mapped"]
+        index_queues = {}
+        for source in self.const.sources:
+            index_queues[source] = {}
+            for loner_type in loner_types:
+                index_queues[source][loner_type] = deque()
+        return index_queues
 
     def __new_package_action__(self,new_package,**kwargs):
-        results = new_package.results
+        subset_type = new_package.subset_type
+
+        if subset_type == "index":
+            self.__start_primary_task__(new_package)
+        elif subset_type == "primary":
+            self.__handle_primary_task__(new_package)
+        elif subset_type == "match_maker":
+            self.__handle_match_maker__(new_package)
+ 
+    def __handle_match_maker__(self,new_package):
         source = new_package.source
+        name = new_package.name
 
-        cur_loner_count = 0
+        for path in new_package.results:
+            self._rescued += (new_package.total * 2) #this number is by pairs, to get read num we times 2
+            self._index_paths[source][name].appendleft(path)
 
-        for loner_count,path in results:
-            if type(loner_count) == tuple:
-                cur_loner_count = loner_count[0]
-                self._rescue_count += loner_count[1]
-            else:
-                self._total_loners += loner_count
+    def __handle_primary_task__(self,new_package):
+        source = new_package.source
+        for loner_type,loner_path in new_package.results.items():
+            self._index_paths[source][loner_type].appendleft(loner_path)
 
-            self._index_paths[source].appendleft(path)
+    def __start_primary_task__(self,new_package):
+        for loner_count,path in new_package.results:
+            self._total_loners += loner_count
+            new_task = PrimaryTask(path,self._inqu,self.const,new_package.source)
+            new_task.start()
 
     def __periodic_action__(self,iterations):
-        print "Rescue: ",self._rescue_count," Total Loners: ",self._total_loners
-
-        for x in xrange(6):
-            for source,qu in self._index_paths.items():
+        sys.stdout.write("\rRescued: %d Total Loners: %d" % (self._rescued,self._total_loners))
+        sys.stdout.flush()
+        for source,queue_dict in self._index_paths.items():
+            for loner_type,queue in queue_dict.items():
+                path_1 = None
                 try:
-                    path_1 = qu.pop()
-                    #path_2 = qu.popleft()
-                    path_2 = qu.pop()
-
-                    new_task = TaskIndex([path_1,path_2,],self._inqu,self.const,source,
-                                        {"queue":self._mainqu,"const":self.const,
-                                         "task_args":[source],"TaskClass":self._TaskClass})
-                    new_task.start()
+                    for x in xrange(3):
+                        path_1 = queue.pop()
+                        path_2 = queue.pop()
+                        
+                        new_task = MatchMakerTask([path_1,path_2],self._inqu,self.const,source,loner_type,
+                                            {"queue":self._mainqu,"const":self.const,
+                                             "task_args":[source],"TaskClass":self._TaskClass})
+                        new_task.start()
+                        path_1 = None
 
                 except IndexError:
-                    pass
+                    if not path_1 == None:
+                        queue.appendleft(path_1)
+                        #If we fail on path1 we need to put it back.
 
     def __handler_exit__(self,**kwargs):
         print "Exiting..."
 
-class PrimaryIndex(Process):
+class ChaserClass(Process):
+    def __init__(self):
+        super(ChaserClass,self).__init__()
+
+    def __sort_and_index__(self,path):
+        temp_path = "%s/sort_temp_%d_%s" % (self.const.temp_dir,time.time(),self.pid)
+        pysam.sort(path,temp_path)
+        temp_path += ".bam"
+
+        os.remove(path)
+        os.rename(temp_path,path)
+
+        pysam.index(path)
+
+    def __read_generator__(self,alig_file_obj):
+        for read in alig_file_obj.fetch(until_eof=True):
+            yield read
+
+    def __get_loner_temp__(self,loner_type,uid=0):
+        return "%s/%s_%s_%d_%d.bam" % (self.const.temp_dir,loner_type,self.pid,time.time(),uid,)
+
+
+class PrimaryTask(ChaserClass):
 
     def __init__(self,object unsorted_path,object outqu,object const,str source):
-        Process.__init__(self)
+        super(PrimaryTask,self).__init__()
         
         self._unsorted_path = unsorted_path
         self._outqu = outqu
@@ -336,7 +385,7 @@ class PrimaryIndex(Process):
             elif not read.is_unmapped and not read.mate_is_unmapped:
                 current_type = "both_mapped"
             else:
-                current_type = "one_unmapped"
+                current_type = "one_mapped"
 
             write_loner(loner_objects,current_type,read)
             loner_count += 1
@@ -345,82 +394,86 @@ class PrimaryIndex(Process):
         os.remove(unsorted_path)
         os.remove(unsorted_path+".bai")
 
-        loner_pack = MergePackage(name="primary",results=loner_paths,
-                subset_type="index",source=self._source,
+        loner_pack = MergePackage(name="",results=loner_paths,
+                subset_type="primary",source=self._source,
                 destroy=False,total=loner_count,time_added=time.time())
         self._outqu.put(loner_pack)
 
-        del loner_objects
+    def __create_loner_objects__(self,loner_paths,unsorted_object):
+        objects = {}
+        for loner_type,path in loner_paths.items():
+            objects[loner_type] = pysam.AlignmentFile(path,"wb",template=unsorted_object)
+        return objects
+
+    def __create_loner_paths__(self,loner_types):
+        paths = {}
+        for loner_type in loner_types:
+            paths[loner_type] = self.__get_loner_temp__(loner_type)
+        return paths
 
     def __write_loner_type__(self,loner_objects,loner_type,read):
         loner_objects[loner_type].write(read)
 
-    def __close_loner_objects(self,loner_objects):
+    def __close_loner_objects__(self,loner_objects):
         for loner_type,loner_object in loner_objects.items():
-            loner_objects.close()
+            loner_object.close()
 
-class TaskIndex(Process):
+class MatchMakerTask(ChaserClass):
 
-    def __init__(self,object index_paths,object outqu,object const,str source,object child_package):
-        Process.__init__(self)
+    def __init__(self,object index_paths,object outqu,object const,str source,str loner_type,object child_package):
+        super(MatchMakerTask,self).__init__()
         
         self._child_package = child_package
         self._index_paths = index_paths
         self._outqu = outqu
         self._source = source
+        self._loner_type = loner_type
         self.const = const
 
     def run(self):
         path1,path2 = self._index_paths
-        loner_path = "%s/loner_temp_%d_%s.bam" % (self.const.temp_dir,time.time(),self.pid,)
+        loner_path = self.__get_loner_temp__(self._loner_type)
 
-        self.__sort_and_index__(path1)
-        self.__sort_and_index__(path2)
-
-        path1_object = pysam.AlignmentFile(path1,"rb")
-        path2_object = pysam.AlignmentFile(path2,"rb")
+        path1_object = self.__create_path_object__(path1)
+        path2_object = self.__create_path_object__(path2)
         loner_object = pysam.AlignmentFile(loner_path,"wb",template=path1_object)
 
         pairs,loners = self.__instalise_loners_and_pairs__(path1_object)
 
         for read in self.__read_generator__(path2_object):
-            read1,read2 = self.__query_loners__(read,loners,1)
-
+            read1,read2 = self.__query_loners__(read,loners)
             if read1:
                 pairs[read1.qname] = (read1,read2)
 
-        stash_count = self.__stash_loners__(loners,loner_object,[path1,path2])
-
-        path1_object.close()
-        path2_object.close()
-        loner_object.close()
-        
-        os.remove(path1)
-        os.remove(path2)
-        os.remove(path1+".bai")
-        os.remove(path2+".bai")
+        stash_count,loner_paths = self.__stash_loners__(loners,self.const.chunk)
+        map( lambda fil: fil.close() , [path1_object,path2_object])
 
         if len(loners) > 0:
-            loner_pack = MergePackage(name="index",results=[((stash_count,len(pairs)),loner_path),],
-                    subset_type="index",source=self._source,
-                    destroy=False,total=0,time_added=time.time())
-            self._outqu.put(loner_pack)
+            results = [loner_path]
+        else:
+            results = []
+            os.remove(loner_path)
 
         if len(pairs) > 0:
             #Send pairs onto the subset decision
             self.__launch_child_task__(pairs)
 
-        del loners
+        loner_pack = MergePackage(name=self._loner_type,results=results,
+                    subset_type="match_maker",source=self._source,
+                    destroy=False,total=len(pairs),time_added=time.time())
+        self._outqu.put(loner_pack)
 
-    def __sort_and_index__(self,path):
-        temp_path = "sort_temp_%d_%s" % (time.time(),self.pid)
-        pysam.sort(path,temp_path)
-        temp_path += ".bam"
+        del loners        
+        os.remove(path1)
+        os.remove(path2)
+        os.remove(path1+".bai")
+        os.remove(path2+".bai")
+        gc.collect()
 
-        os.remove(path)
-        os.rename(temp_path,path)
-
-        pysam.index(path)
+    def __create_path_object__(self,path):
+        self.__sort_and_index__(path)
+        path_object = pysam.AlignmentFile(path,"rb")
+        return path_object
 
     def __launch_child_task__(self,pairs):
         child_pack = self._child_package
@@ -429,20 +482,37 @@ class TaskIndex(Process):
         task = child_pack["TaskClass"](*args)
         task.start()
 
-    def __stash_loners__(self,loners,loner_object,subset_types):
-        stashed = 0
-        for qname,(read,subset_num) in loners.items():
-            stashed += 1
-            loner_object.write(read)
-        return stashed
+    def __stash_loners__(self,loners,loner_object,chunk,template_object):
+        loner_count = len(loners)
+        path_count = (loner_count // chunk) + 1
+        paths = self.__get_loner_paths__(path_count)
+        loner_objects = self.__get_loner_objects__()
+        for i,(qname,read) in enumerate(loners.items()):
+            file_num = i % 3
+            loner_objects[file_num].write(read)
 
-    def __query_loners__(self,read,loners,subset_num):
+        map(lambda filnm : fil.close() , loner_objects) #close files
+        return stashed,paths
+
+    def __get_loner_paths__(self,amount):
+        paths = []
+        for n in xrange(amount):
+            paths.append(self.__get_loner_temp__(self._loner_type,n))
+        return paths
+
+    def __get_loner_objects__(self,paths,template_object):
+        objects = []
+        for path in paths:
+            pysam.AlignmentFile(path,"wb",template=template_object)
+        return objects
+
+    def __query_loners__(self,read,loners):
         try:
-            mate = loners[read.qname][0]
+            mate = loners[read.qname]
             del loners[read.qname]
             return read,mate
         except KeyError:
-            loners[read.qname] = (read,subset_num)
+            loners[read.qname] = read
             return None,None
 
     def __instalise_loners_and_pairs__(self,alig_file_obj):
@@ -450,14 +520,10 @@ class TaskIndex(Process):
         loners = {}
         pairs = {}
         for read in alig_file_obj.fetch():
-            read1,read2 = self.__query_loners__(read,loners,0)
+            read1,read2 = self.__query_loners__(read,loners)
             if read1:
                 pairs[read1.qname] = (read1,read2) 
         return pairs,loners
-
-    def __read_generator__(self,alig_file_obj):
-        for read in alig_file_obj.fetch(until_eof=True):
-            yield read
 
 class ProcessorSubset(parabam.core.Processor):
 

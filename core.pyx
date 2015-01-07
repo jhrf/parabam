@@ -74,6 +74,8 @@ cdef class Handler:
         self._verbose = const.verbose
         self._output_paths = const.output_paths
 
+        self._periodic_interval = 10
+
         self._stats = {}
 
         if const.verbose == 1:
@@ -107,6 +109,8 @@ cdef class Handler:
         cdef int curproc = 0
 
         update_output = self._update_output #speedup alias
+        periodic_interval = self._periodic_interval #speedup alias
+
         while not destroy:
             iterations += 1
             #Listen for a process coming in...
@@ -127,7 +131,7 @@ cdef class Handler:
                 #Queue empty. Continue with loop
                 time.sleep(1)
 
-            if iterations % 10 == 0: 
+            if iterations % periodic_interval == 0: 
                 self.__periodic_action__(iterations)
 
             if self._verbose and self._report and iterations % update_interval == 0:
