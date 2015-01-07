@@ -303,6 +303,62 @@ class HandlerIndex(parabam.core.Handler):
     def __handler_exit__(self,**kwargs):
         print "Exiting..."
 
+class PrimaryIndex(Process):
+
+    def __init__(self,object unsorted_path,object outqu,object const,str source):
+        Process.__init__(self)
+        
+        self._unsorted_path = unsorted_path
+        self._outqu = outqu
+        self._source = source
+        self.const = const
+
+    def run(self):
+        #speedup
+        write_loner = self.__write_loner_type__
+        #speedup
+
+        unsorted_path = self._unsorted_path
+
+        self.__sort_and_index__(unsorted_path)
+        unsorted_object = pysam.AlignmentFile(unsorted_path,"rb")
+
+        loner_types = ["both_mapped","both_unmapped","one_mapped"]
+        loner_paths = self.__create_loner_paths__(loner_types)
+        loner_objects = self.__create_loner_objects__(loner_paths,unsorted_object)
+
+        loner_count = 0
+
+        for read in self.__read_generator__(unsorted_object):
+            current_type = ""
+            if read.is_unmapped and read.mate_is_unmapped:
+                current_type = "both_unmapped"
+            elif not read.is_unmapped and not read.mate_is_unmapped:
+                current_type = "both_mapped"
+            else:
+                current_type = "one_unmapped"
+
+            write_loner(loner_objects,current_type,read)
+            loner_count += 1
+
+        self.__close_loner_objects__(loner_objects)
+        os.remove(unsorted_path)
+        os.remove(unsorted_path+".bai")
+
+        loner_pack = MergePackage(name="primary",results=loner_paths,
+                subset_type="index",source=self._source,
+                destroy=False,total=loner_count,time_added=time.time())
+        self._outqu.put(loner_pack)
+
+        del loner_objects
+
+    def __write_loner_type__(self,loner_objects,loner_type,read):
+        loner_objects[loner_type].write(read)
+
+    def __close_loner_objects(self,loner_objects):
+        for loner_type,loner_object in loner_objects.items():
+            loner_objects.close()
+
 class TaskIndex(Process):
 
     def __init__(self,object index_paths,object outqu,object const,str source,object child_package):
