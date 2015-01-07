@@ -65,7 +65,7 @@ class HandlerChaser(parabam.core.Handler):
         level = new_package.level
 
         for path in new_package.results:
-            self._rescued += (new_package.total * 2) #this number is by pairs, to get read num we times 2
+            self._rescued += (new_package.total) #this number is by pairs, to get read num we times 2
 
             pyramid = self._loner_pyramid[source][name]
             if level == -1:
@@ -129,7 +129,6 @@ class ChaserClass(Process):
 
     def __get_loner_temp__(self,loner_type,level=0):
         return "%s/%s_%s_%d_level%d.bam" % (self.const.temp_dir,loner_type,self.pid,time.time(),level,)
-
 
 class PrimaryTask(ChaserClass):
 
@@ -220,26 +219,32 @@ class MatchMakerTask(ChaserClass):
 
     def run(self):
 
-        loner_path = self.__get_loner_temp__(self._loner_type,self._level)
+        loner_path = self.__get_loner_temp__(self._loner_type,self._level+1)
         loner_object = self.__get_loner_object__(loner_path)
 
         pairs = self.__first_pass__()
-        pairs,read_pairs = self.__prepare_for_second_pass__(pairs)
+        pairs = self.__prepare_for_second_pass__(pairs)
+        read_pairs = {}
 
         rescued = 0
 
         for read in self.__read_generator__():
             try:
                 status = pairs[read.qname]
-                read_pairs[read.qname].append(read)
-                if len(read_pairs[read.qname]) == 2:
-                    del pairs[read.qname]
+                try:
+                    read_pairs[read.qname].append(read)
+                except KeyError:
+                    read_pairs[read.qname] = [read]
 
-                    if len(read_pairs) >= self.const.chunk:
-                        rescued += self.__launch_child_task__(read_pairs)
-                        del read_pairs
-                        gc.collect()
-                        read_pairs = {}
+                if len(read_pairs[read.qname]) == 2:
+                    del pairs[read.qname]    
+                
+                if len(read_pairs) >= self.const.chunk:
+                    rescued += self.__launch_child_task__(read_pairs)
+                    del read_pairs
+                    gc.collect()
+                    read_pairs = {}
+
             except KeyError:
                 loner_object.write(read)
 
@@ -248,11 +253,15 @@ class MatchMakerTask(ChaserClass):
         if len(read_pairs) > 0:
             rescued += self.__launch_child_task__(read_pairs)
 
-        loner_pack = ChaserPackage(name=self._loner_type,results=loner_path,destroy=False,level=self._level+1,
-            source=self._source,chaser_type="match_maker",total=rescued)
+        del read_pairs   
+        del pairs
 
         self._outqu.put(loner_pack)
         self.__remove_paths__()
+        gc.collect()
+
+        loner_pack = ChaserPackage(name=self._loner_type,results=loner_path,destroy=False,level=self._level+1,
+            source=self._source,chaser_type="match_maker",total=rescued)
 
     def __remove_paths__(self):
         for path in self._loner_paths:
@@ -271,14 +280,12 @@ class MatchMakerTask(ChaserClass):
 
     def __prepare_for_second_pass__(self,pairs):
         pairs = dict(filter( lambda tup : tup[1], iter(pairs.items()) ))
-        return pairs,dict([(qname,[])  for qname,status in pairs.items()])
+        return dict([(qname,[])  for qname,status in pairs.items()])
 
     def __read_generator__(self):
         for path in self._loner_paths:
-            
             if not os.path.exists(path+"bai"):
                 self.__sort_and_index__(path)
-
             loner_object = pysam.AlignmentFile(path,"rb")
             for read in loner_object.fetch(until_eof=True):
                 yield read

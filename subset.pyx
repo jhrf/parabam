@@ -213,6 +213,7 @@ class HandlerSubset(parabam.core.Handler):
         for source in self._sources:
             for subset in self._subset_types:
                 if self.__test_merge_store__(source,subset):
+
                     self.__add_merge_task__(name=self._output_paths[source][subset],
                                             results=self._merge_stores[source][subset],
                                             subset_type=subset,source=source,
@@ -225,7 +226,7 @@ class HandlerSubset(parabam.core.Handler):
         gc.collect()
 
     def __test_merge_store__(self,source,subset):
-        return self._merge_stores[source][subset] > 0
+        return len(self._merge_stores[source][subset]) > 0
             
     def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
         
