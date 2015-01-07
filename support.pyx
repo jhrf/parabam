@@ -20,7 +20,7 @@ from parabam.core import Handler
 
 class MergePackage(Package):
     def __init__(self,str name,object results,str subset_type,str source,object destroy,int total,int time_added):
-        super(MergePackage,self).__init__(name,results,destroy,0)
+        super(MergePackage,self).__init__(name,results,destroy)
         self.subset_type = subset_type
         self.source = source
         self.time_added = time_added
@@ -36,7 +36,6 @@ class HandlerMerge(Handler):
         self._out_file_objects = self.__get_out_file_objects__()
         self._merged = 0
         self._outqu = outqu #only used in pairprocess mode to handle index files
-
 
     def __get_out_file_objects__(self):
         file_objects = {}
@@ -73,7 +72,7 @@ class HandlerMerge(Handler):
         #Handle the result. Result will always be of type framework.Result
         subset_type = new_package.subset_type
         source = new_package.source
-        self._total[subset_type] = new_package.curproc #hack to record size of parent BAM
+        self._total[subset_type] = new_package.total
 
         if subset_type == "index":
             self._outqu.put(new_package)

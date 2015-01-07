@@ -13,5 +13,5 @@ setup(name='parabam',
       requires = ['cython','numpy','argparse','pysam'],
       package_data = {'parabam.interface':['master',]},
       scripts = ['bin/parabam'],
-      ext_modules=cythonize(("support.pyx","core.pyx","subset.pyx","para_stat.pyx"))#""
+      ext_modules=cythonize(("chaser.pyx","support.pyx","core.pyx","subset.pyx","para_stat.pyx"))#""
       )

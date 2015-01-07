@@ -942,7 +942,8 @@ static PyObject *__pyx_pf_7parabam_4core_13UserInterface_6run(CYTHON_UNUSED PyOb
 static PyObject *__pyx_pf_7parabam_4core_13UserInterface_8get_parser(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7parabam_4core_5Const___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_output_paths, PyObject *__pyx_v_temp_dir, PyObject *__pyx_v_master_file_path, PyObject *__pyx_v_verbose, PyObject *__pyx_v_chunk, PyObject *__pyx_v_proc, PyObject *__pyx_v_kwargs); /* proto */
 static PyObject *__pyx_pf_7parabam_4core_5Const_2add(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_key, PyObject *__pyx_v_val); /* proto */
-static PyObject *__pyx_pf_7parabam_4core_7Package___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_results, PyObject *__pyx_v_destroy, PyObject *__pyx_v_curproc); /* proto */
+static PyObject *__pyx_pf_7parabam_4core_7Package___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_results, PyObject *__pyx_v_destroy); /* proto */
+static PyObject *__pyx_pf_7parabam_4core_11CorePackage___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_results, PyObject *__pyx_v_destroy, PyObject *__pyx_v_curproc); /* proto */
 static PyObject *__pyx_tp_new_7parabam_4core_Handler(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_7parabam_4core_Processor(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_7parabam_4core___pyx_scope_struct____get_next_alig__(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
@@ -1140,6 +1141,7 @@ static char __pyx_k_start_time[] = "start_time";
 static char __pyx_k_store_true[] = "store_true";
 static char __pyx_k_task_set_2[] = "_task_set";
 static char __pyx_k_temp_dir_2[] = "_temp_dir";
+static char __pyx_k_CorePackage[] = "CorePackage";
 static char __pyx_k_INSTRUCTION[] = "INSTRUCTION";
 static char __pyx_k_ImportError[] = "ImportError";
 static char __pyx_k_TaskClass_2[] = "_TaskClass";
@@ -1198,6 +1200,7 @@ static char __pyx_k_Interface_run_cmd[] = "Interface.run_cmd";
 static char __pyx_k_UserInterface_run[] = "UserInterface.run";
 static char __pyx_k_add_to_collection[] = "__add_to_collection__";
 static char __pyx_k_periodic_interval[] = "_periodic_interval";
+static char __pyx_k_CorePackage___init[] = "CorePackage.__init__";
 static char __pyx_k_master_file_path_2[] = "_master_file_path";
 static char __pyx_k_new_package_action[] = "__new_package_action__";
 static char __pyx_k_Interface___goodbye[] = "Interface.__goodbye__";
@@ -1238,6 +1241,8 @@ static PyObject *__pyx_n_s_ArgumentParser;
 static PyObject *__pyx_n_s_Const;
 static PyObject *__pyx_n_s_Const___init;
 static PyObject *__pyx_n_s_Const_add;
+static PyObject *__pyx_n_s_CorePackage;
+static PyObject *__pyx_n_s_CorePackage___init;
 static PyObject *__pyx_kp_s_ERROR_parabam_can_t_find_user_m;
 static PyObject *__pyx_n_s_Empty;
 static PyObject *__pyx_kp_s_How_many_reads_each_parallel_tas;
@@ -1568,6 +1573,7 @@ static PyObject *__pyx_tuple__69;
 static PyObject *__pyx_tuple__71;
 static PyObject *__pyx_tuple__73;
 static PyObject *__pyx_tuple__75;
+static PyObject *__pyx_tuple__77;
 static PyObject *__pyx_codeobj__23;
 static PyObject *__pyx_codeobj__25;
 static PyObject *__pyx_codeobj__27;
@@ -1594,6 +1600,7 @@ static PyObject *__pyx_codeobj__70;
 static PyObject *__pyx_codeobj__72;
 static PyObject *__pyx_codeobj__74;
 static PyObject *__pyx_codeobj__76;
+static PyObject *__pyx_codeobj__78;
 
 /* "parabam/core.pyx":23
  *     __metaclass__ = ABCMeta
@@ -1912,7 +1919,7 @@ static PyObject *__pyx_pf_7parabam_4core_4Task_2run(CYTHON_UNUSED PyObject *__py
  *         cdef dict results = self.__generate_results__()
  *         results["total"] = len(self._task_set)             # <<<<<<<<<<<<<<
  * 
- *         self._outqu.put(Package(name=self.name,
+ *         self._outqu.put(CorePackage(name=self.name,
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_task_set_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -1930,7 +1937,7 @@ static PyObject *__pyx_pf_7parabam_4core_4Task_2run(CYTHON_UNUSED PyObject *__py
   /* "parabam/core.pyx":36
  *         results["total"] = len(self._task_set)
  * 
- *         self._outqu.put(Package(name=self.name,             # <<<<<<<<<<<<<<
+ *         self._outqu.put(CorePackage(name=self.name,             # <<<<<<<<<<<<<<
  *                                 results=results,
  *                                 destroy=self._destroy,
  */
@@ -1939,7 +1946,7 @@ static PyObject *__pyx_pf_7parabam_4core_4Task_2run(CYTHON_UNUSED PyObject *__py
   __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_put); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_Package); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_CorePackage); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = PyDict_New(); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
@@ -1950,7 +1957,7 @@ static PyObject *__pyx_pf_7parabam_4core_4Task_2run(CYTHON_UNUSED PyObject *__py
 
   /* "parabam/core.pyx":37
  * 
- *         self._outqu.put(Package(name=self.name,
+ *         self._outqu.put(CorePackage(name=self.name,
  *                                 results=results,             # <<<<<<<<<<<<<<
  *                                 destroy=self._destroy,
  *                                 curproc=self._curproc))
@@ -1958,7 +1965,7 @@ static PyObject *__pyx_pf_7parabam_4core_4Task_2run(CYTHON_UNUSED PyObject *__py
   if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_results, __pyx_v_results) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "parabam/core.pyx":38
- *         self._outqu.put(Package(name=self.name,
+ *         self._outqu.put(CorePackage(name=self.name,
  *                                 results=results,
  *                                 destroy=self._destroy,             # <<<<<<<<<<<<<<
  *                                 curproc=self._curproc))
@@ -1984,7 +1991,7 @@ static PyObject *__pyx_pf_7parabam_4core_4Task_2run(CYTHON_UNUSED PyObject *__py
   /* "parabam/core.pyx":36
  *         results["total"] = len(self._task_set)
  * 
- *         self._outqu.put(Package(name=self.name,             # <<<<<<<<<<<<<<
+ *         self._outqu.put(CorePackage(name=self.name,             # <<<<<<<<<<<<<<
  *                                 results=results,
  *                                 destroy=self._destroy,
  */
@@ -11850,7 +11857,7 @@ static PyObject *__pyx_pf_7parabam_4core_5Const_2add(CYTHON_UNUSED PyObject *__p
 /* "parabam/core.pyx":518
  * 
  * class Package(object):
- *     def __init__(self,name,results,destroy,curproc):             # <<<<<<<<<<<<<<
+ *     def __init__(self,name,results,destroy):             # <<<<<<<<<<<<<<
  *         self.name = name
  *         self.results = results
  */
@@ -11859,6 +11866,158 @@ static PyObject *__pyx_pf_7parabam_4core_5Const_2add(CYTHON_UNUSED PyObject *__p
 static PyObject *__pyx_pw_7parabam_4core_7Package_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyMethodDef __pyx_mdef_7parabam_4core_7Package_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7parabam_4core_7Package_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
 static PyObject *__pyx_pw_7parabam_4core_7Package_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_self = 0;
+  PyObject *__pyx_v_name = 0;
+  PyObject *__pyx_v_results = 0;
+  PyObject *__pyx_v_destroy = 0;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_name,&__pyx_n_s_results,&__pyx_n_s_destroy,0};
+    PyObject* values[4] = {0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_name)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        }
+        case  2:
+        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_results)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        }
+        case  3:
+        if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_destroy)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+    }
+    __pyx_v_self = values[0];
+    __pyx_v_name = values[1];
+    __pyx_v_results = values[2];
+    __pyx_v_destroy = values[3];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("parabam.core.Package.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_7parabam_4core_7Package___init__(__pyx_self, __pyx_v_self, __pyx_v_name, __pyx_v_results, __pyx_v_destroy);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7parabam_4core_7Package___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_results, PyObject *__pyx_v_destroy) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__init__", 0);
+
+  /* "parabam/core.pyx":519
+ * class Package(object):
+ *     def __init__(self,name,results,destroy):
+ *         self.name = name             # <<<<<<<<<<<<<<
+ *         self.results = results
+ *         self.destroy = destroy
+ */
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_name, __pyx_v_name) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 519; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+
+  /* "parabam/core.pyx":520
+ *     def __init__(self,name,results,destroy):
+ *         self.name = name
+ *         self.results = results             # <<<<<<<<<<<<<<
+ *         self.destroy = destroy
+ *         self.curproc = 0
+ */
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_results, __pyx_v_results) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 520; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+
+  /* "parabam/core.pyx":521
+ *         self.name = name
+ *         self.results = results
+ *         self.destroy = destroy             # <<<<<<<<<<<<<<
+ *         self.curproc = 0
+ * 
+ */
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_destroy, __pyx_v_destroy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 521; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+
+  /* "parabam/core.pyx":522
+ *         self.results = results
+ *         self.destroy = destroy
+ *         self.curproc = 0             # <<<<<<<<<<<<<<
+ * 
+ * class CorePackage(Package):
+ */
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_curproc, __pyx_int_0) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+
+  /* "parabam/core.pyx":518
+ * 
+ * class Package(object):
+ *     def __init__(self,name,results,destroy):             # <<<<<<<<<<<<<<
+ *         self.name = name
+ *         self.results = results
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("parabam.core.Package.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "parabam/core.pyx":525
+ * 
+ * class CorePackage(Package):
+ *     def __init__(self,name,results,destroy,curproc):             # <<<<<<<<<<<<<<
+ *         super(CorePackage,self).__init__(name,results,destroy)
+ *         self.curproc = curproc
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7parabam_4core_11CorePackage_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_4core_11CorePackage_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7parabam_4core_11CorePackage_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_4core_11CorePackage_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_name = 0;
   PyObject *__pyx_v_results = 0;
@@ -11893,26 +12052,26 @@ static PyObject *__pyx_pw_7parabam_4core_7Package_1__init__(PyObject *__pyx_self
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_name)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_results)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_destroy)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_curproc)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -11931,76 +12090,113 @@ static PyObject *__pyx_pw_7parabam_4core_7Package_1__init__(PyObject *__pyx_self
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("parabam.core.Package.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.core.CorePackage.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7parabam_4core_7Package___init__(__pyx_self, __pyx_v_self, __pyx_v_name, __pyx_v_results, __pyx_v_destroy, __pyx_v_curproc);
+  __pyx_r = __pyx_pf_7parabam_4core_11CorePackage___init__(__pyx_self, __pyx_v_self, __pyx_v_name, __pyx_v_results, __pyx_v_destroy, __pyx_v_curproc);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7parabam_4core_7Package___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_results, PyObject *__pyx_v_destroy, PyObject *__pyx_v_curproc) {
+static PyObject *__pyx_pf_7parabam_4core_11CorePackage___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_results, PyObject *__pyx_v_destroy, PyObject *__pyx_v_curproc) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  Py_ssize_t __pyx_t_4;
+  PyObject *__pyx_t_5 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "parabam/core.pyx":519
- * class Package(object):
+  /* "parabam/core.pyx":526
+ * class CorePackage(Package):
  *     def __init__(self,name,results,destroy,curproc):
- *         self.name = name             # <<<<<<<<<<<<<<
- *         self.results = results
- *         self.destroy = destroy
- */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_name, __pyx_v_name) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 519; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-
-  /* "parabam/core.pyx":520
- *     def __init__(self,name,results,destroy,curproc):
- *         self.name = name
- *         self.results = results             # <<<<<<<<<<<<<<
- *         self.destroy = destroy
- *         self.curproc = curproc
- */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_results, __pyx_v_results) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 520; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-
-  /* "parabam/core.pyx":521
- *         self.name = name
- *         self.results = results
- *         self.destroy = destroy             # <<<<<<<<<<<<<<
+ *         super(CorePackage,self).__init__(name,results,destroy)             # <<<<<<<<<<<<<<
  *         self.curproc = curproc
  * 
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_destroy, __pyx_v_destroy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 521; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_CorePackage); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_v_self);
+  PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_self);
+  __Pyx_GIVEREF(__pyx_v_self);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_init); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  __pyx_t_4 = 0;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+      __pyx_t_4 = 1;
+    }
+  }
+  __pyx_t_5 = PyTuple_New(3+__pyx_t_4); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_5);
+  if (__pyx_t_2) {
+    PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2); __Pyx_GIVEREF(__pyx_t_2); __pyx_t_2 = NULL;
+  }
+  __Pyx_INCREF(__pyx_v_name);
+  PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_4, __pyx_v_name);
+  __Pyx_GIVEREF(__pyx_v_name);
+  __Pyx_INCREF(__pyx_v_results);
+  PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, __pyx_v_results);
+  __Pyx_GIVEREF(__pyx_v_results);
+  __Pyx_INCREF(__pyx_v_destroy);
+  PyTuple_SET_ITEM(__pyx_t_5, 2+__pyx_t_4, __pyx_v_destroy);
+  __Pyx_GIVEREF(__pyx_v_destroy);
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "parabam/core.pyx":522
- *         self.results = results
- *         self.destroy = destroy
+  /* "parabam/core.pyx":527
+ *     def __init__(self,name,results,destroy,curproc):
+ *         super(CorePackage,self).__init__(name,results,destroy)
  *         self.curproc = curproc             # <<<<<<<<<<<<<<
  * 
  * #And they all lived happily ever after...
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_curproc, __pyx_v_curproc) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 522; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_curproc, __pyx_v_curproc) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 527; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "parabam/core.pyx":518
+  /* "parabam/core.pyx":525
  * 
- * class Package(object):
+ * class CorePackage(Package):
  *     def __init__(self,name,results,destroy,curproc):             # <<<<<<<<<<<<<<
- *         self.name = name
- *         self.results = results
+ *         super(CorePackage,self).__init__(name,results,destroy)
+ *         self.curproc = curproc
  */
 
   /* function exit code */
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_AddTraceback("parabam.core.Package.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_AddTraceback("parabam.core.CorePackage.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -12618,6 +12814,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_Const, __pyx_k_Const, sizeof(__pyx_k_Const), 0, 0, 1, 1},
   {&__pyx_n_s_Const___init, __pyx_k_Const___init, sizeof(__pyx_k_Const___init), 0, 0, 1, 1},
   {&__pyx_n_s_Const_add, __pyx_k_Const_add, sizeof(__pyx_k_Const_add), 0, 0, 1, 1},
+  {&__pyx_n_s_CorePackage, __pyx_k_CorePackage, sizeof(__pyx_k_CorePackage), 0, 0, 1, 1},
+  {&__pyx_n_s_CorePackage___init, __pyx_k_CorePackage___init, sizeof(__pyx_k_CorePackage___init), 0, 0, 1, 1},
   {&__pyx_kp_s_ERROR_parabam_can_t_find_user_m, __pyx_k_ERROR_parabam_can_t_find_user_m, sizeof(__pyx_k_ERROR_parabam_can_t_find_user_m), 0, 0, 1, 0},
   {&__pyx_n_s_Empty, __pyx_k_Empty, sizeof(__pyx_k_Empty), 0, 0, 1, 1},
   {&__pyx_kp_s_How_many_reads_each_parallel_tas, __pyx_k_How_many_reads_each_parallel_tas, sizeof(__pyx_k_How_many_reads_each_parallel_tas), 0, 0, 1, 0},
@@ -13388,14 +13586,26 @@ static int __Pyx_InitCachedConstants(void) {
   /* "parabam/core.pyx":518
  * 
  * class Package(object):
- *     def __init__(self,name,results,destroy,curproc):             # <<<<<<<<<<<<<<
+ *     def __init__(self,name,results,destroy):             # <<<<<<<<<<<<<<
  *         self.name = name
  *         self.results = results
  */
-  __pyx_tuple__75 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_name, __pyx_n_s_results, __pyx_n_s_destroy, __pyx_n_s_curproc); if (unlikely(!__pyx_tuple__75)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__75 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_name, __pyx_n_s_results, __pyx_n_s_destroy); if (unlikely(!__pyx_tuple__75)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__75);
   __Pyx_GIVEREF(__pyx_tuple__75);
-  __pyx_codeobj__76 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__75, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_cor, __pyx_n_s_init, 518, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__76)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__76 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__75, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_cor, __pyx_n_s_init, 518, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__76)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+
+  /* "parabam/core.pyx":525
+ * 
+ * class CorePackage(Package):
+ *     def __init__(self,name,results,destroy,curproc):             # <<<<<<<<<<<<<<
+ *         super(CorePackage,self).__init__(name,results,destroy)
+ *         self.curproc = curproc
+ */
+  __pyx_tuple__77 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_name, __pyx_n_s_results, __pyx_n_s_destroy, __pyx_n_s_curproc); if (unlikely(!__pyx_tuple__77)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__77);
+  __Pyx_GIVEREF(__pyx_tuple__77);
+  __pyx_codeobj__78 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__77, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_cor, __pyx_n_s_init, 525, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__78)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -14418,7 +14628,7 @@ PyMODINIT_FUNC PyInit_core(void)
  *         setattr(self,key,val)
  * 
  * class Package(object):             # <<<<<<<<<<<<<<
- *     def __init__(self,name,results,destroy,curproc):
+ *     def __init__(self,name,results,destroy):
  *         self.name = name
  */
   __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 517; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -14434,7 +14644,7 @@ PyMODINIT_FUNC PyInit_core(void)
   /* "parabam/core.pyx":518
  * 
  * class Package(object):
- *     def __init__(self,name,results,destroy,curproc):             # <<<<<<<<<<<<<<
+ *     def __init__(self,name,results,destroy):             # <<<<<<<<<<<<<<
  *         self.name = name
  *         self.results = results
  */
@@ -14447,7 +14657,7 @@ PyMODINIT_FUNC PyInit_core(void)
  *         setattr(self,key,val)
  * 
  * class Package(object):             # <<<<<<<<<<<<<<
- *     def __init__(self,name,results,destroy,curproc):
+ *     def __init__(self,name,results,destroy):
  *         self.name = name
  */
   __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_Package, __pyx_t_1, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 517; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -14458,15 +14668,61 @@ PyMODINIT_FUNC PyInit_core(void)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
+  /* "parabam/core.pyx":524
+ *         self.curproc = 0
+ * 
+ * class CorePackage(Package):             # <<<<<<<<<<<<<<
+ *     def __init__(self,name,results,destroy,curproc):
+ *         super(CorePackage,self).__init__(name,results,destroy)
+ */
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_Package); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 524; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 524; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 524; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_CorePackage, __pyx_n_s_CorePackage, (PyObject *) NULL, __pyx_n_s_parabam_core, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 524; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+
+  /* "parabam/core.pyx":525
+ * 
+ * class CorePackage(Package):
+ *     def __init__(self,name,results,destroy,curproc):             # <<<<<<<<<<<<<<
+ *         super(CorePackage,self).__init__(name,results,destroy)
+ *         self.curproc = curproc
+ */
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_4core_11CorePackage_1__init__, 0, __pyx_n_s_CorePackage___init, NULL, __pyx_n_s_parabam_core, __pyx_d, ((PyObject *)__pyx_codeobj__78)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 525; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "parabam/core.pyx":524
+ *         self.curproc = 0
+ * 
+ * class CorePackage(Package):             # <<<<<<<<<<<<<<
+ *     def __init__(self,name,results,destroy,curproc):
+ *         super(CorePackage,self).__init__(name,results,destroy)
+ */
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_CorePackage, __pyx_t_2, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 524; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_4);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_CorePackage, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 524; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
   /* "parabam/core.pyx":1
  * import os             # <<<<<<<<<<<<<<
  * import time
  * import datetime
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /*--- Wrapped vars code ---*/
 
