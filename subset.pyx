@@ -102,7 +102,7 @@ class TaskSubset(parabam.core.Task):
                 sys.stdout.flush()
 
     def __engine__(self,read,user_constants,master):
-        self.const.user_engine(read,user_constants,master)
+        return self.const.user_engine(read,user_constants,master)
         
 class PairTaskSubset(TaskSubset):
 
@@ -127,6 +127,8 @@ class PairTaskSubset(TaskSubset):
             self.__handle_list_task_set__(task_set,engine,user_constants,master)
 
     def __handle_dict_task_set__(self,task_set,engine,user_constants,master):
+        from pprint import pprint as pp
+
         for qname,(read1,read2) in task_set.items():
             self.__read_pair_decision__(read1,read2,engine,user_constants,master)
 
@@ -166,6 +168,9 @@ class PairTaskSubset(TaskSubset):
             sys.stdout.flush()
 
     def __query_loners__(self,read,loners):
+        if read.is_secondary:#Pair processing only handles primary pairs
+            return None, None
+
         try:
             mate = loners[read.qname]
             del loners[read.qname]

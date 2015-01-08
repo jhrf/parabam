@@ -34,9 +34,29 @@ class HandlerChaser(parabam.core.Handler):
         
         self._loner_pyramid = self.__instalise_loner_pyramid__()
 
-        self._periodic_interval = 1
+        self._periodic_interval = 10
         self._total_loners = 0
         self._rescued = 0
+
+        self._match_tasks = []
+        self._primary_tasks = []
+
+    #borrowed from processor
+    def __update_tasks__(self,active_tasks):
+        terminated_procs = []
+        for pr in active_tasks:
+            if not pr.is_alive():
+                pr.terminate()
+                terminated_procs.append(pr)
+        
+        for pr in terminated_procs:
+            active_tasks.remove(pr)
+
+        if len(terminated_procs) > 0:
+            #Only invoke the GC if there is the possibility of
+            #collecting any memory.
+            del terminated_procs
+            gc.collect()
 
     def __instalise_loner_pyramid__(self):
         loner_pyramid = {}
@@ -64,16 +84,15 @@ class HandlerChaser(parabam.core.Handler):
         name = new_package.name
         level = new_package.level
 
-        for path in new_package.results:
-            self._rescued += (new_package.total) #this number is by pairs, to get read num we times 2
+        self._rescued += (new_package.total*2) #this number is by pairs, to get read num we times 2
 
-            pyramid = self._loner_pyramid[source][name]
-            if level == -1:
-                print "Handle The Terminal Case! The string collection is larger than the max size (5million?)"
-            else:
-                if level >= len(pyramid):
-                    pyramid.append([])
-                pyramid[level].append(new_package.results)
+        pyramid = self._loner_pyramid[source][name]
+        if level == -1:
+            print "Handle The Terminal Case! The string collection is larger than the max size (5million?)"
+        else:
+            if level >= len(pyramid):
+                pyramid.append([])
+            pyramid[level].append(new_package.results)
 
     def __handle_primary_task__(self,new_package):
         source = new_package.source
@@ -81,30 +100,38 @@ class HandlerChaser(parabam.core.Handler):
             self._loner_pyramid[source][loner_type][0].append(loner_path)
 
     def __start_primary_task__(self,new_package):
-        for loner_count,path in new_package.results:
-            self._total_loners += loner_count
-            new_task = PrimaryTask(path,self._inqu,self.const,new_package.source,self._loner_types)
-            new_task.start()
+        self.__update_tasks__(self._primary_tasks)
+        if len(self._primary_tasks) < 10:
+            for loner_count,path in new_package.results:
+                self._total_loners += loner_count
+                new_task = PrimaryTask(path,self._inqu,self.const,new_package.source,self._loner_types)
+                new_task.start()
+                self._primary_tasks.append(new_task)
+        else:
+            self._inqu.put(new_package)
 
     def __periodic_action__(self,iterations):
-        sys.stdout.write("\rRescued: %d Total Loners: %d Ratio: %.5f" % (self._rescued,self._total_loners,float(self._rescued+1)/(self._total_loners+1),))
-        sys.stdout.flush()
-        first_task = None
-        
+        if iterations % 30 ==0 :
+            sys.stdout.write("\rRescued: %d Total Loners: %d Ratio: %.5f Match_Tasks: %d Primary_Tasks: %d" % \
+                (self._rescued,self._total_loners,float(self._rescued+1)/(self._total_loners+1),len(self._match_tasks),len(self._primary_tasks)))
+            sys.stdout.flush()
+
+        task_size = 8
+
         for source,loner_dict in self._loner_pyramid.items():
             for loner_type,pyramid in loner_dict.items():
-                sent_level = -1
-                for i,sub_pyramid in enumerate(reversed(pyramid)):
-                    level = len(pyramid) - (i+1)
-                    if len(sub_pyramid) == 25:
-                        new_task = MatchMakerTask(sub_pyramid,self._inqu,self.const,source,loner_type,level,
-                                    {"queue":self._mainqu,"const":self.const,
-                                     "task_args":[source],"TaskClass":self._TaskClass})
-                        new_task.start()
-                        sent_level = level
-                        break
-                if sent_level > -1:
-                    pyramid[sent_level] = []
+                self.__update_tasks__(self._match_tasks)
+                if len(self._match_tasks) < 10:
+                    for i,sub_pyramid in enumerate(reversed(pyramid)):
+                        level = len(pyramid) - (i+1)
+                        if len(sub_pyramid) >= task_size:
+                            paths = [sub_pyramid.pop() for x in  xrange(task_size)]
+                            new_task = MatchMakerTask(paths,self._inqu,self.const,source,loner_type,level,
+                                        {"queue":self._mainqu,"const":self.const,
+                                         "task_args":[source],"TaskClass":self._TaskClass})
+                            new_task.start()
+                            self._match_tasks.append(new_task)
+                            break
    
     def __handler_exit__(self,**kwargs):
         print "Exiting..."
@@ -122,10 +149,6 @@ class ChaserClass(Process):
         os.rename(temp_path,path)
 
         pysam.index(path)
-
-    def __read_generator__(self,alig_file_obj):
-        for read in alig_file_obj.fetch(until_eof=True):
-            yield read
 
     def __get_loner_temp__(self,loner_type,level=0):
         return "%s/%s_%s_%d_level%d.bam" % (self.const.temp_dir,loner_type,self.pid,time.time(),level,)
@@ -185,6 +208,10 @@ class PrimaryTask(ChaserClass):
             source=self._source,chaser_type="primary",total=loner_total)
         self._outqu.put(loner_pack)
 
+    def __read_generator__(self,alig_file_obj):
+        for read in alig_file_obj.fetch(until_eof=True):
+            yield read
+
     def __create_loner_objects__(self,loner_paths,unsorted_object):
         objects = {}
         for loner_type,path in loner_paths.items():
@@ -219,78 +246,80 @@ class MatchMakerTask(ChaserClass):
 
     def run(self):
 
+        from pprint import pprint as ppr 
+
         loner_path = self.__get_loner_temp__(self._loner_type,self._level+1)
         loner_object = self.__get_loner_object__(loner_path)
 
-        pairs = self.__first_pass__()
-        pairs = self.__prepare_for_second_pass__(pairs)
-        read_pairs = {}
-
-        rescued = 0
+        cdef dict pairs = self.__first_pass__()
+        cdef dict read_pairs = {}
+        cdef dict send_pairs = {}
+        cdef int rescued = 0
 
         for read in self.__read_generator__():
             try:
                 status = pairs[read.qname]
+
                 try:
                     read_pairs[read.qname].append(read)
                 except KeyError:
                     read_pairs[read.qname] = [read]
 
                 if len(read_pairs[read.qname]) == 2:
-                    del pairs[read.qname]    
-                
-                if len(read_pairs) >= self.const.chunk:
-                    rescued += self.__launch_child_task__(read_pairs)
-                    del read_pairs
+                    send_pairs[read.qname] = read_pairs[read.qname]
+                    del pairs[read.qname]
+                    del read_pairs[read.qname]
+
+                #we are handling pairs so we divide chunk by two.
+                if len(send_pairs) >= (self.const.chunk//2):
+                    rescued += self.__launch_child_task__(send_pairs)
+                    send_pairs = {}
                     gc.collect()
-                    read_pairs = {}
 
             except KeyError:
                 loner_object.write(read)
 
         loner_object.close()
 
-        if len(read_pairs) > 0:
-            rescued += self.__launch_child_task__(read_pairs)
+        if len(send_pairs) > 0:
+            rescued += self.__launch_child_task__(send_pairs)
 
         del read_pairs   
         del pairs
 
-        self._outqu.put(loner_pack)
         self.__remove_paths__()
         gc.collect()
 
+        #self.__sort_and_index__(loner_path)
         loner_pack = ChaserPackage(name=self._loner_type,results=loner_path,destroy=False,level=self._level+1,
             source=self._source,chaser_type="match_maker",total=rescued)
+        self._outqu.put(loner_pack)
 
     def __remove_paths__(self):
         for path in self._loner_paths:
             os.remove(path)
-            os.remove(path+".bai")
+            #os.remove(path+".bai")
 
     def __first_pass__(self):
-        pairs = {}
+        cdef dict pairs = {}
         for read in self.__read_generator__():
             try:
                 status = pairs[read.qname]
                 pairs[read.qname] = True
             except KeyError:
                 pairs[read.qname] = False
-        return pairs
+        return self.__prepare_for_second_pass__(pairs)
 
     def __prepare_for_second_pass__(self,pairs):
-        pairs = dict(filter( lambda tup : tup[1], iter(pairs.items()) ))
-        return dict([(qname,[])  for qname,status in pairs.items()])
+        return dict(filter( lambda tup : tup[1], iter(pairs.items()) ))
 
     def __read_generator__(self):
         for path in self._loner_paths:
-            if not os.path.exists(path+"bai"):
-                self.__sort_and_index__(path)
             loner_object = pysam.AlignmentFile(path,"rb")
             for read in loner_object.fetch(until_eof=True):
                 yield read
             loner_object.close()
-            gc.collect()
+        gc.collect()
 
     def __launch_child_task__(self,pairs):
         child_pack = self._child_package
@@ -298,6 +327,7 @@ class MatchMakerTask(ChaserClass):
         args.extend(child_pack["task_args"])
         task = child_pack["TaskClass"](*args)
         task.start()
+        task.join()
         return len(pairs)
 
     def __get_loner_object__(self,path):
@@ -305,6 +335,5 @@ class MatchMakerTask(ChaserClass):
         loner_object = pysam.AlignmentFile(path,"wb",template=template)
         template.close()
         return loner_object
-
 
 #.....happily ever after
