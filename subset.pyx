@@ -113,6 +113,10 @@ class PairTaskSubset(TaskSubset):
                                         destroy=destroy,
                                         const=const,
                                         source=source)
+        if const.include_duplicates:
+            self.__read_filter__ = self.__filter__
+        else:
+            self.__read_filter__ = self.__filter_duplicates__
 
     def __handle_task_set__(self,task_set,master):
         engine = self.__engine__
@@ -168,7 +172,7 @@ class PairTaskSubset(TaskSubset):
             sys.stdout.flush()
 
     def __query_loners__(self,read,loners):
-        if read.is_secondary:#Pair processing only handles primary pairs
+        if self.__read_filter__(read):#Pair processing only handles primary pairs
             return None, None
 
         try:
@@ -179,6 +183,12 @@ class PairTaskSubset(TaskSubset):
         except KeyError:
             loners[read.qname] = read
             return None,None
+
+    def __filter__(self,read):
+        return read.is_secondary
+
+    def __filter_duplicates__(self,read):
+        return read.is_secondary or read.is_duplicate
 
 class HandlerSubset(parabam.core.Handler):
 
@@ -231,10 +241,10 @@ class HandlerSubset(parabam.core.Handler):
         gc.collect()
 
     def __test_merge_store__(self,source,subset):
+        #Test whether there are any temporary bams to be merged
         return len(self._merge_stores[source][subset]) > 0
             
     def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
-        
         res = MergePackage(name=name,results=list(results),
                             subset_type=subset_type,source=source,
                             destroy=destroy,total=total,time_added=time.time())
@@ -320,6 +330,7 @@ class Interface(parabam.core.UserInterface):
             engine_is_class = False,
             fetch_region = cmd_args.region,
             pair_process=cmd_args.m,
+            include_duplicates=cmd_args.d,
             side_by_side = cmd_args.s,
             debug = cmd_args.debug
             )
@@ -327,7 +338,7 @@ class Interface(parabam.core.UserInterface):
     def run(self,input_bams,outputs,proc,chunk,subset_types,
             user_constants,user_engine,fetch_region=None,side_by_side=2,
             keep_in_temp=False,engine_is_class=False,verbose=False,
-            pair_process=False,debug=False):
+            pair_process=False,include_duplicates=False,debug=False):
 
         if not outputs or not len(outputs) == len(input_bams):
             print "[Status] Using default naming scheme."
@@ -364,7 +375,8 @@ class Interface(parabam.core.UserInterface):
                                 user_constants=user_constants,
                                 user_engine=user_engine,
                                 fetch_region=fetch_region,
-                                pair_process=pair_process)
+                                pair_process=pair_process,
+                                include_duplicates=include_duplicates)
 
             task_qu = Queue()
             processors,task_class = self.__create_processors__(task_qu,const,debug,engine_is_class)
@@ -410,8 +422,14 @@ class Interface(parabam.core.UserInterface):
         merge_qu = Queue()
         merge_out = Queue()
 
+        destroy_modifier = 0
+        if const.pair_process:
+            #This is so that the main handler waits for the
+            #chaser to finish before ending.
+            destroy_modifier = 1
+
         handlers.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,
-                        const=const,destroy_limit=len(const.sources)))
+                        const=const,destroy_limit=len(const.sources) + destroy_modifier))
 
         handlers.append(HandlerMerge(inqu=merge_qu,outqu=merge_out,
                         const=const,destroy_limit=len(const.sources)*len(const.subset_types)))
@@ -494,6 +512,8 @@ class Interface(parabam.core.UserInterface):
             ,help="Further parralise subset by running this many samples side-by-side. [Default 2]")
         parser.add_argument('--debug',action="store_true",default=False,
             help="Only the first 5million reads will be processed")
+        parser.add_argument('-d',action="store_true",default=False,
+            help="parabam will process reads marked PCR duplicate. Including this parameter may crash pair processing")
         parser.add_argument('-m',action="store_true",default=False
             ,help="A pair processor is used instead of a conventional processor")
         parser.add_argument('-v', choices=[0,1,2],default=0,type=int,

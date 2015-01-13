@@ -44,9 +44,10 @@ class HandlerMerge(Handler):
             master = pysam.Samfile(self.const.master_file_path[src],"rb")
             file_objects[src] = {}
             for subset in self._subset_types:
-                merge_type = self.__get_subset_merge_type__(output_paths[src][subset])
-                cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_paths[src][subset],master)
-                file_objects[src][subset] = cur_file_obj
+                if not subset == "index":
+                    merge_type = self.__get_subset_merge_type__(output_paths[src][subset])
+                    cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_paths[src][subset],master)
+                    file_objects[src][subset] = cur_file_obj
             master.close()
         return file_objects
 
