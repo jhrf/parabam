@@ -42,9 +42,8 @@ if __name__ == "__main__":
 
 	argument_len = len(sys.argv) >= 2
 
-	progs = {"stat":"para_stat",
-			"subset":"subset",
-			"range":"range"}
+	progs = {"stat":"command.stat",
+			"subset":"command.subset"}
 
 	printInfo = False
 

@@ -63,8 +63,6 @@ class Task(multiprocessing.Process):
 
 cdef class Handler:
 
-    cdef int _destroy_limit
-
     def __init__(self,object inqu,object const,object report=True,int destroy_limit=1):
         self._inqu = inqu
         self._destroy_limit = destroy_limit
@@ -75,6 +73,7 @@ cdef class Handler:
         self._output_paths = const.output_paths
 
         self._periodic_interval = 10
+        self._destroy_count = 0
 
         self._stats = {}
 
@@ -101,7 +100,6 @@ cdef class Handler:
 
     def listen(self,update_interval):
         destroy = False
-        cdef int destroy_count = 0
 
         cdef int iterations = 0
         cdef int start_time = time.time()
@@ -118,8 +116,8 @@ cdef class Handler:
                 new_package = self._inqu.get(False)
                 if new_package.destroy:
                     #destroy limit allows for multiple processors
-                    destroy_count += 1
-                    if destroy_count == self._destroy_limit:
+                    self._destroy_count += 1
+                    if self._destroy_count == self._destroy_limit:
                         destroy = True
 
                 curproc = new_package.curproc 

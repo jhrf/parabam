@@ -27,7 +27,7 @@ class MergePackage(Package):
         self.total = total
 
 class HandlerMerge(Handler):
-    def __init__(self,object inqu, object outqu, object const,int destroy_limit=1):
+    def __init__(self,object inqu, object const,int destroy_limit=1):
         super(HandlerMerge,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)
         
         self._total = Counter()
@@ -35,7 +35,6 @@ class HandlerMerge(Handler):
         self._subset_types = const.subset_types
         self._out_file_objects = self.__get_out_file_objects__()
         self._merged = 0
-        self._outqu = outqu #only used in pairprocess mode to handle index files
 
     def __get_out_file_objects__(self):
         file_objects = {}
@@ -70,34 +69,31 @@ class HandlerMerge(Handler):
         pass
 
     def __new_package_action__(self,new_package,**kwargs):
-        #Handle the result. Result will always be of type framework.Result
+        #Handle the result. Result will always be of type parabam.support.MergePackage
         subset_type = new_package.subset_type
         source = new_package.source
         self._total[subset_type] = new_package.total
 
-        if subset_type == "index":
-            self._outqu.put(new_package)
-        else:
-            for merge_count,merge_path in new_package.results:
-                try:
-                    if merge_count > 0:
-                        for item in self.__get_entries_from_file__(merge_path,subset_type):
-                            self._out_file_objects[source][subset_type].write(item)
-                    os.remove(merge_path)
+        for merge_count,merge_path in new_package.results:
+            try:
+                if merge_count > 0:
+                    for item in self.__get_entries_from_file__(merge_path,subset_type):
+                        self._out_file_objects[source][subset_type].write(item)
+                os.remove(merge_path)
 
-                except IOError:
-                    print "FAILURE ON THIS PATH %s" % (merge_path,)
+            except IOError:
+                print "FAILURE ON THIS PATH %s" % (merge_path,)
 
-                    print "\nTEMP CONTENTS"
-                    sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
-                    print "--"
-                    print "Printing newpackage.results"
-                    print new_package.results
-                    print "--"
+                print "\nTEMP CONTENTS"
+                sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
+                print "--"
+                print "Printing newpackage.results"
+                print new_package.results
+                print "--"
 
-                    raise
-                    
-                self._merged += 1       
+                raise
+                
+            self._merged += 1       
 
     def __get_entries_from_file__(self,path,subset):
         merge_type = self.__get_subset_merge_type__(path)
@@ -158,5 +154,6 @@ class HandlerMerge(Handler):
     def __handler_exit__(self,**kwargs):
         self.__close_all_out_files__()
         self.__add_source_to_header__()
+        print "Merge Finished"
 
 #...happily ever after

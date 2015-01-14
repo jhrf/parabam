@@ -13,7 +13,7 @@ from collections import deque, Counter
 from multiprocessing import Queue,Process
 from abc import ABCMeta, abstractmethod
 from parabam.support import HandlerMerge,MergePackage
-from parabam.chaser import HandlerChaser
+from parabam.chaser import HandlerChaser,ChaserPackage
 
 class TaskSubset(parabam.core.Task):
 
@@ -192,7 +192,7 @@ class PairTaskSubset(TaskSubset):
 
 class HandlerSubset(parabam.core.Handler):
 
-    def __init__(self,object inqu,object outqu,object const,object destroy_limit):
+    def __init__(self,object inqu,object outqu,object const,object destroy_limit,object chaserqu):
         super(HandlerSubset,self).__init__(inqu,const,destroy_limit=destroy_limit)
 
         self._sources = const.sources
@@ -207,6 +207,8 @@ class HandlerSubset(parabam.core.Handler):
 
         self._mergequeue = outqu
         self._mergecount = 0
+
+        self._chasequeue = chaserqu
 
     def __get_total_processed_reads__(self):
         total = 0
@@ -245,10 +247,18 @@ class HandlerSubset(parabam.core.Handler):
         return len(self._merge_stores[source][subset]) > 0
             
     def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
-        res = MergePackage(name=name,results=list(results),
-                            subset_type=subset_type,source=source,
-                            destroy=destroy,total=total,time_added=time.time())
-        self._mergequeue.put(res)
+        if subset_type == "index":
+            res = ChaserPackage(name=name,results=results,destroy=destroy,level=-2,
+                                source=source,chaser_type="origin",
+                                total=total,sub_classifier=None,
+                                processing= (self._destroy_count < ( self._destroy_limit - 1 ))) 
+            self._chasequeue.put(res)
+
+        else:
+            res = MergePackage(name=name,results=list(results),
+                                subset_type=subset_type,source=source,
+                                destroy=destroy,total=total,time_added=time.time())
+            self._mergequeue.put(res)
 
     def __total_reads__(self):
         return sum(map(lambda s : self._stats[s]["total"],self._sources))
@@ -258,6 +268,7 @@ class HandlerSubset(parabam.core.Handler):
             self.__standard_output__("\n[Status] Processed %d reads from bam files\n" % (self.__total_reads__(),))
             self.__standard_output__("[Status] Waiting for merge operation to finish...\n")
 
+        #Kill the handlers handler
         for source in self._sources:
             for subset in self._subset_types:
                 self.__add_merge_task__(name=self._output_paths[source][subset],
@@ -420,23 +431,26 @@ class Interface(parabam.core.UserInterface):
     def __create_handlers__(self,task_qu,object const,task_class):
         handlers = []
         merge_qu = Queue()
-        merge_out = Queue()
+        chaser_qu = Queue()
 
-        destroy_modifier = 0
         if const.pair_process:
-            #This is so that the main handler waits for the
-            #chaser to finish before ending.
+            #This modifies the expected destroy_count
+            #Main handler waits for chaser
+            #Merge handler doesn't expect index destroy
             destroy_modifier = 1
+        else:
+            destroy_modifier = 0
 
         handlers.append(HandlerSubset(inqu=task_qu,outqu=merge_qu,
-                        const=const,destroy_limit=len(const.sources) + destroy_modifier))
+                        const=const,chaserqu=chaser_qu,
+                        destroy_limit=len(const.sources) + destroy_modifier))
 
-        handlers.append(HandlerMerge(inqu=merge_qu,outqu=merge_out,
-                        const=const,destroy_limit=len(const.sources)*len(const.subset_types)))
+        handlers.append(HandlerMerge(inqu=merge_qu,const=const,
+                        destroy_limit=len(const.sources)*(len(const.subset_types) - destroy_modifier) ))
 
         if const.pair_process:
-            handlers.append(HandlerChaser(inqu=merge_out,mainqu=task_qu,
-                        const=const,destroy_limit=len(const.sources),TaskClass=task_class))
+            handlers.append(HandlerChaser(inqu=chaser_qu,mainqu=task_qu,
+                        const=const,destroy_limit=1,TaskClass=task_class))
 
         return handlers
 
