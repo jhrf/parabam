@@ -249,7 +249,6 @@ cdef class Processor:
         bam_iterator = self.__get_next_alig__(master_bam) if not self._debug \
                             else self.__get_next_alig_debug__(master_bam)
 
-        self._prev = master_bam.tell()
         for i,alig in enumerate(bam_iterator):
 
             add_to_collection(master_bam,alig,collection)
@@ -261,7 +260,6 @@ cdef class Processor:
                 del collection
                 collection = [] # already running
                 collection_count = 0
-            self._prev = master_bam.tell()
 
         wait_for_tasks(self._active_tasks,0)
         start_task(collection,destroy=True)

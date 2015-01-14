@@ -141,17 +141,23 @@ class HandlerChaser(parabam.core.Handler):
 
     def __handle_origin_task__(self,new_package):
         self._processing = new_package.processing
+        paths = []
+        package_loners = 0
 
         for loner_count,path in new_package.results:
             if loner_count == 0:
                 os.remove(path)
             else:
                 self._total_loners += loner_count
-                if loner_count < 75000:
-                    max_task = 15
-                else:
-                    max_task = 5
-                self.__start_primary_task__(path,new_package.source,max_task)
+                package_loners += loner_count
+                paths.append(path)
+
+        if loner_count < 100000:
+            max_task = 15
+        else:
+            max_task = 7
+
+        self.__start_primary_task__(paths,new_package.source,max_task)
             
     def __start_primary_task__(self,path,source,max_task):        
         self.__wait_for_tasks__(self._primary_tasks,max_task)
@@ -249,7 +255,7 @@ class HandlerChaser(parabam.core.Handler):
             len(self._match_tasks),len(self._primary_tasks))
 
     def __handler_exit__(self,**kwargs):
-        print "Exiting"
+        pass
 
 class ChaserClass(Process):
     def __init__(self,object const,str source):
@@ -258,14 +264,19 @@ class ChaserClass(Process):
         self._source = source
 
     def __sort_and_index__(self,path):
-        temp_path = "%s/sort_temp_%d_%s" % (self.const.temp_dir,time.time(),self.pid)
-        pysam.sort(path,temp_path)
-        temp_path += ".bam"
+        #temp_path = "%s/sort_temp_%d_%s" % (self.const.temp_dir,time.time(),self.pid)
+        #pysam.sort(path,temp_path)
+        #temp_path += ".bam"
 
-        os.remove(path)
-        os.rename(temp_path,path)
+        #os.remove(path)
+        #os.rename(temp_path,path)
 
-        pysam.index(path)
+        #pysam.index(path)
+
+        #dummy_index = open(path + ".bai","w")
+        #dummy_index.close()
+        pass
+
 
     def __get_loner_temp_path__(self,loner_type,sub_classifier,level=0):
         return "%s/%s_%s_%s_%d_level_%d_%s.bam" %\
@@ -273,10 +284,11 @@ class ChaserClass(Process):
 
 class PrimaryTask(ChaserClass):
 
-    def __init__(self,object unsorted_path,object outqu,object const,str source,list loner_types):
+    def __init__(self,object unsorted_paths,object outqu,object const,str source,list loner_types):
         super(PrimaryTask,self).__init__(const,source)
         
-        self._unsorted_path = unsorted_path
+        self._unsorted_paths = unsorted_paths
+        self._unsorted_path = unsorted_paths[0]
         self._outqu = outqu
         self._loner_types = loner_types
 
@@ -286,17 +298,15 @@ class PrimaryTask(ChaserClass):
         #speedup
 
         unsorted_path = self._unsorted_path
-
-        self.__sort_and_index__(unsorted_path)
         unsorted_object = pysam.AlignmentFile(unsorted_path,"rb")
 
         loner_holder = self.__get_loner_holder__()
         loner_counts = Counter()
         loner_total = 0
 
-        classifier_bins = np.digitize(range(len(unsorted_object.references)),range(0,len(unsorted_object.references),10))
+        classifier_bins = self.__get_classifier_bins__(unsorted_object)
 
-        for read in self.__read_generator__(unsorted_object):
+        for read in self.__read_generator__():
             if read.is_unmapped and read.mate_is_unmapped:
                 current_type = "both_unmapped"
             elif not read.is_unmapped and not read.mate_is_unmapped:
@@ -310,15 +320,49 @@ class PrimaryTask(ChaserClass):
             loner_counts[current_type] += 1
             loner_total += 1
 
-        loner_paths = self.__get_paths_and_close__(loner_holder)
-
         unsorted_object.close()
-        os.remove(unsorted_path)
-        os.remove(unsorted_path+".bai")
+        loner_paths = self.__get_paths_and_close__(loner_holder)
 
         loner_pack = ChaserPackage(name="all",results=loner_paths,destroy=False,level=0,source=self._source,
             chaser_type="primary",total=loner_total,sub_classifier=None)
         self._outqu.put(loner_pack)
+
+    def __read_generator__(self,second_pass=False):
+        for path in self._loner_paths:
+            loner_object = pysam.AlignmentFile(path,"rb")
+            for read in loner_object.fetch(until_eof=True):
+                yield read
+            loner_object.close()
+            if second_pass:
+                os.remove(path)
+        gc.collect()
+
+    def __read_generator__(self):
+        for path in self._unsorted_paths:
+            self.__sort_and_index__(path)
+            loner_object = pysam.AlignmentFile(path,"rb")
+            for read in loner_object.fetch(until_eof=True):
+                yield read
+            loner_object.close()
+            os.remove(path)
+            #os.remove(path+".bai")
+        gc.collect()
+
+    def __get_classifier_bins__(self,unsorted_object):
+        crucial_bin_number = 30
+        if len(unsorted_object.references) > crucial_bin_number:
+            bins = []
+            curcial_bins = list(np.digitize( range(crucial_bin_number) , range(0,crucial_bin_number,3)))
+
+            remainder_bins = list(np.digitize(range(crucial_bin_number,len(unsorted_object.references)),
+                        range(crucial_bin_number,len(unsorted_object.references),20)) + 10)
+
+            bins.extend(curcial_bins)
+            bins.extend(remainder_bins)
+
+            return bins
+        else:
+            return list(np.digitize( range(len(unsorted_object.references)) , range(0,len(unsorted_object.references),2)))
 
     def __get_sub_classifier__(self,loner_type,read,bins):
         if loner_type == "both_mapped":
@@ -339,10 +383,6 @@ class PrimaryTask(ChaserClass):
             return read_ref,mate_ref
         else:
             return mate_ref,read_ref
-
-    def __read_generator__(self,alig_file_obj):
-        for read in alig_file_obj.fetch(until_eof=True):
-            yield read
 
     def __get_loner_holder__(self):
         holder = {}

@@ -32,9 +32,12 @@ class HandlerMerge(Handler):
         
         self._total = Counter()
         self._sources = const.sources
-        self._subset_types = const.subset_types
+        self._subset_types = list(const.subset_types)
         self._out_file_objects = self.__get_out_file_objects__()
         self._merged = 0
+
+        if const.pair_process:
+            self._subset_types.remove("index")
 
     def __get_out_file_objects__(self):
         file_objects = {}
@@ -43,10 +46,9 @@ class HandlerMerge(Handler):
             master = pysam.Samfile(self.const.master_file_path[src],"rb")
             file_objects[src] = {}
             for subset in self._subset_types:
-                if not subset == "index":
-                    merge_type = self.__get_subset_merge_type__(output_paths[src][subset])
-                    cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_paths[src][subset],master)
-                    file_objects[src][subset] = cur_file_obj
+                merge_type = self.__get_subset_merge_type__(output_paths[src][subset])
+                cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_paths[src][subset],master)
+                file_objects[src][subset] = cur_file_obj
             master.close()
         return file_objects
 
@@ -154,6 +156,5 @@ class HandlerMerge(Handler):
     def __handler_exit__(self,**kwargs):
         self.__close_all_out_files__()
         self.__add_source_to_header__()
-        print "Merge Finished"
 
 #...happily ever after

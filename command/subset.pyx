@@ -302,14 +302,6 @@ class ProcessorSubset(parabam.core.Processor):
     def __pre_processor__(self,master_file_path):
         pass
 
-class PairProcessor(ProcessorSubset):
-
-    def __init__(self,object outqu,object const,object TaskClass,object task_args,object debug=False):
-        super(PairProcessor,self).__init__(outqu,const,TaskClass,task_args,debug)
-        
-    def __add_to_collection__(self,master,item,collection):
-        collection.append(item)
-
 class Interface(parabam.core.UserInterface):
     """The interface to parabam subset.
     Users will primarily make use of the ``run`` function."""
@@ -457,11 +449,12 @@ class Interface(parabam.core.UserInterface):
     def __create_processors__(self,task_qu,object const,debug,engine_is_class):
         processors = []
 
+        processor_class = ProcessorSubset
+
         if const.pair_process:
-            processor_class = PairProcessor
             task_class = PairTaskSubset
         else:
-            processor_class = ProcessorSubset
+            
             task_class = TaskSubset
 
         if engine_is_class:
@@ -498,18 +491,19 @@ class Interface(parabam.core.UserInterface):
         final_files = []
         for src, subset_paths in output_paths.items():
             for subset,output_path in subset_paths.items():
-                try:
-                    move_location = output_path.replace(self._temp_dir,".")
-                    shutil.move(output_path,move_location) #./ being the current working dir
-                    final_files.append(move_location) 
-                except shutil.Error,e:
-                    alt_filnm = "./%s_%s_%d.bam" % (src,subset,time.time()) 
-                    print "[Warning] Output file may already exist, you may not" \
-                    "have correct permissions for this file"
-                    print "[Update]Trying to create output using unique filename:"
-                    print "\t\t%s" % (alt_filnm,)
-                    shutil.move(output_path,alt_filnm)
-                    final_files.append(alt_filnm)
+                if not subset == "index":
+                    try:
+                        move_location = output_path.replace(self._temp_dir,".")
+                        shutil.move(output_path,move_location) #./ being the current working dir
+                        final_files.append(move_location) 
+                    except shutil.Error,e:
+                        alt_filnm = "./%s_%s_%d.bam" % (src,subset,time.time()) 
+                        print "[Warning] Output file may already exist, you may not" \
+                        "have correct permissions for this file"
+                        print "[Update]Trying to create output using unique filename:"
+                        print "\t\t%s" % (alt_filnm,)
+                        shutil.move(output_path,alt_filnm)
+                        final_files.append(alt_filnm)
         return final_files
 
     def get_parser(self):
