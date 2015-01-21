@@ -8,6 +8,8 @@ import gc
 import shutil
 import gzip
 
+import Queue as Queue2
+
 from itertools import izip
 from collections import deque, Counter
 from multiprocessing import Queue,Process
@@ -250,7 +252,7 @@ class HandlerSubset(parabam.core.Handler):
         if subset_type == "index":
             res = ChaserPackage(name=name,results=results,destroy=destroy,level=-2,
                                 source=source,chaser_type="origin",
-                                total=total,sub_classifier=None,
+                                total=total,sub_classifier=None,pid=0,
                                 processing= (self._destroy_count < ( self._destroy_limit - 1 ))) 
             self._chasequeue.put(res)
 
@@ -302,6 +304,32 @@ class ProcessorSubset(parabam.core.Processor):
     def __pre_processor__(self,master_file_path):
         pass
 
+class ProcessorSubsetPair(ProcessorSubset):
+
+    def __init__(self,object outqu,object const,object TaskClass,object task_args,object inqu,object debug=False):
+        # if const.fetch_region:
+        #   debug = False 
+        super(ProcessorSubsetPair,self).__init__(outqu,const,TaskClass,task_args,debug)
+        self._inqu = inqu
+
+    def __query_pause_qu__(self):
+        try:
+            pause = self._inqu.get(False)
+            if pause:
+                while True:
+                    try:
+                        pause = self._inqu.get(False)
+                        if not pause:
+                            break
+                    except Queue2.Empty:
+                        time.sleep(10)
+        except Queue2.Empty:
+            pass
+
+    def __start_task__(self,collection,destroy=False):
+        self.__query_pause_qu__()
+        super(ProcessorSubsetPair,self).__start_task__(collection,destroy)
+
 class Interface(parabam.core.UserInterface):
     """The interface to parabam subset.
     Users will primarily make use of the ``run`` function."""
@@ -332,7 +360,7 @@ class Interface(parabam.core.UserInterface):
             user_engine = user_engine,
             engine_is_class = False,
             fetch_region = cmd_args.region,
-            pair_process=cmd_args.m,
+            pair_process=cmd_args.pair,
             include_duplicates=cmd_args.d,
             side_by_side = cmd_args.s,
             debug = cmd_args.debug
@@ -382,8 +410,9 @@ class Interface(parabam.core.UserInterface):
                                 include_duplicates=include_duplicates)
 
             task_qu = Queue()
-            processors,task_class = self.__create_processors__(task_qu,const,debug,engine_is_class)
-            handlers = self.__create_handlers__(task_qu,const,task_class)
+            pause_qu = Queue()
+            processors,task_class = self.__create_processors__(task_qu,pause_qu,const,debug,engine_is_class)
+            handlers = self.__create_handlers__(task_qu,pause_qu,const,task_class)
 
             if verbose == 1: 
                 update_interval = 199
@@ -420,7 +449,7 @@ class Interface(parabam.core.UserInterface):
                     subset_paths[source][subset] = path
         return index_paths,subset_paths
 
-    def __create_handlers__(self,task_qu,object const,task_class):
+    def __create_handlers__(self,task_qu,pause_qu,object const,task_class):
         handlers = []
         merge_qu = Queue()
         chaser_qu = Queue()
@@ -441,20 +470,17 @@ class Interface(parabam.core.UserInterface):
                         destroy_limit=len(const.sources)*(len(const.subset_types) - destroy_modifier) ))
 
         if const.pair_process:
-            handlers.append(HandlerChaser(inqu=chaser_qu,mainqu=task_qu,
-                        const=const,destroy_limit=1,TaskClass=task_class))
+            handlers.append(HandlerChaser(inqu=chaser_qu,pause_qu=pause_qu,mainqu=task_qu,
+                                const=const,destroy_limit=1,TaskClass=task_class))
 
         return handlers
 
-    def __create_processors__(self,task_qu,object const,debug,engine_is_class):
+    def __create_processors__(self,task_qu,pause_qu,object const,debug,engine_is_class):
         processors = []
-
-        processor_class = ProcessorSubset
 
         if const.pair_process:
             task_class = PairTaskSubset
         else:
-            
             task_class = TaskSubset
 
         if engine_is_class:
@@ -472,12 +498,20 @@ class Interface(parabam.core.UserInterface):
                 task_class = const.user_engine
 
         for source in const.sources:
-            processors.append(processor_class(outqu=task_qu,
-                const=const,
-                TaskClass=task_class,
-                task_args=[source],
-                debug = debug))
-        
+            if const.pair_process:
+                processors.append(ProcessorSubsetPair(outqu=task_qu,
+                    const=const,
+                    TaskClass=task_class,
+                    task_args=[source],
+                    inqu = pause_qu,
+                    debug = debug))
+            else:
+                processors.append(ProcessorSubset(outqu=task_qu,
+                    const=const,
+                    TaskClass=task_class,
+                    task_args=[source],
+                    debug = debug))
+            
         return processors,task_class
 
     def __report_file_names__(self,output_paths):
@@ -510,20 +544,20 @@ class Interface(parabam.core.UserInterface):
         #argparse imported in ./interface/parabam
         parser = self.default_parser()
 
-        parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
-            ,help="The subset process will be run only on reads from this region\n"\
-            "Regions should be colon seperated as specified by samtools (eg \'chr1:1000,5000\')")
         parser.add_argument('--output','-o',metavar='OUTPUT', nargs='+',required=False
             ,help="The name of the output that we wish to create. Must be same amount of space"\
             " separated entries as INPUT.")
-        parser.add_argument('-s',type=int,metavar="INT",nargs='?',default=2
-            ,help="Further parralise subset by running this many samples side-by-side. [Default 2]")
         parser.add_argument('--debug',action="store_true",default=False,
             help="Only the first 5million reads will be processed")
+        parser.add_argument('--pair',action="store_true",default=False
+            ,help="A pair processor is used instead of a conventional processor")
+        parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
+            ,help="The subset process will be run only on reads from this region\n"\
+            "Regions should be colon seperated as specified by samtools (eg \'chr1:1000,5000\')")
+        parser.add_argument('-s',type=int,metavar="INT",nargs='?',default=2
+            ,help="Further parralise subset by running this many samples side-by-side. [Default 2]")
         parser.add_argument('-d',action="store_true",default=False,
             help="parabam will process reads marked PCR duplicate. Including this parameter may crash pair processing")
-        parser.add_argument('-m',action="store_true",default=False
-            ,help="A pair processor is used instead of a conventional processor")
         parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
             help="Indicate the amount of information output by the program:\n"\
             "\t0: No output [Default]\n"\

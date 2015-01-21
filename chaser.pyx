@@ -10,51 +10,51 @@ import gc
 import Queue as Queue2
 import numpy as np
 
+from random import randint
 from itertools import izip
 from collections import Counter
 from multiprocessing import Queue,Process
 from parabam.core import Package,CorePackage
 
 class ChaserPackage(Package):
-    def __init__(self,name,results,destroy,level,source,chaser_type,total,sub_classifier,processing=True):
+    def __init__(self,name,results,destroy,level,source,chaser_type,total,sub_classifier,pid,processing=True):
         super(ChaserPackage,self).__init__(name,results,destroy)
         self.level = level
         self.chaser_type=chaser_type
         self.source = source
         self.total = total        
         self.sub_classifier = sub_classifier
+        self.pid = pid
         self.processing = processing
 
 class HandlerChaser(parabam.core.Handler):
 
-    def __init__(self,object inqu,object mainqu,object const,object destroy_limit, object TaskClass):
+    def __init__(self,object inqu,object mainqu,object pause_qu,object const,object destroy_limit, object TaskClass):
         super(HandlerChaser,self).__init__(inqu,const,destroy_limit=destroy_limit,report=False)
 
         self._loner_types = ["both_mapped","both_unmapped","one_mapped"]
         self._sources = const.sources
         self._subset_types = const.subset_types
         
+        self._pause_qu = pause_qu
         self._mainqu = mainqu
         self._TaskClass = TaskClass
         
         self._loner_pyramid = self.__instalise_loner_pyramid__()
         self._pyramid_idle_counts = Counter()
-        self._pyramid_failure_counts = Counter()
 
         self._periodic_interval = 5
         self._total_loners = 0
         self._rescued = Counter()
 
-        self._match_tasks = []
-        self._primary_tasks = []
-
-        self._since_primary = time.time()
+        self._tasks = []
+        self._primary_store = self.__instalise_primary_store__()
 
         self._processing = True
 
     #START -- BORROWED FROM PROCESOR
     #Need to refactor here to stop code duplication
-    def __wait_for_tasks__(self,list active_tasks,int max_tasks):
+    def __wait_for_tasks__(self,list active_tasks,int max_tasks=8):
         update_tasks = self.__update_tasks__ #optimising alias
         update_tasks(active_tasks)
         cdef int currently_active = len(active_tasks)
@@ -63,12 +63,20 @@ class HandlerChaser(parabam.core.Handler):
         if max_tasks > currently_active:
             return
 
-        while(max_tasks < currently_active):
+        self._pause_qu.put(True)
+        while(max_tasks <= currently_active):
             update_tasks(active_tasks)
             currently_active = len(active_tasks)
             time.sleep(1)
+        self._pause_qu.put(False)
 
         return 
+
+    def __instalise_primary_store__(self):
+        paths = {}
+        for source in self._sources:
+            paths[source] = []
+        return paths
 
     def __update_tasks__(self,active_tasks):
         terminated_procs = []
@@ -85,6 +93,9 @@ class HandlerChaser(parabam.core.Handler):
             #collecting any memory.
             del terminated_procs
             gc.collect()
+
+        return len(active_tasks)
+
     #END -- BORROWED FROM PROCESOR
 
     def __instalise_loner_pyramid__(self):
@@ -108,25 +119,6 @@ class HandlerChaser(parabam.core.Handler):
         else:
             print "Error!"
 
-    def __handle_match_maker__(self,new_package):
-        source = new_package.source
-        name = new_package.name
-        level = new_package.level
-
-        self._rescued["total"] += (new_package.total*2) 
-        self._rescued[name] += (new_package.total*2) #this number is by pairs, to get read num we times 2
-
-        pyramid = self._loner_pyramid[source][name]
-        if level == -1:
-            print "Handle The Terminal Case! The string collection is larger than the max size (5million?)"
-        else:
-            if new_package.results: #This ensures that there are leftover loners
-
-                sub_pyramid = pyramid[new_package.sub_classifier]
-                if level >= len(sub_pyramid):
-                    sub_pyramid.append([])
-                sub_pyramid[level].append(new_package.results)
-                
     def __handle_primary_task__(self,new_package):
         source = new_package.source
         for loner_type,sub_classifier_dict in new_package.results.items():
@@ -136,58 +128,82 @@ class HandlerChaser(parabam.core.Handler):
                 except KeyError:
                     self._loner_pyramid[source][loner_type][sub_classifier] = [[]]
                     pyramid = self._loner_pyramid[source][loner_type][sub_classifier][new_package.level]
-
-                pyramid.append(path)
+                pyramid.append((new_package.pid,path))
+                self._pyramid_idle_counts[(loner_type,sub_classifier)] = 0
 
     def __handle_origin_task__(self,new_package):
         self._processing = new_package.processing
-        paths = []
-        package_loners = 0
 
         for loner_count,path in new_package.results:
             if loner_count == 0:
                 os.remove(path)
             else:
                 self._total_loners += loner_count
-                package_loners += loner_count
-                paths.append(path)
+                self._primary_store[new_package.source].append(path)
 
-        if loner_count < 100000:
-            max_task = 15
-        else:
-            max_task = 7
+        self.__test_primary_tasks__()
 
-        self.__start_primary_task__(paths,new_package.source,max_task)
-            
-    def __start_primary_task__(self,path,source,max_task):        
-        self.__wait_for_tasks__(self._primary_tasks,max_task)
+    def __handle_match_maker__(self,new_package):
+        source = new_package.source
+        name = new_package.name
+        level = new_package.level
 
-        new_task = PrimaryTask(path,self._inqu,self.const,source,self._loner_types)
+        self._rescued["total"] += (new_package.total*2) 
+        self._rescued[name] += (new_package.total*2) #this number is by pairs, to get read num we times 2
+
+        if new_package.results: #This ensures that there are leftover loners
+            pyramid = self._loner_pyramid[source][name][new_package.sub_classifier]
+            if level >= len(pyramid):
+                pyramid.append([])
+            if len(new_package.results) == 1: 
+                pyramid[level].append((new_package.pid,new_package.results[0]))
+            else:
+                for loner_path in new_package.results:
+                    random_insert = randint(0,len(pyramid[level]))
+                    pyramid[level].insert(random_insert,(new_package.pid,loner_path))
+
+    def __test_primary_tasks__(self,required_paths=10):
+        task_sent = []
+        for source,paths in self._primary_store.items():
+            if len(paths) >= required_paths:
+                self.__start_primary_task__(source)
+                task_sent.append(source)
+
+        for source in task_sent:
+            self._primary_store[source] = []
+        gc.collect()
+          
+    def __start_primary_task__(self,source):        
+        self.__wait_for_tasks__(self._tasks) #wait for existing tasks
+
+        new_task = PrimaryTask(self._primary_store[source],self._inqu,self.const,source,self._loner_types)
         new_task.start()
-        self._primary_tasks.append(new_task)
+        self._tasks.append(new_task)
 
     def __start_matchmaker_task__(self,paths,source,loner_type,level,sub_classifier):
-        self.__wait_for_tasks__(self._match_tasks,7)
+        self.__wait_for_tasks__(self._tasks)
 
         new_task = MatchMakerTask(paths,self._inqu,self.const,source,loner_type,level,sub_classifier,
                     {"queue":self._mainqu,"const":self.const,
                      "task_args":[source],"TaskClass":self._TaskClass})
         new_task.start()
-        self._match_tasks.append(new_task)
+
+        self._tasks.append(new_task)
         return new_task.pid
 
     def __periodic_action__(self,iterations):
-        pyramid_idle_counts = self._pyramid_idle_counts 
-
         if self._processing:
             idle_threshold = 300
+            self.__test_primary_tasks__()
         else:
-            idle_threshold = 10
+            idle_threshold = 5
+            self.__test_primary_tasks__(required_paths=1)
 
         if iterations % 10 == 0 :
             sys.stdout.write(self.__format_out_str__())                
             sys.stdout.flush()
 
+        pyramid_idle_counts = self._pyramid_idle_counts 
         empty = True
         for source,loner_dict in self._loner_pyramid.items():
             for loner_type,pyramid_dict in loner_dict.items():
@@ -195,31 +211,61 @@ class HandlerChaser(parabam.core.Handler):
                         for i,sub_pyramid in enumerate(reversed(pyramid)):
                             level = len(pyramid) - (i+1)
                             task_size = self.__get_task_size__(level,sub_classifier)
-                            if len(sub_pyramid) >= task_size:
-                                paths = [sub_pyramid.pop() for x in xrange(task_size)]
+                            if len(sub_pyramid) >= task_size and self.__pid_mix__(task_size,sub_pyramid):
+                                paths = [sub_pyramid.pop()[1] for x in xrange(task_size)]
                                 self.__start_matchmaker_task__(paths,source,loner_type,level,sub_classifier)
                                 pyramid_idle_counts[(loner_type,sub_classifier)] = 0
                                 break
                             elif len(sub_pyramid) > 0:
                                 empty = False
-                                pyramid_idle_counts[(loner_type,sub_classifier)] += 2 * len(sub_pyramid)
+                                pyramid_idle_counts[(loner_type,sub_classifier)] += 1
 
                         if pyramid_idle_counts[(loner_type,sub_classifier)] >= idle_threshold:
-                            success = self.__idle_routine__(pyramid,sub_classifier,loner_type,source)
+                            idle_success,idle_paths = self.__idle_routine__(pyramid,sub_classifier,loner_type,source)
                             pyramid_idle_counts[(loner_type,sub_classifier)] = 0
-                            if success:
-                                self._loner_pyramid[source][loner_type][sub_classifier] = [] 
-                                for x in xrange(len(pyramid)):
-                                    self._loner_pyramid[source][loner_type][sub_classifier].append(list())
-                            else:
-                                if not self._processing:
-                                    self._loner_pyramid[source][loner_type][sub_classifier] = []
-        
+
+                            #delete after idle success or when processing has finished and idle fails
+                            if self.__clear_subpyramid__(idle_success,self._processing):  
+                                for delete_tup in idle_paths:
+                                    for sub_pyramid in pyramid:
+                                        if delete_tup in sub_pyramid:
+                                            sub_pyramid.remove(delete_tup)
+                                            break
+                           
         if empty and not self._processing:
-            print "[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
+            print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
             self.__send_final_kill_signal__()
 
         gc.collect()
+
+    def __pid_mix__(self,task_size,sub_pyramid):
+        prev_pid = -1
+        for i,(pid,path) in enumerate(sub_pyramid):
+            if i == task_size:
+                break
+            elif prev_pid == -1:
+                prev_pid = pid
+            else:
+                if not prev_pid == pid:
+                    return True
+        return False
+
+    def __clear_subpyramid__(self,success,processing):
+        if success:
+            #If the idle task was sent, clear pyramid
+            return True
+        elif not processing and not success:
+            running = self.__update_tasks__(self._tasks)
+            if running == 0:
+                #if main process has finished and no tasks run
+                #clear the pyramid
+                return True
+            else:
+                #Tasks still running. Don't clear
+                return False 
+        else:
+            #Idle task not sent, don't clear pyramid
+            return False
 
     def __send_final_kill_signal__(self):
         kill_package = CorePackage(name="",results={},destroy=True,curproc=0)
@@ -227,32 +273,43 @@ class HandlerChaser(parabam.core.Handler):
 
     def __idle_routine__(self,pyramid,sub_classifier,loner_type,source):
         paths = []
+        delete_paths = []
+        task_size = 4
         max_level = 0
+
         for i,sub_pyramid in enumerate(pyramid):
             max_level = i
-            paths.extend(sub_pyramid)
+            for pid,path in sub_pyramid:
+                paths.append(path)
+                delete_paths.append((pid,path))
+                if len(paths) == task_size:
+                    break
 
-        if len(paths) > 1:
+        if len(paths) > 1 or (len(paths) > 0 and max_level == 0): #level 0 may not be unique
             pid = self.__start_matchmaker_task__(paths,source,loner_type,max_level,sub_classifier)
-            return True
-
-        return False
+            return True,delete_paths
+        return False,delete_paths
+        
 
     def __get_task_size__(self,level,sub_classifier):
-        if sub_classifier == "0-0" and level > 0:
+        if sub_classifier == "0-0":
             return 2
+        elif sub_classifier == "d-d":
+            return 3
+        elif sub_classifier == "u-m" and level == 0:
+            return 20
         else:
-            return 7
+            return 6
 
     def __format_out_str__(self):
         induvidual_str = ""
         for i,loner_type in enumerate(self._loner_types):
             induvidual_str += "%i:%d " % (i,self._rescued[loner_type])
 
-        return "\r %s Total: %d/%d Ratio: %.5f M-Task:%d P-Task:%d " %\
+        return "\r %s Total: %d/%d Ratio: %.5f Tasks:%d " %\
             (induvidual_str,self._rescued["total"],self._total_loners,
             float(self._rescued["total"]+1)/(self._total_loners+1),
-            len(self._match_tasks),len(self._primary_tasks))
+            len(self._tasks))
 
     def __handler_exit__(self,**kwargs):
         pass
@@ -264,23 +321,11 @@ class ChaserClass(Process):
         self._source = source
 
     def __sort_and_index__(self,path):
-        #temp_path = "%s/sort_temp_%d_%s" % (self.const.temp_dir,time.time(),self.pid)
-        #pysam.sort(path,temp_path)
-        #temp_path += ".bam"
-
-        #os.remove(path)
-        #os.rename(temp_path,path)
-
-        #pysam.index(path)
-
-        #dummy_index = open(path + ".bai","w")
-        #dummy_index.close()
         pass
 
-
-    def __get_loner_temp_path__(self,loner_type,sub_classifier,level=0):
-        return "%s/%s_%s_%s_%d_level_%d_%s.bam" %\
-            (self.const.temp_dir,self._source,loner_type,self.pid,time.time(),level,sub_classifier)
+    def __get_loner_temp_path__(self,loner_type,sub_classifier,level=0,unique=""):
+        return "%s/%s_%s_%s_%d_level_%d_%s%s.bam" %\
+            (self.const.temp_dir,self._source,loner_type,self.pid,time.time(),level,sub_classifier,unique)
 
 class PrimaryTask(ChaserClass):
 
@@ -324,7 +369,7 @@ class PrimaryTask(ChaserClass):
         loner_paths = self.__get_paths_and_close__(loner_holder)
 
         loner_pack = ChaserPackage(name="all",results=loner_paths,destroy=False,level=0,source=self._source,
-            chaser_type="primary",total=loner_total,sub_classifier=None)
+            chaser_type="primary",total=loner_total,sub_classifier=None,pid=self.pid)
         self._outqu.put(loner_pack)
 
     def __read_generator__(self,second_pass=False):
@@ -355,7 +400,7 @@ class PrimaryTask(ChaserClass):
             curcial_bins = list(np.digitize( range(crucial_bin_number) , range(0,crucial_bin_number,3)))
 
             remainder_bins = list(np.digitize(range(crucial_bin_number,len(unsorted_object.references)),
-                        range(crucial_bin_number,len(unsorted_object.references),20)) + 10)
+                        range(crucial_bin_number,len(unsorted_object.references),50)) + 10)
 
             bins.extend(curcial_bins)
             bins.extend(remainder_bins)
@@ -367,14 +412,17 @@ class PrimaryTask(ChaserClass):
     def __get_sub_classifier__(self,loner_type,read,bins):
         if loner_type == "both_mapped":
             if read.reference_id == read.next_reference_id:
-                return "0-0"
+                if read.is_duplicate:
+                    return "d-d"
+                else:
+                    return "0-0"
             else:
                 class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
                 return "%d-%d" % tuple(class_bins)
         elif loner_type == "both_unmapped":
             return "u-u"
         elif loner_type == "one_mapped":
-            return "u-%d" % (bins[self.__order_reference_number__(read.reference_id,read.next_reference_id)[1]],)
+            return "u-m" #mate reference not loaded properly
         else:
             return "e-e"
 
@@ -424,13 +472,12 @@ class MatchMakerTask(ChaserClass):
         self._loner_type = loner_type
         self._level = level
         self._sub_classifier = sub_classifier
+        self._header = self.__get_header__(self._loner_paths[0])
 
     def run(self):
-
-        from pprint import pprint as ppr 
-
-        loner_path = self.__get_loner_temp_path__(self._loner_type,self._sub_classifier,self._level+1)
-        loner_object = self.__get_loner_object__(loner_path)
+        loner_paths = [] 
+        loner_objects = []
+        self.__new_loner_setup__(loner_paths,loner_objects)
 
         cdef dict pairs = self.__first_pass__()
         cdef dict read_pairs = {}
@@ -460,9 +507,11 @@ class MatchMakerTask(ChaserClass):
 
             except KeyError:
                 written += 1
-                loner_object.write(read)
+                if written % 2500000 == 0:
+                    self.__new_loner_setup__(loner_paths,loner_objects)           
+                loner_objects[-1].write(read)
 
-        loner_object.close()
+        loner_objects[-1].close()
 
         if len(send_pairs) > 0:
             rescued += self.__launch_child_task__(send_pairs)
@@ -473,12 +522,27 @@ class MatchMakerTask(ChaserClass):
         gc.collect()
 
         if written == 0:
-            os.remove(loner_path)
+            os.remove(loner_paths[-1])
             loner_path = None
 
-        loner_pack = ChaserPackage(name=self._loner_type,results=loner_path,destroy=False,level=self._level+1,
-                source=self._source,chaser_type="match_maker",total=rescued,sub_classifier=self._sub_classifier)
+        loner_pack = ChaserPackage(name=self._loner_type,results=loner_paths,destroy=False,level=self._level+1,
+                source=self._source,chaser_type="match_maker",total=rescued,sub_classifier=self._sub_classifier,pid=self.pid)
         self._outqu.put(loner_pack)
+
+    def __get_header__(self,path):
+        bam_object = pysam.AlignmentFile(path,"rb")
+        header = bam_object.header
+        bam_object.close()
+        return header
+
+    def __new_loner_setup__(self,loner_paths,loner_objects):
+        unique = ""
+        if len(loner_objects) > 0:
+            loner_objects[-1].close()
+            unique = "_%d" % (len(loner_objects),)
+
+        loner_paths.append(self.__get_loner_temp_path__(self._loner_type,self._sub_classifier,self._level+1,unique=unique))
+        loner_objects.append(self.__get_loner_object__(loner_paths[-1]))
 
     def __remove_paths__(self):
         for path in self._loner_paths:
@@ -517,9 +581,7 @@ class MatchMakerTask(ChaserClass):
         return len(pairs)
 
     def __get_loner_object__(self,path):
-        template = pysam.AlignmentFile(self._loner_paths[0],"rb")
-        loner_object = pysam.AlignmentFile(path,"wb",template=template)
-        template.close()
+        loner_object = pysam.AlignmentFile(path,"wb",header=self._header)
         return loner_object
 
 #.....happily ever after

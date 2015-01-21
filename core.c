@@ -475,7 +475,7 @@ struct __pyx_obj_7parabam_4core___pyx_scope_struct____get_next_alig__ {
  * 
  *     def __get_next_alig_debug__(self,master_bam):             # <<<<<<<<<<<<<<
  *         for i,alig in enumerate(master_bam.fetch(until_eof=True)):
- *             if i < 5000000:
+ *             if i < 10000000:
  */
 struct __pyx_obj_7parabam_4core___pyx_scope_struct_1___get_next_alig_debug__ {
   PyObject_HEAD
@@ -1532,7 +1532,7 @@ static PyObject *__pyx_int_2;
 static PyObject *__pyx_int_4;
 static PyObject *__pyx_int_10;
 static PyObject *__pyx_int_100000;
-static PyObject *__pyx_int_5000000;
+static PyObject *__pyx_int_10000000;
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__3;
 static PyObject *__pyx_tuple__4;
@@ -6351,7 +6351,7 @@ static PyObject *__pyx_pf_7parabam_4core_9Processor_6__wait_for_tasks__(struct _
  *         if max_tasks > currently_active:
  *             return             # <<<<<<<<<<<<<<
  * 
- *         while(max_tasks < currently_active):
+ *         while(max_tasks <= currently_active):
  */
     __Pyx_XDECREF(__pyx_r);
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
@@ -6361,17 +6361,17 @@ static PyObject *__pyx_pf_7parabam_4core_9Processor_6__wait_for_tasks__(struct _
   /* "parabam/core.pyx":286
  *             return
  * 
- *         while(max_tasks < currently_active):             # <<<<<<<<<<<<<<
+ *         while(max_tasks <= currently_active):             # <<<<<<<<<<<<<<
  *             update_tasks(active_tasks)
  *             currently_active = len(active_tasks)
  */
   while (1) {
-    __pyx_t_6 = ((__pyx_v_max_tasks < __pyx_v_currently_active) != 0);
+    __pyx_t_6 = ((__pyx_v_max_tasks <= __pyx_v_currently_active) != 0);
     if (!__pyx_t_6) break;
 
     /* "parabam/core.pyx":287
  * 
- *         while(max_tasks < currently_active):
+ *         while(max_tasks <= currently_active):
  *             update_tasks(active_tasks)             # <<<<<<<<<<<<<<
  *             currently_active = len(active_tasks)
  *             time.sleep(1)
@@ -6405,7 +6405,7 @@ static PyObject *__pyx_pf_7parabam_4core_9Processor_6__wait_for_tasks__(struct _
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "parabam/core.pyx":288
- *         while(max_tasks < currently_active):
+ *         while(max_tasks <= currently_active):
  *             update_tasks(active_tasks)
  *             currently_active = len(active_tasks)             # <<<<<<<<<<<<<<
  *             time.sleep(1)
@@ -7325,7 +7325,7 @@ static PyObject *__pyx_gb_7parabam_4core_9Processor_19generator1(__pyx_Generator
  * 
  *     def __get_next_alig_debug__(self,master_bam):             # <<<<<<<<<<<<<<
  *         for i,alig in enumerate(master_bam.fetch(until_eof=True)):
- *             if i < 5000000:
+ *             if i < 10000000:
  */
 
 /* Python wrapper */
@@ -7408,7 +7408,7 @@ static PyObject *__pyx_gb_7parabam_4core_9Processor_19generator1(__pyx_Generator
  * 
  *     def __get_next_alig_debug__(self,master_bam):
  *         for i,alig in enumerate(master_bam.fetch(until_eof=True)):             # <<<<<<<<<<<<<<
- *             if i < 5000000:
+ *             if i < 10000000:
  *                 yield alig
  */
   __Pyx_INCREF(__pyx_int_0);
@@ -7477,18 +7477,18 @@ static PyObject *__pyx_gb_7parabam_4core_9Processor_19generator1(__pyx_Generator
     /* "parabam/core.pyx":326
  *     def __get_next_alig_debug__(self,master_bam):
  *         for i,alig in enumerate(master_bam.fetch(until_eof=True)):
- *             if i < 5000000:             # <<<<<<<<<<<<<<
+ *             if i < 10000000:             # <<<<<<<<<<<<<<
  *                 yield alig
  *             else:
  */
-    __pyx_t_4 = PyObject_RichCompare(__pyx_cur_scope->__pyx_v_i, __pyx_int_5000000, Py_LT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_RichCompare(__pyx_cur_scope->__pyx_v_i, __pyx_int_10000000, Py_LT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_7 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (__pyx_t_7) {
 
       /* "parabam/core.pyx":327
  *         for i,alig in enumerate(master_bam.fetch(until_eof=True)):
- *             if i < 5000000:
+ *             if i < 10000000:
  *                 yield alig             # <<<<<<<<<<<<<<
  *             else:
  *                 return
@@ -7539,7 +7539,7 @@ static PyObject *__pyx_gb_7parabam_4core_9Processor_19generator1(__pyx_Generator
  * 
  *     def __get_next_alig_debug__(self,master_bam):
  *         for i,alig in enumerate(master_bam.fetch(until_eof=True)):             # <<<<<<<<<<<<<<
- *             if i < 5000000:
+ *             if i < 10000000:
  *                 yield alig
  */
   }
@@ -7551,7 +7551,7 @@ static PyObject *__pyx_gb_7parabam_4core_9Processor_19generator1(__pyx_Generator
  * 
  *     def __get_next_alig_debug__(self,master_bam):             # <<<<<<<<<<<<<<
  *         for i,alig in enumerate(master_bam.fetch(until_eof=True)):
- *             if i < 5000000:
+ *             if i < 10000000:
  */
 
   /* function exit code */
@@ -13582,7 +13582,7 @@ static int __Pyx_InitGlobals(void) {
   __pyx_int_4 = PyInt_FromLong(4); if (unlikely(!__pyx_int_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_10 = PyInt_FromLong(10); if (unlikely(!__pyx_int_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_100000 = PyInt_FromLong(100000L); if (unlikely(!__pyx_int_100000)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_int_5000000 = PyInt_FromLong(5000000L); if (unlikely(!__pyx_int_5000000)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_int_10000000 = PyInt_FromLong(10000000L); if (unlikely(!__pyx_int_10000000)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;
   return -1;

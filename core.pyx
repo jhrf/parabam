@@ -283,7 +283,7 @@ cdef class Processor:
         if max_tasks > currently_active:
             return
 
-        while(max_tasks < currently_active):
+        while(max_tasks <= currently_active):
             update_tasks(active_tasks)
             currently_active = len(active_tasks)
             time.sleep(1)
@@ -323,7 +323,7 @@ cdef class Processor:
 
     def __get_next_alig_debug__(self,master_bam):
         for i,alig in enumerate(master_bam.fetch(until_eof=True)):
-            if i < 5000000:
+            if i < 10000000:
                 yield alig
             else:
                 return
