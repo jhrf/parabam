@@ -210,6 +210,7 @@ class HandlerSubset(parabam.core.Handler):
         self._mergequeue = outqu
         self._mergecount = 0
 
+        self._chasercount = 0
         self._chasequeue = chaserqu
 
     def __get_total_processed_reads__(self):
@@ -252,9 +253,10 @@ class HandlerSubset(parabam.core.Handler):
         if subset_type == "index":
             res = ChaserPackage(name=name,results=results,destroy=destroy,level=-2,
                                 source=source,chaser_type="origin",
-                                total=total,sub_classifier=None,pid=0,
+                                total=total,sub_classifier=None,order=self._chasercount,
                                 processing= (self._destroy_count < ( self._destroy_limit - 1 ))) 
             self._chasequeue.put(res)
+            self._chasercount += 1
 
         else:
             res = MergePackage(name=name,results=list(results),
@@ -307,8 +309,6 @@ class ProcessorSubset(parabam.core.Processor):
 class ProcessorSubsetPair(ProcessorSubset):
 
     def __init__(self,object outqu,object const,object TaskClass,object task_args,object inqu,object debug=False):
-        # if const.fetch_region:
-        #   debug = False 
         super(ProcessorSubsetPair,self).__init__(outqu,const,TaskClass,task_args,debug)
         self._inqu = inqu
 
@@ -322,7 +322,7 @@ class ProcessorSubsetPair(ProcessorSubset):
                         if not pause:
                             break
                     except Queue2.Empty:
-                        time.sleep(10)
+                        time.sleep(5)
         except Queue2.Empty:
             pass
 

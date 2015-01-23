@@ -37,7 +37,6 @@ class Task(multiprocessing.Process):
                                 results=results,
                                 destroy=self._destroy,
                                 curproc=self._curproc))
-
         #Trying to control mem useage
         del self._task_set
         gc.collect()
@@ -263,7 +262,6 @@ cdef class Processor:
 
         wait_for_tasks(self._active_tasks,0)
         start_task(collection,destroy=True)
-
         self.__end_processing__(master_bam)
 
     def __output__(self,outstr):
@@ -283,7 +281,7 @@ cdef class Processor:
         if max_tasks > currently_active:
             return
 
-        while(max_tasks <= currently_active):
+        while(max_tasks <= currently_active and currently_active > 0):
             update_tasks(active_tasks)
             currently_active = len(active_tasks)
             time.sleep(1)
