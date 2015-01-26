@@ -15,7 +15,7 @@ from collections import deque, Counter
 from multiprocessing import Queue,Process
 from abc import ABCMeta, abstractmethod
 from parabam.support import HandlerMerge,MergePackage
-from parabam.chaser import HandlerChaser,ChaserPackage
+from parabam.chaser import HandlerChaser,OriginPackage
 
 class TaskSubset(parabam.core.Task):
 
@@ -210,7 +210,6 @@ class HandlerSubset(parabam.core.Handler):
         self._mergequeue = outqu
         self._mergecount = 0
 
-        self._chasercount = 0
         self._chasequeue = chaserqu
 
     def __get_total_processed_reads__(self):
@@ -251,12 +250,10 @@ class HandlerSubset(parabam.core.Handler):
             
     def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
         if subset_type == "index":
-            res = ChaserPackage(name=name,results=results,destroy=destroy,level=-2,
-                                source=source,chaser_type="origin",
-                                total=total,sub_classifier=None,order=self._chasercount,
-                                processing= (self._destroy_count < ( self._destroy_limit - 1 ))) 
+            res = OriginPackage(results=results,destroy=destroy,
+                                source=source,chaser_type="origin",total=total,
+                                processing=(self._destroy_count < ( self._destroy_limit - 1 ))) 
             self._chasequeue.put(res)
-            self._chasercount += 1
 
         else:
             res = MergePackage(name=name,results=list(results),

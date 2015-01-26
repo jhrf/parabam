@@ -17,22 +17,33 @@ from multiprocessing import Queue,Process
 from parabam.core import Package,CorePackage
 
 class ChaserPackage(Package):
-    def __init__(self,name,results,destroy,level,source,chaser_type,total,sub_classifier,order,processing=True):
-        super(ChaserPackage,self).__init__(name,results,destroy)
-        self.level = level
+    def __init__(self,results,destroy,source,chaser_type,total):
+        super(ChaserPackage,self).__init__("ChaserPackage",results,destroy)
+        
         self.chaser_type=chaser_type
         self.source = source
         self.total = total        
-        self.sub_classifier = sub_classifier
-        self.order = order
+
+class OriginPackage(ChaserPackage):
+    def __init__(self,results,destroy,source,chaser_type,total,processing=True):
+        super(OriginPackage,self).__init__(results,destroy,source,chaser_type,total)
         self.processing = processing
+
+class PrimaryPackage(ChaserPackage):
+    def __init__(self,results,source,chaser_type,total):
+        super(PrimaryPackage,self).__init__(results,False,source,chaser_type,total)
+
+class MatchMakerPackage(ChaserPackage):
+    def __init__(self,loner_type,results,source,chaser_type,total,level):
+        super(MatchMakerPackage,self).__init__(results,False,source,chaser_type,total)
+        self.loner_type = loner_type
+        self.level = level
 
 class HandlerChaser(parabam.core.Handler):
 
     def __init__(self,object inqu,object mainqu,object pause_qu,object const,object destroy_limit, object TaskClass):
         super(HandlerChaser,self).__init__(inqu,const,destroy_limit=destroy_limit,report=False)
 
-        self._loner_types = ["both_mapped","both_unmapped","one_mapped"]
         self._sources = const.sources
         self._subset_types = const.subset_types
         
@@ -102,9 +113,6 @@ class HandlerChaser(parabam.core.Handler):
         loner_pyramid = {}
         for source in self.const.sources:
             loner_pyramid[source] = {}
-            for loner_type in self._loner_types:
-                loner_pyramid[source][loner_type] = {}
-
         return loner_pyramid
 
     def __new_package_action__(self,new_package,**kwargs):
@@ -121,15 +129,15 @@ class HandlerChaser(parabam.core.Handler):
 
     def __handle_primary_task__(self,new_package):
         source = new_package.source
-        for loner_type,sub_classifier_dict in new_package.results.items():
-            for sub_classifier,path in sub_classifier_dict.items():
-                try: 
-                    pyramid = self._loner_pyramid[source][loner_type][sub_classifier][new_package.level]
-                except KeyError:
-                    self._loner_pyramid[source][loner_type][sub_classifier] = [[]]
-                    pyramid = self._loner_pyramid[source][loner_type][sub_classifier][new_package.level]
-                pyramid.append((new_package.order,path))
-                self._pyramid_idle_counts[(loner_type,sub_classifier)] = 0
+        for loner_type,path in new_package.results.items():
+            try: 
+                pyramid = self._loner_pyramid[source][loner_type][0]
+            except KeyError:
+                self._loner_pyramid[source][loner_type] = [[]]
+                pyramid = self._loner_pyramid[source][loner_type][0]
+
+            pyramid.append(path)
+            self._pyramid_idle_counts[loner_type] = 0
 
     def __handle_origin_task__(self,new_package):
         self._processing = new_package.processing
@@ -139,28 +147,25 @@ class HandlerChaser(parabam.core.Handler):
                 os.remove(path)
             else:
                 self._total_loners += loner_count
-                self._primary_store[new_package.source].append((new_package.order,path))
+                self._primary_store[new_package.source].append(path)
 
         self.__test_primary_tasks__()
 
     def __handle_match_maker__(self,new_package):
         source = new_package.source
-        name = new_package.name
+        loner_type = new_package.loner_type
         level = new_package.level
 
-        self._rescued["total"] += (new_package.total*2) 
-        self._rescued[name] += (new_package.total*2) #this number is by pairs, to get read num we times 2
+        #this number is by pairs to get read num we times 2
+        self._rescued["total"] += (new_package.total*2)    
 
         if new_package.results: #This ensures that there are leftover loners
-            pyramid = self._loner_pyramid[source][name][new_package.sub_classifier]
-            if level >= len(pyramid):
+            pyramid = self._loner_pyramid[source][loner_type]
+            if len(pyramid) >= level:
                 pyramid.append([])
-            if len(new_package.results) == 1: 
-                pyramid[level].append((new_package.order,new_package.results[0]))
-            else:
-                for loner_path in new_package.results:
-                    random_insert = randint(0,len(pyramid[level]))
-                    pyramid[level].insert(random_insert,(new_package.order,loner_path))
+
+            for loner_level,loner_path in new_package.results:
+                pyramid[loner_level].append(loner_path)
 
     def __test_primary_tasks__(self,required_paths=10):
         task_sent = []
@@ -176,23 +181,22 @@ class HandlerChaser(parabam.core.Handler):
     def __start_primary_task__(self,source):        
         self.__wait_for_tasks__(self._tasks) #wait for existing tasks
 
-        orders,paths = zip(*self._primary_store[source])
+        paths = self._primary_store[source]
 
-        new_task = PrimaryTask(paths,self._inqu,self.const,source,self._loner_types,max(orders))
+        new_task = PrimaryTask(paths,self._inqu,self.const,source)
         new_task.start()
         self._tasks.append(new_task)
 
-    def __start_matchmaker_task__(self,paths,source,loner_type,level,sub_classifier,max_order):
+    def __start_matchmaker_task__(self,paths,source,loner_type,level):
         self.__wait_for_tasks__(self._tasks)
 
         new_task = MatchMakerTask(paths,self._inqu,self.const,source,
-                    loner_type,level,sub_classifier,max_order,
+                    loner_type,level,
                     {"queue":self._mainqu,"const":self.const,
                      "task_args":[source],"TaskClass":self._TaskClass})
         new_task.start()
 
         self._tasks.append(new_task)
-        return max_order
 
     def __periodic_action__(self,iterations):
         if self._processing:
@@ -209,37 +213,30 @@ class HandlerChaser(parabam.core.Handler):
         pyramid_idle_counts = self._pyramid_idle_counts 
         empty = True
         for source,loner_dict in self._loner_pyramid.items():
-            for loner_type,pyramid_dict in loner_dict.items():
-                    for sub_classifier,pyramid in pyramid_dict.items():
-                        for i,sub_pyramid in enumerate(reversed(pyramid)):
-                            level = len(pyramid) - (i+1)
-                            task_size = self.__get_task_size__(level,sub_classifier)
-                            has_mix,max_order = self.__order_mix__(task_size,sub_pyramid)
-                            if len(sub_pyramid) >= task_size and has_mix:
-                                empty = False
-                                paths = [sub_pyramid.pop()[1] for x in xrange(task_size)]
-                                self.__start_matchmaker_task__(paths,source,loner_type,level,sub_classifier,max_order)
-                                pyramid_idle_counts[(loner_type,sub_classifier)] = 0
-                                break
+            for loner_type,pyramid in loner_dict.items():
+                    for i,sub_pyramid in enumerate(reversed(pyramid)):
+                        level = len(pyramid) - (i+1)
+                        paths = self.__get_paths__(loner_type,sub_pyramid,level)
+                        if len(paths) > 0:
+                            self.__start_matchmaker_task__(paths,source,loner_type,level)
+                            pyramid_idle_counts[loner_type] = 0
+                            for path in paths:#remove sent paths
+                                sub_pyramid.remove(path)
+                            break
+                        if len(sub_pyramid) > 1:
+                            empty = False
+                            pyramid_idle_counts[loner_type] += 1
+                        del paths
+                    if pyramid_idle_counts[loner_type] >= idle_threshold:
+                        idle_success,idle_paths,idle_levels = self.__idle_routine__(pyramid,loner_type,source)
+                        pyramid_idle_counts[loner_type] = 0
 
-                            elif len(sub_pyramid) > 0:
-                                empty = False
-                                pyramid_idle_counts[(loner_type,sub_classifier)] += 1
-                                if len(sub_pyramid) > task_size:
-                                    self.__cycle_paths__(sub_pyramid)
+                        #delete after idle success or when processing has finished and idle fails
+                        if self.__clear_subpyramid__(idle_success,self._processing):  
+                            for idle_level,idle_path in izip(idle_levels,idle_paths):
+                                pyramid[idle_level].remove(idle_path)
+                        del idle_paths,idle_levels
 
-                        if pyramid_idle_counts[(loner_type,sub_classifier)] >= idle_threshold:
-                            idle_success,idle_paths = self.__idle_routine__(pyramid,sub_classifier,loner_type,source)
-                            pyramid_idle_counts[(loner_type,sub_classifier)] = 0
-
-                            #delete after idle success or when processing has finished and idle fails
-                            if self.__clear_subpyramid__(idle_success,self._processing):  
-                                for delete_tup in idle_paths:
-                                    for sub_pyramid in pyramid:
-                                        if delete_tup in sub_pyramid:
-                                            sub_pyramid.remove(delete_tup)
-                                            break
-        
         self.__update_tasks__(self._tasks)              
         if empty and not self._processing and len(self._tasks) == 0:
             print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
@@ -247,22 +244,16 @@ class HandlerChaser(parabam.core.Handler):
 
         gc.collect()
 
-    def __cycle_paths__(self,sub_pyramid):
-        path = sub_pyramid.pop()
-        sub_pyramid.append(path)
-
-    def __order_mix__(self,task_size,sub_pyramid):
-        seen = []
-        for i,(order,path) in enumerate(sub_pyramid):
-            if i == task_size:
-                break
-            seen.append(order)
-        seen_set = set(seen)
-        if len(seen_set) > 1:
-            return True,max(seen_set)
-        else:
-            return False,-1
-
+    def __get_paths__(self,loner_type,sub_pyramid,level):
+        task_size = self.__get_task_size__(level,loner_type)
+        paths = []
+        if len(sub_pyramid) >= task_size:
+            for path in sub_pyramid:
+                paths.append(path)
+                if len(paths) == task_size:
+                    break
+        return paths
+        
     def __clear_subpyramid__(self,success,processing):
         if success:
             #If the idle task was sent, clear pyramid
@@ -284,42 +275,43 @@ class HandlerChaser(parabam.core.Handler):
         kill_package = CorePackage(name="",results={},destroy=True,curproc=0)
         self._mainqu.put(kill_package)
 
-    def __idle_routine__(self,pyramid,sub_classifier,loner_type,source):
-        paths = []
-        orders = []
+    def __idle_routine__(self,pyramid,loner_type,source):
+        idle_paths = []
+        levels = []
         task_size = 3
-        max_level = 0
 
         for i,sub_pyramid in enumerate(pyramid):
-            max_level = i
-            for order,path in sub_pyramid:
-                if len(orders) == 0 or any(map(lambda comp: not comp == order,orders)):
-                    paths.append(path)
-                    orders.append(order)
-                    if len(paths) == task_size:
-                        break
+            for path in sub_pyramid:
+                idle_paths.append(path)
+                levels.append(i)
+                if len(idle_paths) == task_size:
+                    break
         
-        if (len(paths) > 1) or (len(paths) > 0 and max_level == 0): #level 0 may not be unique
-            order = self.__start_matchmaker_task__(paths,source,loner_type,max_level,sub_classifier,max(orders))
-            return True,zip(orders,paths)
-
-        return False,zip(orders,paths)
+        success = False
+        if (len(idle_paths) > 1) or (len(idle_paths) > 0 and levels[-1] == 0): #level 0 may not be unique
+            self.__start_matchmaker_task__(idle_paths,source,loner_type,levels[-1])
+            success = True
+        
+        return success,idle_paths,levels
        
-    def __get_task_size__(self,level,sub_classifier):
-        if sub_classifier == "0-0":
-            return 2
-        elif sub_classifier == "u-m" and level == 0:
-            return 20
+    def __get_task_size__(self,level,loner_type):
+        if loner_type == "0-0":
+            if level % 2 == 0:
+                return 2
+            else:
+                return 3
+        elif loner_type == "u-m" and level == 0:
+            return 30
         else:
-            return 6
+            if level % 2 == 0:
+                return 4
+            else:
+                return 3
 
     def __format_out_str__(self):
-        induvidual_str = ""
-        for i,loner_type in enumerate(self._loner_types):
-            induvidual_str += "%i:%d " % (i,self._rescued[loner_type])
 
-        return "\r %s Total: %d/%d Ratio: %.5f Tasks:%d " %\
-            (induvidual_str,self._rescued["total"],self._total_loners,
+        return "\rTotal: %d/%d Ratio: %.5f Tasks:%d " %\
+            (self._rescued["total"],self._total_loners,
             float(self._rescued["total"]+1)/(self._total_loners+1),
             len(self._tasks))
 
@@ -335,20 +327,18 @@ class ChaserClass(Process):
     def __sort_and_index__(self,path):
         pass
 
-    def __get_loner_temp_path__(self,loner_type,sub_classifier,level=0,unique=""):
-        return "%s/%s_%s_%s_%d_level_%d_%s%s.bam" %\
-            (self.const.temp_dir,self._source,loner_type,self.pid,time.time(),level,sub_classifier,unique)
+    def __get_loner_temp_path__(self,loner_type,level=0,unique=""):
+        return "%s/%s_%s_lvl%d_typ%s%s.bam" %\
+            (self.const.temp_dir,self._source,self.pid,level,loner_type,unique)
 
 class PrimaryTask(ChaserClass):
 
-    def __init__(self,object unsorted_paths,object outqu,object const,str source,list loner_types,int order):
+    def __init__(self,object unsorted_paths,object outqu,object const,str source):
         super(PrimaryTask,self).__init__(const,source)
         
-        self._order = order
         self._unsorted_paths = unsorted_paths
         self._unsorted_path = unsorted_paths[0]
         self._outqu = outqu
-        self._loner_types = loner_types
 
     def run(self):
         #speedup
@@ -365,35 +355,19 @@ class PrimaryTask(ChaserClass):
         classifier_bins = self.__get_classifier_bins__(unsorted_object)
 
         for read in self.__read_generator__():
-            if read.is_unmapped and read.mate_is_unmapped:
-                current_type = "both_unmapped"
-            elif not read.is_unmapped and not read.mate_is_unmapped:
-                current_type = "both_mapped"
-            else:
-                current_type = "one_mapped"
-
-            sub_classifier = self.__get_sub_classifier__(current_type,read,classifier_bins)
-            write_loner(loner_holder,current_type,sub_classifier,unsorted_object,read)
-
-            loner_counts[current_type] += 1
+            
+            loner_type = self.__get_loner_type__(read,classifier_bins)
+            loner_counts[loner_type] += 1
             loner_total += 1
+
+            write_loner(loner_holder,loner_type,unsorted_object,read)
 
         unsorted_object.close()
         loner_paths = self.__get_paths_and_close__(loner_holder)
 
-        loner_pack = ChaserPackage(name="all",results=loner_paths,destroy=False,level=0,source=self._source,
-            chaser_type="primary",total=loner_total,sub_classifier=None,order=self._order)
+        loner_pack = PrimaryPackage(results=loner_paths,source=self._source,
+            chaser_type="primary",total=loner_total)
         self._outqu.put(loner_pack)
-
-    def __read_generator__(self,second_pass=False):
-        for path in self._loner_paths:
-            loner_object = pysam.AlignmentFile(path,"rb")
-            for read in loner_object.fetch(until_eof=True):
-                yield read
-            loner_object.close()
-            if second_pass:
-                os.remove(path)
-        gc.collect()
 
     def __read_generator__(self):
         for path in self._unsorted_paths:
@@ -403,7 +377,6 @@ class PrimaryTask(ChaserClass):
                 yield read
             loner_object.close()
             os.remove(path)
-            #os.remove(path+".bai")
         gc.collect()
 
     def __get_classifier_bins__(self,unsorted_object):
@@ -422,19 +395,17 @@ class PrimaryTask(ChaserClass):
         else:
             return list(np.digitize( range(len(unsorted_object.references)) , range(0,len(unsorted_object.references),2)))
 
-    def __get_sub_classifier__(self,loner_type,read,bins):
-        if loner_type == "both_mapped":
+    def __get_loner_type__(self,read,bins):
+        if not read.is_unmapped and not read.mate_is_unmapped:
             if read.reference_id == read.next_reference_id:
                 return "0-0"
             else:
                 class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
                 return "%d-%d" % tuple(class_bins)
-        elif loner_type == "both_unmapped":
+        elif read.is_unmapped and read.mate_is_unmapped:
             return "u-u"
-        elif loner_type == "one_mapped":
-            return "u-m" #mate reference not loaded properly
         else:
-            return "e-e"
+            return "u-m"
 
     def __order_reference_number__(self,read_ref,mate_ref):
         if min((read_ref,mate_ref)) == read_ref:
@@ -444,35 +415,31 @@ class PrimaryTask(ChaserClass):
 
     def __get_loner_holder__(self):
         holder = {}
-        for loner_type in self._loner_types:
-            holder[loner_type] = {}
         return holder
 
-    def __get_loner_object__(self,loner_type,sub_classifier,unsorted_object):
-        path = self.__get_loner_temp_path__(loner_type,sub_classifier,0)
+    def __get_loner_object__(self,loner_type,unsorted_object):
+        path = self.__get_loner_temp_path__(loner_type,0)
         return pysam.AlignmentFile(path,"wb",template=unsorted_object)
 
-    def __write_loner__(self,loner_objects,loner_type,sub_classifier,unsorted_object,read):
+    def __write_loner__(self,loner_objects,loner_type,unsorted_object,read):
         try:
-            loner_objects[loner_type][sub_classifier].write(read)
+            loner_objects[loner_type].write(read)
         except KeyError:
-            new_bam_object = self.__get_loner_object__(loner_type,sub_classifier,unsorted_object)
-            loner_objects[loner_type][sub_classifier] = new_bam_object
-            loner_objects[loner_type][sub_classifier].write(read)
+            new_bam_object = self.__get_loner_object__(loner_type,unsorted_object)
+            loner_objects[loner_type] = new_bam_object
+            loner_objects[loner_type].write(read)
 
     def __get_paths_and_close__(self,loner_holder):
         paths = {}
-        for loner_type,sub_classifier_dict in loner_holder.items():
-            paths[loner_type] = {}
-            for sub_classifier,loner_object in sub_classifier_dict.items():
-                paths[loner_type][sub_classifier] = loner_object.filename
-                loner_object.close()
+        for loner_type,loner_object in loner_holder.items():
+            paths[loner_type] = loner_object.filename
+            loner_object.close()
         return paths
 
 class MatchMakerTask(ChaserClass):
 
     def __init__(self,object loner_paths,object outqu,object const,str source,
-        str loner_type,int level,str sub_classifier,int max_order,object child_package):
+        str loner_type,int level,object child_package):
 
         super(MatchMakerTask,self).__init__(const,source)
         
@@ -481,14 +448,13 @@ class MatchMakerTask(ChaserClass):
         self._outqu = outqu
         self._loner_type = loner_type
         self._level = level
-        self._sub_classifier = sub_classifier
-        self._max_order = max_order
         self._header = self.__get_header__(self._loner_paths[0])
+        self._leftover_paths = []
 
     def run(self):
-        loner_paths = [] 
-        loner_objects = []
-        self.__new_loner_setup__(loner_paths,loner_objects)
+
+        loner_path = self.__get_loner_temp_path__(self._loner_type,self._level+1)
+        loner_object = self.__get_loner_object__(loner_path)
 
         cdef dict pairs = self.__first_pass__()
         cdef dict read_pairs = {}
@@ -499,7 +465,6 @@ class MatchMakerTask(ChaserClass):
         for read in self.__read_generator__(second_pass=True):
             try:
                 status = pairs[read.qname]
-
                 try:
                     read_pairs[read.qname].append(read)
                 except KeyError:
@@ -518,11 +483,8 @@ class MatchMakerTask(ChaserClass):
 
             except KeyError:
                 written += 1
-                if written % 2500000 == 0:
-                    self.__new_loner_setup__(loner_paths,loner_objects)           
-                loner_objects[-1].write(read)
-
-        loner_objects[-1].close()
+                loner_object.write(read)
+        loner_object.close()
 
         if len(send_pairs) > 0:
             rescued += self.__launch_child_task__(send_pairs)
@@ -532,12 +494,19 @@ class MatchMakerTask(ChaserClass):
 
         gc.collect()
 
-        if written == 0:
-            os.remove(loner_paths[-1])
-            loner_path = None
+        return_paths = []
 
-        loner_pack = ChaserPackage(name=self._loner_type,results=loner_paths,destroy=False,level=self._level+1,
-                source=self._source,chaser_type="match_maker",total=rescued,sub_classifier=self._sub_classifier,order=self._max_order)
+        if written == 0:
+            os.remove(loner_path)
+        else:
+            return_paths.append((self._level+1,loner_path))
+
+        if len(self._leftover_paths) > 1:
+            for leftover_path in self._leftover_paths:
+                return_paths.append((self._level,leftover_path))
+
+        loner_pack = MatchMakerPackage(loner_type=self._loner_type,results=return_paths,level=self._level+1,
+                source=self._source,chaser_type="match_maker",total=rescued)
         self._outqu.put(loner_pack)
 
     def __get_header__(self,path):
@@ -545,19 +514,6 @@ class MatchMakerTask(ChaserClass):
         header = bam_object.header
         bam_object.close()
         return header
-
-    def __new_loner_setup__(self,loner_paths,loner_objects):
-        unique = ""
-        if len(loner_objects) > 0:
-            loner_objects[-1].close()
-            unique = "_%d" % (len(loner_objects),)
-
-        loner_paths.append(self.__get_loner_temp_path__(self._loner_type,self._sub_classifier,self._level+1,unique=unique))
-        loner_objects.append(self.__get_loner_object__(loner_paths[-1]))
-
-    def __remove_paths__(self):
-        for path in self._loner_paths:
-            os.remove(path)
 
     def __first_pass__(self):
         cdef dict pairs = {}
@@ -573,13 +529,34 @@ class MatchMakerTask(ChaserClass):
         return dict(filter( lambda tup : tup[1], iter(pairs.items()) ))
 
     def __read_generator__(self,second_pass=False):
+        count = 3000000 // len(self._loner_paths)
+        count_limit = False
         for path in self._loner_paths:
             loner_object = pysam.AlignmentFile(path,"rb")
-            for read in loner_object.fetch(until_eof=True):
+            bam_iterator = loner_object.fetch(until_eof=True)
+           
+            for i,read in enumerate(bam_iterator):
+                if i == count:
+                    count_limit = True
+                    break 
                 yield read
-            loner_object.close()
+            
             if second_pass:
+                if count_limit:
+                    count_limit = False
+                    leftover_count = 0
+                    leftover_object = self.__get_leftover_object__(len(self._leftover_paths))
+                    for read in bam_iterator:
+                        leftover_count += 1
+                        leftover_object.write(read)
+                    leftover_object.close()
+                    
+                    if leftover_count > 0:
+                        self._leftover_paths.append(leftover_object.filename)
+                    else:
+                        os.remove(leftover_object.filename)
                 os.remove(path)
+            loner_object.close()
         gc.collect()
 
     def __launch_child_task__(self,pairs):
@@ -590,6 +567,11 @@ class MatchMakerTask(ChaserClass):
         task.start()
         task.join()
         return len(pairs)
+
+    def __get_leftover_object__(self,unique):
+        path = self.__get_loner_temp_path__(self._loner_type,self._level,"-%d" % (unique,))
+        leftover = pysam.AlignmentFile(path,"wb",header=self._header)
+        return leftover
 
     def __get_loner_object__(self,path):
         loner_object = pysam.AlignmentFile(path,"wb",header=self._header)
