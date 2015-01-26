@@ -231,8 +231,8 @@ void __Pyx_call_destructor(T* x) {
 #define _USE_MATH_DEFINES
 #endif
 #include <math.h>
-#define __PYX_HAVE__stat
-#define __PYX_HAVE_API__stat
+#define __PYX_HAVE__parabam__command__stat
+#define __PYX_HAVE_API__parabam__command__stat
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -415,7 +415,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "stat.pyx",
+  "parabam/command/stat.pyx",
 };
 
 /*--- Type declarations ---*/
@@ -792,70 +792,70 @@ static int __Pyx_check_binary_version(void);
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 
-/* Module declarations from 'stat' */
-#define __Pyx_MODULE_NAME "stat"
-int __pyx_module_is_main_stat = 0;
+/* Module declarations from 'parabam.command.stat' */
+#define __Pyx_MODULE_NAME "parabam.command.stat"
+int __pyx_module_is_main_parabam__command__stat = 0;
 
-/* Implementation of 'stat' */
+/* Implementation of 'parabam.command.stat' */
 static PyObject *__pyx_builtin_object;
 static PyObject *__pyx_builtin_super;
 static PyObject *__pyx_builtin_open;
 static PyObject *__pyx_builtin_Exception;
 static PyObject *__pyx_builtin_zip;
-static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_outqu, PyObject *__pyx_v_curproc, PyObject *__pyx_v_destroy, PyObject *__pyx_v_const, PyObject *__pyx_v_source); /* proto */
-static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_structures); /* proto */
-static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_master); /* proto */
-static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_inqu, PyObject *__pyx_v_const); /* proto */
-static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_new_package, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
-static PyObject *__pyx_pf_4stat_11HandlerStat_4__periodic_action__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_iterations); /* proto */
-static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
-static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_names, PyObject *__pyx_v_user_structures); /* proto */
-static PyObject *__pyx_pf_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_outqu, PyObject *__pyx_v_const, PyObject *__pyx_v_TaskClass, PyObject *__pyx_v_task_args); /* proto */
-static PyObject *__pyx_pf_4stat_13ProcessorStat_2__get_master_bam__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_master_file_path); /* proto */
-static PyObject *__pyx_pf_4stat_13ProcessorStat_4__add_to_collection__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_master, PyObject *__pyx_v_alig, PyObject *__pyx_v_collection); /* proto */
-static PyObject *__pyx_pf_4stat_13ProcessorStat_6__pre_processor__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_master_file_path); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_2max_decision(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_existing); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_4min_decision(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_exisiting); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_6empty_clone(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_8add_max(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_10add_min(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_12add_cumu(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_14merge_max(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_16merge_min(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_18merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_13UserStructure_20write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_source); /* proto */
-static PyObject *__pyx_pf_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data, PyObject *__pyx_v_log_scaling); /* proto */
-static PyObject *__pyx_pf_4stat_16NumericStructure_2empty_clone(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4stat_16NumericStructure_4add_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_16NumericStructure_6add_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_16NumericStructure_8add_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_out_paths, PyObject *__pyx_v_source, PyObject *__pyx_v_mode); /* proto */
-static PyObject *__pyx_pf_4stat_14ArrayStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data); /* proto */
-static PyObject *__pyx_pf_4stat_14ArrayStructure_2empty_clone(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords); /* proto */
-static PyObject *__pyx_pf_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords); /* proto */
-static PyObject *__pyx_pf_4stat_14ArrayStructure_8add_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords); /* proto */
-static PyObject *__pyx_pf_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
-static PyObject *__pyx_pf_4stat_14ArrayStructure_16write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_out_path, CYTHON_UNUSED PyObject *__pyx_v_source, CYTHON_UNUSED PyObject *__pyx_v_mode); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_temp_dir, PyObject *__pyx_v_exe_dir); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_parser); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_input_bams, PyObject *__pyx_v_user_specified_outpath, PyObject *__pyx_v_proc, PyObject *__pyx_v_chunk, PyObject *__pyx_v_user_constants, PyObject *__pyx_v_user_engine, PyObject *__pyx_v_user_struc_blueprint, PyObject *__pyx_v_outmode, PyObject *__pyx_v_multi, PyObject *__pyx_v_verbose, PyObject *__pyx_v_engine_is_class); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_output_path, CYTHON_UNUSED PyObject *__pyx_v_user_structures, PyObject *__pyx_v_outmode, PyObject *__pyx_v_analysis_names); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_8__create_handlers__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_task_qu, PyObject *__pyx_v_const); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_task_qu, PyObject *__pyx_v_output_group, PyObject *__pyx_v_engine_is_class, PyObject *__pyx_v_user_engine, PyObject *__pyx_v_const); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_input_group, PyObject *__pyx_v_output_group); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_outmode, PyObject *__pyx_v_output_group, PyObject *__pyx_v_user_structures); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_mode, PyObject *__pyx_v_source, CYTHON_UNUSED PyObject *__pyx_v_name); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_user_structures); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_user_structures_blueprint); /* proto */
-static PyObject *__pyx_pf_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_outqu, PyObject *__pyx_v_curproc, PyObject *__pyx_v_destroy, PyObject *__pyx_v_const, PyObject *__pyx_v_source); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_structures); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_master); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_inqu, PyObject *__pyx_v_const); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_new_package, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_4__periodic_action__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_iterations); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_names, PyObject *__pyx_v_user_structures); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_outqu, PyObject *__pyx_v_const, PyObject *__pyx_v_TaskClass, PyObject *__pyx_v_task_args); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13ProcessorStat_2__get_master_bam__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_master_file_path); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13ProcessorStat_4__add_to_collection__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_master, PyObject *__pyx_v_alig, PyObject *__pyx_v_collection); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13ProcessorStat_6__pre_processor__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_master_file_path); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_2max_decision(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_existing); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_4min_decision(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_exisiting); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_6empty_clone(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_8add_max(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_10add_min(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_12add_cumu(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_14merge_max(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_16merge_min(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_18merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_20write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_source); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data, PyObject *__pyx_v_log_scaling); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_2empty_clone(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_4add_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_6add_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_8add_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_out_paths, PyObject *__pyx_v_source, PyObject *__pyx_v_mode); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_2empty_clone(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_8add_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_16write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_out_path, CYTHON_UNUSED PyObject *__pyx_v_source, CYTHON_UNUSED PyObject *__pyx_v_mode); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_temp_dir, PyObject *__pyx_v_exe_dir); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_parser); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_input_bams, PyObject *__pyx_v_user_specified_outpath, PyObject *__pyx_v_proc, PyObject *__pyx_v_chunk, PyObject *__pyx_v_user_constants, PyObject *__pyx_v_user_engine, PyObject *__pyx_v_user_struc_blueprint, PyObject *__pyx_v_outmode, PyObject *__pyx_v_multi, PyObject *__pyx_v_verbose, PyObject *__pyx_v_engine_is_class); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_6__create_output_files__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_output_path, CYTHON_UNUSED PyObject *__pyx_v_user_structures, PyObject *__pyx_v_outmode, PyObject *__pyx_v_analysis_names); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_8__create_handlers__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_task_qu, PyObject *__pyx_v_const); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_task_qu, PyObject *__pyx_v_output_group, PyObject *__pyx_v_engine_is_class, PyObject *__pyx_v_user_engine, PyObject *__pyx_v_const); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_12__create_master_file_paths__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_input_group, PyObject *__pyx_v_output_group); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_14__create_individual_output_files__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_outmode, PyObject *__pyx_v_output_group, PyObject *__pyx_v_user_structures); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_mode, PyObject *__pyx_v_source, CYTHON_UNUSED PyObject *__pyx_v_name); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_user_structures); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_20__create_structures__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_user_structures_blueprint); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
 static char __pyx_k_a[] = "a";
 static char __pyx_k_b[] = "b";
 static char __pyx_k_c[] = "c";
@@ -903,7 +903,6 @@ static char __pyx_k_open[] = "open";
 static char __pyx_k_proc[] = "proc";
 static char __pyx_k_s_3f[] = "%s,%.3f\n";
 static char __pyx_k_self[] = "self";
-static char __pyx_k_stat[] = "stat";
 static char __pyx_k_test[] = "__test__";
 static char __pyx_k_time[] = "time";
 static char __pyx_k_Const[] = "Const";
@@ -1088,6 +1087,7 @@ static char __pyx_k_master_output_paths[] = "master_output_paths";
 static char __pyx_k_Interface_get_parser[] = "Interface.get_parser";
 static char __pyx_k_ProcessorStat___init[] = "ProcessorStat.__init__";
 static char __pyx_k_UserStructure___init[] = "UserStructure.__init__";
+static char __pyx_k_parabam_command_stat[] = "parabam.command.stat";
 static char __pyx_k_user_struc_blueprint[] = "user_struc_blueprint";
 static char __pyx_k_ArrayStructure___init[] = "ArrayStructure.__init__";
 static char __pyx_k_UserStructure_add_max[] = "UserStructure.add_max";
@@ -1372,6 +1372,7 @@ static PyObject *__pyx_n_s_outqu;
 static PyObject *__pyx_n_s_p;
 static PyObject *__pyx_n_s_package;
 static PyObject *__pyx_n_s_parabam;
+static PyObject *__pyx_n_s_parabam_command_stat;
 static PyObject *__pyx_n_s_parse_args;
 static PyObject *__pyx_n_s_parser;
 static PyObject *__pyx_n_s_periodic_action;
@@ -1402,7 +1403,6 @@ static PyObject *__pyx_n_s_source_2;
 static PyObject *__pyx_n_s_source_structures;
 static PyObject *__pyx_n_s_sources;
 static PyObject *__pyx_n_s_sources_2;
-static PyObject *__pyx_n_s_stat;
 static PyObject *__pyx_n_s_store_method;
 static PyObject *__pyx_n_s_struc;
 static PyObject *__pyx_n_s_struc_type;
@@ -1558,7 +1558,7 @@ static PyObject *__pyx_codeobj__117;
 static PyObject *__pyx_codeobj__119;
 static PyObject *__pyx_codeobj__121;
 
-/* "stat.pyx":17
+/* "parabam/command/stat.pyx":17
  * 	__metaclass__ = ABCMeta
  * 
  * 	def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):             # <<<<<<<<<<<<<<
@@ -1567,9 +1567,9 @@ static PyObject *__pyx_codeobj__121;
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_8TaskStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_8TaskStat_1__init__ = {"__init__", (PyCFunction)__pyx_pw_4stat_8TaskStat_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_8TaskStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_8TaskStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_8TaskStat_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_8TaskStat_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_8TaskStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_task_set = 0;
   PyObject *__pyx_v_outqu = 0;
@@ -1662,12 +1662,12 @@ static PyObject *__pyx_pw_4stat_8TaskStat_1__init__(PyObject *__pyx_self, PyObje
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__init__", 1, 7, 7, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.TaskStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.TaskStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_source), (&PyString_Type), 1, "source", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_4stat_8TaskStat___init__(__pyx_self, __pyx_v_self, __pyx_v_task_set, __pyx_v_outqu, __pyx_v_curproc, __pyx_v_destroy, __pyx_v_const, __pyx_v_source);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_8TaskStat___init__(__pyx_self, __pyx_v_self, __pyx_v_task_set, __pyx_v_outqu, __pyx_v_curproc, __pyx_v_destroy, __pyx_v_const, __pyx_v_source);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1678,7 +1678,7 @@ static PyObject *__pyx_pw_4stat_8TaskStat_1__init__(PyObject *__pyx_self, PyObje
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_outqu, PyObject *__pyx_v_curproc, PyObject *__pyx_v_destroy, PyObject *__pyx_v_const, PyObject *__pyx_v_source) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_outqu, PyObject *__pyx_v_curproc, PyObject *__pyx_v_destroy, PyObject *__pyx_v_const, PyObject *__pyx_v_source) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1689,7 +1689,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "stat.pyx":18
+  /* "parabam/command/stat.pyx":18
  * 
  * 	def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
  * 		super(TaskStat, self).__init__(task_set=task_set,             # <<<<<<<<<<<<<<
@@ -1716,7 +1716,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_task_set, __pyx_v_task_set) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":19
+  /* "parabam/command/stat.pyx":19
  * 	def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
  * 		super(TaskStat, self).__init__(task_set=task_set,
  * 										outqu=outqu,             # <<<<<<<<<<<<<<
@@ -1725,7 +1725,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
  */
   if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_outqu, __pyx_v_outqu) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":20
+  /* "parabam/command/stat.pyx":20
  * 		super(TaskStat, self).__init__(task_set=task_set,
  * 										outqu=outqu,
  * 										curproc=curproc,             # <<<<<<<<<<<<<<
@@ -1734,7 +1734,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
  */
   if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_curproc, __pyx_v_curproc) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":21
+  /* "parabam/command/stat.pyx":21
  * 										outqu=outqu,
  * 										curproc=curproc,
  * 										destroy=destroy,             # <<<<<<<<<<<<<<
@@ -1743,7 +1743,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
  */
   if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_destroy, __pyx_v_destroy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":22
+  /* "parabam/command/stat.pyx":22
  * 										curproc=curproc,
  * 										destroy=destroy,
  * 										const=const)             # <<<<<<<<<<<<<<
@@ -1752,7 +1752,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
  */
   if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_const, __pyx_v_const) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":18
+  /* "parabam/command/stat.pyx":18
  * 
  * 	def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
  * 		super(TaskStat, self).__init__(task_set=task_set,             # <<<<<<<<<<<<<<
@@ -1765,7 +1765,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":23
+  /* "parabam/command/stat.pyx":23
  * 										destroy=destroy,
  * 										const=const)
  * 		self._source = source             # <<<<<<<<<<<<<<
@@ -1774,7 +1774,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_source_2, __pyx_v_source) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 23; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":24
+  /* "parabam/command/stat.pyx":24
  * 										const=const)
  * 		self._source = source
  * 		self._master_file_path = const.master_file_path[self._source]             # <<<<<<<<<<<<<<
@@ -1792,7 +1792,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_master_file_path_2, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 24; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":25
+  /* "parabam/command/stat.pyx":25
  * 		self._source = source
  * 		self._master_file_path = const.master_file_path[self._source]
  * 		self._counts = {}             # <<<<<<<<<<<<<<
@@ -1804,7 +1804,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_counts, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":26
+  /* "parabam/command/stat.pyx":26
  * 		self._master_file_path = const.master_file_path[self._source]
  * 		self._counts = {}
  * 		self._local_structures = {}             # <<<<<<<<<<<<<<
@@ -1816,7 +1816,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_local_structures, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":17
+  /* "parabam/command/stat.pyx":17
  * 	__metaclass__ = ABCMeta
  * 
  * 	def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):             # <<<<<<<<<<<<<<
@@ -1831,7 +1831,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("stat.TaskStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.TaskStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1839,7 +1839,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
   return __pyx_r;
 }
 
-/* "stat.pyx":28
+/* "parabam/command/stat.pyx":28
  * 		self._local_structures = {}
  * 
  * 	def __generate_results__(self):             # <<<<<<<<<<<<<<
@@ -1848,20 +1848,20 @@ static PyObject *__pyx_pf_4stat_8TaskStat___init__(CYTHON_UNUSED PyObject *__pyx
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_8TaskStat_3__generate_results__(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_8TaskStat_3__generate_results__ = {"__generate_results__", (PyCFunction)__pyx_pw_4stat_8TaskStat_3__generate_results__, METH_O, 0};
-static PyObject *__pyx_pw_4stat_8TaskStat_3__generate_results__(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_8TaskStat_3__generate_results__(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_8TaskStat_3__generate_results__ = {"__generate_results__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_8TaskStat_3__generate_results__, METH_O, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_8TaskStat_3__generate_results__(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__generate_results__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_4stat_8TaskStat_2__generate_results__(__pyx_self, ((PyObject *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_8TaskStat_2__generate_results__(__pyx_self, ((PyObject *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_v_master = NULL;
   PyObject *__pyx_v_name = NULL;
   PyObject *__pyx_v_struct = NULL;
@@ -1881,7 +1881,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__generate_results__", 0);
 
-  /* "stat.pyx":29
+  /* "parabam/command/stat.pyx":29
  * 
  * 	def __generate_results__(self):
  * 		master = pysam.Samfile(self._master_file_path,"rb")             # <<<<<<<<<<<<<<
@@ -1925,7 +1925,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   __pyx_v_master = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":31
+  /* "parabam/command/stat.pyx":31
  * 		master = pysam.Samfile(self._master_file_path,"rb")
  * 
  * 		for name,struct in self.const.user_structures.items():             # <<<<<<<<<<<<<<
@@ -2051,7 +2051,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
     __Pyx_XDECREF_SET(__pyx_v_struct, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":32
+    /* "parabam/command/stat.pyx":32
  * 
  * 		for name,struct in self.const.user_structures.items():
  * 			self._local_structures[name] = struct.empty_clone()             # <<<<<<<<<<<<<<
@@ -2084,7 +2084,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "stat.pyx":33
+    /* "parabam/command/stat.pyx":33
  * 		for name,struct in self.const.user_structures.items():
  * 			self._local_structures[name] = struct.empty_clone()
  * 			self._counts[name] = 0             # <<<<<<<<<<<<<<
@@ -2096,7 +2096,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
     if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_v_name, __pyx_int_0) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "stat.pyx":31
+    /* "parabam/command/stat.pyx":31
  * 		master = pysam.Samfile(self._master_file_path,"rb")
  * 
  * 		for name,struct in self.const.user_structures.items():             # <<<<<<<<<<<<<<
@@ -2106,7 +2106,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":35
+  /* "parabam/command/stat.pyx":35
  * 			self._counts[name] = 0
  * 
  * 		self.__handle_task_set__(self._task_set,master)             # <<<<<<<<<<<<<<
@@ -2146,7 +2146,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":37
+  /* "parabam/command/stat.pyx":37
  * 		self.__handle_task_set__(self._task_set,master)
  * 
  * 		master.close() #Close the master bamfile             # <<<<<<<<<<<<<<
@@ -2175,7 +2175,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":39
+  /* "parabam/command/stat.pyx":39
  * 		master.close() #Close the master bamfile
  * 
  * 		results = {}             # <<<<<<<<<<<<<<
@@ -2187,7 +2187,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   __pyx_v_results = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "stat.pyx":40
+  /* "parabam/command/stat.pyx":40
  * 
  * 		results = {}
  * 		results["source"] = self._source             # <<<<<<<<<<<<<<
@@ -2199,7 +2199,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   if (unlikely(PyDict_SetItem(__pyx_v_results, __pyx_n_s_source, __pyx_t_3) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 40; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":41
+  /* "parabam/command/stat.pyx":41
  * 		results = {}
  * 		results["source"] = self._source
  * 		results["structures"] = self.__unpack_structures__(self._local_structures)             # <<<<<<<<<<<<<<
@@ -2239,7 +2239,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   if (unlikely(PyDict_SetItem(__pyx_v_results, __pyx_n_s_structures, __pyx_t_3) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":42
+  /* "parabam/command/stat.pyx":42
  * 		results["source"] = self._source
  * 		results["structures"] = self.__unpack_structures__(self._local_structures)
  * 		results["counts"] = self._counts             # <<<<<<<<<<<<<<
@@ -2251,7 +2251,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   if (unlikely(PyDict_SetItem(__pyx_v_results, __pyx_n_s_counts_2, __pyx_t_3) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":44
+  /* "parabam/command/stat.pyx":44
  * 		results["counts"] = self._counts
  * 
  * 		return results             # <<<<<<<<<<<<<<
@@ -2263,7 +2263,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   __pyx_r = __pyx_v_results;
   goto __pyx_L0;
 
-  /* "stat.pyx":28
+  /* "parabam/command/stat.pyx":28
  * 		self._local_structures = {}
  * 
  * 	def __generate_results__(self):             # <<<<<<<<<<<<<<
@@ -2278,7 +2278,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.TaskStat.__generate_results__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.TaskStat.__generate_results__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_master);
@@ -2290,7 +2290,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "stat.pyx":46
+/* "parabam/command/stat.pyx":46
  * 		return results
  * 
  * 	def __unpack_structures__(self,structures):             # <<<<<<<<<<<<<<
@@ -2299,9 +2299,9 @@ static PyObject *__pyx_pf_4stat_8TaskStat_2__generate_results__(CYTHON_UNUSED Py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_8TaskStat_5__unpack_structures__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_8TaskStat_5__unpack_structures__ = {"__unpack_structures__", (PyCFunction)__pyx_pw_4stat_8TaskStat_5__unpack_structures__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_8TaskStat_5__unpack_structures__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_8TaskStat_5__unpack_structures__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_8TaskStat_5__unpack_structures__ = {"__unpack_structures__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_8TaskStat_5__unpack_structures__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_8TaskStat_5__unpack_structures__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_structures = 0;
   int __pyx_lineno = 0;
@@ -2349,18 +2349,18 @@ static PyObject *__pyx_pw_4stat_8TaskStat_5__unpack_structures__(PyObject *__pyx
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__unpack_structures__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.TaskStat.__unpack_structures__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.TaskStat.__unpack_structures__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_8TaskStat_4__unpack_structures__(__pyx_self, __pyx_v_self, __pyx_v_structures);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_8TaskStat_4__unpack_structures__(__pyx_self, __pyx_v_self, __pyx_v_structures);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_structures) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_structures) {
   PyObject *__pyx_v_unpacked = NULL;
   PyObject *__pyx_v_name = NULL;
   PyObject *__pyx_v_struc = NULL;
@@ -2380,7 +2380,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED P
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__unpack_structures__", 0);
 
-  /* "stat.pyx":47
+  /* "parabam/command/stat.pyx":47
  * 
  * 	def __unpack_structures__(self,structures):
  * 		unpacked = []             # <<<<<<<<<<<<<<
@@ -2392,7 +2392,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED P
   __pyx_v_unpacked = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":48
+  /* "parabam/command/stat.pyx":48
  * 	def __unpack_structures__(self,structures):
  * 		unpacked = []
  * 		for name,struc in structures.items():             # <<<<<<<<<<<<<<
@@ -2512,7 +2512,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED P
     __Pyx_XDECREF_SET(__pyx_v_struc, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "stat.pyx":49
+    /* "parabam/command/stat.pyx":49
  * 		unpacked = []
  * 		for name,struc in structures.items():
  * 			unpacked.append( (name,struc.data) )             # <<<<<<<<<<<<<<
@@ -2532,7 +2532,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED P
     __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_unpacked, __pyx_t_6); if (unlikely(__pyx_t_9 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 49; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "stat.pyx":48
+    /* "parabam/command/stat.pyx":48
  * 	def __unpack_structures__(self,structures):
  * 		unpacked = []
  * 		for name,struc in structures.items():             # <<<<<<<<<<<<<<
@@ -2542,7 +2542,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED P
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":51
+  /* "parabam/command/stat.pyx":51
  * 			unpacked.append( (name,struc.data) )
  * 
  * 		return unpacked             # <<<<<<<<<<<<<<
@@ -2554,7 +2554,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED P
   __pyx_r = __pyx_v_unpacked;
   goto __pyx_L0;
 
-  /* "stat.pyx":46
+  /* "parabam/command/stat.pyx":46
  * 		return results
  * 
  * 	def __unpack_structures__(self,structures):             # <<<<<<<<<<<<<<
@@ -2569,7 +2569,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED P
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("stat.TaskStat.__unpack_structures__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.TaskStat.__unpack_structures__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_unpacked);
@@ -2580,7 +2580,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED P
   return __pyx_r;
 }
 
-/* "stat.pyx":53
+/* "parabam/command/stat.pyx":53
  * 		return unpacked
  * 
  * 	def __handle_task_set__(self,task_set,master):             # <<<<<<<<<<<<<<
@@ -2589,9 +2589,9 @@ static PyObject *__pyx_pf_4stat_8TaskStat_4__unpack_structures__(CYTHON_UNUSED P
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_8TaskStat_7__handle_task_set__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_8TaskStat_7__handle_task_set__ = {"__handle_task_set__", (PyCFunction)__pyx_pw_4stat_8TaskStat_7__handle_task_set__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_8TaskStat_7__handle_task_set__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_8TaskStat_7__handle_task_set__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_8TaskStat_7__handle_task_set__ = {"__handle_task_set__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_8TaskStat_7__handle_task_set__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_8TaskStat_7__handle_task_set__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_task_set = 0;
   PyObject *__pyx_v_master = 0;
@@ -2648,18 +2648,18 @@ static PyObject *__pyx_pw_4stat_8TaskStat_7__handle_task_set__(PyObject *__pyx_s
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__handle_task_set__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.TaskStat.__handle_task_set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.TaskStat.__handle_task_set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_8TaskStat_6__handle_task_set__(__pyx_self, __pyx_v_self, __pyx_v_task_set, __pyx_v_master);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_8TaskStat_6__handle_task_set__(__pyx_self, __pyx_v_self, __pyx_v_task_set, __pyx_v_master);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_master) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_master) {
   PyObject *__pyx_v_engine = NULL;
   PyObject *__pyx_v_constants = NULL;
   PyObject *__pyx_v_local_structures = NULL;
@@ -2686,7 +2686,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__handle_task_set__", 0);
 
-  /* "stat.pyx":54
+  /* "parabam/command/stat.pyx":54
  * 
  * 	def __handle_task_set__(self,task_set,master):
  * 		engine = self.const.user_engine             # <<<<<<<<<<<<<<
@@ -2701,7 +2701,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
   __pyx_v_engine = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "stat.pyx":55
+  /* "parabam/command/stat.pyx":55
  * 	def __handle_task_set__(self,task_set,master):
  * 		engine = self.const.user_engine
  * 		constants = self.const.user_constants             # <<<<<<<<<<<<<<
@@ -2716,7 +2716,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
   __pyx_v_constants = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":56
+  /* "parabam/command/stat.pyx":56
  * 		engine = self.const.user_engine
  * 		constants = self.const.user_constants
  * 		local_structures = self._local_structures             # <<<<<<<<<<<<<<
@@ -2728,7 +2728,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
   __pyx_v_local_structures = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":57
+  /* "parabam/command/stat.pyx":57
  * 		constants = self.const.user_constants
  * 		local_structures = self._local_structures
  * 		for alig in task_set:             # <<<<<<<<<<<<<<
@@ -2775,7 +2775,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
     __Pyx_XDECREF_SET(__pyx_v_alig, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":58
+    /* "parabam/command/stat.pyx":58
  * 		local_structures = self._local_structures
  * 		for alig in task_set:
  * 			results = engine(alig,constants,master)             # <<<<<<<<<<<<<<
@@ -2816,7 +2816,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
     __Pyx_XDECREF_SET(__pyx_v_results, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":59
+    /* "parabam/command/stat.pyx":59
  * 		for alig in task_set:
  * 			results = engine(alig,constants,master)
  * 			if results:             # <<<<<<<<<<<<<<
@@ -2826,7 +2826,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
     __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_results); if (unlikely(__pyx_t_9 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (__pyx_t_9) {
 
-      /* "stat.pyx":60
+      /* "parabam/command/stat.pyx":60
  * 			results = engine(alig,constants,master)
  * 			if results:
  * 				for name,package in results.items():             # <<<<<<<<<<<<<<
@@ -2946,7 +2946,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
         __Pyx_XDECREF_SET(__pyx_v_package, __pyx_t_6);
         __pyx_t_6 = 0;
 
-        /* "stat.pyx":61
+        /* "parabam/command/stat.pyx":61
  * 			if results:
  * 				for name,package in results.items():
  * 					self._counts[name] += 1             # <<<<<<<<<<<<<<
@@ -2967,7 +2967,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "stat.pyx":62
+        /* "parabam/command/stat.pyx":62
  * 				for name,package in results.items():
  * 					self._counts[name] += 1
  * 					local_structures[name].add(**package)             # <<<<<<<<<<<<<<
@@ -2996,7 +2996,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-        /* "stat.pyx":60
+        /* "parabam/command/stat.pyx":60
  * 			results = engine(alig,constants,master)
  * 			if results:
  * 				for name,package in results.items():             # <<<<<<<<<<<<<<
@@ -3009,7 +3009,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
     }
     __pyx_L5:;
 
-    /* "stat.pyx":57
+    /* "parabam/command/stat.pyx":57
  * 		constants = self.const.user_constants
  * 		local_structures = self._local_structures
  * 		for alig in task_set:             # <<<<<<<<<<<<<<
@@ -3019,7 +3019,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":53
+  /* "parabam/command/stat.pyx":53
  * 		return unpacked
  * 
  * 	def __handle_task_set__(self,task_set,master):             # <<<<<<<<<<<<<<
@@ -3037,7 +3037,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_11);
-  __Pyx_AddTraceback("stat.TaskStat.__handle_task_set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.TaskStat.__handle_task_set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_engine);
@@ -3052,7 +3052,7 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "stat.pyx":66
+/* "parabam/command/stat.pyx":66
  * class HandlerStat(parabam.core.Handler):
  * 
  * 	def __init__(self,object inqu,object const):             # <<<<<<<<<<<<<<
@@ -3061,9 +3061,9 @@ static PyObject *__pyx_pf_4stat_8TaskStat_6__handle_task_set__(CYTHON_UNUSED PyO
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_11HandlerStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_11HandlerStat_1__init__ = {"__init__", (PyCFunction)__pyx_pw_4stat_11HandlerStat_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_11HandlerStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_11HandlerStat_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_11HandlerStat_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_inqu = 0;
   PyObject *__pyx_v_const = 0;
@@ -3120,18 +3120,18 @@ static PyObject *__pyx_pw_4stat_11HandlerStat_1__init__(PyObject *__pyx_self, Py
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__init__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.HandlerStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_11HandlerStat___init__(__pyx_self, __pyx_v_self, __pyx_v_inqu, __pyx_v_const);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_11HandlerStat___init__(__pyx_self, __pyx_v_self, __pyx_v_inqu, __pyx_v_const);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_inqu, PyObject *__pyx_v_const) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_inqu, PyObject *__pyx_v_const) {
   PyObject *__pyx_v_source = NULL;
   CYTHON_UNUSED PyObject *__pyx_v_name = NULL;
   PyObject *__pyx_v_struc = NULL;
@@ -3153,7 +3153,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "stat.pyx":67
+  /* "parabam/command/stat.pyx":67
  * 
  * 	def __init__(self,object inqu,object const):
  * 		super(HandlerStat,self).__init__(inqu,const,destroy_limit=len(const.sources))             # <<<<<<<<<<<<<<
@@ -3201,7 +3201,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":69
+  /* "parabam/command/stat.pyx":69
  * 		super(HandlerStat,self).__init__(inqu,const,destroy_limit=len(const.sources))
  * 
  * 		self._sources = const.sources             # <<<<<<<<<<<<<<
@@ -3213,7 +3213,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_sources_2, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 69; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":70
+  /* "parabam/command/stat.pyx":70
  * 
  * 		self._sources = const.sources
  * 		self._final_structures = {}             # <<<<<<<<<<<<<<
@@ -3225,7 +3225,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_final_structures, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":72
+  /* "parabam/command/stat.pyx":72
  * 		self._final_structures = {}
  * 
  * 		for source in self._sources:             # <<<<<<<<<<<<<<
@@ -3275,7 +3275,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
     __Pyx_XDECREF_SET(__pyx_v_source, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "stat.pyx":73
+    /* "parabam/command/stat.pyx":73
  * 
  * 		for source in self._sources:
  * 			self._final_structures[source] = {}             # <<<<<<<<<<<<<<
@@ -3290,7 +3290,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "stat.pyx":74
+    /* "parabam/command/stat.pyx":74
  * 		for source in self._sources:
  * 			self._final_structures[source] = {}
  * 			for name,struc in self.const.user_structures.items():             # <<<<<<<<<<<<<<
@@ -3416,7 +3416,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
       __Pyx_XDECREF_SET(__pyx_v_struc, __pyx_t_9);
       __pyx_t_9 = 0;
 
-      /* "stat.pyx":75
+      /* "parabam/command/stat.pyx":75
  * 			self._final_structures[source] = {}
  * 			for name,struc in self.const.user_structures.items():
  * 				self._final_structures[source][struc.name] = struc.empty_clone()             # <<<<<<<<<<<<<<
@@ -3455,7 +3455,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "stat.pyx":74
+      /* "parabam/command/stat.pyx":74
  * 		for source in self._sources:
  * 			self._final_structures[source] = {}
  * 			for name,struc in self.const.user_structures.items():             # <<<<<<<<<<<<<<
@@ -3465,7 +3465,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "stat.pyx":72
+    /* "parabam/command/stat.pyx":72
  * 		self._final_structures = {}
  * 
  * 		for source in self._sources:             # <<<<<<<<<<<<<<
@@ -3475,7 +3475,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":66
+  /* "parabam/command/stat.pyx":66
  * class HandlerStat(parabam.core.Handler):
  * 
  * 	def __init__(self,object inqu,object const):             # <<<<<<<<<<<<<<
@@ -3493,7 +3493,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("stat.HandlerStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_source);
@@ -3504,7 +3504,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
   return __pyx_r;
 }
 
-/* "stat.pyx":77
+/* "parabam/command/stat.pyx":77
  * 				self._final_structures[source][struc.name] = struc.empty_clone()
  * 
  * 	def __new_package_action__(self,new_package,**kwargs):             # <<<<<<<<<<<<<<
@@ -3513,9 +3513,9 @@ static PyObject *__pyx_pf_4stat_11HandlerStat___init__(CYTHON_UNUSED PyObject *_
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_11HandlerStat_3__new_package_action__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_11HandlerStat_3__new_package_action__ = {"__new_package_action__", (PyCFunction)__pyx_pw_4stat_11HandlerStat_3__new_package_action__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_11HandlerStat_3__new_package_action__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_3__new_package_action__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_11HandlerStat_3__new_package_action__ = {"__new_package_action__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_11HandlerStat_3__new_package_action__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_3__new_package_action__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_new_package = 0;
   CYTHON_UNUSED PyObject *__pyx_v_kwargs = 0;
@@ -3567,11 +3567,11 @@ static PyObject *__pyx_pw_4stat_11HandlerStat_3__new_package_action__(PyObject *
   __Pyx_RaiseArgtupleInvalid("__new_package_action__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_DECREF(__pyx_v_kwargs); __pyx_v_kwargs = 0;
-  __Pyx_AddTraceback("stat.HandlerStat.__new_package_action__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__new_package_action__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_11HandlerStat_2__new_package_action__(__pyx_self, __pyx_v_self, __pyx_v_new_package, __pyx_v_kwargs);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_11HandlerStat_2__new_package_action__(__pyx_self, __pyx_v_self, __pyx_v_new_package, __pyx_v_kwargs);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_kwargs);
@@ -3579,7 +3579,7 @@ static PyObject *__pyx_pw_4stat_11HandlerStat_3__new_package_action__(PyObject *
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_new_package, CYTHON_UNUSED PyObject *__pyx_v_kwargs) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_new_package, CYTHON_UNUSED PyObject *__pyx_v_kwargs) {
   PyObject *__pyx_v_results = NULL;
   PyObject *__pyx_v_source = NULL;
   PyObject *__pyx_v_name = NULL;
@@ -3600,7 +3600,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__new_package_action__", 0);
 
-  /* "stat.pyx":78
+  /* "parabam/command/stat.pyx":78
  * 
  * 	def __new_package_action__(self,new_package,**kwargs):
  * 		results = new_package.results             # <<<<<<<<<<<<<<
@@ -3612,7 +3612,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
   __pyx_v_results = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":79
+  /* "parabam/command/stat.pyx":79
  * 	def __new_package_action__(self,new_package,**kwargs):
  * 		results = new_package.results
  * 		source = results["source"]             # <<<<<<<<<<<<<<
@@ -3624,7 +3624,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
   __pyx_v_source = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":80
+  /* "parabam/command/stat.pyx":80
  * 		results = new_package.results
  * 		source = results["source"]
  * 		self.__auto_handle__(results,source)             # <<<<<<<<<<<<<<
@@ -3662,7 +3662,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":81
+  /* "parabam/command/stat.pyx":81
  * 		source = results["source"]
  * 		self.__auto_handle__(results,source)
  * 		for name,data in results["structures"]:             # <<<<<<<<<<<<<<
@@ -3764,7 +3764,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
     __Pyx_XDECREF_SET(__pyx_v_data, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "stat.pyx":82
+    /* "parabam/command/stat.pyx":82
  * 		self.__auto_handle__(results,source)
  * 		for name,data in results["structures"]:
  * 			final_struc = self._final_structures[source][name]             # <<<<<<<<<<<<<<
@@ -3782,7 +3782,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
     __Pyx_XDECREF_SET(__pyx_v_final_struc, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "stat.pyx":83
+    /* "parabam/command/stat.pyx":83
  * 		for name,data in results["structures"]:
  * 			final_struc = self._final_structures[source][name]
  * 			final_struc.merge(data)             # <<<<<<<<<<<<<<
@@ -3818,7 +3818,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "stat.pyx":81
+    /* "parabam/command/stat.pyx":81
  * 		source = results["source"]
  * 		self.__auto_handle__(results,source)
  * 		for name,data in results["structures"]:             # <<<<<<<<<<<<<<
@@ -3828,7 +3828,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":77
+  /* "parabam/command/stat.pyx":77
  * 				self._final_structures[source][struc.name] = struc.empty_clone()
  * 
  * 	def __new_package_action__(self,new_package,**kwargs):             # <<<<<<<<<<<<<<
@@ -3845,7 +3845,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("stat.HandlerStat.__new_package_action__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__new_package_action__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_results);
@@ -3858,7 +3858,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "stat.pyx":85
+/* "parabam/command/stat.pyx":85
  * 			final_struc.merge(data)
  * 
  * 	def __periodic_action__(self,iterations):             # <<<<<<<<<<<<<<
@@ -3867,9 +3867,9 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_2__new_package_action__(CYTHON_UNU
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_11HandlerStat_5__periodic_action__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_11HandlerStat_5__periodic_action__ = {"__periodic_action__", (PyCFunction)__pyx_pw_4stat_11HandlerStat_5__periodic_action__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_11HandlerStat_5__periodic_action__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_5__periodic_action__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_11HandlerStat_5__periodic_action__ = {"__periodic_action__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_11HandlerStat_5__periodic_action__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_5__periodic_action__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_iterations = 0;
   int __pyx_lineno = 0;
@@ -3917,18 +3917,18 @@ static PyObject *__pyx_pw_4stat_11HandlerStat_5__periodic_action__(PyObject *__p
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__periodic_action__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.HandlerStat.__periodic_action__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__periodic_action__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_11HandlerStat_4__periodic_action__(__pyx_self, __pyx_v_self, __pyx_v_iterations);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_11HandlerStat_4__periodic_action__(__pyx_self, __pyx_v_self, __pyx_v_iterations);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_11HandlerStat_4__periodic_action__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_iterations) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_4__periodic_action__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_iterations) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__periodic_action__", 0);
@@ -3940,7 +3940,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_4__periodic_action__(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "stat.pyx":88
+/* "parabam/command/stat.pyx":88
  * 		pass
  * 
  * 	def __handler_exit__(self,**kwargs):             # <<<<<<<<<<<<<<
@@ -3949,9 +3949,9 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_4__periodic_action__(CYTHON_UNUSED
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_11HandlerStat_7__handler_exit__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_11HandlerStat_7__handler_exit__ = {"__handler_exit__", (PyCFunction)__pyx_pw_4stat_11HandlerStat_7__handler_exit__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_11HandlerStat_7__handler_exit__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_7__handler_exit__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_11HandlerStat_7__handler_exit__ = {"__handler_exit__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_11HandlerStat_7__handler_exit__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_7__handler_exit__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_kwargs = 0;
   int __pyx_lineno = 0;
@@ -3994,11 +3994,11 @@ static PyObject *__pyx_pw_4stat_11HandlerStat_7__handler_exit__(PyObject *__pyx_
   __Pyx_RaiseArgtupleInvalid("__handler_exit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_DECREF(__pyx_v_kwargs); __pyx_v_kwargs = 0;
-  __Pyx_AddTraceback("stat.HandlerStat.__handler_exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__handler_exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_11HandlerStat_6__handler_exit__(__pyx_self, __pyx_v_self, __pyx_v_kwargs);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_11HandlerStat_6__handler_exit__(__pyx_self, __pyx_v_self, __pyx_v_kwargs);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_kwargs);
@@ -4006,7 +4006,7 @@ static PyObject *__pyx_pw_4stat_11HandlerStat_7__handler_exit__(PyObject *__pyx_
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_kwargs) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_kwargs) {
   PyObject *__pyx_v_const = NULL;
   PyObject *__pyx_v_source = NULL;
   PyObject *__pyx_v_source_structures = NULL;
@@ -4043,7 +4043,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__handler_exit__", 0);
 
-  /* "stat.pyx":89
+  /* "parabam/command/stat.pyx":89
  * 
  * 	def __handler_exit__(self,**kwargs):
  * 		const = self.const             # <<<<<<<<<<<<<<
@@ -4055,7 +4055,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
   __pyx_v_const = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":90
+  /* "parabam/command/stat.pyx":90
  * 	def __handler_exit__(self,**kwargs):
  * 		const = self.const
  * 		if const.outmode == "d":             # <<<<<<<<<<<<<<
@@ -4068,7 +4068,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "stat.pyx":91
+    /* "parabam/command/stat.pyx":91
  * 		const = self.const
  * 		if const.outmode == "d":
  * 			for source in self._sources:             # <<<<<<<<<<<<<<
@@ -4118,7 +4118,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
       __Pyx_XDECREF_SET(__pyx_v_source, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "stat.pyx":92
+      /* "parabam/command/stat.pyx":92
  * 		if const.outmode == "d":
  * 			for source in self._sources:
  * 				source_structures = self._final_structures[source]             # <<<<<<<<<<<<<<
@@ -4133,7 +4133,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
       __Pyx_XDECREF_SET(__pyx_v_source_structures, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "stat.pyx":93
+      /* "parabam/command/stat.pyx":93
  * 			for source in self._sources:
  * 				source_structures = self._final_structures[source]
  * 				data_str = self.__get_data_str_from_names__(const.analysis_names,source_structures)             # <<<<<<<<<<<<<<
@@ -4174,7 +4174,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
       __Pyx_XDECREF_SET(__pyx_v_data_str, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "stat.pyx":95
+      /* "parabam/command/stat.pyx":95
  * 				data_str = self.__get_data_str_from_names__(const.analysis_names,source_structures)
  * 
  * 				with open(const.output_paths,"a") as out_object:             # <<<<<<<<<<<<<<
@@ -4230,7 +4230,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
               __Pyx_XDECREF_SET(__pyx_v_out_object, __pyx_t_10);
               __pyx_t_10 = 0;
 
-              /* "stat.pyx":96
+              /* "parabam/command/stat.pyx":96
  * 
  * 				with open(const.output_paths,"a") as out_object:
  * 					out_object.write("%s%s\n" % (source,data_str))             # <<<<<<<<<<<<<<
@@ -4289,7 +4289,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
             __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-            /* "stat.pyx":95
+            /* "parabam/command/stat.pyx":95
  * 				data_str = self.__get_data_str_from_names__(const.analysis_names,source_structures)
  * 
  * 				with open(const.output_paths,"a") as out_object:             # <<<<<<<<<<<<<<
@@ -4297,7 +4297,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
  * 
  */
             /*except:*/ {
-              __Pyx_AddTraceback("stat.HandlerStat.__handler_exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+              __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__handler_exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
               if (__Pyx_GetException(&__pyx_t_10, &__pyx_t_6, &__pyx_t_8) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L14_except_error;}
               __Pyx_GOTREF(__pyx_t_10);
               __Pyx_GOTREF(__pyx_t_6);
@@ -4360,7 +4360,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
         __pyx_L23:;
       }
 
-      /* "stat.pyx":99
+      /* "parabam/command/stat.pyx":99
  * 
  * 				#Arrays can't be squished into unified output, so create a unique file path
  * 				for name,struc in source_structures.items():             # <<<<<<<<<<<<<<
@@ -4480,7 +4480,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
         __Pyx_XDECREF_SET(__pyx_v_struc, __pyx_t_7);
         __pyx_t_7 = 0;
 
-        /* "stat.pyx":100
+        /* "parabam/command/stat.pyx":100
  * 				#Arrays can't be squished into unified output, so create a unique file path
  * 				for name,struc in source_structures.items():
  * 					if struc.struc_type == np.ndarray:             # <<<<<<<<<<<<<<
@@ -4501,7 +4501,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         if (__pyx_t_16) {
 
-          /* "stat.pyx":101
+          /* "parabam/command/stat.pyx":101
  * 				for name,struc in source_structures.items():
  * 					if struc.struc_type == np.ndarray:
  * 						array_path = "%s_%s.csv" % (source,struc.name)             # <<<<<<<<<<<<<<
@@ -4524,7 +4524,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
           __Pyx_XDECREF_SET(__pyx_v_array_path, ((PyObject*)__pyx_t_7));
           __pyx_t_7 = 0;
 
-          /* "stat.pyx":102
+          /* "parabam/command/stat.pyx":102
  * 					if struc.struc_type == np.ndarray:
  * 						array_path = "%s_%s.csv" % (source,struc.name)
  * 						struc.write_to_csv(array_path,source,const.outmode)             # <<<<<<<<<<<<<<
@@ -4570,7 +4570,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
         }
         __pyx_L28:;
 
-        /* "stat.pyx":99
+        /* "parabam/command/stat.pyx":99
  * 
  * 				#Arrays can't be squished into unified output, so create a unique file path
  * 				for name,struc in source_structures.items():             # <<<<<<<<<<<<<<
@@ -4580,7 +4580,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
       }
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "stat.pyx":91
+      /* "parabam/command/stat.pyx":91
  * 		const = self.const
  * 		if const.outmode == "d":
  * 			for source in self._sources:             # <<<<<<<<<<<<<<
@@ -4593,7 +4593,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
   }
   /*else*/ {
 
-    /* "stat.pyx":104
+    /* "parabam/command/stat.pyx":104
  * 						struc.write_to_csv(array_path,source,const.outmode)
  * 		else:
  * 			for source in self._sources:             # <<<<<<<<<<<<<<
@@ -4643,7 +4643,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
       __Pyx_XDECREF_SET(__pyx_v_source, __pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "stat.pyx":105
+      /* "parabam/command/stat.pyx":105
  * 		else:
  * 			for source in self._sources:
  * 				for name,struc in self._final_structures[source].items():             # <<<<<<<<<<<<<<
@@ -4769,7 +4769,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
         __Pyx_XDECREF_SET(__pyx_v_struc, __pyx_t_20);
         __pyx_t_20 = 0;
 
-        /* "stat.pyx":106
+        /* "parabam/command/stat.pyx":106
  * 			for source in self._sources:
  * 				for name,struc in self._final_structures[source].items():
  * 					struc.write_to_csv(const.output_paths,source,const.outmode)             # <<<<<<<<<<<<<<
@@ -4814,7 +4814,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
         __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "stat.pyx":105
+        /* "parabam/command/stat.pyx":105
  * 		else:
  * 			for source in self._sources:
  * 				for name,struc in self._final_structures[source].items():             # <<<<<<<<<<<<<<
@@ -4824,7 +4824,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
       }
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "stat.pyx":104
+      /* "parabam/command/stat.pyx":104
  * 						struc.write_to_csv(array_path,source,const.outmode)
  * 		else:
  * 			for source in self._sources:             # <<<<<<<<<<<<<<
@@ -4836,7 +4836,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
   }
   __pyx_L3:;
 
-  /* "stat.pyx":88
+  /* "parabam/command/stat.pyx":88
  * 		pass
  * 
  * 	def __handler_exit__(self,**kwargs):             # <<<<<<<<<<<<<<
@@ -4856,7 +4856,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
   __Pyx_XDECREF(__pyx_t_10);
   __Pyx_XDECREF(__pyx_t_20);
   __Pyx_XDECREF(__pyx_t_21);
-  __Pyx_AddTraceback("stat.HandlerStat.__handler_exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__handler_exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_const);
@@ -4872,7 +4872,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "stat.pyx":108
+/* "parabam/command/stat.pyx":108
  * 					struc.write_to_csv(const.output_paths,source,const.outmode)
  * 
  * 	def __get_data_str_from_names__(self,names,user_structures):             # <<<<<<<<<<<<<<
@@ -4881,9 +4881,9 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_6__handler_exit__(CYTHON_UNUSED Py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_11HandlerStat_9__get_data_str_from_names__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_11HandlerStat_9__get_data_str_from_names__ = {"__get_data_str_from_names__", (PyCFunction)__pyx_pw_4stat_11HandlerStat_9__get_data_str_from_names__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_11HandlerStat_9__get_data_str_from_names__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_9__get_data_str_from_names__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_11HandlerStat_9__get_data_str_from_names__ = {"__get_data_str_from_names__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_11HandlerStat_9__get_data_str_from_names__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_9__get_data_str_from_names__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_names = 0;
   PyObject *__pyx_v_user_structures = 0;
@@ -4940,18 +4940,18 @@ static PyObject *__pyx_pw_4stat_11HandlerStat_9__get_data_str_from_names__(PyObj
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__get_data_str_from_names__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.HandlerStat.__get_data_str_from_names__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__get_data_str_from_names__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(__pyx_self, __pyx_v_self, __pyx_v_names, __pyx_v_user_structures);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_11HandlerStat_8__get_data_str_from_names__(__pyx_self, __pyx_v_self, __pyx_v_names, __pyx_v_user_structures);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_names, PyObject *__pyx_v_user_structures) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_names, PyObject *__pyx_v_user_structures) {
   PyObject *__pyx_v_data_str = NULL;
   PyObject *__pyx_v_name = NULL;
   PyObject *__pyx_v_cur_data = NULL;
@@ -4967,7 +4967,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get_data_str_from_names__", 0);
 
-  /* "stat.pyx":109
+  /* "parabam/command/stat.pyx":109
  * 
  * 	def __get_data_str_from_names__(self,names,user_structures):
  * 		data_str = ""             # <<<<<<<<<<<<<<
@@ -4977,7 +4977,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
   __Pyx_INCREF(__pyx_kp_s__2);
   __pyx_v_data_str = __pyx_kp_s__2;
 
-  /* "stat.pyx":110
+  /* "parabam/command/stat.pyx":110
  * 	def __get_data_str_from_names__(self,names,user_structures):
  * 		data_str = ""
  * 		for name in names:             # <<<<<<<<<<<<<<
@@ -5024,7 +5024,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
     __Pyx_XDECREF_SET(__pyx_v_name, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "stat.pyx":111
+    /* "parabam/command/stat.pyx":111
  * 		data_str = ""
  * 		for name in names:
  * 			cur_data = user_structures[name].data             # <<<<<<<<<<<<<<
@@ -5039,7 +5039,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
     __Pyx_XDECREF_SET(__pyx_v_cur_data, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "stat.pyx":112
+    /* "parabam/command/stat.pyx":112
  * 		for name in names:
  * 			cur_data = user_structures[name].data
  * 			data_str += ",%.3f" % (cur_data,)             # <<<<<<<<<<<<<<
@@ -5060,7 +5060,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
     __Pyx_DECREF_SET(__pyx_v_data_str, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "stat.pyx":110
+    /* "parabam/command/stat.pyx":110
  * 	def __get_data_str_from_names__(self,names,user_structures):
  * 		data_str = ""
  * 		for name in names:             # <<<<<<<<<<<<<<
@@ -5070,7 +5070,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":113
+  /* "parabam/command/stat.pyx":113
  * 			cur_data = user_structures[name].data
  * 			data_str += ",%.3f" % (cur_data,)
  * 		return data_str             # <<<<<<<<<<<<<<
@@ -5082,7 +5082,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
   __pyx_r = __pyx_v_data_str;
   goto __pyx_L0;
 
-  /* "stat.pyx":108
+  /* "parabam/command/stat.pyx":108
  * 					struc.write_to_csv(const.output_paths,source,const.outmode)
  * 
  * 	def __get_data_str_from_names__(self,names,user_structures):             # <<<<<<<<<<<<<<
@@ -5095,7 +5095,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("stat.HandlerStat.__get_data_str_from_names__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.HandlerStat.__get_data_str_from_names__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_data_str);
@@ -5106,7 +5106,7 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
   return __pyx_r;
 }
 
-/* "stat.pyx":117
+/* "parabam/command/stat.pyx":117
  * class ProcessorStat(parabam.core.Processor):
  * 
  * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):             # <<<<<<<<<<<<<<
@@ -5115,9 +5115,9 @@ static PyObject *__pyx_pf_4stat_11HandlerStat_8__get_data_str_from_names__(CYTHO
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13ProcessorStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13ProcessorStat_1__init__ = {"__init__", (PyCFunction)__pyx_pw_4stat_13ProcessorStat_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13ProcessorStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13ProcessorStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13ProcessorStat_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13ProcessorStat_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13ProcessorStat_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_outqu = 0;
   PyObject *__pyx_v_const = 0;
@@ -5192,12 +5192,12 @@ static PyObject *__pyx_pw_4stat_13ProcessorStat_1__init__(PyObject *__pyx_self, 
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ProcessorStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ProcessorStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_task_args), (&PyList_Type), 1, "task_args", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_4stat_13ProcessorStat___init__(__pyx_self, __pyx_v_self, __pyx_v_outqu, __pyx_v_const, __pyx_v_TaskClass, __pyx_v_task_args);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13ProcessorStat___init__(__pyx_self, __pyx_v_self, __pyx_v_outqu, __pyx_v_const, __pyx_v_TaskClass, __pyx_v_task_args);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5208,7 +5208,7 @@ static PyObject *__pyx_pw_4stat_13ProcessorStat_1__init__(PyObject *__pyx_self, 
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_outqu, PyObject *__pyx_v_const, PyObject *__pyx_v_TaskClass, PyObject *__pyx_v_task_args) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_outqu, PyObject *__pyx_v_const, PyObject *__pyx_v_TaskClass, PyObject *__pyx_v_task_args) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5221,7 +5221,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "stat.pyx":118
+  /* "parabam/command/stat.pyx":118
  * 
  * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):
  * 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)             # <<<<<<<<<<<<<<
@@ -5279,7 +5279,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject 
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":119
+  /* "parabam/command/stat.pyx":119
  * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):
  * 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
  * 		self._source = task_args[0] #Defined in the run function within Interface             # <<<<<<<<<<<<<<
@@ -5295,7 +5295,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject 
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_source_2, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":117
+  /* "parabam/command/stat.pyx":117
  * class ProcessorStat(parabam.core.Processor):
  * 
  * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):             # <<<<<<<<<<<<<<
@@ -5311,7 +5311,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject 
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("stat.ProcessorStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ProcessorStat.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -5319,7 +5319,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject 
   return __pyx_r;
 }
 
-/* "stat.pyx":121
+/* "parabam/command/stat.pyx":121
  * 		self._source = task_args[0] #Defined in the run function within Interface
  * 
  * 	def __get_master_bam__(self,master_file_path):             # <<<<<<<<<<<<<<
@@ -5328,9 +5328,9 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat___init__(CYTHON_UNUSED PyObject 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13ProcessorStat_3__get_master_bam__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13ProcessorStat_3__get_master_bam__ = {"__get_master_bam__", (PyCFunction)__pyx_pw_4stat_13ProcessorStat_3__get_master_bam__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13ProcessorStat_3__get_master_bam__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13ProcessorStat_3__get_master_bam__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13ProcessorStat_3__get_master_bam__ = {"__get_master_bam__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13ProcessorStat_3__get_master_bam__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13ProcessorStat_3__get_master_bam__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_master_file_path = 0;
   int __pyx_lineno = 0;
@@ -5378,18 +5378,18 @@ static PyObject *__pyx_pw_4stat_13ProcessorStat_3__get_master_bam__(PyObject *__
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__get_master_bam__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ProcessorStat.__get_master_bam__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ProcessorStat.__get_master_bam__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13ProcessorStat_2__get_master_bam__(__pyx_self, __pyx_v_self, __pyx_v_master_file_path);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13ProcessorStat_2__get_master_bam__(__pyx_self, __pyx_v_self, __pyx_v_master_file_path);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13ProcessorStat_2__get_master_bam__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_master_file_path) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13ProcessorStat_2__get_master_bam__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_master_file_path) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5403,7 +5403,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_2__get_master_bam__(CYTHON_UNUSE
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get_master_bam__", 0);
 
-  /* "stat.pyx":122
+  /* "parabam/command/stat.pyx":122
  * 
  * 	def __get_master_bam__(self,master_file_path):
  * 		return pysam.Samfile(master_file_path[self._source],"rb")             # <<<<<<<<<<<<<<
@@ -5452,7 +5452,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_2__get_master_bam__(CYTHON_UNUSE
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "stat.pyx":121
+  /* "parabam/command/stat.pyx":121
  * 		self._source = task_args[0] #Defined in the run function within Interface
  * 
  * 	def __get_master_bam__(self,master_file_path):             # <<<<<<<<<<<<<<
@@ -5467,7 +5467,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_2__get_master_bam__(CYTHON_UNUSE
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.ProcessorStat.__get_master_bam__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ProcessorStat.__get_master_bam__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -5475,7 +5475,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_2__get_master_bam__(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "stat.pyx":124
+/* "parabam/command/stat.pyx":124
  * 		return pysam.Samfile(master_file_path[self._source],"rb")
  * 
  * 	def __add_to_collection__(self,master,alig,collection):             # <<<<<<<<<<<<<<
@@ -5484,9 +5484,9 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_2__get_master_bam__(CYTHON_UNUSE
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13ProcessorStat_5__add_to_collection__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13ProcessorStat_5__add_to_collection__ = {"__add_to_collection__", (PyCFunction)__pyx_pw_4stat_13ProcessorStat_5__add_to_collection__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13ProcessorStat_5__add_to_collection__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13ProcessorStat_5__add_to_collection__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13ProcessorStat_5__add_to_collection__ = {"__add_to_collection__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13ProcessorStat_5__add_to_collection__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13ProcessorStat_5__add_to_collection__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_master = 0;
   PyObject *__pyx_v_alig = 0;
@@ -5552,18 +5552,18 @@ static PyObject *__pyx_pw_4stat_13ProcessorStat_5__add_to_collection__(PyObject 
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__add_to_collection__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ProcessorStat.__add_to_collection__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ProcessorStat.__add_to_collection__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13ProcessorStat_4__add_to_collection__(__pyx_self, __pyx_v_self, __pyx_v_master, __pyx_v_alig, __pyx_v_collection);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13ProcessorStat_4__add_to_collection__(__pyx_self, __pyx_v_self, __pyx_v_master, __pyx_v_alig, __pyx_v_collection);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13ProcessorStat_4__add_to_collection__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_master, PyObject *__pyx_v_alig, PyObject *__pyx_v_collection) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13ProcessorStat_4__add_to_collection__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_master, PyObject *__pyx_v_alig, PyObject *__pyx_v_collection) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -5572,7 +5572,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_4__add_to_collection__(CYTHON_UN
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__add_to_collection__", 0);
 
-  /* "stat.pyx":125
+  /* "parabam/command/stat.pyx":125
  * 
  * 	def __add_to_collection__(self,master,alig,collection):
  * 		collection.append(alig)             # <<<<<<<<<<<<<<
@@ -5581,7 +5581,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_4__add_to_collection__(CYTHON_UN
  */
   __pyx_t_1 = __Pyx_PyObject_Append(__pyx_v_collection, __pyx_v_alig); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":124
+  /* "parabam/command/stat.pyx":124
  * 		return pysam.Samfile(master_file_path[self._source],"rb")
  * 
  * 	def __add_to_collection__(self,master,alig,collection):             # <<<<<<<<<<<<<<
@@ -5593,7 +5593,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_4__add_to_collection__(CYTHON_UN
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_AddTraceback("stat.ProcessorStat.__add_to_collection__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ProcessorStat.__add_to_collection__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -5601,7 +5601,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_4__add_to_collection__(CYTHON_UN
   return __pyx_r;
 }
 
-/* "stat.pyx":127
+/* "parabam/command/stat.pyx":127
  * 		collection.append(alig)
  * 
  * 	def __pre_processor__(self,master_file_path):             # <<<<<<<<<<<<<<
@@ -5610,9 +5610,9 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_4__add_to_collection__(CYTHON_UN
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13ProcessorStat_7__pre_processor__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13ProcessorStat_7__pre_processor__ = {"__pre_processor__", (PyCFunction)__pyx_pw_4stat_13ProcessorStat_7__pre_processor__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13ProcessorStat_7__pre_processor__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13ProcessorStat_7__pre_processor__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13ProcessorStat_7__pre_processor__ = {"__pre_processor__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13ProcessorStat_7__pre_processor__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13ProcessorStat_7__pre_processor__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_master_file_path = 0;
   int __pyx_lineno = 0;
@@ -5660,18 +5660,18 @@ static PyObject *__pyx_pw_4stat_13ProcessorStat_7__pre_processor__(PyObject *__p
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__pre_processor__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ProcessorStat.__pre_processor__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ProcessorStat.__pre_processor__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13ProcessorStat_6__pre_processor__(__pyx_self, __pyx_v_self, __pyx_v_master_file_path);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13ProcessorStat_6__pre_processor__(__pyx_self, __pyx_v_self, __pyx_v_master_file_path);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13ProcessorStat_6__pre_processor__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_master_file_path) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13ProcessorStat_6__pre_processor__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_master_file_path) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__pre_processor__", 0);
@@ -5683,7 +5683,7 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_6__pre_processor__(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "stat.pyx":134
+/* "parabam/command/stat.pyx":134
  * 	__metaclass__ = ABCMeta
  * 
  * 	def __init__(self,name,struc_type,store_method,data):             # <<<<<<<<<<<<<<
@@ -5692,9 +5692,9 @@ static PyObject *__pyx_pf_4stat_13ProcessorStat_6__pre_processor__(CYTHON_UNUSED
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_1__init__ = {"__init__", (PyCFunction)__pyx_pw_4stat_13UserStructure_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_name = 0;
   PyObject *__pyx_v_struc_type = 0;
@@ -5769,18 +5769,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_1__init__(PyObject *__pyx_self, 
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure___init__(__pyx_self, __pyx_v_self, __pyx_v_name, __pyx_v_struc_type, __pyx_v_store_method, __pyx_v_data);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure___init__(__pyx_self, __pyx_v_self, __pyx_v_name, __pyx_v_struc_type, __pyx_v_store_method, __pyx_v_data);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5793,7 +5793,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "stat.pyx":135
+  /* "parabam/command/stat.pyx":135
  * 
  * 	def __init__(self,name,struc_type,store_method,data):
  * 		self.struc_type = struc_type             # <<<<<<<<<<<<<<
@@ -5802,7 +5802,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_struc_type, __pyx_v_struc_type) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 135; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":136
+  /* "parabam/command/stat.pyx":136
  * 	def __init__(self,name,struc_type,store_method,data):
  * 		self.struc_type = struc_type
  * 		self.store_method = store_method             # <<<<<<<<<<<<<<
@@ -5811,7 +5811,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_store_method, __pyx_v_store_method) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":137
+  /* "parabam/command/stat.pyx":137
  * 		self.struc_type = struc_type
  * 		self.store_method = store_method
  * 		self.data = data             # <<<<<<<<<<<<<<
@@ -5820,7 +5820,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_v_data) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":138
+  /* "parabam/command/stat.pyx":138
  * 		self.store_method = store_method
  * 		self.data = data
  * 		self.org_data = copy.copy(data)             # <<<<<<<<<<<<<<
@@ -5860,7 +5860,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_org_data, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":139
+  /* "parabam/command/stat.pyx":139
  * 		self.data = data
  * 		self.org_data = copy.copy(data)
  * 		self.name = name             # <<<<<<<<<<<<<<
@@ -5869,7 +5869,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_name, __pyx_v_name) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 139; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":141
+  /* "parabam/command/stat.pyx":141
  * 		self.name = name
  * 
  * 		if store_method == "max":             # <<<<<<<<<<<<<<
@@ -5879,7 +5879,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
   __pyx_t_5 = (__Pyx_PyString_Equals(__pyx_v_store_method, __pyx_n_s_max, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 141; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_5) {
 
-    /* "stat.pyx":142
+    /* "parabam/command/stat.pyx":142
  * 
  * 		if store_method == "max":
  * 			self.add = self.add_max             # <<<<<<<<<<<<<<
@@ -5891,7 +5891,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
     if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_add, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "stat.pyx":143
+    /* "parabam/command/stat.pyx":143
  * 		if store_method == "max":
  * 			self.add = self.add_max
  * 			self.merge = self.merge_max             # <<<<<<<<<<<<<<
@@ -5905,7 +5905,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
     goto __pyx_L3;
   }
 
-  /* "stat.pyx":144
+  /* "parabam/command/stat.pyx":144
  * 			self.add = self.add_max
  * 			self.merge = self.merge_max
  * 		elif store_method == "min":             # <<<<<<<<<<<<<<
@@ -5915,7 +5915,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
   __pyx_t_5 = (__Pyx_PyString_Equals(__pyx_v_store_method, __pyx_n_s_min, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 144; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_5) {
 
-    /* "stat.pyx":145
+    /* "parabam/command/stat.pyx":145
  * 			self.merge = self.merge_max
  * 		elif store_method == "min":
  * 			self.add = self.add_min             # <<<<<<<<<<<<<<
@@ -5927,7 +5927,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
     if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_add, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 145; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "stat.pyx":146
+    /* "parabam/command/stat.pyx":146
  * 		elif store_method == "min":
  * 			self.add = self.add_min
  * 			self.merge = self.merge_min             # <<<<<<<<<<<<<<
@@ -5942,7 +5942,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
   }
   /*else*/ {
 
-    /* "stat.pyx":148
+    /* "parabam/command/stat.pyx":148
  * 			self.merge = self.merge_min
  * 		else:
  * 			self.add = self.add_cumu             # <<<<<<<<<<<<<<
@@ -5954,7 +5954,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
     if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_add, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "stat.pyx":149
+    /* "parabam/command/stat.pyx":149
  * 		else:
  * 			self.add = self.add_cumu
  * 			self.merge = self.merge_cumu             # <<<<<<<<<<<<<<
@@ -5968,7 +5968,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
   }
   __pyx_L3:;
 
-  /* "stat.pyx":134
+  /* "parabam/command/stat.pyx":134
  * 	__metaclass__ = ABCMeta
  * 
  * 	def __init__(self,name,struc_type,store_method,data):             # <<<<<<<<<<<<<<
@@ -5984,7 +5984,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("stat.UserStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -5992,7 +5992,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
   return __pyx_r;
 }
 
-/* "stat.pyx":151
+/* "parabam/command/stat.pyx":151
  * 			self.merge = self.merge_cumu
  * 
  * 	def max_decision(self,result,existing):             # <<<<<<<<<<<<<<
@@ -6001,9 +6001,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure___init__(CYTHON_UNUSED PyObject 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_3max_decision(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_3max_decision = {"max_decision", (PyCFunction)__pyx_pw_4stat_13UserStructure_3max_decision, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_3max_decision(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_3max_decision(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_3max_decision = {"max_decision", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_3max_decision, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_3max_decision(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   PyObject *__pyx_v_existing = 0;
@@ -6060,18 +6060,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_3max_decision(PyObject *__pyx_se
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("max_decision", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.max_decision", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.max_decision", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure_2max_decision(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_existing);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_2max_decision(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_existing);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_2max_decision(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_existing) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_2max_decision(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_existing) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -6084,7 +6084,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_2max_decision(CYTHON_UNUSED PyOb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("max_decision", 0);
 
-  /* "stat.pyx":152
+  /* "parabam/command/stat.pyx":152
  * 
  * 	def max_decision(self,result,existing):
  * 		return max(result,existing)             # <<<<<<<<<<<<<<
@@ -6113,7 +6113,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_2max_decision(CYTHON_UNUSED PyOb
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "stat.pyx":151
+  /* "parabam/command/stat.pyx":151
  * 			self.merge = self.merge_cumu
  * 
  * 	def max_decision(self,result,existing):             # <<<<<<<<<<<<<<
@@ -6127,7 +6127,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_2max_decision(CYTHON_UNUSED PyOb
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("stat.UserStructure.max_decision", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.max_decision", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -6135,7 +6135,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_2max_decision(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "stat.pyx":154
+/* "parabam/command/stat.pyx":154
  * 		return max(result,existing)
  * 
  * 	def min_decision(self,result,exisiting):             # <<<<<<<<<<<<<<
@@ -6144,9 +6144,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure_2max_decision(CYTHON_UNUSED PyOb
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_5min_decision(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_5min_decision = {"min_decision", (PyCFunction)__pyx_pw_4stat_13UserStructure_5min_decision, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_5min_decision(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_5min_decision(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_5min_decision = {"min_decision", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_5min_decision, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_5min_decision(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   PyObject *__pyx_v_exisiting = 0;
@@ -6203,18 +6203,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_5min_decision(PyObject *__pyx_se
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("min_decision", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.min_decision", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.min_decision", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure_4min_decision(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_exisiting);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_4min_decision(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_exisiting);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_4min_decision(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_exisiting) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_4min_decision(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_exisiting) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -6227,7 +6227,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_4min_decision(CYTHON_UNUSED PyOb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("min_decision", 0);
 
-  /* "stat.pyx":155
+  /* "parabam/command/stat.pyx":155
  * 
  * 	def min_decision(self,result,exisiting):
  * 		return min(result,exisiting)             # <<<<<<<<<<<<<<
@@ -6256,7 +6256,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_4min_decision(CYTHON_UNUSED PyOb
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "stat.pyx":154
+  /* "parabam/command/stat.pyx":154
  * 		return max(result,existing)
  * 
  * 	def min_decision(self,result,exisiting):             # <<<<<<<<<<<<<<
@@ -6270,7 +6270,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_4min_decision(CYTHON_UNUSED PyOb
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("stat.UserStructure.min_decision", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.min_decision", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -6278,7 +6278,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_4min_decision(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "stat.pyx":158
+/* "parabam/command/stat.pyx":158
  * 
  * 	@abstractmethod
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
@@ -6287,20 +6287,20 @@ static PyObject *__pyx_pf_4stat_13UserStructure_4min_decision(CYTHON_UNUSED PyOb
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_7empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_7empty_clone = {"empty_clone", (PyCFunction)__pyx_pw_4stat_13UserStructure_7empty_clone, METH_O, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_7empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_7empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_7empty_clone = {"empty_clone", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_7empty_clone, METH_O, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_7empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("empty_clone (wrapper)", 0);
-  __pyx_r = __pyx_pf_4stat_13UserStructure_6empty_clone(__pyx_self, ((PyObject *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_6empty_clone(__pyx_self, ((PyObject *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_6empty_clone(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_6empty_clone(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("empty_clone", 0);
@@ -6312,7 +6312,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_6empty_clone(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "stat.pyx":162
+/* "parabam/command/stat.pyx":162
  * 
  * 	@abstractmethod
  * 	def add_max(self,result):             # <<<<<<<<<<<<<<
@@ -6321,9 +6321,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure_6empty_clone(CYTHON_UNUSED PyObj
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_9add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_9add_max = {"add_max", (PyCFunction)__pyx_pw_4stat_13UserStructure_9add_max, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_9add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_9add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_9add_max = {"add_max", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_9add_max, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_9add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -6371,18 +6371,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_9add_max(PyObject *__pyx_self, P
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("add_max", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure_8add_max(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_8add_max(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_8add_max(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_8add_max(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("add_max", 0);
@@ -6394,7 +6394,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_8add_max(CYTHON_UNUSED PyObject 
   return __pyx_r;
 }
 
-/* "stat.pyx":166
+/* "parabam/command/stat.pyx":166
  * 
  * 	@abstractmethod
  * 	def add_min(self,result):             # <<<<<<<<<<<<<<
@@ -6403,9 +6403,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure_8add_max(CYTHON_UNUSED PyObject 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_11add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_11add_min = {"add_min", (PyCFunction)__pyx_pw_4stat_13UserStructure_11add_min, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_11add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_11add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_11add_min = {"add_min", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_11add_min, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_11add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -6453,18 +6453,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_11add_min(PyObject *__pyx_self, 
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("add_min", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 166; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure_10add_min(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_10add_min(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_10add_min(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_10add_min(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("add_min", 0);
@@ -6476,7 +6476,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_10add_min(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "stat.pyx":170
+/* "parabam/command/stat.pyx":170
  * 
  * 	@abstractmethod
  * 	def add_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -6485,9 +6485,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure_10add_min(CYTHON_UNUSED PyObject
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_13add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_13add_cumu = {"add_cumu", (PyCFunction)__pyx_pw_4stat_13UserStructure_13add_cumu, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_13add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_13add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_13add_cumu = {"add_cumu", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_13add_cumu, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_13add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -6535,18 +6535,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_13add_cumu(PyObject *__pyx_self,
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("add_cumu", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure_12add_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_12add_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_12add_cumu(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_12add_cumu(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("add_cumu", 0);
@@ -6558,7 +6558,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_12add_cumu(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "stat.pyx":174
+/* "parabam/command/stat.pyx":174
  * 
  * 	@abstractmethod
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
@@ -6567,9 +6567,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure_12add_cumu(CYTHON_UNUSED PyObjec
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_15merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_15merge_max = {"merge_max", (PyCFunction)__pyx_pw_4stat_13UserStructure_15merge_max, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_15merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_15merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_15merge_max = {"merge_max", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_15merge_max, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_15merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -6617,18 +6617,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_15merge_max(PyObject *__pyx_self
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("merge_max", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure_14merge_max(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_14merge_max(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_14merge_max(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_14merge_max(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("merge_max", 0);
@@ -6640,7 +6640,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_14merge_max(CYTHON_UNUSED PyObje
   return __pyx_r;
 }
 
-/* "stat.pyx":178
+/* "parabam/command/stat.pyx":178
  * 
  * 	@abstractmethod
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
@@ -6649,9 +6649,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure_14merge_max(CYTHON_UNUSED PyObje
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_17merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_17merge_min = {"merge_min", (PyCFunction)__pyx_pw_4stat_13UserStructure_17merge_min, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_17merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_17merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_17merge_min = {"merge_min", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_17merge_min, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_17merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -6699,18 +6699,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_17merge_min(PyObject *__pyx_self
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("merge_min", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure_16merge_min(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_16merge_min(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_16merge_min(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_16merge_min(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("merge_min", 0);
@@ -6722,7 +6722,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_16merge_min(CYTHON_UNUSED PyObje
   return __pyx_r;
 }
 
-/* "stat.pyx":182
+/* "parabam/command/stat.pyx":182
  * 
  * 	@abstractmethod
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -6731,9 +6731,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure_16merge_min(CYTHON_UNUSED PyObje
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_19merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_19merge_cumu = {"merge_cumu", (PyCFunction)__pyx_pw_4stat_13UserStructure_19merge_cumu, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_19merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_19merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_19merge_cumu = {"merge_cumu", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_19merge_cumu, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_19merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -6781,18 +6781,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_19merge_cumu(PyObject *__pyx_sel
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("merge_cumu", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure_18merge_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_18merge_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_18merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_18merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("merge_cumu", 0);
@@ -6804,7 +6804,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_18merge_cumu(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "stat.pyx":186
+/* "parabam/command/stat.pyx":186
  * 
  * 	@abstractmethod
  * 	def write_to_csv(self,source):             # <<<<<<<<<<<<<<
@@ -6813,9 +6813,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure_18merge_cumu(CYTHON_UNUSED PyObj
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_13UserStructure_21write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_13UserStructure_21write_to_csv = {"write_to_csv", (PyCFunction)__pyx_pw_4stat_13UserStructure_21write_to_csv, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_13UserStructure_21write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_21write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_13UserStructure_21write_to_csv = {"write_to_csv", (PyCFunction)__pyx_pw_7parabam_7command_4stat_13UserStructure_21write_to_csv, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_13UserStructure_21write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   CYTHON_UNUSED PyObject *__pyx_v_source = 0;
   int __pyx_lineno = 0;
@@ -6863,18 +6863,18 @@ static PyObject *__pyx_pw_4stat_13UserStructure_21write_to_csv(PyObject *__pyx_s
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("write_to_csv", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.UserStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.UserStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_13UserStructure_20write_to_csv(__pyx_self, __pyx_v_self, __pyx_v_source);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_13UserStructure_20write_to_csv(__pyx_self, __pyx_v_self, __pyx_v_source);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_13UserStructure_20write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_source) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_13UserStructure_20write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_source) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("write_to_csv", 0);
@@ -6886,7 +6886,7 @@ static PyObject *__pyx_pf_4stat_13UserStructure_20write_to_csv(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "stat.pyx":190
+/* "parabam/command/stat.pyx":190
  * 
  * class NumericStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data,log_scaling=False):             # <<<<<<<<<<<<<<
@@ -6895,9 +6895,9 @@ static PyObject *__pyx_pf_4stat_13UserStructure_20write_to_csv(CYTHON_UNUSED PyO
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_16NumericStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_16NumericStructure_1__init__ = {"__init__", (PyCFunction)__pyx_pw_4stat_16NumericStructure_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_16NumericStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_16NumericStructure_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_16NumericStructure_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_name = 0;
   PyObject *__pyx_v_struc_type = 0;
@@ -6984,18 +6984,18 @@ static PyObject *__pyx_pw_4stat_16NumericStructure_1__init__(PyObject *__pyx_sel
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__init__", 0, 5, 6, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.NumericStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_16NumericStructure___init__(__pyx_self, __pyx_v_self, __pyx_v_name, __pyx_v_struc_type, __pyx_v_store_method, __pyx_v_data, __pyx_v_log_scaling);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_16NumericStructure___init__(__pyx_self, __pyx_v_self, __pyx_v_name, __pyx_v_struc_type, __pyx_v_store_method, __pyx_v_data, __pyx_v_log_scaling);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data, PyObject *__pyx_v_log_scaling) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data, PyObject *__pyx_v_log_scaling) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -7008,7 +7008,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObje
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "stat.pyx":191
+  /* "parabam/command/stat.pyx":191
  * class NumericStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data,log_scaling=False):
  * 		super(NumericStructure,self).__init__(name,struc_type,store_method,data)             # <<<<<<<<<<<<<<
@@ -7066,7 +7066,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObje
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":192
+  /* "parabam/command/stat.pyx":192
  * 	def __init__(self,name,struc_type,store_method,data,log_scaling=False):
  * 		super(NumericStructure,self).__init__(name,struc_type,store_method,data)
  * 		self.log_scaling = log_scaling             # <<<<<<<<<<<<<<
@@ -7075,7 +7075,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObje
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_log_scaling, __pyx_v_log_scaling) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":190
+  /* "parabam/command/stat.pyx":190
  * 
  * class NumericStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data,log_scaling=False):             # <<<<<<<<<<<<<<
@@ -7091,7 +7091,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObje
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("stat.NumericStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -7099,7 +7099,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObje
   return __pyx_r;
 }
 
-/* "stat.pyx":194
+/* "parabam/command/stat.pyx":194
  * 		self.log_scaling = log_scaling
  * 
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
@@ -7108,20 +7108,20 @@ static PyObject *__pyx_pf_4stat_16NumericStructure___init__(CYTHON_UNUSED PyObje
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_16NumericStructure_3empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_16NumericStructure_3empty_clone = {"empty_clone", (PyCFunction)__pyx_pw_4stat_16NumericStructure_3empty_clone, METH_O, 0};
-static PyObject *__pyx_pw_4stat_16NumericStructure_3empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_3empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_16NumericStructure_3empty_clone = {"empty_clone", (PyCFunction)__pyx_pw_7parabam_7command_4stat_16NumericStructure_3empty_clone, METH_O, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_3empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("empty_clone (wrapper)", 0);
-  __pyx_r = __pyx_pf_4stat_16NumericStructure_2empty_clone(__pyx_self, ((PyObject *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_16NumericStructure_2empty_clone(__pyx_self, ((PyObject *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_16NumericStructure_2empty_clone(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_2empty_clone(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -7138,7 +7138,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_2empty_clone(CYTHON_UNUSED Py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("empty_clone", 0);
 
-  /* "stat.pyx":195
+  /* "parabam/command/stat.pyx":195
  * 
  * 	def empty_clone(self):
  * 		return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)             # <<<<<<<<<<<<<<
@@ -7193,7 +7193,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_2empty_clone(CYTHON_UNUSED Py
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "stat.pyx":194
+  /* "parabam/command/stat.pyx":194
  * 		self.log_scaling = log_scaling
  * 
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
@@ -7211,7 +7211,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_2empty_clone(CYTHON_UNUSED Py
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_AddTraceback("stat.NumericStructure.empty_clone", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.empty_clone", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -7219,7 +7219,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_2empty_clone(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "stat.pyx":197
+/* "parabam/command/stat.pyx":197
  * 		return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  * 	def add_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -7228,9 +7228,9 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_2empty_clone(CYTHON_UNUSED Py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_16NumericStructure_5add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_16NumericStructure_5add_cumu = {"add_cumu", (PyCFunction)__pyx_pw_4stat_16NumericStructure_5add_cumu, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_16NumericStructure_5add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_5add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_16NumericStructure_5add_cumu = {"add_cumu", (PyCFunction)__pyx_pw_7parabam_7command_4stat_16NumericStructure_5add_cumu, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_5add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -7278,18 +7278,18 @@ static PyObject *__pyx_pw_4stat_16NumericStructure_5add_cumu(PyObject *__pyx_sel
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("add_cumu", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 197; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.NumericStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_16NumericStructure_4add_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_16NumericStructure_4add_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_16NumericStructure_4add_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_4add_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -7299,7 +7299,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_4add_cumu(CYTHON_UNUSED PyObj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_cumu", 0);
 
-  /* "stat.pyx":198
+  /* "parabam/command/stat.pyx":198
  * 
  * 	def add_cumu(self,result):
  * 		self.data += result             # <<<<<<<<<<<<<<
@@ -7314,7 +7314,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_4add_cumu(CYTHON_UNUSED PyObj
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":197
+  /* "parabam/command/stat.pyx":197
  * 		return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  * 	def add_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -7328,7 +7328,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_4add_cumu(CYTHON_UNUSED PyObj
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_AddTraceback("stat.NumericStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -7336,7 +7336,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_4add_cumu(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "stat.pyx":200
+/* "parabam/command/stat.pyx":200
  * 		self.data += result
  * 
  * 	def add_max(self,result):             # <<<<<<<<<<<<<<
@@ -7345,9 +7345,9 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_4add_cumu(CYTHON_UNUSED PyObj
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_16NumericStructure_7add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_16NumericStructure_7add_max = {"add_max", (PyCFunction)__pyx_pw_4stat_16NumericStructure_7add_max, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_16NumericStructure_7add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_7add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_16NumericStructure_7add_max = {"add_max", (PyCFunction)__pyx_pw_7parabam_7command_4stat_16NumericStructure_7add_max, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_7add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -7395,18 +7395,18 @@ static PyObject *__pyx_pw_4stat_16NumericStructure_7add_max(PyObject *__pyx_self
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("add_max", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 200; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.NumericStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_16NumericStructure_6add_max(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_16NumericStructure_6add_max(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_16NumericStructure_6add_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_6add_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -7420,7 +7420,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_6add_max(CYTHON_UNUSED PyObje
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_max", 0);
 
-  /* "stat.pyx":201
+  /* "parabam/command/stat.pyx":201
  * 
  * 	def add_max(self,result):
  * 		self.data = self.max_decision(result,self.data)             # <<<<<<<<<<<<<<
@@ -7461,7 +7461,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_6add_max(CYTHON_UNUSED PyObje
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 201; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":200
+  /* "parabam/command/stat.pyx":200
  * 		self.data += result
  * 
  * 	def add_max(self,result):             # <<<<<<<<<<<<<<
@@ -7478,7 +7478,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_6add_max(CYTHON_UNUSED PyObje
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.NumericStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -7486,7 +7486,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_6add_max(CYTHON_UNUSED PyObje
   return __pyx_r;
 }
 
-/* "stat.pyx":203
+/* "parabam/command/stat.pyx":203
  * 		self.data = self.max_decision(result,self.data)
  * 
  * 	def add_min(self,result):             # <<<<<<<<<<<<<<
@@ -7495,9 +7495,9 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_6add_max(CYTHON_UNUSED PyObje
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_16NumericStructure_9add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_16NumericStructure_9add_min = {"add_min", (PyCFunction)__pyx_pw_4stat_16NumericStructure_9add_min, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_16NumericStructure_9add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_9add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_16NumericStructure_9add_min = {"add_min", (PyCFunction)__pyx_pw_7parabam_7command_4stat_16NumericStructure_9add_min, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_9add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -7545,18 +7545,18 @@ static PyObject *__pyx_pw_4stat_16NumericStructure_9add_min(PyObject *__pyx_self
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("add_min", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.NumericStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_16NumericStructure_8add_min(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_16NumericStructure_8add_min(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_16NumericStructure_8add_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_8add_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -7570,7 +7570,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_8add_min(CYTHON_UNUSED PyObje
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_min", 0);
 
-  /* "stat.pyx":204
+  /* "parabam/command/stat.pyx":204
  * 
  * 	def add_min(self,result):
  * 		self.data = self.min_decision(result,self.data)             # <<<<<<<<<<<<<<
@@ -7611,7 +7611,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_8add_min(CYTHON_UNUSED PyObje
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":203
+  /* "parabam/command/stat.pyx":203
  * 		self.data = self.max_decision(result,self.data)
  * 
  * 	def add_min(self,result):             # <<<<<<<<<<<<<<
@@ -7628,7 +7628,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_8add_min(CYTHON_UNUSED PyObje
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.NumericStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -7636,7 +7636,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_8add_min(CYTHON_UNUSED PyObje
   return __pyx_r;
 }
 
-/* "stat.pyx":206
+/* "parabam/command/stat.pyx":206
  * 		self.data = self.min_decision(result,self.data)
  * 
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
@@ -7645,9 +7645,9 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_8add_min(CYTHON_UNUSED PyObje
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_16NumericStructure_11merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_16NumericStructure_11merge_max = {"merge_max", (PyCFunction)__pyx_pw_4stat_16NumericStructure_11merge_max, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_16NumericStructure_11merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_11merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_16NumericStructure_11merge_max = {"merge_max", (PyCFunction)__pyx_pw_7parabam_7command_4stat_16NumericStructure_11merge_max, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_11merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -7695,18 +7695,18 @@ static PyObject *__pyx_pw_4stat_16NumericStructure_11merge_max(PyObject *__pyx_s
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("merge_max", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.NumericStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_16NumericStructure_10merge_max(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_16NumericStructure_10merge_max(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -7721,7 +7721,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyO
   __Pyx_RefNannySetupContext("merge_max", 0);
   __Pyx_INCREF(__pyx_v_result);
 
-  /* "stat.pyx":207
+  /* "parabam/command/stat.pyx":207
  * 
  * 	def merge_max(self,result):
  * 		self.data = self.max_decision(self.data,result)             # <<<<<<<<<<<<<<
@@ -7762,7 +7762,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyO
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 207; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":208
+  /* "parabam/command/stat.pyx":208
  * 	def merge_max(self,result):
  * 		self.data = self.max_decision(self.data,result)
  * 		del result             # <<<<<<<<<<<<<<
@@ -7772,7 +7772,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyO
   __Pyx_DECREF(__pyx_v_result);
   __pyx_v_result = NULL;
 
-  /* "stat.pyx":206
+  /* "parabam/command/stat.pyx":206
  * 		self.data = self.min_decision(result,self.data)
  * 
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
@@ -7789,7 +7789,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyO
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.NumericStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_result);
@@ -7798,7 +7798,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "stat.pyx":210
+/* "parabam/command/stat.pyx":210
  * 		del result
  * 
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
@@ -7807,9 +7807,9 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_10merge_max(CYTHON_UNUSED PyO
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_16NumericStructure_13merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_16NumericStructure_13merge_min = {"merge_min", (PyCFunction)__pyx_pw_4stat_16NumericStructure_13merge_min, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_16NumericStructure_13merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_13merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_16NumericStructure_13merge_min = {"merge_min", (PyCFunction)__pyx_pw_7parabam_7command_4stat_16NumericStructure_13merge_min, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_13merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -7857,18 +7857,18 @@ static PyObject *__pyx_pw_4stat_16NumericStructure_13merge_min(PyObject *__pyx_s
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("merge_min", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.NumericStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_16NumericStructure_12merge_min(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_16NumericStructure_12merge_min(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -7883,7 +7883,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyO
   __Pyx_RefNannySetupContext("merge_min", 0);
   __Pyx_INCREF(__pyx_v_result);
 
-  /* "stat.pyx":211
+  /* "parabam/command/stat.pyx":211
  * 
  * 	def merge_min(self,result):
  * 		self.data = self.min_decision(self.data,result)             # <<<<<<<<<<<<<<
@@ -7924,7 +7924,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyO
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":212
+  /* "parabam/command/stat.pyx":212
  * 	def merge_min(self,result):
  * 		self.data = self.min_decision(self.data,result)
  * 		del result             # <<<<<<<<<<<<<<
@@ -7934,7 +7934,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyO
   __Pyx_DECREF(__pyx_v_result);
   __pyx_v_result = NULL;
 
-  /* "stat.pyx":210
+  /* "parabam/command/stat.pyx":210
  * 		del result
  * 
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
@@ -7951,7 +7951,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyO
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.NumericStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_result);
@@ -7960,7 +7960,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "stat.pyx":214
+/* "parabam/command/stat.pyx":214
  * 		del result
  * 
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -7969,9 +7969,9 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_12merge_min(CYTHON_UNUSED PyO
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_16NumericStructure_15merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_16NumericStructure_15merge_cumu = {"merge_cumu", (PyCFunction)__pyx_pw_4stat_16NumericStructure_15merge_cumu, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_16NumericStructure_15merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_15merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_16NumericStructure_15merge_cumu = {"merge_cumu", (PyCFunction)__pyx_pw_7parabam_7command_4stat_16NumericStructure_15merge_cumu, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_15merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -8019,18 +8019,18 @@ static PyObject *__pyx_pw_4stat_16NumericStructure_15merge_cumu(PyObject *__pyx_
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("merge_cumu", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 214; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.NumericStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_16NumericStructure_14merge_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_16NumericStructure_14merge_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -8041,7 +8041,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED Py
   __Pyx_RefNannySetupContext("merge_cumu", 0);
   __Pyx_INCREF(__pyx_v_result);
 
-  /* "stat.pyx":215
+  /* "parabam/command/stat.pyx":215
  * 
  * 	def merge_cumu(self,result):
  * 		self.data += result             # <<<<<<<<<<<<<<
@@ -8056,7 +8056,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED Py
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 215; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":216
+  /* "parabam/command/stat.pyx":216
  * 	def merge_cumu(self,result):
  * 		self.data += result
  * 		del result             # <<<<<<<<<<<<<<
@@ -8066,7 +8066,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED Py
   __Pyx_DECREF(__pyx_v_result);
   __pyx_v_result = NULL;
 
-  /* "stat.pyx":214
+  /* "parabam/command/stat.pyx":214
  * 		del result
  * 
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -8080,7 +8080,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED Py
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_AddTraceback("stat.NumericStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_result);
@@ -8089,7 +8089,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "stat.pyx":218
+/* "parabam/command/stat.pyx":218
  * 		del result
  * 
  * 	def write_to_csv(self,out_paths,source,mode):             # <<<<<<<<<<<<<<
@@ -8098,9 +8098,9 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_14merge_cumu(CYTHON_UNUSED Py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_16NumericStructure_17write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_16NumericStructure_17write_to_csv = {"write_to_csv", (PyCFunction)__pyx_pw_4stat_16NumericStructure_17write_to_csv, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_16NumericStructure_17write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_17write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_16NumericStructure_17write_to_csv = {"write_to_csv", (PyCFunction)__pyx_pw_7parabam_7command_4stat_16NumericStructure_17write_to_csv, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_16NumericStructure_17write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_out_paths = 0;
   PyObject *__pyx_v_source = 0;
@@ -8166,18 +8166,18 @@ static PyObject *__pyx_pw_4stat_16NumericStructure_17write_to_csv(PyObject *__py
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("write_to_csv", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.NumericStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_16NumericStructure_16write_to_csv(__pyx_self, __pyx_v_self, __pyx_v_out_paths, __pyx_v_source, __pyx_v_mode);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_16NumericStructure_16write_to_csv(__pyx_self, __pyx_v_self, __pyx_v_out_paths, __pyx_v_source, __pyx_v_mode);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_out_paths, PyObject *__pyx_v_source, PyObject *__pyx_v_mode) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_out_paths, PyObject *__pyx_v_source, PyObject *__pyx_v_mode) {
   PyObject *__pyx_v_first_col = NULL;
   PyObject *__pyx_v_write_line = NULL;
   PyObject *__pyx_v_out_object = NULL;
@@ -8199,7 +8199,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("write_to_csv", 0);
 
-  /* "stat.pyx":219
+  /* "parabam/command/stat.pyx":219
  * 
  * 	def write_to_csv(self,out_paths,source,mode):
  * 		if mode == "a":             # <<<<<<<<<<<<<<
@@ -8209,7 +8209,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
   __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_mode, __pyx_n_s_a, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 219; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_1) {
 
-    /* "stat.pyx":220
+    /* "parabam/command/stat.pyx":220
  * 	def write_to_csv(self,out_paths,source,mode):
  * 		if mode == "a":
  * 			first_col=source             # <<<<<<<<<<<<<<
@@ -8221,7 +8221,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
     goto __pyx_L3;
   }
 
-  /* "stat.pyx":221
+  /* "parabam/command/stat.pyx":221
  * 		if mode == "a":
  * 			first_col=source
  * 		elif mode == "s":             # <<<<<<<<<<<<<<
@@ -8231,7 +8231,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
   __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_mode, __pyx_n_s_s, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_1) {
 
-    /* "stat.pyx":222
+    /* "parabam/command/stat.pyx":222
  * 			first_col=source
  * 		elif mode == "s":
  * 			first_col=self.name             # <<<<<<<<<<<<<<
@@ -8246,7 +8246,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
   }
   __pyx_L3:;
 
-  /* "stat.pyx":223
+  /* "parabam/command/stat.pyx":223
  * 		elif mode == "s":
  * 			first_col=self.name
  * 		write_line = "%s,%.3f\n" % (first_col,self.data,)             # <<<<<<<<<<<<<<
@@ -8270,7 +8270,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
   __pyx_v_write_line = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "stat.pyx":225
+  /* "parabam/command/stat.pyx":225
  * 		write_line = "%s,%.3f\n" % (first_col,self.data,)
  * 
  * 		with open(out_paths[source][self.name],"a") as out_object:             # <<<<<<<<<<<<<<
@@ -8332,7 +8332,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
           __pyx_v_out_object = __pyx_t_2;
           __pyx_t_2 = 0;
 
-          /* "stat.pyx":226
+          /* "parabam/command/stat.pyx":226
  * 
  * 		with open(out_paths[source][self.name],"a") as out_object:
  * 			out_object.write(write_line)             # <<<<<<<<<<<<<<
@@ -8378,7 +8378,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "stat.pyx":225
+        /* "parabam/command/stat.pyx":225
  * 		write_line = "%s,%.3f\n" % (first_col,self.data,)
  * 
  * 		with open(out_paths[source][self.name],"a") as out_object:             # <<<<<<<<<<<<<<
@@ -8386,7 +8386,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
  * 
  */
         /*except:*/ {
-          __Pyx_AddTraceback("stat.NumericStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
+          __Pyx_AddTraceback("parabam.command.stat.NumericStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
           if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_4, &__pyx_t_6) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L10_except_error;}
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GOTREF(__pyx_t_4);
@@ -8449,7 +8449,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
     __pyx_L19:;
   }
 
-  /* "stat.pyx":218
+  /* "parabam/command/stat.pyx":218
  * 		del result
  * 
  * 	def write_to_csv(self,out_paths,source,mode):             # <<<<<<<<<<<<<<
@@ -8465,7 +8465,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.NumericStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.NumericStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_first_col);
@@ -8476,7 +8476,7 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
   return __pyx_r;
 }
 
-/* "stat.pyx":229
+/* "parabam/command/stat.pyx":229
  * 
  * class ArrayStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data):             # <<<<<<<<<<<<<<
@@ -8485,9 +8485,9 @@ static PyObject *__pyx_pf_4stat_16NumericStructure_16write_to_csv(CYTHON_UNUSED 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_14ArrayStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_14ArrayStructure_1__init__ = {"__init__", (PyCFunction)__pyx_pw_4stat_14ArrayStructure_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_14ArrayStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_14ArrayStructure_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_14ArrayStructure_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_name = 0;
   PyObject *__pyx_v_struc_type = 0;
@@ -8562,18 +8562,18 @@ static PyObject *__pyx_pw_4stat_14ArrayStructure_1__init__(PyObject *__pyx_self,
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__init__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ArrayStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_14ArrayStructure___init__(__pyx_self, __pyx_v_self, __pyx_v_name, __pyx_v_struc_type, __pyx_v_store_method, __pyx_v_data);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_14ArrayStructure___init__(__pyx_self, __pyx_v_self, __pyx_v_name, __pyx_v_struc_type, __pyx_v_store_method, __pyx_v_data);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_14ArrayStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_struc_type, PyObject *__pyx_v_store_method, PyObject *__pyx_v_data) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -8586,7 +8586,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure___init__(CYTHON_UNUSED PyObject
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "stat.pyx":230
+  /* "parabam/command/stat.pyx":230
  * class ArrayStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data):
  * 		super(ArrayStructure,self).__init__(name,struc_type,store_method,data)             # <<<<<<<<<<<<<<
@@ -8644,7 +8644,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure___init__(CYTHON_UNUSED PyObject
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":229
+  /* "parabam/command/stat.pyx":229
  * 
  * class ArrayStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data):             # <<<<<<<<<<<<<<
@@ -8660,7 +8660,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure___init__(CYTHON_UNUSED PyObject
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("stat.ArrayStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -8668,7 +8668,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure___init__(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "stat.pyx":232
+/* "parabam/command/stat.pyx":232
  * 		super(ArrayStructure,self).__init__(name,struc_type,store_method,data)
  * 
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
@@ -8677,20 +8677,20 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure___init__(CYTHON_UNUSED PyObject
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_14ArrayStructure_3empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_14ArrayStructure_3empty_clone = {"empty_clone", (PyCFunction)__pyx_pw_4stat_14ArrayStructure_3empty_clone, METH_O, 0};
-static PyObject *__pyx_pw_4stat_14ArrayStructure_3empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_3empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_14ArrayStructure_3empty_clone = {"empty_clone", (PyCFunction)__pyx_pw_7parabam_7command_4stat_14ArrayStructure_3empty_clone, METH_O, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_3empty_clone(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("empty_clone (wrapper)", 0);
-  __pyx_r = __pyx_pf_4stat_14ArrayStructure_2empty_clone(__pyx_self, ((PyObject *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_14ArrayStructure_2empty_clone(__pyx_self, ((PyObject *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_14ArrayStructure_2empty_clone(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_2empty_clone(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -8707,7 +8707,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_2empty_clone(CYTHON_UNUSED PyOb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("empty_clone", 0);
 
-  /* "stat.pyx":233
+  /* "parabam/command/stat.pyx":233
  * 
  * 	def empty_clone(self):
  * 		return ArrayStructure(self.name,self.struc_type,self.store_method,self.org_data)             # <<<<<<<<<<<<<<
@@ -8762,7 +8762,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_2empty_clone(CYTHON_UNUSED PyOb
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "stat.pyx":232
+  /* "parabam/command/stat.pyx":232
  * 		super(ArrayStructure,self).__init__(name,struc_type,store_method,data)
  * 
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
@@ -8780,7 +8780,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_2empty_clone(CYTHON_UNUSED PyOb
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_AddTraceback("stat.ArrayStructure.empty_clone", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.empty_clone", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -8788,7 +8788,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_2empty_clone(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "stat.pyx":235
+/* "parabam/command/stat.pyx":235
  * 		return ArrayStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  * 	def add_max(self,result,coords):             # <<<<<<<<<<<<<<
@@ -8797,9 +8797,9 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_2empty_clone(CYTHON_UNUSED PyOb
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_14ArrayStructure_5add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_14ArrayStructure_5add_max = {"add_max", (PyCFunction)__pyx_pw_4stat_14ArrayStructure_5add_max, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_14ArrayStructure_5add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_5add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_14ArrayStructure_5add_max = {"add_max", (PyCFunction)__pyx_pw_7parabam_7command_4stat_14ArrayStructure_5add_max, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_5add_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   PyObject *__pyx_v_coords = 0;
@@ -8856,18 +8856,18 @@ static PyObject *__pyx_pw_4stat_14ArrayStructure_5add_max(PyObject *__pyx_self, 
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("add_max", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ArrayStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_14ArrayStructure_4add_max(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_coords);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_14ArrayStructure_4add_max(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_coords);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords) {
   PyObject *__pyx_v_existing = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -8881,7 +8881,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_max", 0);
 
-  /* "stat.pyx":236
+  /* "parabam/command/stat.pyx":236
  * 
  * 	def add_max(self,result,coords):
  * 		existing = self.data[coords]             # <<<<<<<<<<<<<<
@@ -8896,7 +8896,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject
   __pyx_v_existing = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "stat.pyx":237
+  /* "parabam/command/stat.pyx":237
  * 	def add_max(self,result,coords):
  * 		existing = self.data[coords]
  * 		self.data[coords] = self.max_decision(result,existing)             # <<<<<<<<<<<<<<
@@ -8938,7 +8938,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":235
+  /* "parabam/command/stat.pyx":235
  * 		return ArrayStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  * 	def add_max(self,result,coords):             # <<<<<<<<<<<<<<
@@ -8954,7 +8954,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("stat.ArrayStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.add_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_existing);
@@ -8963,7 +8963,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "stat.pyx":239
+/* "parabam/command/stat.pyx":239
  * 		self.data[coords] = self.max_decision(result,existing)
  * 
  * 	def add_min(self,result,coords):             # <<<<<<<<<<<<<<
@@ -8972,9 +8972,9 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_4add_max(CYTHON_UNUSED PyObject
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_14ArrayStructure_7add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_14ArrayStructure_7add_min = {"add_min", (PyCFunction)__pyx_pw_4stat_14ArrayStructure_7add_min, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_14ArrayStructure_7add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_7add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_14ArrayStructure_7add_min = {"add_min", (PyCFunction)__pyx_pw_7parabam_7command_4stat_14ArrayStructure_7add_min, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_7add_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   PyObject *__pyx_v_coords = 0;
@@ -9031,18 +9031,18 @@ static PyObject *__pyx_pw_4stat_14ArrayStructure_7add_min(PyObject *__pyx_self, 
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("add_min", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ArrayStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_14ArrayStructure_6add_min(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_coords);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_14ArrayStructure_6add_min(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_coords);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords) {
   PyObject *__pyx_v_existing = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -9056,7 +9056,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_min", 0);
 
-  /* "stat.pyx":240
+  /* "parabam/command/stat.pyx":240
  * 
  * 	def add_min(self,result,coords):
  * 		existing = self.data[coords]             # <<<<<<<<<<<<<<
@@ -9071,7 +9071,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject
   __pyx_v_existing = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "stat.pyx":241
+  /* "parabam/command/stat.pyx":241
  * 	def add_min(self,result,coords):
  * 		existing = self.data[coords]
  * 		self.data[coords] = self.min_decision(result,existing)             # <<<<<<<<<<<<<<
@@ -9113,7 +9113,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":239
+  /* "parabam/command/stat.pyx":239
  * 		self.data[coords] = self.max_decision(result,existing)
  * 
  * 	def add_min(self,result,coords):             # <<<<<<<<<<<<<<
@@ -9129,7 +9129,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("stat.ArrayStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.add_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_existing);
@@ -9138,7 +9138,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "stat.pyx":243
+/* "parabam/command/stat.pyx":243
  * 		self.data[coords] = self.min_decision(result,existing)
  * 
  * 	def add_cumu(self,result,coords):             # <<<<<<<<<<<<<<
@@ -9147,9 +9147,9 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_6add_min(CYTHON_UNUSED PyObject
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_14ArrayStructure_9add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_14ArrayStructure_9add_cumu = {"add_cumu", (PyCFunction)__pyx_pw_4stat_14ArrayStructure_9add_cumu, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_14ArrayStructure_9add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_9add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_14ArrayStructure_9add_cumu = {"add_cumu", (PyCFunction)__pyx_pw_7parabam_7command_4stat_14ArrayStructure_9add_cumu, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_9add_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   PyObject *__pyx_v_coords = 0;
@@ -9206,18 +9206,18 @@ static PyObject *__pyx_pw_4stat_14ArrayStructure_9add_cumu(PyObject *__pyx_self,
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("add_cumu", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ArrayStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_14ArrayStructure_8add_cumu(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_coords);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_14ArrayStructure_8add_cumu(__pyx_self, __pyx_v_self, __pyx_v_result, __pyx_v_coords);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_14ArrayStructure_8add_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_8add_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result, PyObject *__pyx_v_coords) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9229,7 +9229,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_8add_cumu(CYTHON_UNUSED PyObjec
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_cumu", 0);
 
-  /* "stat.pyx":244
+  /* "parabam/command/stat.pyx":244
  * 
  * 	def add_cumu(self,result,coords):
  * 		self.data[coords] += result             # <<<<<<<<<<<<<<
@@ -9250,7 +9250,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_8add_cumu(CYTHON_UNUSED PyObjec
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":243
+  /* "parabam/command/stat.pyx":243
  * 		self.data[coords] = self.min_decision(result,existing)
  * 
  * 	def add_cumu(self,result,coords):             # <<<<<<<<<<<<<<
@@ -9266,7 +9266,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_8add_cumu(CYTHON_UNUSED PyObjec
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("stat.ArrayStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.add_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -9274,7 +9274,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_8add_cumu(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "stat.pyx":246
+/* "parabam/command/stat.pyx":246
  * 		self.data[coords] += result
  * 
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
@@ -9283,9 +9283,9 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_8add_cumu(CYTHON_UNUSED PyObjec
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_14ArrayStructure_11merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_14ArrayStructure_11merge_max = {"merge_max", (PyCFunction)__pyx_pw_4stat_14ArrayStructure_11merge_max, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_14ArrayStructure_11merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_11merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_14ArrayStructure_11merge_max = {"merge_max", (PyCFunction)__pyx_pw_7parabam_7command_4stat_14ArrayStructure_11merge_max, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_11merge_max(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -9333,18 +9333,18 @@ static PyObject *__pyx_pw_4stat_14ArrayStructure_11merge_max(PyObject *__pyx_sel
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("merge_max", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ArrayStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_14ArrayStructure_10merge_max(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_14ArrayStructure_10merge_max(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9359,7 +9359,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObj
   __Pyx_RefNannySetupContext("merge_max", 0);
   __Pyx_INCREF(__pyx_v_result);
 
-  /* "stat.pyx":247
+  /* "parabam/command/stat.pyx":247
  * 
  * 	def merge_max(self,result):
  * 		self.data = np.maximum(self.data,result)             # <<<<<<<<<<<<<<
@@ -9403,7 +9403,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObj
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":248
+  /* "parabam/command/stat.pyx":248
  * 	def merge_max(self,result):
  * 		self.data = np.maximum(self.data,result)
  * 		del result             # <<<<<<<<<<<<<<
@@ -9413,7 +9413,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObj
   __Pyx_DECREF(__pyx_v_result);
   __pyx_v_result = NULL;
 
-  /* "stat.pyx":246
+  /* "parabam/command/stat.pyx":246
  * 		self.data[coords] += result
  * 
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
@@ -9430,7 +9430,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObj
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.ArrayStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.merge_max", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_result);
@@ -9439,7 +9439,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "stat.pyx":250
+/* "parabam/command/stat.pyx":250
  * 		del result
  * 
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
@@ -9448,9 +9448,9 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_10merge_max(CYTHON_UNUSED PyObj
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_14ArrayStructure_13merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_14ArrayStructure_13merge_min = {"merge_min", (PyCFunction)__pyx_pw_4stat_14ArrayStructure_13merge_min, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_14ArrayStructure_13merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_13merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_14ArrayStructure_13merge_min = {"merge_min", (PyCFunction)__pyx_pw_7parabam_7command_4stat_14ArrayStructure_13merge_min, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_13merge_min(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -9498,18 +9498,18 @@ static PyObject *__pyx_pw_4stat_14ArrayStructure_13merge_min(PyObject *__pyx_sel
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("merge_min", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ArrayStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_14ArrayStructure_12merge_min(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_14ArrayStructure_12merge_min(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9524,7 +9524,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObj
   __Pyx_RefNannySetupContext("merge_min", 0);
   __Pyx_INCREF(__pyx_v_result);
 
-  /* "stat.pyx":251
+  /* "parabam/command/stat.pyx":251
  * 
  * 	def merge_min(self,result):
  * 		self.data = np.minimum(self.data,result)             # <<<<<<<<<<<<<<
@@ -9568,7 +9568,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObj
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 251; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":252
+  /* "parabam/command/stat.pyx":252
  * 	def merge_min(self,result):
  * 		self.data = np.minimum(self.data,result)
  * 		del result             # <<<<<<<<<<<<<<
@@ -9578,7 +9578,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObj
   __Pyx_DECREF(__pyx_v_result);
   __pyx_v_result = NULL;
 
-  /* "stat.pyx":250
+  /* "parabam/command/stat.pyx":250
  * 		del result
  * 
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
@@ -9595,7 +9595,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObj
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.ArrayStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.merge_min", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_result);
@@ -9604,7 +9604,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "stat.pyx":254
+/* "parabam/command/stat.pyx":254
  * 		del result
  * 
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -9613,9 +9613,9 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_12merge_min(CYTHON_UNUSED PyObj
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_14ArrayStructure_15merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_14ArrayStructure_15merge_cumu = {"merge_cumu", (PyCFunction)__pyx_pw_4stat_14ArrayStructure_15merge_cumu, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_14ArrayStructure_15merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_15merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_14ArrayStructure_15merge_cumu = {"merge_cumu", (PyCFunction)__pyx_pw_7parabam_7command_4stat_14ArrayStructure_15merge_cumu, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_15merge_cumu(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_result = 0;
   int __pyx_lineno = 0;
@@ -9663,18 +9663,18 @@ static PyObject *__pyx_pw_4stat_14ArrayStructure_15merge_cumu(PyObject *__pyx_se
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("merge_cumu", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ArrayStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_14ArrayStructure_14merge_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_14ArrayStructure_14merge_cumu(__pyx_self, __pyx_v_self, __pyx_v_result);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_result) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9685,7 +9685,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyOb
   __Pyx_RefNannySetupContext("merge_cumu", 0);
   __Pyx_INCREF(__pyx_v_result);
 
-  /* "stat.pyx":255
+  /* "parabam/command/stat.pyx":255
  * 
  * 	def merge_cumu(self,result):
  * 		self.data += result             # <<<<<<<<<<<<<<
@@ -9700,7 +9700,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyOb
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_data, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":256
+  /* "parabam/command/stat.pyx":256
  * 	def merge_cumu(self,result):
  * 		self.data += result
  * 		del result             # <<<<<<<<<<<<<<
@@ -9710,7 +9710,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyOb
   __Pyx_DECREF(__pyx_v_result);
   __pyx_v_result = NULL;
 
-  /* "stat.pyx":254
+  /* "parabam/command/stat.pyx":254
  * 		del result
  * 
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -9724,7 +9724,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyOb
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_AddTraceback("stat.ArrayStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.merge_cumu", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_result);
@@ -9733,7 +9733,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "stat.pyx":258
+/* "parabam/command/stat.pyx":258
  * 		del result
  * 
  * 	def write_to_csv(self,out_path,source,mode):             # <<<<<<<<<<<<<<
@@ -9742,9 +9742,9 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_14merge_cumu(CYTHON_UNUSED PyOb
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_14ArrayStructure_17write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_14ArrayStructure_17write_to_csv = {"write_to_csv", (PyCFunction)__pyx_pw_4stat_14ArrayStructure_17write_to_csv, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_14ArrayStructure_17write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_17write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_14ArrayStructure_17write_to_csv = {"write_to_csv", (PyCFunction)__pyx_pw_7parabam_7command_4stat_14ArrayStructure_17write_to_csv, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_14ArrayStructure_17write_to_csv(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_out_path = 0;
   CYTHON_UNUSED PyObject *__pyx_v_source = 0;
@@ -9810,18 +9810,18 @@ static PyObject *__pyx_pw_4stat_14ArrayStructure_17write_to_csv(PyObject *__pyx_
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("write_to_csv", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.ArrayStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_14ArrayStructure_16write_to_csv(__pyx_self, __pyx_v_self, __pyx_v_out_path, __pyx_v_source, __pyx_v_mode);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_14ArrayStructure_16write_to_csv(__pyx_self, __pyx_v_self, __pyx_v_out_path, __pyx_v_source, __pyx_v_mode);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_14ArrayStructure_16write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_out_path, CYTHON_UNUSED PyObject *__pyx_v_source, CYTHON_UNUSED PyObject *__pyx_v_mode) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_16write_to_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_out_path, CYTHON_UNUSED PyObject *__pyx_v_source, CYTHON_UNUSED PyObject *__pyx_v_mode) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9833,7 +9833,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_16write_to_csv(CYTHON_UNUSED Py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("write_to_csv", 0);
 
-  /* "stat.pyx":259
+  /* "parabam/command/stat.pyx":259
  * 
  * 	def write_to_csv(self,out_path,source,mode):
  * 		np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")             # <<<<<<<<<<<<<<
@@ -9866,7 +9866,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_16write_to_csv(CYTHON_UNUSED Py
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":258
+  /* "parabam/command/stat.pyx":258
  * 		del result
  * 
  * 	def write_to_csv(self,out_path,source,mode):             # <<<<<<<<<<<<<<
@@ -9882,7 +9882,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_16write_to_csv(CYTHON_UNUSED Py
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("stat.ArrayStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.ArrayStructure.write_to_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -9890,7 +9890,7 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_16write_to_csv(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "stat.pyx":263
+/* "parabam/command/stat.pyx":263
  * class Interface(parabam.core.UserInterface):
  * 
  * 	def __init__(self,temp_dir,exe_dir):             # <<<<<<<<<<<<<<
@@ -9899,9 +9899,9 @@ static PyObject *__pyx_pf_4stat_14ArrayStructure_16write_to_csv(CYTHON_UNUSED Py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_1__init__ = {"__init__", (PyCFunction)__pyx_pw_4stat_9Interface_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_1__init__ = {"__init__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_temp_dir = 0;
   PyObject *__pyx_v_exe_dir = 0;
@@ -9958,18 +9958,18 @@ static PyObject *__pyx_pw_4stat_9Interface_1__init__(PyObject *__pyx_self, PyObj
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__init__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface___init__(__pyx_self, __pyx_v_self, __pyx_v_temp_dir, __pyx_v_exe_dir);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface___init__(__pyx_self, __pyx_v_self, __pyx_v_temp_dir, __pyx_v_exe_dir);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_temp_dir, PyObject *__pyx_v_exe_dir) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_temp_dir, PyObject *__pyx_v_exe_dir) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9982,7 +9982,7 @@ static PyObject *__pyx_pf_4stat_9Interface___init__(CYTHON_UNUSED PyObject *__py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "stat.pyx":264
+  /* "parabam/command/stat.pyx":264
  * 
  * 	def __init__(self,temp_dir,exe_dir):
  * 		super(Interface,self).__init__(temp_dir,exe_dir)             # <<<<<<<<<<<<<<
@@ -10034,7 +10034,7 @@ static PyObject *__pyx_pf_4stat_9Interface___init__(CYTHON_UNUSED PyObject *__py
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":263
+  /* "parabam/command/stat.pyx":263
  * class Interface(parabam.core.UserInterface):
  * 
  * 	def __init__(self,temp_dir,exe_dir):             # <<<<<<<<<<<<<<
@@ -10050,7 +10050,7 @@ static PyObject *__pyx_pf_4stat_9Interface___init__(CYTHON_UNUSED PyObject *__py
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("stat.Interface.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -10058,7 +10058,7 @@ static PyObject *__pyx_pf_4stat_9Interface___init__(CYTHON_UNUSED PyObject *__py
   return __pyx_r;
 }
 
-/* "stat.pyx":266
+/* "parabam/command/stat.pyx":266
  * 		super(Interface,self).__init__(temp_dir,exe_dir)
  * 
  * 	def run_cmd(self,parser):             # <<<<<<<<<<<<<<
@@ -10067,9 +10067,9 @@ static PyObject *__pyx_pf_4stat_9Interface___init__(CYTHON_UNUSED PyObject *__py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_3run_cmd(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_3run_cmd = {"run_cmd", (PyCFunction)__pyx_pw_4stat_9Interface_3run_cmd, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_3run_cmd(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_3run_cmd(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_3run_cmd = {"run_cmd", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_3run_cmd, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_3run_cmd(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_parser = 0;
   int __pyx_lineno = 0;
@@ -10117,18 +10117,18 @@ static PyObject *__pyx_pw_4stat_9Interface_3run_cmd(PyObject *__pyx_self, PyObje
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("run_cmd", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.run_cmd", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.run_cmd", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_2run_cmd(__pyx_self, __pyx_v_self, __pyx_v_parser);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_2run_cmd(__pyx_self, __pyx_v_self, __pyx_v_parser);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_parser) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_parser) {
   PyObject *__pyx_v_cmd_args = NULL;
   PyObject *__pyx_v_verbose = NULL;
   PyObject *__pyx_v_module = NULL;
@@ -10148,7 +10148,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("run_cmd", 0);
 
-  /* "stat.pyx":268
+  /* "parabam/command/stat.pyx":268
  * 	def run_cmd(self,parser):
  * 
  * 		cmd_args = parser.parse_args()             # <<<<<<<<<<<<<<
@@ -10178,7 +10178,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   __pyx_v_cmd_args = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":270
+  /* "parabam/command/stat.pyx":270
  * 		cmd_args = parser.parse_args()
  * 
  * 		verbose = cmd_args.v             # <<<<<<<<<<<<<<
@@ -10190,7 +10190,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   __pyx_v_verbose = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":271
+  /* "parabam/command/stat.pyx":271
  * 
  * 		verbose = cmd_args.v
  * 		module,user_engine,user_constants = self.__get_module_and_vitals__(cmd_args.instruc)             # <<<<<<<<<<<<<<
@@ -10291,7 +10291,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   __pyx_v_user_constants = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "stat.pyx":272
+  /* "parabam/command/stat.pyx":272
  * 		verbose = cmd_args.v
  * 		module,user_engine,user_constants = self.__get_module_and_vitals__(cmd_args.instruc)
  * 		user_structures_blueprint = {}             # <<<<<<<<<<<<<<
@@ -10303,7 +10303,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   __pyx_v_user_structures_blueprint = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":273
+  /* "parabam/command/stat.pyx":273
  * 		module,user_engine,user_constants = self.__get_module_and_vitals__(cmd_args.instruc)
  * 		user_structures_blueprint = {}
  * 		module.set_structures(user_structures_blueprint)             # <<<<<<<<<<<<<<
@@ -10339,7 +10339,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":275
+  /* "parabam/command/stat.pyx":275
  * 		module.set_structures(user_structures_blueprint)
  * 
  * 		self.run(             # <<<<<<<<<<<<<<
@@ -10351,7 +10351,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "stat.pyx":276
+  /* "parabam/command/stat.pyx":276
  * 
  * 		self.run(
  * 			input_bams=cmd_args.input,             # <<<<<<<<<<<<<<
@@ -10363,7 +10363,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_input_bams, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":277
+  /* "parabam/command/stat.pyx":277
  * 		self.run(
  * 			input_bams=cmd_args.input,
  * 			user_specified_outpath = cmd_args.output,             # <<<<<<<<<<<<<<
@@ -10375,7 +10375,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_user_specified_outpath, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":278
+  /* "parabam/command/stat.pyx":278
  * 			input_bams=cmd_args.input,
  * 			user_specified_outpath = cmd_args.output,
  * 			proc= cmd_args.p,             # <<<<<<<<<<<<<<
@@ -10387,7 +10387,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_proc, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":279
+  /* "parabam/command/stat.pyx":279
  * 			user_specified_outpath = cmd_args.output,
  * 			proc= cmd_args.p,
  * 			chunk= cmd_args.c,             # <<<<<<<<<<<<<<
@@ -10399,7 +10399,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_chunk, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":280
+  /* "parabam/command/stat.pyx":280
  * 			proc= cmd_args.p,
  * 			chunk= cmd_args.c,
  * 			verbose= verbose,             # <<<<<<<<<<<<<<
@@ -10408,7 +10408,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
  */
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_verbose, __pyx_v_verbose) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":281
+  /* "parabam/command/stat.pyx":281
  * 			chunk= cmd_args.c,
  * 			verbose= verbose,
  * 			user_constants = user_constants,             # <<<<<<<<<<<<<<
@@ -10417,7 +10417,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
  */
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_user_constants, __pyx_v_user_constants) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":282
+  /* "parabam/command/stat.pyx":282
  * 			verbose= verbose,
  * 			user_constants = user_constants,
  * 			user_engine = user_engine,             # <<<<<<<<<<<<<<
@@ -10426,7 +10426,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
  */
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_user_engine, __pyx_v_user_engine) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":283
+  /* "parabam/command/stat.pyx":283
  * 			user_constants = user_constants,
  * 			user_engine = user_engine,
  * 			user_struc_blueprint = user_structures_blueprint,             # <<<<<<<<<<<<<<
@@ -10435,7 +10435,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
  */
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_user_struc_blueprint, __pyx_v_user_structures_blueprint) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":284
+  /* "parabam/command/stat.pyx":284
  * 			user_engine = user_engine,
  * 			user_struc_blueprint = user_structures_blueprint,
  * 			engine_is_class = False,             # <<<<<<<<<<<<<<
@@ -10444,7 +10444,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
  */
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_engine_is_class, Py_False) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":285
+  /* "parabam/command/stat.pyx":285
  * 			user_struc_blueprint = user_structures_blueprint,
  * 			engine_is_class = False,
  * 			outmode = cmd_args.outmode)             # <<<<<<<<<<<<<<
@@ -10456,7 +10456,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_outmode, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":275
+  /* "parabam/command/stat.pyx":275
  * 		module.set_structures(user_structures_blueprint)
  * 
  * 		self.run(             # <<<<<<<<<<<<<<
@@ -10469,7 +10469,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":266
+  /* "parabam/command/stat.pyx":266
  * 		super(Interface,self).__init__(temp_dir,exe_dir)
  * 
  * 	def run_cmd(self,parser):             # <<<<<<<<<<<<<<
@@ -10486,7 +10486,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("stat.Interface.run_cmd", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.run_cmd", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_cmd_args);
@@ -10500,7 +10500,7 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
   return __pyx_r;
 }
 
-/* "stat.pyx":287
+/* "parabam/command/stat.pyx":287
  * 			outmode = cmd_args.outmode)
  * 
  * 	def run(self,input_bams,user_specified_outpath,proc,chunk,user_constants,user_engine,             # <<<<<<<<<<<<<<
@@ -10509,9 +10509,9 @@ static PyObject *__pyx_pf_4stat_9Interface_2run_cmd(CYTHON_UNUSED PyObject *__py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_5run(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_5run = {"run", (PyCFunction)__pyx_pw_4stat_9Interface_5run, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_5run(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_5run(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_5run = {"run", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_5run, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_5run(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_input_bams = 0;
   PyObject *__pyx_v_user_specified_outpath = 0;
@@ -10535,7 +10535,7 @@ static PyObject *__pyx_pw_4stat_9Interface_5run(PyObject *__pyx_self, PyObject *
     PyObject* values[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
     values[9] = ((PyObject *)((PyObject *)__pyx_int_4));
 
-    /* "stat.pyx":288
+    /* "parabam/command/stat.pyx":288
  * 
  * 	def run(self,input_bams,user_specified_outpath,proc,chunk,user_constants,user_engine,
  * 			user_struc_blueprint,outmode,multi=4,verbose=False,engine_is_class=False):             # <<<<<<<<<<<<<<
@@ -10662,13 +10662,13 @@ static PyObject *__pyx_pw_4stat_9Interface_5run(PyObject *__pyx_self, PyObject *
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("run", 0, 9, 12, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 287; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.run", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.run", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_4run(__pyx_self, __pyx_v_self, __pyx_v_input_bams, __pyx_v_user_specified_outpath, __pyx_v_proc, __pyx_v_chunk, __pyx_v_user_constants, __pyx_v_user_engine, __pyx_v_user_struc_blueprint, __pyx_v_outmode, __pyx_v_multi, __pyx_v_verbose, __pyx_v_engine_is_class);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_4run(__pyx_self, __pyx_v_self, __pyx_v_input_bams, __pyx_v_user_specified_outpath, __pyx_v_proc, __pyx_v_chunk, __pyx_v_user_constants, __pyx_v_user_engine, __pyx_v_user_struc_blueprint, __pyx_v_outmode, __pyx_v_multi, __pyx_v_verbose, __pyx_v_engine_is_class);
 
-  /* "stat.pyx":287
+  /* "parabam/command/stat.pyx":287
  * 			outmode = cmd_args.outmode)
  * 
  * 	def run(self,input_bams,user_specified_outpath,proc,chunk,user_constants,user_engine,             # <<<<<<<<<<<<<<
@@ -10681,7 +10681,7 @@ static PyObject *__pyx_pw_4stat_9Interface_5run(PyObject *__pyx_self, PyObject *
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_input_bams, PyObject *__pyx_v_user_specified_outpath, PyObject *__pyx_v_proc, PyObject *__pyx_v_chunk, PyObject *__pyx_v_user_constants, PyObject *__pyx_v_user_engine, PyObject *__pyx_v_user_struc_blueprint, PyObject *__pyx_v_outmode, PyObject *__pyx_v_multi, PyObject *__pyx_v_verbose, PyObject *__pyx_v_engine_is_class) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_input_bams, PyObject *__pyx_v_user_specified_outpath, PyObject *__pyx_v_proc, PyObject *__pyx_v_chunk, PyObject *__pyx_v_user_constants, PyObject *__pyx_v_user_engine, PyObject *__pyx_v_user_struc_blueprint, PyObject *__pyx_v_outmode, PyObject *__pyx_v_multi, PyObject *__pyx_v_verbose, PyObject *__pyx_v_engine_is_class) {
   PyObject *__pyx_v_user_structures = NULL;
   PyObject *__pyx_v_super_sources = NULL;
   PyObject *__pyx_v_output_path = NULL;
@@ -10716,7 +10716,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("run", 0);
 
-  /* "stat.pyx":290
+  /* "parabam/command/stat.pyx":290
  * 			user_struc_blueprint,outmode,multi=4,verbose=False,engine_is_class=False):
  * 
  * 		user_structures = self.__create_structures__(user_struc_blueprint)             # <<<<<<<<<<<<<<
@@ -10753,7 +10753,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_v_user_structures = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":291
+  /* "parabam/command/stat.pyx":291
  * 
  * 		user_structures = self.__create_structures__(user_struc_blueprint)
  * 		super_sources = [ self.__get_basename__(b) for b in input_bams ]             # <<<<<<<<<<<<<<
@@ -10835,7 +10835,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_v_super_sources = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":293
+  /* "parabam/command/stat.pyx":293
  * 		super_sources = [ self.__get_basename__(b) for b in input_bams ]
  * 
  * 		if not user_specified_outpath:             # <<<<<<<<<<<<<<
@@ -10846,7 +10846,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_t_10 = ((!__pyx_t_9) != 0);
   if (__pyx_t_10) {
 
-    /* "stat.pyx":294
+    /* "parabam/command/stat.pyx":294
  * 
  * 		if not user_specified_outpath:
  * 			output_path = "%s/parabam_stat_%d.csv" % (self._temp_dir,int(time.time()),)             # <<<<<<<<<<<<<<
@@ -10898,7 +10898,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   }
   /*else*/ {
 
-    /* "stat.pyx":296
+    /* "parabam/command/stat.pyx":296
  * 			output_path = "%s/parabam_stat_%d.csv" % (self._temp_dir,int(time.time()),)
  * 		else:
  * 			output_path = user_specified_outpath             # <<<<<<<<<<<<<<
@@ -10910,7 +10910,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   }
   __pyx_L5:;
 
-  /* "stat.pyx":298
+  /* "parabam/command/stat.pyx":298
  * 			output_path = user_specified_outpath
  * 
  * 		analysis_names = self.__get_non_array_names__(user_structures)             # <<<<<<<<<<<<<<
@@ -10947,7 +10947,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_v_analysis_names = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "stat.pyx":299
+  /* "parabam/command/stat.pyx":299
  * 
  * 		analysis_names = self.__get_non_array_names__(user_structures)
  * 		self.__create_output_files__(output_path,user_structures,outmode,analysis_names)             # <<<<<<<<<<<<<<
@@ -10991,7 +10991,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":301
+  /* "parabam/command/stat.pyx":301
  * 		self.__create_output_files__(output_path,user_structures,outmode,analysis_names)
  * 
  * 		if outmode == "d":             # <<<<<<<<<<<<<<
@@ -11001,7 +11001,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_t_10 = (__Pyx_PyString_Equals(__pyx_v_outmode, __pyx_n_s_d, Py_EQ)); if (unlikely(__pyx_t_10 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 301; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_10) {
 
-    /* "stat.pyx":302
+    /* "parabam/command/stat.pyx":302
  * 
  * 		if outmode == "d":
  * 			master_output_paths = output_path             # <<<<<<<<<<<<<<
@@ -11014,7 +11014,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   }
   /*else*/ {
 
-    /* "stat.pyx":304
+    /* "parabam/command/stat.pyx":304
  * 			master_output_paths = output_path
  * 		else:
  * 			master_output_paths = {}             # <<<<<<<<<<<<<<
@@ -11028,7 +11028,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   }
   __pyx_L6:;
 
-  /* "stat.pyx":307
+  /* "parabam/command/stat.pyx":307
  * 
  * 
  * 		for input_group,output_group in self.__get_group__(input_bams,super_sources,multi=multi):             # <<<<<<<<<<<<<<
@@ -11146,7 +11146,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     __Pyx_XDECREF_SET(__pyx_v_output_group, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "stat.pyx":309
+    /* "parabam/command/stat.pyx":309
  * 		for input_group,output_group in self.__get_group__(input_bams,super_sources,multi=multi):
  * 
  * 			master_file_path = self.__create_master_file_paths__(input_group,output_group)             # <<<<<<<<<<<<<<
@@ -11185,7 +11185,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     __Pyx_XDECREF_SET(__pyx_v_master_file_path, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "stat.pyx":311
+    /* "parabam/command/stat.pyx":311
  * 			master_file_path = self.__create_master_file_paths__(input_group,output_group)
  * 
  * 			if not outmode == "d":             # <<<<<<<<<<<<<<
@@ -11196,7 +11196,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     __pyx_t_9 = ((!__pyx_t_10) != 0);
     if (__pyx_t_9) {
 
-      /* "stat.pyx":312
+      /* "parabam/command/stat.pyx":312
  * 
  * 			if not outmode == "d":
  * 				output_path = self.__create_individual_output_files__(outmode,output_group,user_structures)             # <<<<<<<<<<<<<<
@@ -11238,7 +11238,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
       __Pyx_DECREF_SET(__pyx_v_output_path, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "stat.pyx":313
+      /* "parabam/command/stat.pyx":313
  * 			if not outmode == "d":
  * 				output_path = self.__create_individual_output_files__(outmode,output_group,user_structures)
  * 				master_output_paths.update(output_path)             # <<<<<<<<<<<<<<
@@ -11277,7 +11277,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     }
     __pyx_L11:;
 
-    /* "stat.pyx":315
+    /* "parabam/command/stat.pyx":315
  * 				master_output_paths.update(output_path)
  * 
  * 			const = parabam.core.Const(output_paths=output_path,temp_dir=self._temp_dir,             # <<<<<<<<<<<<<<
@@ -11300,7 +11300,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_temp_dir, __pyx_t_8) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "stat.pyx":316
+    /* "parabam/command/stat.pyx":316
  * 
  * 			const = parabam.core.Const(output_paths=output_path,temp_dir=self._temp_dir,
  * 								master_file_path=master_file_path,             # <<<<<<<<<<<<<<
@@ -11309,7 +11309,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
  */
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_master_file_path, __pyx_v_master_file_path) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":317
+    /* "parabam/command/stat.pyx":317
  * 			const = parabam.core.Const(output_paths=output_path,temp_dir=self._temp_dir,
  * 								master_file_path=master_file_path,
  * 								chunk=chunk,proc=(proc // len(input_group)),             # <<<<<<<<<<<<<<
@@ -11326,7 +11326,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_proc, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "stat.pyx":318
+    /* "parabam/command/stat.pyx":318
  * 								master_file_path=master_file_path,
  * 								chunk=chunk,proc=(proc // len(input_group)),
  * 								verbose=verbose,thresh=0,             # <<<<<<<<<<<<<<
@@ -11336,7 +11336,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_verbose, __pyx_v_verbose) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_thresh, __pyx_int_0) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":319
+    /* "parabam/command/stat.pyx":319
  * 								chunk=chunk,proc=(proc // len(input_group)),
  * 								verbose=verbose,thresh=0,
  * 								sources=output_group,             # <<<<<<<<<<<<<<
@@ -11345,7 +11345,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
  */
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_sources, __pyx_v_output_group) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":320
+    /* "parabam/command/stat.pyx":320
  * 								verbose=verbose,thresh=0,
  * 								sources=output_group,
  * 								exe_dir=self._exe_dir,             # <<<<<<<<<<<<<<
@@ -11357,7 +11357,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_exe_dir, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "stat.pyx":321
+    /* "parabam/command/stat.pyx":321
  * 								sources=output_group,
  * 								exe_dir=self._exe_dir,
  * 								user_constants=user_constants,             # <<<<<<<<<<<<<<
@@ -11366,7 +11366,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
  */
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_user_constants, __pyx_v_user_constants) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":322
+    /* "parabam/command/stat.pyx":322
  * 								exe_dir=self._exe_dir,
  * 								user_constants=user_constants,
  * 								user_structures=user_structures,             # <<<<<<<<<<<<<<
@@ -11375,7 +11375,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
  */
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_user_structures, __pyx_v_user_structures) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":323
+    /* "parabam/command/stat.pyx":323
  * 								user_constants=user_constants,
  * 								user_structures=user_structures,
  * 								user_engine=user_engine,             # <<<<<<<<<<<<<<
@@ -11384,7 +11384,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
  */
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_user_engine, __pyx_v_user_engine) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":324
+    /* "parabam/command/stat.pyx":324
  * 								user_structures=user_structures,
  * 								user_engine=user_engine,
  * 								outmode=outmode,             # <<<<<<<<<<<<<<
@@ -11393,7 +11393,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
  */
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_outmode, __pyx_v_outmode) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":325
+    /* "parabam/command/stat.pyx":325
  * 								user_engine=user_engine,
  * 								outmode=outmode,
  * 								analysis_names = analysis_names)             # <<<<<<<<<<<<<<
@@ -11402,7 +11402,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
  */
     if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_analysis_names, __pyx_v_analysis_names) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":315
+    /* "parabam/command/stat.pyx":315
  * 				master_output_paths.update(output_path)
  * 
  * 			const = parabam.core.Const(output_paths=output_path,temp_dir=self._temp_dir,             # <<<<<<<<<<<<<<
@@ -11416,7 +11416,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     __Pyx_XDECREF_SET(__pyx_v_const, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":327
+    /* "parabam/command/stat.pyx":327
  * 								analysis_names = analysis_names)
  * 
  * 			task_qu = Queue()             # <<<<<<<<<<<<<<
@@ -11446,7 +11446,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     __Pyx_XDECREF_SET(__pyx_v_task_qu, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":329
+    /* "parabam/command/stat.pyx":329
  * 			task_qu = Queue()
  * 
  * 			processors = self.__create_proccessors__(task_qu,output_group,engine_is_class,user_engine,const)             # <<<<<<<<<<<<<<
@@ -11494,7 +11494,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     __Pyx_XDECREF_SET(__pyx_v_processors, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":330
+    /* "parabam/command/stat.pyx":330
  * 
  * 			processors = self.__create_proccessors__(task_qu,output_group,engine_is_class,user_engine,const)
  * 			handlers = self.__create_handlers__(task_qu,const)             # <<<<<<<<<<<<<<
@@ -11533,7 +11533,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     __Pyx_XDECREF_SET(__pyx_v_handlers, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":332
+    /* "parabam/command/stat.pyx":332
  * 			handlers = self.__create_handlers__(task_qu,const)
  * 
  * 			lev = parabam.core.Leviathon(processors,handlers,100000)             # <<<<<<<<<<<<<<
@@ -11581,7 +11581,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     __Pyx_XDECREF_SET(__pyx_v_lev, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":333
+    /* "parabam/command/stat.pyx":333
  * 
  * 			lev = parabam.core.Leviathon(processors,handlers,100000)
  * 			lev.run()             # <<<<<<<<<<<<<<
@@ -11610,7 +11610,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "stat.pyx":307
+    /* "parabam/command/stat.pyx":307
  * 
  * 
  * 		for input_group,output_group in self.__get_group__(input_bams,super_sources,multi=multi):             # <<<<<<<<<<<<<<
@@ -11620,7 +11620,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":335
+  /* "parabam/command/stat.pyx":335
  * 			lev.run()
  * 
  * 		if outmode == "d" and analysis_names and not user_specified_outpath:             # <<<<<<<<<<<<<<
@@ -11645,7 +11645,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_L13_bool_binop_done:;
   if (__pyx_t_9) {
 
-    /* "stat.pyx":336
+    /* "parabam/command/stat.pyx":336
  * 
  * 		if outmode == "d" and analysis_names and not user_specified_outpath:
  * 			shutil.move(output_path,"./")             # <<<<<<<<<<<<<<
@@ -11689,7 +11689,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   }
   __pyx_L12:;
 
-  /* "stat.pyx":337
+  /* "parabam/command/stat.pyx":337
  * 		if outmode == "d" and analysis_names and not user_specified_outpath:
  * 			shutil.move(output_path,"./")
  * 		return master_output_paths #Depending on outmode this output a dict or string             # <<<<<<<<<<<<<<
@@ -11701,7 +11701,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   __pyx_r = __pyx_v_master_output_paths;
   goto __pyx_L0;
 
-  /* "stat.pyx":287
+  /* "parabam/command/stat.pyx":287
  * 			outmode = cmd_args.outmode)
  * 
  * 	def run(self,input_bams,user_specified_outpath,proc,chunk,user_constants,user_engine,             # <<<<<<<<<<<<<<
@@ -11717,7 +11717,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_AddTraceback("stat.Interface.run", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.run", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_user_structures);
@@ -11739,7 +11739,7 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
   return __pyx_r;
 }
 
-/* "stat.pyx":339
+/* "parabam/command/stat.pyx":339
  * 		return master_output_paths #Depending on outmode this output a dict or string
  * 
  * 	def __create_output_files__(self,output_path,user_structures,outmode,analysis_names):             # <<<<<<<<<<<<<<
@@ -11748,9 +11748,9 @@ static PyObject *__pyx_pf_4stat_9Interface_4run(CYTHON_UNUSED PyObject *__pyx_se
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_7__create_output_files__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_7__create_output_files__ = {"__create_output_files__", (PyCFunction)__pyx_pw_4stat_9Interface_7__create_output_files__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_7__create_output_files__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_7__create_output_files__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_7__create_output_files__ = {"__create_output_files__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_7__create_output_files__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_7__create_output_files__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_output_path = 0;
   CYTHON_UNUSED PyObject *__pyx_v_user_structures = 0;
@@ -11825,18 +11825,18 @@ static PyObject *__pyx_pw_4stat_9Interface_7__create_output_files__(PyObject *__
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__create_output_files__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.__create_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_6__create_output_files__(__pyx_self, __pyx_v_self, __pyx_v_output_path, __pyx_v_user_structures, __pyx_v_outmode, __pyx_v_analysis_names);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_6__create_output_files__(__pyx_self, __pyx_v_self, __pyx_v_output_path, __pyx_v_user_structures, __pyx_v_outmode, __pyx_v_analysis_names);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_output_path, CYTHON_UNUSED PyObject *__pyx_v_user_structures, PyObject *__pyx_v_outmode, PyObject *__pyx_v_analysis_names) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_6__create_output_files__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_output_path, CYTHON_UNUSED PyObject *__pyx_v_user_structures, PyObject *__pyx_v_outmode, PyObject *__pyx_v_analysis_names) {
   PyObject *__pyx_v_header = NULL;
   PyObject *__pyx_v_out_obj = NULL;
   PyObject *__pyx_r = NULL;
@@ -11857,7 +11857,7 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__create_output_files__", 0);
 
-  /* "stat.pyx":340
+  /* "parabam/command/stat.pyx":340
  * 
  * 	def __create_output_files__(self,output_path,user_structures,outmode,analysis_names):
  * 		if outmode == "d":             # <<<<<<<<<<<<<<
@@ -11867,7 +11867,7 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
   __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_outmode, __pyx_n_s_d, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 340; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_1) {
 
-    /* "stat.pyx":341
+    /* "parabam/command/stat.pyx":341
  * 	def __create_output_files__(self,output_path,user_structures,outmode,analysis_names):
  * 		if outmode == "d":
  * 			header = "Sample,%s\n" % (",".join(analysis_names),)             # <<<<<<<<<<<<<<
@@ -11887,7 +11887,7 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
     __pyx_v_header = ((PyObject*)__pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":342
+    /* "parabam/command/stat.pyx":342
  * 		if outmode == "d":
  * 			header = "Sample,%s\n" % (",".join(analysis_names),)
  * 			with open(output_path,"w") as out_obj:             # <<<<<<<<<<<<<<
@@ -11941,7 +11941,7 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
             __pyx_v_out_obj = __pyx_t_5;
             __pyx_t_5 = 0;
 
-            /* "stat.pyx":343
+            /* "parabam/command/stat.pyx":343
  * 			header = "Sample,%s\n" % (",".join(analysis_names),)
  * 			with open(output_path,"w") as out_obj:
  * 				out_obj.write(header)             # <<<<<<<<<<<<<<
@@ -11987,7 +11987,7 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "stat.pyx":342
+          /* "parabam/command/stat.pyx":342
  * 		if outmode == "d":
  * 			header = "Sample,%s\n" % (",".join(analysis_names),)
  * 			with open(output_path,"w") as out_obj:             # <<<<<<<<<<<<<<
@@ -11995,7 +11995,7 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
  * 
  */
           /*except:*/ {
-            __Pyx_AddTraceback("stat.Interface.__create_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+            __Pyx_AddTraceback("parabam.command.stat.Interface.__create_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
             if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_3, &__pyx_t_6) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 342; __pyx_clineno = __LINE__; goto __pyx_L10_except_error;}
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_GOTREF(__pyx_t_3);
@@ -12061,7 +12061,7 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
   }
   __pyx_L3:;
 
-  /* "stat.pyx":339
+  /* "parabam/command/stat.pyx":339
  * 		return master_output_paths #Depending on outmode this output a dict or string
  * 
  * 	def __create_output_files__(self,output_path,user_structures,outmode,analysis_names):             # <<<<<<<<<<<<<<
@@ -12077,7 +12077,7 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("stat.Interface.__create_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_header);
@@ -12087,7 +12087,7 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "stat.pyx":345
+/* "parabam/command/stat.pyx":345
  * 				out_obj.write(header)
  * 
  * 	def __create_handlers__(self,task_qu,object const):             # <<<<<<<<<<<<<<
@@ -12096,9 +12096,9 @@ static PyObject *__pyx_pf_4stat_9Interface_6__create_output_files__(CYTHON_UNUSE
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_9__create_handlers__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_9__create_handlers__ = {"__create_handlers__", (PyCFunction)__pyx_pw_4stat_9Interface_9__create_handlers__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_9__create_handlers__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_9__create_handlers__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_9__create_handlers__ = {"__create_handlers__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_9__create_handlers__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_9__create_handlers__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_task_qu = 0;
   PyObject *__pyx_v_const = 0;
@@ -12155,18 +12155,18 @@ static PyObject *__pyx_pw_4stat_9Interface_9__create_handlers__(PyObject *__pyx_
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__create_handlers__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 345; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.__create_handlers__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_handlers__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_8__create_handlers__(__pyx_self, __pyx_v_self, __pyx_v_task_qu, __pyx_v_const);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_8__create_handlers__(__pyx_self, __pyx_v_self, __pyx_v_task_qu, __pyx_v_const);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_8__create_handlers__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_task_qu, PyObject *__pyx_v_const) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_8__create_handlers__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_task_qu, PyObject *__pyx_v_const) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -12177,7 +12177,7 @@ static PyObject *__pyx_pf_4stat_9Interface_8__create_handlers__(CYTHON_UNUSED Py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__create_handlers__", 0);
 
-  /* "stat.pyx":346
+  /* "parabam/command/stat.pyx":346
  * 
  * 	def __create_handlers__(self,task_qu,object const):
  * 		return [HandlerStat(inqu=task_qu,const=const)]             # <<<<<<<<<<<<<<
@@ -12204,7 +12204,7 @@ static PyObject *__pyx_pf_4stat_9Interface_8__create_handlers__(CYTHON_UNUSED Py
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "stat.pyx":345
+  /* "parabam/command/stat.pyx":345
  * 				out_obj.write(header)
  * 
  * 	def __create_handlers__(self,task_qu,object const):             # <<<<<<<<<<<<<<
@@ -12217,7 +12217,7 @@ static PyObject *__pyx_pf_4stat_9Interface_8__create_handlers__(CYTHON_UNUSED Py
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("stat.Interface.__create_handlers__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_handlers__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -12225,7 +12225,7 @@ static PyObject *__pyx_pf_4stat_9Interface_8__create_handlers__(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "stat.pyx":348
+/* "parabam/command/stat.pyx":348
  * 		return [HandlerStat(inqu=task_qu,const=const)]
  * 
  * 	def __create_proccessors__(self,task_qu,output_group,engine_is_class,user_engine,object const):             # <<<<<<<<<<<<<<
@@ -12234,9 +12234,9 @@ static PyObject *__pyx_pf_4stat_9Interface_8__create_handlers__(CYTHON_UNUSED Py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_11__create_proccessors__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_11__create_proccessors__ = {"__create_proccessors__", (PyCFunction)__pyx_pw_4stat_9Interface_11__create_proccessors__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_11__create_proccessors__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_11__create_proccessors__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_11__create_proccessors__ = {"__create_proccessors__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_11__create_proccessors__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_11__create_proccessors__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_task_qu = 0;
   PyObject *__pyx_v_output_group = 0;
@@ -12320,18 +12320,18 @@ static PyObject *__pyx_pw_4stat_9Interface_11__create_proccessors__(PyObject *__
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__create_proccessors__", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 348; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.__create_proccessors__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_proccessors__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_10__create_proccessors__(__pyx_self, __pyx_v_self, __pyx_v_task_qu, __pyx_v_output_group, __pyx_v_engine_is_class, __pyx_v_user_engine, __pyx_v_const);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_10__create_proccessors__(__pyx_self, __pyx_v_self, __pyx_v_task_qu, __pyx_v_output_group, __pyx_v_engine_is_class, __pyx_v_user_engine, __pyx_v_const);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_task_qu, PyObject *__pyx_v_output_group, PyObject *__pyx_v_engine_is_class, PyObject *__pyx_v_user_engine, PyObject *__pyx_v_const) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_task_qu, PyObject *__pyx_v_output_group, PyObject *__pyx_v_engine_is_class, PyObject *__pyx_v_user_engine, PyObject *__pyx_v_const) {
   PyObject *__pyx_v_processors = NULL;
   PyObject *__pyx_v_source = NULL;
   PyObject *__pyx_v_cur_args = NULL;
@@ -12351,7 +12351,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__create_proccessors__", 0);
 
-  /* "stat.pyx":349
+  /* "parabam/command/stat.pyx":349
  * 
  * 	def __create_proccessors__(self,task_qu,output_group,engine_is_class,user_engine,object const):
  * 		processors = []             # <<<<<<<<<<<<<<
@@ -12363,7 +12363,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
   __pyx_v_processors = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":351
+  /* "parabam/command/stat.pyx":351
  * 		processors = []
  * 
  * 		for source in output_group:             # <<<<<<<<<<<<<<
@@ -12410,7 +12410,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
     __Pyx_XDECREF_SET(__pyx_v_source, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "stat.pyx":352
+    /* "parabam/command/stat.pyx":352
  * 
  * 		for source in output_group:
  * 				if engine_is_class:             # <<<<<<<<<<<<<<
@@ -12420,7 +12420,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
     __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_engine_is_class); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 352; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (__pyx_t_5) {
 
-      /* "stat.pyx":353
+      /* "parabam/command/stat.pyx":353
  * 		for source in output_group:
  * 				if engine_is_class:
  * 					if not issubclass(user_engine,TaskStat):             # <<<<<<<<<<<<<<
@@ -12434,7 +12434,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
       __pyx_t_6 = ((!(__pyx_t_5 != 0)) != 0);
       if (__pyx_t_6) {
 
-        /* "stat.pyx":354
+        /* "parabam/command/stat.pyx":354
  * 				if engine_is_class:
  * 					if not issubclass(user_engine,TaskStat):
  * 						raise Exception("[ERROR]\tThe class provided to parabam must be a subclass of\n"\             # <<<<<<<<<<<<<<
@@ -12448,7 +12448,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
         {__pyx_filename = __pyx_f[0]; __pyx_lineno = 354; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
 
-      /* "stat.pyx":356
+      /* "parabam/command/stat.pyx":356
  * 						raise Exception("[ERROR]\tThe class provided to parabam must be a subclass of\n"\
  * 										"\tparabam.interface.subset.TaskStat. Please consult the parabam manual.")
  * 					cur_args = [source]             # <<<<<<<<<<<<<<
@@ -12463,7 +12463,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
       __Pyx_XDECREF_SET(__pyx_v_cur_args, ((PyObject*)__pyx_t_4));
       __pyx_t_4 = 0;
 
-      /* "stat.pyx":357
+      /* "parabam/command/stat.pyx":357
  * 										"\tparabam.interface.subset.TaskStat. Please consult the parabam manual.")
  * 					cur_args = [source]
  * 					processors.append(ProcessorStat(outqu=task_qu,             # <<<<<<<<<<<<<<
@@ -12476,7 +12476,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
       __Pyx_GOTREF(__pyx_t_7);
       if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_outqu, __pyx_v_task_qu) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-      /* "stat.pyx":358
+      /* "parabam/command/stat.pyx":358
  * 					cur_args = [source]
  * 					processors.append(ProcessorStat(outqu=task_qu,
  * 											const=const,             # <<<<<<<<<<<<<<
@@ -12485,7 +12485,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
  */
       if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_const, __pyx_v_const) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-      /* "stat.pyx":359
+      /* "parabam/command/stat.pyx":359
  * 					processors.append(ProcessorStat(outqu=task_qu,
  * 											const=const,
  * 											TaskClass=user_engine,             # <<<<<<<<<<<<<<
@@ -12494,7 +12494,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
  */
       if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_TaskClass, __pyx_v_user_engine) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-      /* "stat.pyx":360
+      /* "parabam/command/stat.pyx":360
  * 											const=const,
  * 											TaskClass=user_engine,
  * 											task_args=cur_args))             # <<<<<<<<<<<<<<
@@ -12503,7 +12503,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
  */
       if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_task_args, __pyx_v_cur_args) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-      /* "stat.pyx":357
+      /* "parabam/command/stat.pyx":357
  * 										"\tparabam.interface.subset.TaskStat. Please consult the parabam manual.")
  * 					cur_args = [source]
  * 					processors.append(ProcessorStat(outqu=task_qu,             # <<<<<<<<<<<<<<
@@ -12520,7 +12520,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
     }
     /*else*/ {
 
-      /* "stat.pyx":362
+      /* "parabam/command/stat.pyx":362
  * 											task_args=cur_args))
  * 				else:
  * 					processors.append(ProcessorStat(outqu=task_qu,             # <<<<<<<<<<<<<<
@@ -12533,7 +12533,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
       __Pyx_GOTREF(__pyx_t_7);
       if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_outqu, __pyx_v_task_qu) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 362; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-      /* "stat.pyx":363
+      /* "parabam/command/stat.pyx":363
  * 				else:
  * 					processors.append(ProcessorStat(outqu=task_qu,
  * 												const=const,             # <<<<<<<<<<<<<<
@@ -12542,7 +12542,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
  */
       if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_const, __pyx_v_const) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 362; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-      /* "stat.pyx":364
+      /* "parabam/command/stat.pyx":364
  * 					processors.append(ProcessorStat(outqu=task_qu,
  * 												const=const,
  * 												TaskClass=TaskStat,             # <<<<<<<<<<<<<<
@@ -12554,7 +12554,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
       if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_TaskClass, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 362; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "stat.pyx":365
+      /* "parabam/command/stat.pyx":365
  * 												const=const,
  * 												TaskClass=TaskStat,
  * 												task_args=[source]))             # <<<<<<<<<<<<<<
@@ -12569,7 +12569,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
       if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_task_args, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 362; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "stat.pyx":362
+      /* "parabam/command/stat.pyx":362
  * 											task_args=cur_args))
  * 				else:
  * 					processors.append(ProcessorStat(outqu=task_qu,             # <<<<<<<<<<<<<<
@@ -12585,7 +12585,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
     }
     __pyx_L5:;
 
-    /* "stat.pyx":351
+    /* "parabam/command/stat.pyx":351
  * 		processors = []
  * 
  * 		for source in output_group:             # <<<<<<<<<<<<<<
@@ -12595,7 +12595,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":366
+  /* "parabam/command/stat.pyx":366
  * 												TaskClass=TaskStat,
  * 												task_args=[source]))
  * 		return processors             # <<<<<<<<<<<<<<
@@ -12607,7 +12607,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
   __pyx_r = __pyx_v_processors;
   goto __pyx_L0;
 
-  /* "stat.pyx":348
+  /* "parabam/command/stat.pyx":348
  * 		return [HandlerStat(inqu=task_qu,const=const)]
  * 
  * 	def __create_proccessors__(self,task_qu,output_group,engine_is_class,user_engine,object const):             # <<<<<<<<<<<<<<
@@ -12621,7 +12621,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_AddTraceback("stat.Interface.__create_proccessors__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_proccessors__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_processors);
@@ -12632,7 +12632,7 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "stat.pyx":368
+/* "parabam/command/stat.pyx":368
  * 		return processors
  * 
  * 	def __create_master_file_paths__(self,input_group,output_group):             # <<<<<<<<<<<<<<
@@ -12641,9 +12641,9 @@ static PyObject *__pyx_pf_4stat_9Interface_10__create_proccessors__(CYTHON_UNUSE
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_13__create_master_file_paths__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_13__create_master_file_paths__ = {"__create_master_file_paths__", (PyCFunction)__pyx_pw_4stat_9Interface_13__create_master_file_paths__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_13__create_master_file_paths__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_13__create_master_file_paths__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_13__create_master_file_paths__ = {"__create_master_file_paths__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_13__create_master_file_paths__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_13__create_master_file_paths__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_input_group = 0;
   PyObject *__pyx_v_output_group = 0;
@@ -12700,18 +12700,18 @@ static PyObject *__pyx_pw_4stat_9Interface_13__create_master_file_paths__(PyObje
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__create_master_file_paths__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.__create_master_file_paths__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_master_file_paths__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_12__create_master_file_paths__(__pyx_self, __pyx_v_self, __pyx_v_input_group, __pyx_v_output_group);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_12__create_master_file_paths__(__pyx_self, __pyx_v_self, __pyx_v_input_group, __pyx_v_output_group);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_input_group, PyObject *__pyx_v_output_group) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_12__create_master_file_paths__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_input_group, PyObject *__pyx_v_output_group) {
   PyObject *__pyx_v_master_file_path = NULL;
   PyObject *__pyx_v_master = NULL;
   PyObject *__pyx_v_source = NULL;
@@ -12730,7 +12730,7 @@ static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__create_master_file_paths__", 0);
 
-  /* "stat.pyx":369
+  /* "parabam/command/stat.pyx":369
  * 
  * 	def __create_master_file_paths__(self,input_group,output_group):
  * 		master_file_path = {}             # <<<<<<<<<<<<<<
@@ -12742,7 +12742,7 @@ static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON
   __pyx_v_master_file_path = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":370
+  /* "parabam/command/stat.pyx":370
  * 	def __create_master_file_paths__(self,input_group,output_group):
  * 		master_file_path = {}
  * 		for master,source in zip(input_group,output_group):             # <<<<<<<<<<<<<<
@@ -12853,7 +12853,7 @@ static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON
     __Pyx_XDECREF_SET(__pyx_v_source, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "stat.pyx":371
+    /* "parabam/command/stat.pyx":371
  * 		master_file_path = {}
  * 		for master,source in zip(input_group,output_group):
  * 				master_file_path[source] = master             # <<<<<<<<<<<<<<
@@ -12862,7 +12862,7 @@ static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON
  */
     if (unlikely(PyDict_SetItem(__pyx_v_master_file_path, __pyx_v_source, __pyx_v_master) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 371; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":370
+    /* "parabam/command/stat.pyx":370
  * 	def __create_master_file_paths__(self,input_group,output_group):
  * 		master_file_path = {}
  * 		for master,source in zip(input_group,output_group):             # <<<<<<<<<<<<<<
@@ -12872,7 +12872,7 @@ static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":372
+  /* "parabam/command/stat.pyx":372
  * 		for master,source in zip(input_group,output_group):
  * 				master_file_path[source] = master
  * 		return master_file_path             # <<<<<<<<<<<<<<
@@ -12884,7 +12884,7 @@ static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON
   __pyx_r = __pyx_v_master_file_path;
   goto __pyx_L0;
 
-  /* "stat.pyx":368
+  /* "parabam/command/stat.pyx":368
  * 		return processors
  * 
  * 	def __create_master_file_paths__(self,input_group,output_group):             # <<<<<<<<<<<<<<
@@ -12899,7 +12899,7 @@ static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("stat.Interface.__create_master_file_paths__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_master_file_paths__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_master_file_path);
@@ -12910,7 +12910,7 @@ static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON
   return __pyx_r;
 }
 
-/* "stat.pyx":374
+/* "parabam/command/stat.pyx":374
  * 		return master_file_path
  * 
  * 	def __create_individual_output_files__(self,outmode,output_group,user_structures):             # <<<<<<<<<<<<<<
@@ -12919,9 +12919,9 @@ static PyObject *__pyx_pf_4stat_9Interface_12__create_master_file_paths__(CYTHON
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_15__create_individual_output_files__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_15__create_individual_output_files__ = {"__create_individual_output_files__", (PyCFunction)__pyx_pw_4stat_9Interface_15__create_individual_output_files__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_15__create_individual_output_files__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_15__create_individual_output_files__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_15__create_individual_output_files__ = {"__create_individual_output_files__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_15__create_individual_output_files__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_15__create_individual_output_files__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_outmode = 0;
   PyObject *__pyx_v_output_group = 0;
@@ -12987,18 +12987,18 @@ static PyObject *__pyx_pw_4stat_9Interface_15__create_individual_output_files__(
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__create_individual_output_files__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.__create_individual_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_individual_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_14__create_individual_output_files__(__pyx_self, __pyx_v_self, __pyx_v_outmode, __pyx_v_output_group, __pyx_v_user_structures);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_14__create_individual_output_files__(__pyx_self, __pyx_v_self, __pyx_v_outmode, __pyx_v_output_group, __pyx_v_user_structures);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_outmode, PyObject *__pyx_v_output_group, PyObject *__pyx_v_user_structures) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_14__create_individual_output_files__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_outmode, PyObject *__pyx_v_output_group, PyObject *__pyx_v_user_structures) {
   PyObject *__pyx_v_out_paths = NULL;
   PyObject *__pyx_v_source = NULL;
   PyObject *__pyx_v_name = NULL;
@@ -13032,7 +13032,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__create_individual_output_files__", 0);
 
-  /* "stat.pyx":375
+  /* "parabam/command/stat.pyx":375
  * 
  * 	def __create_individual_output_files__(self,outmode,output_group,user_structures):
  * 		out_paths = {}             # <<<<<<<<<<<<<<
@@ -13044,7 +13044,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
   __pyx_v_out_paths = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":376
+  /* "parabam/command/stat.pyx":376
  * 	def __create_individual_output_files__(self,outmode,output_group,user_structures):
  * 		out_paths = {}
  * 		for source in output_group:             # <<<<<<<<<<<<<<
@@ -13091,7 +13091,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
     __Pyx_XDECREF_SET(__pyx_v_source, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "stat.pyx":377
+    /* "parabam/command/stat.pyx":377
  * 		out_paths = {}
  * 		for source in output_group:
  * 			out_paths[source] = {}             # <<<<<<<<<<<<<<
@@ -13103,7 +13103,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
     if (unlikely(PyDict_SetItem(__pyx_v_out_paths, __pyx_v_source, __pyx_t_4) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "stat.pyx":378
+    /* "parabam/command/stat.pyx":378
  * 		for source in output_group:
  * 			out_paths[source] = {}
  * 			for name,struc in user_structures.items():             # <<<<<<<<<<<<<<
@@ -13223,7 +13223,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
       __Pyx_XDECREF_SET(__pyx_v_struc, __pyx_t_9);
       __pyx_t_9 = 0;
 
-      /* "stat.pyx":379
+      /* "parabam/command/stat.pyx":379
  * 			out_paths[source] = {}
  * 			for name,struc in user_structures.items():
  * 				if not struc.struc_type == np.ndarray:             # <<<<<<<<<<<<<<
@@ -13245,7 +13245,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
       __pyx_t_13 = ((!__pyx_t_12) != 0);
       if (__pyx_t_13) {
 
-        /* "stat.pyx":380
+        /* "parabam/command/stat.pyx":380
  * 			for name,struc in user_structures.items():
  * 				if not struc.struc_type == np.ndarray:
  * 					header,out_path = self.__format_path__(outmode,source,name)             # <<<<<<<<<<<<<<
@@ -13339,7 +13339,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
         __Pyx_XDECREF_SET(__pyx_v_out_path, __pyx_t_10);
         __pyx_t_10 = 0;
 
-        /* "stat.pyx":381
+        /* "parabam/command/stat.pyx":381
  * 				if not struc.struc_type == np.ndarray:
  * 					header,out_path = self.__format_path__(outmode,source,name)
  * 					out_paths[source][name] = out_path             # <<<<<<<<<<<<<<
@@ -13351,7 +13351,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
         if (unlikely(PyObject_SetItem(__pyx_t_9, __pyx_v_name, __pyx_v_out_path) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 381; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-        /* "stat.pyx":382
+        /* "parabam/command/stat.pyx":382
  * 					header,out_path = self.__format_path__(outmode,source,name)
  * 					out_paths[source][name] = out_path
  * 					with open(out_path,"w") as out_object:             # <<<<<<<<<<<<<<
@@ -13405,7 +13405,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
                 __Pyx_XDECREF_SET(__pyx_v_out_object, __pyx_t_6);
                 __pyx_t_6 = 0;
 
-                /* "stat.pyx":383
+                /* "parabam/command/stat.pyx":383
  * 					out_paths[source][name] = out_path
  * 					with open(out_path,"w") as out_object:
  * 						out_object.write(header)             # <<<<<<<<<<<<<<
@@ -13451,7 +13451,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
               __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
               __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-              /* "stat.pyx":382
+              /* "parabam/command/stat.pyx":382
  * 					header,out_path = self.__format_path__(outmode,source,name)
  * 					out_paths[source][name] = out_path
  * 					with open(out_path,"w") as out_object:             # <<<<<<<<<<<<<<
@@ -13459,7 +13459,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
  * 				else:
  */
               /*except:*/ {
-                __Pyx_AddTraceback("stat.Interface.__create_individual_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+                __Pyx_AddTraceback("parabam.command.stat.Interface.__create_individual_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
                 if (__Pyx_GetException(&__pyx_t_6, &__pyx_t_10, &__pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L20_except_error;}
                 __Pyx_GOTREF(__pyx_t_6);
                 __Pyx_GOTREF(__pyx_t_10);
@@ -13525,7 +13525,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
       }
       /*else*/ {
 
-        /* "stat.pyx":385
+        /* "parabam/command/stat.pyx":385
  * 						out_object.write(header)
  * 				else:
  * 					out_paths[source] = {name:""}             # <<<<<<<<<<<<<<
@@ -13540,7 +13540,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
       }
       __pyx_L9:;
 
-      /* "stat.pyx":378
+      /* "parabam/command/stat.pyx":378
  * 		for source in output_group:
  * 			out_paths[source] = {}
  * 			for name,struc in user_structures.items():             # <<<<<<<<<<<<<<
@@ -13550,7 +13550,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "stat.pyx":376
+    /* "parabam/command/stat.pyx":376
  * 	def __create_individual_output_files__(self,outmode,output_group,user_structures):
  * 		out_paths = {}
  * 		for source in output_group:             # <<<<<<<<<<<<<<
@@ -13560,7 +13560,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":386
+  /* "parabam/command/stat.pyx":386
  * 				else:
  * 					out_paths[source] = {name:""}
  * 		return out_paths             # <<<<<<<<<<<<<<
@@ -13572,7 +13572,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
   __pyx_r = __pyx_v_out_paths;
   goto __pyx_L0;
 
-  /* "stat.pyx":374
+  /* "parabam/command/stat.pyx":374
  * 		return master_file_path
  * 
  * 	def __create_individual_output_files__(self,outmode,output_group,user_structures):             # <<<<<<<<<<<<<<
@@ -13588,7 +13588,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("stat.Interface.__create_individual_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_individual_output_files__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_out_paths);
@@ -13603,7 +13603,7 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
   return __pyx_r;
 }
 
-/* "stat.pyx":388
+/* "parabam/command/stat.pyx":388
  * 		return out_paths
  * 
  * 	def __format_path__(self,mode,source,name):             # <<<<<<<<<<<<<<
@@ -13612,9 +13612,9 @@ static PyObject *__pyx_pf_4stat_9Interface_14__create_individual_output_files__(
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_17__format_path__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_17__format_path__ = {"__format_path__", (PyCFunction)__pyx_pw_4stat_9Interface_17__format_path__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_17__format_path__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_17__format_path__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_17__format_path__ = {"__format_path__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_17__format_path__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_17__format_path__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_mode = 0;
   PyObject *__pyx_v_source = 0;
@@ -13680,18 +13680,18 @@ static PyObject *__pyx_pw_4stat_9Interface_17__format_path__(PyObject *__pyx_sel
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__format_path__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.__format_path__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__format_path__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_16__format_path__(__pyx_self, __pyx_v_self, __pyx_v_mode, __pyx_v_source, __pyx_v_name);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_16__format_path__(__pyx_self, __pyx_v_self, __pyx_v_mode, __pyx_v_source, __pyx_v_name);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_mode, PyObject *__pyx_v_source, CYTHON_UNUSED PyObject *__pyx_v_name) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_mode, PyObject *__pyx_v_source, CYTHON_UNUSED PyObject *__pyx_v_name) {
   PyObject *__pyx_v_header = NULL;
   PyObject *__pyx_v_out_path = NULL;
   PyObject *__pyx_r = NULL;
@@ -13704,7 +13704,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__format_path__", 0);
 
-  /* "stat.pyx":389
+  /* "parabam/command/stat.pyx":389
  * 
  * 	def __format_path__(self,mode,source,name):
  * 		if mode == "a":             # <<<<<<<<<<<<<<
@@ -13714,7 +13714,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
   __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_mode, __pyx_n_s_a, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_1) {
 
-    /* "stat.pyx":390
+    /* "parabam/command/stat.pyx":390
  * 	def __format_path__(self,mode,source,name):
  * 		if mode == "a":
  * 			header = "Sample,%s\n" % (self.name,)             # <<<<<<<<<<<<<<
@@ -13734,7 +13734,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
     __pyx_v_header = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "stat.pyx":391
+    /* "parabam/command/stat.pyx":391
  * 		if mode == "a":
  * 			header = "Sample,%s\n" % (self.name,)
  * 			out_path = "./%s.csv" % (self.name,)             # <<<<<<<<<<<<<<
@@ -13756,7 +13756,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
     goto __pyx_L3;
   }
 
-  /* "stat.pyx":392
+  /* "parabam/command/stat.pyx":392
  * 			header = "Sample,%s\n" % (self.name,)
  * 			out_path = "./%s.csv" % (self.name,)
  * 		elif mode == "s":             # <<<<<<<<<<<<<<
@@ -13766,7 +13766,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
   __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_mode, __pyx_n_s_s, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_1) {
 
-    /* "stat.pyx":393
+    /* "parabam/command/stat.pyx":393
  * 			out_path = "./%s.csv" % (self.name,)
  * 		elif mode == "s":
  * 			header = "Analysis,Value\n"             # <<<<<<<<<<<<<<
@@ -13776,7 +13776,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
     __Pyx_INCREF(__pyx_kp_s_Analysis_Value);
     __pyx_v_header = __pyx_kp_s_Analysis_Value;
 
-    /* "stat.pyx":394
+    /* "parabam/command/stat.pyx":394
  * 		elif mode == "s":
  * 			header = "Analysis,Value\n"
  * 			out_path = "./%s.csv" % (source,)             # <<<<<<<<<<<<<<
@@ -13797,7 +13797,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
   }
   __pyx_L3:;
 
-  /* "stat.pyx":395
+  /* "parabam/command/stat.pyx":395
  * 			header = "Analysis,Value\n"
  * 			out_path = "./%s.csv" % (source,)
  * 		return (header,out_path)             # <<<<<<<<<<<<<<
@@ -13819,7 +13819,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "stat.pyx":388
+  /* "parabam/command/stat.pyx":388
  * 		return out_paths
  * 
  * 	def __format_path__(self,mode,source,name):             # <<<<<<<<<<<<<<
@@ -13831,7 +13831,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("stat.Interface.__format_path__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__format_path__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_header);
@@ -13841,7 +13841,7 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "stat.pyx":397
+/* "parabam/command/stat.pyx":397
  * 		return (header,out_path)
  * 
  * 	def __get_non_array_names__(self,user_structures):             # <<<<<<<<<<<<<<
@@ -13850,9 +13850,9 @@ static PyObject *__pyx_pf_4stat_9Interface_16__format_path__(CYTHON_UNUSED PyObj
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_19__get_non_array_names__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_19__get_non_array_names__ = {"__get_non_array_names__", (PyCFunction)__pyx_pw_4stat_9Interface_19__get_non_array_names__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_19__get_non_array_names__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_19__get_non_array_names__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_19__get_non_array_names__ = {"__get_non_array_names__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_19__get_non_array_names__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_19__get_non_array_names__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_user_structures = 0;
   int __pyx_lineno = 0;
@@ -13900,18 +13900,18 @@ static PyObject *__pyx_pw_4stat_9Interface_19__get_non_array_names__(PyObject *_
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__get_non_array_names__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.__get_non_array_names__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__get_non_array_names__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_18__get_non_array_names__(__pyx_self, __pyx_v_self, __pyx_v_user_structures);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_18__get_non_array_names__(__pyx_self, __pyx_v_self, __pyx_v_user_structures);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_user_structures) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_user_structures) {
   PyObject *__pyx_v_names = NULL;
   PyObject *__pyx_v_name = NULL;
   PyObject *__pyx_v_struc = NULL;
@@ -13933,7 +13933,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get_non_array_names__", 0);
 
-  /* "stat.pyx":398
+  /* "parabam/command/stat.pyx":398
  * 
  * 	def __get_non_array_names__(self,user_structures):
  * 		names = []             # <<<<<<<<<<<<<<
@@ -13945,7 +13945,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
   __pyx_v_names = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":399
+  /* "parabam/command/stat.pyx":399
  * 	def __get_non_array_names__(self,user_structures):
  * 		names = []
  * 		for name,struc in user_structures.items():             # <<<<<<<<<<<<<<
@@ -14065,7 +14065,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
     __Pyx_XDECREF_SET(__pyx_v_struc, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "stat.pyx":400
+    /* "parabam/command/stat.pyx":400
  * 		names = []
  * 		for name,struc in user_structures.items():
  * 			if not struc.struc_type == np.ndarray:             # <<<<<<<<<<<<<<
@@ -14087,7 +14087,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
     __pyx_t_10 = ((!__pyx_t_9) != 0);
     if (__pyx_t_10) {
 
-      /* "stat.pyx":401
+      /* "parabam/command/stat.pyx":401
  * 		for name,struc in user_structures.items():
  * 			if not struc.struc_type == np.ndarray:
  * 				names.append(name)             # <<<<<<<<<<<<<<
@@ -14099,7 +14099,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
     }
     __pyx_L7:;
 
-    /* "stat.pyx":399
+    /* "parabam/command/stat.pyx":399
  * 	def __get_non_array_names__(self,user_structures):
  * 		names = []
  * 		for name,struc in user_structures.items():             # <<<<<<<<<<<<<<
@@ -14109,7 +14109,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":402
+  /* "parabam/command/stat.pyx":402
  * 			if not struc.struc_type == np.ndarray:
  * 				names.append(name)
  * 		names.sort()             # <<<<<<<<<<<<<<
@@ -14118,7 +14118,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
  */
   __pyx_t_11 = PyList_Sort(__pyx_v_names); if (unlikely(__pyx_t_11 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 402; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":403
+  /* "parabam/command/stat.pyx":403
  * 				names.append(name)
  * 		names.sort()
  * 		return names             # <<<<<<<<<<<<<<
@@ -14130,7 +14130,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
   __pyx_r = __pyx_v_names;
   goto __pyx_L0;
 
-  /* "stat.pyx":397
+  /* "parabam/command/stat.pyx":397
  * 		return (header,out_path)
  * 
  * 	def __get_non_array_names__(self,user_structures):             # <<<<<<<<<<<<<<
@@ -14145,7 +14145,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("stat.Interface.__get_non_array_names__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__get_non_array_names__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_names);
@@ -14156,7 +14156,7 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "stat.pyx":405
+/* "parabam/command/stat.pyx":405
  * 		return names
  * 
  * 	def __create_structures__(self,user_structures_blueprint):             # <<<<<<<<<<<<<<
@@ -14165,9 +14165,9 @@ static PyObject *__pyx_pf_4stat_9Interface_18__get_non_array_names__(CYTHON_UNUS
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_21__create_structures__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_21__create_structures__ = {"__create_structures__", (PyCFunction)__pyx_pw_4stat_9Interface_21__create_structures__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4stat_9Interface_21__create_structures__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_21__create_structures__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_21__create_structures__ = {"__create_structures__", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_21__create_structures__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_21__create_structures__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_user_structures_blueprint = 0;
   int __pyx_lineno = 0;
@@ -14215,18 +14215,18 @@ static PyObject *__pyx_pw_4stat_9Interface_21__create_structures__(PyObject *__p
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__create_structures__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
-  __Pyx_AddTraceback("stat.Interface.__create_structures__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_structures__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4stat_9Interface_20__create_structures__(__pyx_self, __pyx_v_self, __pyx_v_user_structures_blueprint);
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_20__create_structures__(__pyx_self, __pyx_v_self, __pyx_v_user_structures_blueprint);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_user_structures_blueprint) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_20__create_structures__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_user_structures_blueprint) {
   PyObject *__pyx_v_user_structures = NULL;
   PyObject *__pyx_v_class_to_type_map = NULL;
   PyObject *__pyx_v_name = NULL;
@@ -14246,7 +14246,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__create_structures__", 0);
 
-  /* "stat.pyx":407
+  /* "parabam/command/stat.pyx":407
  * 	def __create_structures__(self,user_structures_blueprint):
  * 		#(data,store_method,)
  * 		user_structures = {}             # <<<<<<<<<<<<<<
@@ -14258,7 +14258,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
   __pyx_v_user_structures = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":408
+  /* "parabam/command/stat.pyx":408
  * 		#(data,store_method,)
  * 		user_structures = {}
  * 		class_to_type_map = {int:NumericStructure,float:NumericStructure,np.ndarray:ArrayStructure}             # <<<<<<<<<<<<<<
@@ -14288,7 +14288,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
   __pyx_v_class_to_type_map = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":409
+  /* "parabam/command/stat.pyx":409
  * 		user_structures = {}
  * 		class_to_type_map = {int:NumericStructure,float:NumericStructure,np.ndarray:ArrayStructure}
  * 		for name,definition in user_structures_blueprint.items():             # <<<<<<<<<<<<<<
@@ -14408,7 +14408,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
     __Pyx_XDECREF_SET(__pyx_v_definition, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "stat.pyx":410
+    /* "parabam/command/stat.pyx":410
  * 		class_to_type_map = {int:NumericStructure,float:NumericStructure,np.ndarray:ArrayStructure}
  * 		for name,definition in user_structures_blueprint.items():
  * 			definition["name"] = name             # <<<<<<<<<<<<<<
@@ -14417,7 +14417,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
  */
     if (unlikely(PyObject_SetItem(__pyx_v_definition, __pyx_n_s_name, __pyx_v_name) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 410; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "stat.pyx":411
+    /* "parabam/command/stat.pyx":411
  * 		for name,definition in user_structures_blueprint.items():
  * 			definition["name"] = name
  * 			definition["struc_type"] = type(definition["data"])             # <<<<<<<<<<<<<<
@@ -14429,7 +14429,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
     if (unlikely(PyObject_SetItem(__pyx_v_definition, __pyx_n_s_struc_type, ((PyObject *)Py_TYPE(__pyx_t_1))) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 411; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "stat.pyx":412
+    /* "parabam/command/stat.pyx":412
  * 			definition["name"] = name
  * 			definition["struc_type"] = type(definition["data"])
  * 			user_structures[name] = class_to_type_map[definition["struc_type"]](**definition)             # <<<<<<<<<<<<<<
@@ -14459,7 +14459,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
     if (unlikely(PyDict_SetItem(__pyx_v_user_structures, __pyx_v_name, __pyx_t_3) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "stat.pyx":409
+    /* "parabam/command/stat.pyx":409
  * 		user_structures = {}
  * 		class_to_type_map = {int:NumericStructure,float:NumericStructure,np.ndarray:ArrayStructure}
  * 		for name,definition in user_structures_blueprint.items():             # <<<<<<<<<<<<<<
@@ -14469,7 +14469,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":413
+  /* "parabam/command/stat.pyx":413
  * 			definition["struc_type"] = type(definition["data"])
  * 			user_structures[name] = class_to_type_map[definition["struc_type"]](**definition)
  * 		return user_structures             # <<<<<<<<<<<<<<
@@ -14481,7 +14481,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
   __pyx_r = __pyx_v_user_structures;
   goto __pyx_L0;
 
-  /* "stat.pyx":405
+  /* "parabam/command/stat.pyx":405
  * 		return names
  * 
  * 	def __create_structures__(self,user_structures_blueprint):             # <<<<<<<<<<<<<<
@@ -14496,7 +14496,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("stat.Interface.__create_structures__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.__create_structures__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_user_structures);
@@ -14508,7 +14508,7 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "stat.pyx":415
+/* "parabam/command/stat.pyx":415
  * 		return user_structures
  * 
  * 	def get_parser(self):             # <<<<<<<<<<<<<<
@@ -14517,20 +14517,20 @@ static PyObject *__pyx_pf_4stat_9Interface_20__create_structures__(CYTHON_UNUSED
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4stat_9Interface_23get_parser(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static PyMethodDef __pyx_mdef_4stat_9Interface_23get_parser = {"get_parser", (PyCFunction)__pyx_pw_4stat_9Interface_23get_parser, METH_O, 0};
-static PyObject *__pyx_pw_4stat_9Interface_23get_parser(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_23get_parser(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static PyMethodDef __pyx_mdef_7parabam_7command_4stat_9Interface_23get_parser = {"get_parser", (PyCFunction)__pyx_pw_7parabam_7command_4stat_9Interface_23get_parser, METH_O, 0};
+static PyObject *__pyx_pw_7parabam_7command_4stat_9Interface_23get_parser(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_parser (wrapper)", 0);
-  __pyx_r = __pyx_pf_4stat_9Interface_22get_parser(__pyx_self, ((PyObject *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7parabam_7command_4stat_9Interface_22get_parser(__pyx_self, ((PyObject *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pf_7parabam_7command_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_v_parser = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -14542,7 +14542,7 @@ static PyObject *__pyx_pf_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_parser", 0);
 
-  /* "stat.pyx":417
+  /* "parabam/command/stat.pyx":417
  * 	def get_parser(self):
  * 		#argparse imported in ./interface/parabam
  * 		parser = self.default_parser()             # <<<<<<<<<<<<<<
@@ -14572,7 +14572,7 @@ static PyObject *__pyx_pf_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *
   __pyx_v_parser = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "stat.pyx":419
+  /* "parabam/command/stat.pyx":419
  * 		parser = self.default_parser()
  * 
  * 		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='?',required=False             # <<<<<<<<<<<<<<
@@ -14593,7 +14593,7 @@ static PyObject *__pyx_pf_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "stat.pyx":423
+  /* "parabam/command/stat.pyx":423
  * 			"If this argument is not supplied, the output will take the following form:\n"\
  * 			"parabam_stat_[UNIX_TIME].csv")
  * 		parser.add_argument('--outmode', choices=['d','s','a'],default='d',             # <<<<<<<<<<<<<<
@@ -14625,7 +14625,7 @@ static PyObject *__pyx_pf_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":428
+  /* "parabam/command/stat.pyx":428
  * 			"[s]ample: csv for each sample"\
  * 			"[a]nalysis: csv for each analysis")
  * 		return parser             # <<<<<<<<<<<<<<
@@ -14637,7 +14637,7 @@ static PyObject *__pyx_pf_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *
   __pyx_r = __pyx_v_parser;
   goto __pyx_L0;
 
-  /* "stat.pyx":415
+  /* "parabam/command/stat.pyx":415
  * 		return user_structures
  * 
  * 	def get_parser(self):             # <<<<<<<<<<<<<<
@@ -14650,7 +14650,7 @@ static PyObject *__pyx_pf_4stat_9Interface_22get_parser(CYTHON_UNUSED PyObject *
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("stat.Interface.get_parser", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("parabam.command.stat.Interface.get_parser", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_parser);
@@ -14908,6 +14908,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_p, __pyx_k_p, sizeof(__pyx_k_p), 0, 0, 1, 1},
   {&__pyx_n_s_package, __pyx_k_package, sizeof(__pyx_k_package), 0, 0, 1, 1},
   {&__pyx_n_s_parabam, __pyx_k_parabam, sizeof(__pyx_k_parabam), 0, 0, 1, 1},
+  {&__pyx_n_s_parabam_command_stat, __pyx_k_parabam_command_stat, sizeof(__pyx_k_parabam_command_stat), 0, 0, 1, 1},
   {&__pyx_n_s_parse_args, __pyx_k_parse_args, sizeof(__pyx_k_parse_args), 0, 0, 1, 1},
   {&__pyx_n_s_parser, __pyx_k_parser, sizeof(__pyx_k_parser), 0, 0, 1, 1},
   {&__pyx_n_s_periodic_action, __pyx_k_periodic_action, sizeof(__pyx_k_periodic_action), 0, 0, 1, 1},
@@ -14938,7 +14939,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_source_structures, __pyx_k_source_structures, sizeof(__pyx_k_source_structures), 0, 0, 1, 1},
   {&__pyx_n_s_sources, __pyx_k_sources, sizeof(__pyx_k_sources), 0, 0, 1, 1},
   {&__pyx_n_s_sources_2, __pyx_k_sources_2, sizeof(__pyx_k_sources_2), 0, 0, 1, 1},
-  {&__pyx_n_s_stat, __pyx_k_stat, sizeof(__pyx_k_stat), 0, 0, 1, 1},
   {&__pyx_n_s_store_method, __pyx_k_store_method, sizeof(__pyx_k_store_method), 0, 0, 1, 1},
   {&__pyx_n_s_struc, __pyx_k_struc, sizeof(__pyx_k_struc), 0, 0, 1, 1},
   {&__pyx_n_s_struc_type, __pyx_k_struc_type, sizeof(__pyx_k_struc_type), 0, 0, 1, 1},
@@ -14989,7 +14989,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "stat.pyx":95
+  /* "parabam/command/stat.pyx":95
  * 				data_str = self.__get_data_str_from_names__(const.analysis_names,source_structures)
  * 
  * 				with open(const.output_paths,"a") as out_object:             # <<<<<<<<<<<<<<
@@ -15000,7 +15000,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "stat.pyx":225
+  /* "parabam/command/stat.pyx":225
  * 		write_line = "%s,%.3f\n" % (first_col,self.data,)
  * 
  * 		with open(out_paths[source][self.name],"a") as out_object:             # <<<<<<<<<<<<<<
@@ -15011,7 +15011,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "stat.pyx":342
+  /* "parabam/command/stat.pyx":342
  * 		if outmode == "d":
  * 			header = "Sample,%s\n" % (",".join(analysis_names),)
  * 			with open(output_path,"w") as out_obj:             # <<<<<<<<<<<<<<
@@ -15022,7 +15022,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "stat.pyx":354
+  /* "parabam/command/stat.pyx":354
  * 				if engine_is_class:
  * 					if not issubclass(user_engine,TaskStat):
  * 						raise Exception("[ERROR]\tThe class provided to parabam must be a subclass of\n"\             # <<<<<<<<<<<<<<
@@ -15033,7 +15033,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "stat.pyx":382
+  /* "parabam/command/stat.pyx":382
  * 					header,out_path = self.__format_path__(outmode,source,name)
  * 					out_paths[source][name] = out_path
  * 					with open(out_path,"w") as out_object:             # <<<<<<<<<<<<<<
@@ -15044,7 +15044,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
-  /* "stat.pyx":419
+  /* "parabam/command/stat.pyx":419
  * 		parser = self.default_parser()
  * 
  * 		parser.add_argument('--output','-o',metavar='OUTPUT', nargs='?',required=False             # <<<<<<<<<<<<<<
@@ -15055,7 +15055,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "stat.pyx":423
+  /* "parabam/command/stat.pyx":423
  * 			"If this argument is not supplied, the output will take the following form:\n"\
  * 			"parabam_stat_[UNIX_TIME].csv")
  * 		parser.add_argument('--outmode', choices=['d','s','a'],default='d',             # <<<<<<<<<<<<<<
@@ -15066,7 +15066,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
 
-  /* "stat.pyx":17
+  /* "parabam/command/stat.pyx":17
  * 	__metaclass__ = ABCMeta
  * 
  * 	def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):             # <<<<<<<<<<<<<<
@@ -15078,7 +15078,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__12);
   __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(7, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_init, 17, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":28
+  /* "parabam/command/stat.pyx":28
  * 		self._local_structures = {}
  * 
  * 	def __generate_results__(self):             # <<<<<<<<<<<<<<
@@ -15090,7 +15090,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__14);
   __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_generate_results, 28, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":46
+  /* "parabam/command/stat.pyx":46
  * 		return results
  * 
  * 	def __unpack_structures__(self,structures):             # <<<<<<<<<<<<<<
@@ -15102,7 +15102,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__16);
   __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_unpack_structures, 46, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":53
+  /* "parabam/command/stat.pyx":53
  * 		return unpacked
  * 
  * 	def __handle_task_set__(self,task_set,master):             # <<<<<<<<<<<<<<
@@ -15114,7 +15114,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__18);
   __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(3, 0, 10, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_handle_task_set, 53, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":66
+  /* "parabam/command/stat.pyx":66
  * class HandlerStat(parabam.core.Handler):
  * 
  * 	def __init__(self,object inqu,object const):             # <<<<<<<<<<<<<<
@@ -15126,7 +15126,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__20);
   __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_init, 66, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":77
+  /* "parabam/command/stat.pyx":77
  * 				self._final_structures[source][struc.name] = struc.empty_clone()
  * 
  * 	def __new_package_action__(self,new_package,**kwargs):             # <<<<<<<<<<<<<<
@@ -15138,7 +15138,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__22);
   __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_new_package_action, 77, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":85
+  /* "parabam/command/stat.pyx":85
  * 			final_struc.merge(data)
  * 
  * 	def __periodic_action__(self,iterations):             # <<<<<<<<<<<<<<
@@ -15150,7 +15150,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__24);
   __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_periodic_action, 85, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":88
+  /* "parabam/command/stat.pyx":88
  * 		pass
  * 
  * 	def __handler_exit__(self,**kwargs):             # <<<<<<<<<<<<<<
@@ -15162,7 +15162,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__26);
   __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(1, 0, 10, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_handler_exit, 88, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":108
+  /* "parabam/command/stat.pyx":108
  * 					struc.write_to_csv(const.output_paths,source,const.outmode)
  * 
  * 	def __get_data_str_from_names__(self,names,user_structures):             # <<<<<<<<<<<<<<
@@ -15174,7 +15174,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__28);
   __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_get_data_str_from_names, 108, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":117
+  /* "parabam/command/stat.pyx":117
  * class ProcessorStat(parabam.core.Processor):
  * 
  * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):             # <<<<<<<<<<<<<<
@@ -15186,7 +15186,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__30);
   __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_init, 117, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":121
+  /* "parabam/command/stat.pyx":121
  * 		self._source = task_args[0] #Defined in the run function within Interface
  * 
  * 	def __get_master_bam__(self,master_file_path):             # <<<<<<<<<<<<<<
@@ -15198,7 +15198,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__32);
   __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_get_master_bam, 121, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":124
+  /* "parabam/command/stat.pyx":124
  * 		return pysam.Samfile(master_file_path[self._source],"rb")
  * 
  * 	def __add_to_collection__(self,master,alig,collection):             # <<<<<<<<<<<<<<
@@ -15210,7 +15210,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__34);
   __pyx_codeobj__35 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__34, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_to_collection, 124, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__35)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":127
+  /* "parabam/command/stat.pyx":127
  * 		collection.append(alig)
  * 
  * 	def __pre_processor__(self,master_file_path):             # <<<<<<<<<<<<<<
@@ -15222,7 +15222,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__36);
   __pyx_codeobj__37 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__36, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_pre_processor, 127, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__37)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":134
+  /* "parabam/command/stat.pyx":134
  * 	__metaclass__ = ABCMeta
  * 
  * 	def __init__(self,name,struc_type,store_method,data):             # <<<<<<<<<<<<<<
@@ -15234,7 +15234,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__38);
   __pyx_codeobj__39 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_init, 134, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__39)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":151
+  /* "parabam/command/stat.pyx":151
  * 			self.merge = self.merge_cumu
  * 
  * 	def max_decision(self,result,existing):             # <<<<<<<<<<<<<<
@@ -15246,7 +15246,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__40);
   __pyx_codeobj__41 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__40, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_max_decision, 151, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__41)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":154
+  /* "parabam/command/stat.pyx":154
  * 		return max(result,existing)
  * 
  * 	def min_decision(self,result,exisiting):             # <<<<<<<<<<<<<<
@@ -15258,7 +15258,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__42);
   __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_min_decision, 154, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":158
+  /* "parabam/command/stat.pyx":158
  * 
  * 	@abstractmethod
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
@@ -15270,7 +15270,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__44);
   __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__44, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_empty_clone, 158, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 158; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":162
+  /* "parabam/command/stat.pyx":162
  * 
  * 	@abstractmethod
  * 	def add_max(self,result):             # <<<<<<<<<<<<<<
@@ -15282,7 +15282,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__46);
   __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_max, 162, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":166
+  /* "parabam/command/stat.pyx":166
  * 
  * 	@abstractmethod
  * 	def add_min(self,result):             # <<<<<<<<<<<<<<
@@ -15294,7 +15294,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__48);
   __pyx_codeobj__49 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__48, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_min, 166, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__49)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 166; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":170
+  /* "parabam/command/stat.pyx":170
  * 
  * 	@abstractmethod
  * 	def add_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -15306,7 +15306,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__50);
   __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_cumu, 170, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":174
+  /* "parabam/command/stat.pyx":174
  * 
  * 	@abstractmethod
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
@@ -15318,7 +15318,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__52);
   __pyx_codeobj__53 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__52, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_merge_max, 174, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__53)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":178
+  /* "parabam/command/stat.pyx":178
  * 
  * 	@abstractmethod
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
@@ -15330,7 +15330,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__54);
   __pyx_codeobj__55 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__54, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_merge_min, 178, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__55)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":182
+  /* "parabam/command/stat.pyx":182
  * 
  * 	@abstractmethod
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -15342,7 +15342,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__56);
   __pyx_codeobj__57 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__56, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_merge_cumu, 182, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__57)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":186
+  /* "parabam/command/stat.pyx":186
  * 
  * 	@abstractmethod
  * 	def write_to_csv(self,source):             # <<<<<<<<<<<<<<
@@ -15354,7 +15354,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__58);
   __pyx_codeobj__59 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__58, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_write_to_csv, 186, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__59)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":190
+  /* "parabam/command/stat.pyx":190
  * 
  * class NumericStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data,log_scaling=False):             # <<<<<<<<<<<<<<
@@ -15369,7 +15369,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__62);
   __Pyx_GIVEREF(__pyx_tuple__62);
 
-  /* "stat.pyx":194
+  /* "parabam/command/stat.pyx":194
  * 		self.log_scaling = log_scaling
  * 
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
@@ -15381,7 +15381,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__63);
   __pyx_codeobj__64 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__63, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_empty_clone, 194, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__64)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 194; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":197
+  /* "parabam/command/stat.pyx":197
  * 		return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  * 	def add_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -15393,7 +15393,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__65);
   __pyx_codeobj__66 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__65, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_cumu, 197, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__66)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 197; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":200
+  /* "parabam/command/stat.pyx":200
  * 		self.data += result
  * 
  * 	def add_max(self,result):             # <<<<<<<<<<<<<<
@@ -15405,7 +15405,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__67);
   __pyx_codeobj__68 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__67, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_max, 200, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__68)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 200; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":203
+  /* "parabam/command/stat.pyx":203
  * 		self.data = self.max_decision(result,self.data)
  * 
  * 	def add_min(self,result):             # <<<<<<<<<<<<<<
@@ -15417,7 +15417,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__69);
   __pyx_codeobj__70 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__69, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_min, 203, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__70)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":206
+  /* "parabam/command/stat.pyx":206
  * 		self.data = self.min_decision(result,self.data)
  * 
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
@@ -15429,7 +15429,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__71);
   __pyx_codeobj__72 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__71, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_merge_max, 206, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__72)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":210
+  /* "parabam/command/stat.pyx":210
  * 		del result
  * 
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
@@ -15441,7 +15441,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__73);
   __pyx_codeobj__74 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_merge_min, 210, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__74)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":214
+  /* "parabam/command/stat.pyx":214
  * 		del result
  * 
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -15453,7 +15453,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__75);
   __pyx_codeobj__76 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__75, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_merge_cumu, 214, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__76)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 214; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":218
+  /* "parabam/command/stat.pyx":218
  * 		del result
  * 
  * 	def write_to_csv(self,out_paths,source,mode):             # <<<<<<<<<<<<<<
@@ -15465,7 +15465,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__77);
   __pyx_codeobj__78 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__77, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_write_to_csv, 218, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__78)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":229
+  /* "parabam/command/stat.pyx":229
  * 
  * class ArrayStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data):             # <<<<<<<<<<<<<<
@@ -15477,7 +15477,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__79);
   __pyx_codeobj__80 = (PyObject*)__Pyx_PyCode_New(5, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__79, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_init, 229, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__80)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":232
+  /* "parabam/command/stat.pyx":232
  * 		super(ArrayStructure,self).__init__(name,struc_type,store_method,data)
  * 
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
@@ -15489,7 +15489,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__81);
   __pyx_codeobj__82 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__81, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_empty_clone, 232, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__82)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":235
+  /* "parabam/command/stat.pyx":235
  * 		return ArrayStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  * 	def add_max(self,result,coords):             # <<<<<<<<<<<<<<
@@ -15501,7 +15501,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__83);
   __pyx_codeobj__84 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__83, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_max, 235, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__84)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":239
+  /* "parabam/command/stat.pyx":239
  * 		self.data[coords] = self.max_decision(result,existing)
  * 
  * 	def add_min(self,result,coords):             # <<<<<<<<<<<<<<
@@ -15513,7 +15513,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__85);
   __pyx_codeobj__86 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__85, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_min, 239, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__86)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":243
+  /* "parabam/command/stat.pyx":243
  * 		self.data[coords] = self.min_decision(result,existing)
  * 
  * 	def add_cumu(self,result,coords):             # <<<<<<<<<<<<<<
@@ -15525,7 +15525,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__87);
   __pyx_codeobj__88 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__87, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_add_cumu, 243, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__88)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":246
+  /* "parabam/command/stat.pyx":246
  * 		self.data[coords] += result
  * 
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
@@ -15537,7 +15537,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__89);
   __pyx_codeobj__90 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__89, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_merge_max, 246, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__90)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":250
+  /* "parabam/command/stat.pyx":250
  * 		del result
  * 
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
@@ -15549,7 +15549,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__91);
   __pyx_codeobj__92 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__91, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_merge_min, 250, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__92)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":254
+  /* "parabam/command/stat.pyx":254
  * 		del result
  * 
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
@@ -15561,7 +15561,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__93);
   __pyx_codeobj__94 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__93, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_merge_cumu, 254, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__94)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":258
+  /* "parabam/command/stat.pyx":258
  * 		del result
  * 
  * 	def write_to_csv(self,out_path,source,mode):             # <<<<<<<<<<<<<<
@@ -15573,7 +15573,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__95);
   __pyx_codeobj__96 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__95, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_write_to_csv, 258, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__96)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":263
+  /* "parabam/command/stat.pyx":263
  * class Interface(parabam.core.UserInterface):
  * 
  * 	def __init__(self,temp_dir,exe_dir):             # <<<<<<<<<<<<<<
@@ -15585,7 +15585,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__97);
   __pyx_codeobj__98 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__97, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_init, 263, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__98)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":266
+  /* "parabam/command/stat.pyx":266
  * 		super(Interface,self).__init__(temp_dir,exe_dir)
  * 
  * 	def run_cmd(self,parser):             # <<<<<<<<<<<<<<
@@ -15597,7 +15597,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__99);
   __pyx_codeobj__100 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__99, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_run_cmd, 266, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__100)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":287
+  /* "parabam/command/stat.pyx":287
  * 			outmode = cmd_args.outmode)
  * 
  * 	def run(self,input_bams,user_specified_outpath,proc,chunk,user_constants,user_engine,             # <<<<<<<<<<<<<<
@@ -15612,7 +15612,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__103);
   __Pyx_GIVEREF(__pyx_tuple__103);
 
-  /* "stat.pyx":339
+  /* "parabam/command/stat.pyx":339
  * 		return master_output_paths #Depending on outmode this output a dict or string
  * 
  * 	def __create_output_files__(self,output_path,user_structures,outmode,analysis_names):             # <<<<<<<<<<<<<<
@@ -15624,7 +15624,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__104);
   __pyx_codeobj__105 = (PyObject*)__Pyx_PyCode_New(5, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__104, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_create_output_files, 339, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__105)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":345
+  /* "parabam/command/stat.pyx":345
  * 				out_obj.write(header)
  * 
  * 	def __create_handlers__(self,task_qu,object const):             # <<<<<<<<<<<<<<
@@ -15636,7 +15636,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__106);
   __pyx_codeobj__107 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__106, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_create_handlers, 345, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__107)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 345; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":348
+  /* "parabam/command/stat.pyx":348
  * 		return [HandlerStat(inqu=task_qu,const=const)]
  * 
  * 	def __create_proccessors__(self,task_qu,output_group,engine_is_class,user_engine,object const):             # <<<<<<<<<<<<<<
@@ -15648,7 +15648,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__108);
   __pyx_codeobj__109 = (PyObject*)__Pyx_PyCode_New(6, 0, 9, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__108, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_create_proccessors, 348, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__109)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 348; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":368
+  /* "parabam/command/stat.pyx":368
  * 		return processors
  * 
  * 	def __create_master_file_paths__(self,input_group,output_group):             # <<<<<<<<<<<<<<
@@ -15660,7 +15660,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__110);
   __pyx_codeobj__111 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__110, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_create_master_file_paths, 368, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__111)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":374
+  /* "parabam/command/stat.pyx":374
  * 		return master_file_path
  * 
  * 	def __create_individual_output_files__(self,outmode,output_group,user_structures):             # <<<<<<<<<<<<<<
@@ -15672,7 +15672,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__112);
   __pyx_codeobj__113 = (PyObject*)__Pyx_PyCode_New(4, 0, 11, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__112, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_create_individual_output_files, 374, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__113)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":388
+  /* "parabam/command/stat.pyx":388
  * 		return out_paths
  * 
  * 	def __format_path__(self,mode,source,name):             # <<<<<<<<<<<<<<
@@ -15684,7 +15684,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__114);
   __pyx_codeobj__115 = (PyObject*)__Pyx_PyCode_New(4, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__114, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_format_path, 388, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__115)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":397
+  /* "parabam/command/stat.pyx":397
  * 		return (header,out_path)
  * 
  * 	def __get_non_array_names__(self,user_structures):             # <<<<<<<<<<<<<<
@@ -15696,7 +15696,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__116);
   __pyx_codeobj__117 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__116, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_get_non_array_names, 397, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__117)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":405
+  /* "parabam/command/stat.pyx":405
  * 		return names
  * 
  * 	def __create_structures__(self,user_structures_blueprint):             # <<<<<<<<<<<<<<
@@ -15708,7 +15708,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__118);
   __pyx_codeobj__119 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__118, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_create_structures, 405, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__119)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "stat.pyx":415
+  /* "parabam/command/stat.pyx":415
  * 		return user_structures
  * 
  * 	def get_parser(self):             # <<<<<<<<<<<<<<
@@ -15805,14 +15805,14 @@ PyMODINIT_FUNC PyInit_stat(void)
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   #endif
-  if (__pyx_module_is_main_stat) {
+  if (__pyx_module_is_main_parabam__command__stat) {
     if (PyObject_SetAttrString(__pyx_m, "__name__", __pyx_n_s_main) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    if (!PyDict_GetItemString(modules, "stat")) {
-      if (unlikely(PyDict_SetItemString(modules, "stat", __pyx_m) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!PyDict_GetItemString(modules, "parabam.command.stat")) {
+      if (unlikely(PyDict_SetItemString(modules, "parabam.command.stat", __pyx_m) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
@@ -15829,7 +15829,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   /*--- Function import code ---*/
   /*--- Execution code ---*/
 
-  /* "stat.pyx":1
+  /* "parabam/command/stat.pyx":1
  * import pysam             # <<<<<<<<<<<<<<
  * import parabam
  * import shutil
@@ -15839,7 +15839,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pysam, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":2
+  /* "parabam/command/stat.pyx":2
  * import pysam
  * import parabam             # <<<<<<<<<<<<<<
  * import shutil
@@ -15850,7 +15850,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_parabam, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 2; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":3
+  /* "parabam/command/stat.pyx":3
  * import pysam
  * import parabam
  * import shutil             # <<<<<<<<<<<<<<
@@ -15862,7 +15862,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_shutil, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 3; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":4
+  /* "parabam/command/stat.pyx":4
  * import parabam
  * import shutil
  * import time             # <<<<<<<<<<<<<<
@@ -15874,7 +15874,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_time, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 4; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":5
+  /* "parabam/command/stat.pyx":5
  * import shutil
  * import time
  * import sys             # <<<<<<<<<<<<<<
@@ -15886,7 +15886,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_sys, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 5; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":6
+  /* "parabam/command/stat.pyx":6
  * import time
  * import sys
  * import os             # <<<<<<<<<<<<<<
@@ -15898,7 +15898,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_os, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":7
+  /* "parabam/command/stat.pyx":7
  * import sys
  * import os
  * import copy             # <<<<<<<<<<<<<<
@@ -15910,7 +15910,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_copy, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 7; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":8
+  /* "parabam/command/stat.pyx":8
  * import os
  * import copy
  * import numpy as np             # <<<<<<<<<<<<<<
@@ -15922,7 +15922,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 8; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":10
+  /* "parabam/command/stat.pyx":10
  * import numpy as np
  * 
  * from multiprocessing import Queue             # <<<<<<<<<<<<<<
@@ -15943,7 +15943,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":11
+  /* "parabam/command/stat.pyx":11
  * 
  * from multiprocessing import Queue
  * from abc import ABCMeta, abstractmethod             # <<<<<<<<<<<<<<
@@ -15971,7 +15971,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":13
+  /* "parabam/command/stat.pyx":13
  * from abc import ABCMeta, abstractmethod
  * 
  * class TaskStat(parabam.core.Task):             # <<<<<<<<<<<<<<
@@ -15993,10 +15993,10 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_1 = 0;
   __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_TaskStat, __pyx_n_s_TaskStat, (PyObject *) NULL, __pyx_n_s_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_TaskStat, __pyx_n_s_TaskStat, (PyObject *) NULL, __pyx_n_s_parabam_command_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "stat.pyx":15
+  /* "parabam/command/stat.pyx":15
  * class TaskStat(parabam.core.Task):
  * 
  * 	__metaclass__ = ABCMeta             # <<<<<<<<<<<<<<
@@ -16008,55 +16008,55 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_metaclass, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":17
+  /* "parabam/command/stat.pyx":17
  * 	__metaclass__ = ABCMeta
  * 
  * 	def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):             # <<<<<<<<<<<<<<
  * 		super(TaskStat, self).__init__(task_set=task_set,
  * 										outqu=outqu,
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_8TaskStat_1__init__, 0, __pyx_n_s_TaskStat___init, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_8TaskStat_1__init__, 0, __pyx_n_s_TaskStat___init, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":28
+  /* "parabam/command/stat.pyx":28
  * 		self._local_structures = {}
  * 
  * 	def __generate_results__(self):             # <<<<<<<<<<<<<<
  * 		master = pysam.Samfile(self._master_file_path,"rb")
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_8TaskStat_3__generate_results__, 0, __pyx_n_s_TaskStat___generate_results, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_8TaskStat_3__generate_results__, 0, __pyx_n_s_TaskStat___generate_results, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_generate_results, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":46
+  /* "parabam/command/stat.pyx":46
  * 		return results
  * 
  * 	def __unpack_structures__(self,structures):             # <<<<<<<<<<<<<<
  * 		unpacked = []
  * 		for name,struc in structures.items():
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_8TaskStat_5__unpack_structures__, 0, __pyx_n_s_TaskStat___unpack_structures, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_8TaskStat_5__unpack_structures__, 0, __pyx_n_s_TaskStat___unpack_structures, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_unpack_structures, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":53
+  /* "parabam/command/stat.pyx":53
  * 		return unpacked
  * 
  * 	def __handle_task_set__(self,task_set,master):             # <<<<<<<<<<<<<<
  * 		engine = self.const.user_engine
  * 		constants = self.const.user_constants
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_8TaskStat_7__handle_task_set__, 0, __pyx_n_s_TaskStat___handle_task_set, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__19)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_8TaskStat_7__handle_task_set__, 0, __pyx_n_s_TaskStat___handle_task_set, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__19)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_handle_task_set, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 53; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":13
+  /* "parabam/command/stat.pyx":13
  * from abc import ABCMeta, abstractmethod
  * 
  * class TaskStat(parabam.core.Task):             # <<<<<<<<<<<<<<
@@ -16071,7 +16071,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":64
+  /* "parabam/command/stat.pyx":64
  * 					local_structures[name].add(**package)
  * 
  * class HandlerStat(parabam.core.Handler):             # <<<<<<<<<<<<<<
@@ -16093,70 +16093,70 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_2 = 0;
   __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 64; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_HandlerStat, __pyx_n_s_HandlerStat, (PyObject *) NULL, __pyx_n_s_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 64; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_HandlerStat, __pyx_n_s_HandlerStat, (PyObject *) NULL, __pyx_n_s_parabam_command_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 64; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "stat.pyx":66
+  /* "parabam/command/stat.pyx":66
  * class HandlerStat(parabam.core.Handler):
  * 
  * 	def __init__(self,object inqu,object const):             # <<<<<<<<<<<<<<
  * 		super(HandlerStat,self).__init__(inqu,const,destroy_limit=len(const.sources))
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_11HandlerStat_1__init__, 0, __pyx_n_s_HandlerStat___init, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__21)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_11HandlerStat_1__init__, 0, __pyx_n_s_HandlerStat___init, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__21)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":77
+  /* "parabam/command/stat.pyx":77
  * 				self._final_structures[source][struc.name] = struc.empty_clone()
  * 
  * 	def __new_package_action__(self,new_package,**kwargs):             # <<<<<<<<<<<<<<
  * 		results = new_package.results
  * 		source = results["source"]
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_11HandlerStat_3__new_package_action__, 0, __pyx_n_s_HandlerStat___new_package_action, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__23)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_11HandlerStat_3__new_package_action__, 0, __pyx_n_s_HandlerStat___new_package_action, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__23)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_new_package_action, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":85
+  /* "parabam/command/stat.pyx":85
  * 			final_struc.merge(data)
  * 
  * 	def __periodic_action__(self,iterations):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_11HandlerStat_5__periodic_action__, 0, __pyx_n_s_HandlerStat___periodic_action, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__25)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_11HandlerStat_5__periodic_action__, 0, __pyx_n_s_HandlerStat___periodic_action, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__25)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_periodic_action, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":88
+  /* "parabam/command/stat.pyx":88
  * 		pass
  * 
  * 	def __handler_exit__(self,**kwargs):             # <<<<<<<<<<<<<<
  * 		const = self.const
  * 		if const.outmode == "d":
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_11HandlerStat_7__handler_exit__, 0, __pyx_n_s_HandlerStat___handler_exit, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__27)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_11HandlerStat_7__handler_exit__, 0, __pyx_n_s_HandlerStat___handler_exit, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__27)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_handler_exit, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":108
+  /* "parabam/command/stat.pyx":108
  * 					struc.write_to_csv(const.output_paths,source,const.outmode)
  * 
  * 	def __get_data_str_from_names__(self,names,user_structures):             # <<<<<<<<<<<<<<
  * 		data_str = ""
  * 		for name in names:
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_11HandlerStat_9__get_data_str_from_names__, 0, __pyx_n_s_HandlerStat___get_data_str_from, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__29)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_11HandlerStat_9__get_data_str_from_names__, 0, __pyx_n_s_HandlerStat___get_data_str_from, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__29)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_get_data_str_from_names, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":64
+  /* "parabam/command/stat.pyx":64
  * 					local_structures[name].add(**package)
  * 
  * class HandlerStat(parabam.core.Handler):             # <<<<<<<<<<<<<<
@@ -16171,7 +16171,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":115
+  /* "parabam/command/stat.pyx":115
  * 		return data_str
  * 
  * class ProcessorStat(parabam.core.Processor):             # <<<<<<<<<<<<<<
@@ -16193,58 +16193,58 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_1 = 0;
   __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_ProcessorStat, __pyx_n_s_ProcessorStat, (PyObject *) NULL, __pyx_n_s_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_ProcessorStat, __pyx_n_s_ProcessorStat, (PyObject *) NULL, __pyx_n_s_parabam_command_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "stat.pyx":117
+  /* "parabam/command/stat.pyx":117
  * class ProcessorStat(parabam.core.Processor):
  * 
  * 	def __init__(self,object outqu,object const,object TaskClass,list task_args):             # <<<<<<<<<<<<<<
  * 		super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
  * 		self._source = task_args[0] #Defined in the run function within Interface
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13ProcessorStat_1__init__, 0, __pyx_n_s_ProcessorStat___init, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__31)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13ProcessorStat_1__init__, 0, __pyx_n_s_ProcessorStat___init, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__31)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":121
+  /* "parabam/command/stat.pyx":121
  * 		self._source = task_args[0] #Defined in the run function within Interface
  * 
  * 	def __get_master_bam__(self,master_file_path):             # <<<<<<<<<<<<<<
  * 		return pysam.Samfile(master_file_path[self._source],"rb")
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13ProcessorStat_3__get_master_bam__, 0, __pyx_n_s_ProcessorStat___get_master_bam, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__33)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13ProcessorStat_3__get_master_bam__, 0, __pyx_n_s_ProcessorStat___get_master_bam, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__33)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_get_master_bam, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":124
+  /* "parabam/command/stat.pyx":124
  * 		return pysam.Samfile(master_file_path[self._source],"rb")
  * 
  * 	def __add_to_collection__(self,master,alig,collection):             # <<<<<<<<<<<<<<
  * 		collection.append(alig)
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13ProcessorStat_5__add_to_collection__, 0, __pyx_n_s_ProcessorStat___add_to_collectio, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__35)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13ProcessorStat_5__add_to_collection__, 0, __pyx_n_s_ProcessorStat___add_to_collectio, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__35)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_to_collection, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":127
+  /* "parabam/command/stat.pyx":127
  * 		collection.append(alig)
  * 
  * 	def __pre_processor__(self,master_file_path):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13ProcessorStat_7__pre_processor__, 0, __pyx_n_s_ProcessorStat___pre_processor, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__37)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13ProcessorStat_7__pre_processor__, 0, __pyx_n_s_ProcessorStat___pre_processor, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__37)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_pre_processor, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":115
+  /* "parabam/command/stat.pyx":115
  * 		return data_str
  * 
  * class ProcessorStat(parabam.core.Processor):             # <<<<<<<<<<<<<<
@@ -16259,7 +16259,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":130
+  /* "parabam/command/stat.pyx":130
  * 		pass
  * 
  * class UserStructure(object):             # <<<<<<<<<<<<<<
@@ -16273,10 +16273,10 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_GIVEREF(__pyx_builtin_object);
   __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_UserStructure, __pyx_n_s_UserStructure, (PyObject *) NULL, __pyx_n_s_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_UserStructure, __pyx_n_s_UserStructure, (PyObject *) NULL, __pyx_n_s_parabam_command_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "stat.pyx":132
+  /* "parabam/command/stat.pyx":132
  * class UserStructure(object):
  * 
  * 	__metaclass__ = ABCMeta             # <<<<<<<<<<<<<<
@@ -16288,43 +16288,43 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_metaclass, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":134
+  /* "parabam/command/stat.pyx":134
  * 	__metaclass__ = ABCMeta
  * 
  * 	def __init__(self,name,struc_type,store_method,data):             # <<<<<<<<<<<<<<
  * 		self.struc_type = struc_type
  * 		self.store_method = store_method
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_1__init__, 0, __pyx_n_s_UserStructure___init, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__39)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_1__init__, 0, __pyx_n_s_UserStructure___init, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__39)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":151
+  /* "parabam/command/stat.pyx":151
  * 			self.merge = self.merge_cumu
  * 
  * 	def max_decision(self,result,existing):             # <<<<<<<<<<<<<<
  * 		return max(result,existing)
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_3max_decision, 0, __pyx_n_s_UserStructure_max_decision, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__41)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_3max_decision, 0, __pyx_n_s_UserStructure_max_decision, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__41)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_max_decision, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":154
+  /* "parabam/command/stat.pyx":154
  * 		return max(result,existing)
  * 
  * 	def min_decision(self,result,exisiting):             # <<<<<<<<<<<<<<
  * 		return min(result,exisiting)
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_5min_decision, 0, __pyx_n_s_UserStructure_min_decision, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__43)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_5min_decision, 0, __pyx_n_s_UserStructure_min_decision, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__43)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_min_decision, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":157
+  /* "parabam/command/stat.pyx":157
  * 		return min(result,exisiting)
  * 
  * 	@abstractmethod             # <<<<<<<<<<<<<<
@@ -16334,14 +16334,14 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_abstractmethod); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 157; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "stat.pyx":158
+  /* "parabam/command/stat.pyx":158
  * 
  * 	@abstractmethod
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_6 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_7empty_clone, 0, __pyx_n_s_UserStructure_empty_clone, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__45)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 158; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_7empty_clone, 0, __pyx_n_s_UserStructure_empty_clone, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__45)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 158; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -16372,7 +16372,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_empty_clone, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 158; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":161
+  /* "parabam/command/stat.pyx":161
  * 		pass
  * 
  * 	@abstractmethod             # <<<<<<<<<<<<<<
@@ -16382,14 +16382,14 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_abstractmethod); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 161; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "stat.pyx":162
+  /* "parabam/command/stat.pyx":162
  * 
  * 	@abstractmethod
  * 	def add_max(self,result):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_8 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_9add_max, 0, __pyx_n_s_UserStructure_add_max, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__47)); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_9add_max, 0, __pyx_n_s_UserStructure_add_max, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__47)); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_6 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -16420,7 +16420,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_max, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":165
+  /* "parabam/command/stat.pyx":165
  * 		pass
  * 
  * 	@abstractmethod             # <<<<<<<<<<<<<<
@@ -16430,14 +16430,14 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_abstractmethod); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 165; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "stat.pyx":166
+  /* "parabam/command/stat.pyx":166
  * 
  * 	@abstractmethod
  * 	def add_min(self,result):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_7 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_11add_min, 0, __pyx_n_s_UserStructure_add_min, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__49)); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 166; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_11add_min, 0, __pyx_n_s_UserStructure_add_min, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__49)); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 166; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_8 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -16468,7 +16468,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_min, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 166; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":169
+  /* "parabam/command/stat.pyx":169
  * 		pass
  * 
  * 	@abstractmethod             # <<<<<<<<<<<<<<
@@ -16478,14 +16478,14 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_abstractmethod); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 169; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "stat.pyx":170
+  /* "parabam/command/stat.pyx":170
  * 
  * 	@abstractmethod
  * 	def add_cumu(self,result):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_6 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_13add_cumu, 0, __pyx_n_s_UserStructure_add_cumu, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__51)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_13add_cumu, 0, __pyx_n_s_UserStructure_add_cumu, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__51)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -16516,7 +16516,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_cumu, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":173
+  /* "parabam/command/stat.pyx":173
  * 		pass
  * 
  * 	@abstractmethod             # <<<<<<<<<<<<<<
@@ -16526,14 +16526,14 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_abstractmethod); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 173; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "stat.pyx":174
+  /* "parabam/command/stat.pyx":174
  * 
  * 	@abstractmethod
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_8 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_15merge_max, 0, __pyx_n_s_UserStructure_merge_max, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__53)); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_15merge_max, 0, __pyx_n_s_UserStructure_merge_max, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__53)); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_6 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -16564,7 +16564,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_merge_max, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 174; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":177
+  /* "parabam/command/stat.pyx":177
  * 		pass
  * 
  * 	@abstractmethod             # <<<<<<<<<<<<<<
@@ -16574,14 +16574,14 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_abstractmethod); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "stat.pyx":178
+  /* "parabam/command/stat.pyx":178
  * 
  * 	@abstractmethod
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_7 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_17merge_min, 0, __pyx_n_s_UserStructure_merge_min, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__55)); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_17merge_min, 0, __pyx_n_s_UserStructure_merge_min, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__55)); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_8 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -16612,7 +16612,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_merge_min, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":181
+  /* "parabam/command/stat.pyx":181
  * 		pass
  * 
  * 	@abstractmethod             # <<<<<<<<<<<<<<
@@ -16622,14 +16622,14 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_abstractmethod); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "stat.pyx":182
+  /* "parabam/command/stat.pyx":182
  * 
  * 	@abstractmethod
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_6 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_19merge_cumu, 0, __pyx_n_s_UserStructure_merge_cumu, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__57)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_19merge_cumu, 0, __pyx_n_s_UserStructure_merge_cumu, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__57)); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -16660,7 +16660,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_merge_cumu, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":185
+  /* "parabam/command/stat.pyx":185
  * 		pass
  * 
  * 	@abstractmethod             # <<<<<<<<<<<<<<
@@ -16670,14 +16670,14 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_5 = __Pyx_GetModuleGlobalName(__pyx_n_s_abstractmethod); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 185; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "stat.pyx":186
+  /* "parabam/command/stat.pyx":186
  * 
  * 	@abstractmethod
  * 	def write_to_csv(self,source):             # <<<<<<<<<<<<<<
  * 		pass
  * 
  */
-  __pyx_t_8 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_13UserStructure_21write_to_csv, 0, __pyx_n_s_UserStructure_write_to_csv, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__59)); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_13UserStructure_21write_to_csv, 0, __pyx_n_s_UserStructure_write_to_csv, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__59)); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_6 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -16708,7 +16708,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_write_to_csv, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":130
+  /* "parabam/command/stat.pyx":130
  * 		pass
  * 
  * class UserStructure(object):             # <<<<<<<<<<<<<<
@@ -16723,7 +16723,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":189
+  /* "parabam/command/stat.pyx":189
  * 		pass
  * 
  * class NumericStructure(UserStructure):             # <<<<<<<<<<<<<<
@@ -16739,119 +16739,119 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_2 = 0;
   __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_NumericStructure, __pyx_n_s_NumericStructure, (PyObject *) NULL, __pyx_n_s_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_NumericStructure, __pyx_n_s_NumericStructure, (PyObject *) NULL, __pyx_n_s_parabam_command_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "stat.pyx":190
+  /* "parabam/command/stat.pyx":190
  * 
  * class NumericStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data,log_scaling=False):             # <<<<<<<<<<<<<<
  * 		super(NumericStructure,self).__init__(name,struc_type,store_method,data)
  * 		self.log_scaling = log_scaling
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_16NumericStructure_1__init__, 0, __pyx_n_s_NumericStructure___init, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__61)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_16NumericStructure_1__init__, 0, __pyx_n_s_NumericStructure___init, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__61)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_4, __pyx_tuple__62);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":194
+  /* "parabam/command/stat.pyx":194
  * 		self.log_scaling = log_scaling
  * 
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
  * 		return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_16NumericStructure_3empty_clone, 0, __pyx_n_s_NumericStructure_empty_clone, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__64)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 194; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_16NumericStructure_3empty_clone, 0, __pyx_n_s_NumericStructure_empty_clone, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__64)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 194; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_empty_clone, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 194; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":197
+  /* "parabam/command/stat.pyx":197
  * 		return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  * 	def add_cumu(self,result):             # <<<<<<<<<<<<<<
  * 		self.data += result
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_16NumericStructure_5add_cumu, 0, __pyx_n_s_NumericStructure_add_cumu, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__66)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 197; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_16NumericStructure_5add_cumu, 0, __pyx_n_s_NumericStructure_add_cumu, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__66)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 197; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_cumu, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 197; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":200
+  /* "parabam/command/stat.pyx":200
  * 		self.data += result
  * 
  * 	def add_max(self,result):             # <<<<<<<<<<<<<<
  * 		self.data = self.max_decision(result,self.data)
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_16NumericStructure_7add_max, 0, __pyx_n_s_NumericStructure_add_max, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__68)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 200; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_16NumericStructure_7add_max, 0, __pyx_n_s_NumericStructure_add_max, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__68)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 200; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_max, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 200; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":203
+  /* "parabam/command/stat.pyx":203
  * 		self.data = self.max_decision(result,self.data)
  * 
  * 	def add_min(self,result):             # <<<<<<<<<<<<<<
  * 		self.data = self.min_decision(result,self.data)
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_16NumericStructure_9add_min, 0, __pyx_n_s_NumericStructure_add_min, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__70)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_16NumericStructure_9add_min, 0, __pyx_n_s_NumericStructure_add_min, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__70)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_min, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":206
+  /* "parabam/command/stat.pyx":206
  * 		self.data = self.min_decision(result,self.data)
  * 
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
  * 		self.data = self.max_decision(self.data,result)
  * 		del result
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_16NumericStructure_11merge_max, 0, __pyx_n_s_NumericStructure_merge_max, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__72)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_16NumericStructure_11merge_max, 0, __pyx_n_s_NumericStructure_merge_max, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__72)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_merge_max, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":210
+  /* "parabam/command/stat.pyx":210
  * 		del result
  * 
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
  * 		self.data = self.min_decision(self.data,result)
  * 		del result
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_16NumericStructure_13merge_min, 0, __pyx_n_s_NumericStructure_merge_min, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__74)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_16NumericStructure_13merge_min, 0, __pyx_n_s_NumericStructure_merge_min, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__74)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_merge_min, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":214
+  /* "parabam/command/stat.pyx":214
  * 		del result
  * 
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
  * 		self.data += result
  * 		del result
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_16NumericStructure_15merge_cumu, 0, __pyx_n_s_NumericStructure_merge_cumu, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__76)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 214; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_16NumericStructure_15merge_cumu, 0, __pyx_n_s_NumericStructure_merge_cumu, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__76)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 214; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_merge_cumu, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 214; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":218
+  /* "parabam/command/stat.pyx":218
  * 		del result
  * 
  * 	def write_to_csv(self,out_paths,source,mode):             # <<<<<<<<<<<<<<
  * 		if mode == "a":
  * 			first_col=source
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_16NumericStructure_17write_to_csv, 0, __pyx_n_s_NumericStructure_write_to_csv, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__78)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_16NumericStructure_17write_to_csv, 0, __pyx_n_s_NumericStructure_write_to_csv, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__78)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_write_to_csv, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":189
+  /* "parabam/command/stat.pyx":189
  * 		pass
  * 
  * class NumericStructure(UserStructure):             # <<<<<<<<<<<<<<
@@ -16866,7 +16866,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":228
+  /* "parabam/command/stat.pyx":228
  * 			out_object.write(write_line)
  * 
  * class ArrayStructure(UserStructure):             # <<<<<<<<<<<<<<
@@ -16882,118 +16882,118 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_1 = 0;
   __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_ArrayStructure, __pyx_n_s_ArrayStructure, (PyObject *) NULL, __pyx_n_s_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_ArrayStructure, __pyx_n_s_ArrayStructure, (PyObject *) NULL, __pyx_n_s_parabam_command_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "stat.pyx":229
+  /* "parabam/command/stat.pyx":229
  * 
  * class ArrayStructure(UserStructure):
  * 	def __init__(self,name,struc_type,store_method,data):             # <<<<<<<<<<<<<<
  * 		super(ArrayStructure,self).__init__(name,struc_type,store_method,data)
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_14ArrayStructure_1__init__, 0, __pyx_n_s_ArrayStructure___init, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__80)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_1__init__, 0, __pyx_n_s_ArrayStructure___init, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__80)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":232
+  /* "parabam/command/stat.pyx":232
  * 		super(ArrayStructure,self).__init__(name,struc_type,store_method,data)
  * 
  * 	def empty_clone(self):             # <<<<<<<<<<<<<<
  * 		return ArrayStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_14ArrayStructure_3empty_clone, 0, __pyx_n_s_ArrayStructure_empty_clone, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__82)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_3empty_clone, 0, __pyx_n_s_ArrayStructure_empty_clone, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__82)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_empty_clone, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":235
+  /* "parabam/command/stat.pyx":235
  * 		return ArrayStructure(self.name,self.struc_type,self.store_method,self.org_data)
  * 
  * 	def add_max(self,result,coords):             # <<<<<<<<<<<<<<
  * 		existing = self.data[coords]
  * 		self.data[coords] = self.max_decision(result,existing)
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_14ArrayStructure_5add_max, 0, __pyx_n_s_ArrayStructure_add_max, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__84)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_5add_max, 0, __pyx_n_s_ArrayStructure_add_max, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__84)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_max, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":239
+  /* "parabam/command/stat.pyx":239
  * 		self.data[coords] = self.max_decision(result,existing)
  * 
  * 	def add_min(self,result,coords):             # <<<<<<<<<<<<<<
  * 		existing = self.data[coords]
  * 		self.data[coords] = self.min_decision(result,existing)
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_14ArrayStructure_7add_min, 0, __pyx_n_s_ArrayStructure_add_min, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__86)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_7add_min, 0, __pyx_n_s_ArrayStructure_add_min, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__86)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_min, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":243
+  /* "parabam/command/stat.pyx":243
  * 		self.data[coords] = self.min_decision(result,existing)
  * 
  * 	def add_cumu(self,result,coords):             # <<<<<<<<<<<<<<
  * 		self.data[coords] += result
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_14ArrayStructure_9add_cumu, 0, __pyx_n_s_ArrayStructure_add_cumu, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__88)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_9add_cumu, 0, __pyx_n_s_ArrayStructure_add_cumu, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__88)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_add_cumu, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":246
+  /* "parabam/command/stat.pyx":246
  * 		self.data[coords] += result
  * 
  * 	def merge_max(self,result):             # <<<<<<<<<<<<<<
  * 		self.data = np.maximum(self.data,result)
  * 		del result
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_14ArrayStructure_11merge_max, 0, __pyx_n_s_ArrayStructure_merge_max, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__90)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_11merge_max, 0, __pyx_n_s_ArrayStructure_merge_max, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__90)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_merge_max, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 246; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":250
+  /* "parabam/command/stat.pyx":250
  * 		del result
  * 
  * 	def merge_min(self,result):             # <<<<<<<<<<<<<<
  * 		self.data = np.minimum(self.data,result)
  * 		del result
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_14ArrayStructure_13merge_min, 0, __pyx_n_s_ArrayStructure_merge_min, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__92)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_13merge_min, 0, __pyx_n_s_ArrayStructure_merge_min, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__92)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_merge_min, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":254
+  /* "parabam/command/stat.pyx":254
  * 		del result
  * 
  * 	def merge_cumu(self,result):             # <<<<<<<<<<<<<<
  * 		self.data += result
  * 		del result
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_14ArrayStructure_15merge_cumu, 0, __pyx_n_s_ArrayStructure_merge_cumu, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__94)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_15merge_cumu, 0, __pyx_n_s_ArrayStructure_merge_cumu, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__94)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_merge_cumu, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":258
+  /* "parabam/command/stat.pyx":258
  * 		del result
  * 
  * 	def write_to_csv(self,out_path,source,mode):             # <<<<<<<<<<<<<<
  * 		np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_14ArrayStructure_17write_to_csv, 0, __pyx_n_s_ArrayStructure_write_to_csv, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__96)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_17write_to_csv, 0, __pyx_n_s_ArrayStructure_write_to_csv, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__96)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_write_to_csv, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":228
+  /* "parabam/command/stat.pyx":228
  * 			out_object.write(write_line)
  * 
  * class ArrayStructure(UserStructure):             # <<<<<<<<<<<<<<
@@ -17008,7 +17008,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "stat.pyx":261
+  /* "parabam/command/stat.pyx":261
  * 		np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
  * 
  * class Interface(parabam.core.UserInterface):             # <<<<<<<<<<<<<<
@@ -17030,155 +17030,155 @@ PyMODINIT_FUNC PyInit_stat(void)
   __pyx_t_2 = 0;
   __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_Interface, __pyx_n_s_Interface, (PyObject *) NULL, __pyx_n_s_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_Interface, __pyx_n_s_Interface, (PyObject *) NULL, __pyx_n_s_parabam_command_stat, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "stat.pyx":263
+  /* "parabam/command/stat.pyx":263
  * class Interface(parabam.core.UserInterface):
  * 
  * 	def __init__(self,temp_dir,exe_dir):             # <<<<<<<<<<<<<<
  * 		super(Interface,self).__init__(temp_dir,exe_dir)
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_1__init__, 0, __pyx_n_s_Interface___init, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__98)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_1__init__, 0, __pyx_n_s_Interface___init, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__98)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":266
+  /* "parabam/command/stat.pyx":266
  * 		super(Interface,self).__init__(temp_dir,exe_dir)
  * 
  * 	def run_cmd(self,parser):             # <<<<<<<<<<<<<<
  * 
  * 		cmd_args = parser.parse_args()
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_3run_cmd, 0, __pyx_n_s_Interface_run_cmd, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__100)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_3run_cmd, 0, __pyx_n_s_Interface_run_cmd, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__100)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_run_cmd, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":287
+  /* "parabam/command/stat.pyx":287
  * 			outmode = cmd_args.outmode)
  * 
  * 	def run(self,input_bams,user_specified_outpath,proc,chunk,user_constants,user_engine,             # <<<<<<<<<<<<<<
  * 			user_struc_blueprint,outmode,multi=4,verbose=False,engine_is_class=False):
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_5run, 0, __pyx_n_s_Interface_run, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__102)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 287; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_5run, 0, __pyx_n_s_Interface_run, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__102)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 287; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_4, __pyx_tuple__103);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_run, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 287; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":339
+  /* "parabam/command/stat.pyx":339
  * 		return master_output_paths #Depending on outmode this output a dict or string
  * 
  * 	def __create_output_files__(self,output_path,user_structures,outmode,analysis_names):             # <<<<<<<<<<<<<<
  * 		if outmode == "d":
  * 			header = "Sample,%s\n" % (",".join(analysis_names),)
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_7__create_output_files__, 0, __pyx_n_s_Interface___create_output_files, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__105)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_7__create_output_files__, 0, __pyx_n_s_Interface___create_output_files, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__105)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_create_output_files, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":345
+  /* "parabam/command/stat.pyx":345
  * 				out_obj.write(header)
  * 
  * 	def __create_handlers__(self,task_qu,object const):             # <<<<<<<<<<<<<<
  * 		return [HandlerStat(inqu=task_qu,const=const)]
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_9__create_handlers__, 0, __pyx_n_s_Interface___create_handlers, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__107)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 345; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_9__create_handlers__, 0, __pyx_n_s_Interface___create_handlers, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__107)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 345; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_create_handlers, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 345; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":348
+  /* "parabam/command/stat.pyx":348
  * 		return [HandlerStat(inqu=task_qu,const=const)]
  * 
  * 	def __create_proccessors__(self,task_qu,output_group,engine_is_class,user_engine,object const):             # <<<<<<<<<<<<<<
  * 		processors = []
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_11__create_proccessors__, 0, __pyx_n_s_Interface___create_proccessors, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__109)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 348; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_11__create_proccessors__, 0, __pyx_n_s_Interface___create_proccessors, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__109)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 348; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_create_proccessors, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 348; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":368
+  /* "parabam/command/stat.pyx":368
  * 		return processors
  * 
  * 	def __create_master_file_paths__(self,input_group,output_group):             # <<<<<<<<<<<<<<
  * 		master_file_path = {}
  * 		for master,source in zip(input_group,output_group):
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_13__create_master_file_paths__, 0, __pyx_n_s_Interface___create_master_file_p, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__111)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_13__create_master_file_paths__, 0, __pyx_n_s_Interface___create_master_file_p, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__111)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_create_master_file_paths, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":374
+  /* "parabam/command/stat.pyx":374
  * 		return master_file_path
  * 
  * 	def __create_individual_output_files__(self,outmode,output_group,user_structures):             # <<<<<<<<<<<<<<
  * 		out_paths = {}
  * 		for source in output_group:
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_15__create_individual_output_files__, 0, __pyx_n_s_Interface___create_individual_ou, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__113)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_15__create_individual_output_files__, 0, __pyx_n_s_Interface___create_individual_ou, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__113)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_create_individual_output_files, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":388
+  /* "parabam/command/stat.pyx":388
  * 		return out_paths
  * 
  * 	def __format_path__(self,mode,source,name):             # <<<<<<<<<<<<<<
  * 		if mode == "a":
  * 			header = "Sample,%s\n" % (self.name,)
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_17__format_path__, 0, __pyx_n_s_Interface___format_path, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__115)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_17__format_path__, 0, __pyx_n_s_Interface___format_path, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__115)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_format_path, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":397
+  /* "parabam/command/stat.pyx":397
  * 		return (header,out_path)
  * 
  * 	def __get_non_array_names__(self,user_structures):             # <<<<<<<<<<<<<<
  * 		names = []
  * 		for name,struc in user_structures.items():
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_19__get_non_array_names__, 0, __pyx_n_s_Interface___get_non_array_names, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__117)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_19__get_non_array_names__, 0, __pyx_n_s_Interface___get_non_array_names, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__117)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_get_non_array_names, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":405
+  /* "parabam/command/stat.pyx":405
  * 		return names
  * 
  * 	def __create_structures__(self,user_structures_blueprint):             # <<<<<<<<<<<<<<
  * 		#(data,store_method,)
  * 		user_structures = {}
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_21__create_structures__, 0, __pyx_n_s_Interface___create_structures, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__119)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_21__create_structures__, 0, __pyx_n_s_Interface___create_structures, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__119)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_create_structures, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":415
+  /* "parabam/command/stat.pyx":415
  * 		return user_structures
  * 
  * 	def get_parser(self):             # <<<<<<<<<<<<<<
  * 		#argparse imported in ./interface/parabam
  * 		parser = self.default_parser()
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_4stat_9Interface_23get_parser, 0, __pyx_n_s_Interface_get_parser, NULL, __pyx_n_s_stat, __pyx_d, ((PyObject *)__pyx_codeobj__121)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 415; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_9Interface_23get_parser, 0, __pyx_n_s_Interface_get_parser, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__121)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 415; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   if (PyObject_SetItem(__pyx_t_3, __pyx_n_s_get_parser, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 415; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "stat.pyx":261
+  /* "parabam/command/stat.pyx":261
  * 		np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
  * 
  * class Interface(parabam.core.UserInterface):             # <<<<<<<<<<<<<<
@@ -17193,7 +17193,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "stat.pyx":1
+  /* "parabam/command/stat.pyx":1
  * import pysam             # <<<<<<<<<<<<<<
  * import parabam
  * import shutil
@@ -17217,11 +17217,11 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_XDECREF(__pyx_t_8);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init stat", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init parabam.command.stat", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_DECREF(__pyx_m); __pyx_m = 0;
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init stat");
+    PyErr_SetString(PyExc_ImportError, "init parabam.command.stat");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

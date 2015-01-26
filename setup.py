@@ -1,18 +1,35 @@
 import os
 from distutils.core import setup
 from Cython.Build import cythonize
+from distutils.extension import Extension
+from distutils.command.sdist import sdist as _sdist
+
+cmdclass = {}
+ext_modules = [
+        Extension("core", [ "core.c" ]),
+        Extension("chaser", ["chaser.c"]),
+        Extension("support", ["support.c"]),
+]
+
+class sdist(_sdist):
+    def run(self):
+        # Make sure the compiled Cython files in the distribution are up-to-date
+        cythonize(['chaser.pyx','core.pyx','support.pyx','command/stat.pyx','command/subset.pyx'])
+        _sdist.run(self)
+cmdclass['sdist'] = sdist
 
 setup(name='parabam',
       description='Parallel BAM File Analysis',
-      version='0.1.4dev',
+      version='0.1.6dev',
       author="JHR Farmery",
       license='BSD',
       author_email = 'jhrf2@cam.ac.uk',
-      packages = ['parabam','parabam.command'],
-      package_dir = {'parabam': '','parabam.command': 'command'},
-      package_data = {'parabam':['chaser.pyx',"support.pyx","core.pyx",],
-                  'parabam.command':["subset.pyx","stat.pyx",]},
+      packages = ['parabam','parabam.command','parabam.core'],
+      package_dir = {'parabam':'','parabam.command':'command'},
+      #package_data = {'parabam':['chaser.pyx',"support.pyx","core.pyx",],
+      #            'parabam.command':["subset.pyx","stat.pyx",]},
       requires = ['cython','numpy','argparse','pysam'],
       scripts = ['bin/parabam'],
-      ext_modules=cythonize(("chaser.pyx","support.pyx","core.pyx","command/subset.pyx","command/stat.pyx"))#""
+      cmdclass = cmdclass,
+      ext_modules=ext_modules#""
       )

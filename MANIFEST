@@ -2,15 +2,8 @@
 README.txt
 __init__.py
 chaser.c
-chaser.pyx
 core.c
-core.pyx
 setup.py
 support.c
-support.pyx
 bin/parabam
 command/__init__.py
-command/stat.c
-command/stat.pyx
-command/subset.c
-command/subset.pyx
