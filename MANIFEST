@@ -7,4 +7,5 @@ setup.py
 support.c
 bin/parabam
 command/__init__.py
+command/stat.c
 command/subset.c
