@@ -6,9 +6,11 @@ from distutils.command.sdist import sdist as _sdist
 
 cmdclass = {}
 ext_modules = [
-        Extension("core", [ "core.c" ]),
-        Extension("chaser", ["chaser.c"]),
-        Extension("support", ["support.c"]),
+      Extension("parabam.core", [ "core.c" ]),
+      Extension("parabam.chaser", ["chaser.c"]),
+      Extension("parabam.support", ["support.c"]),
+      Extension("parabam.command.subset", ["command/subset.c"]),
+      Extension("parabam.command.stat", ["command/stat.c"])
 ]
 
 class sdist(_sdist):
@@ -24,7 +26,7 @@ setup(name='parabam',
       author="JHR Farmery",
       license='BSD',
       author_email = 'jhrf2@cam.ac.uk',
-      packages = ['parabam','parabam.command','parabam.core'],
+      packages = ['parabam','parabam.command'],
       package_dir = {'parabam':'','parabam.command':'command'},
       #package_data = {'parabam':['chaser.pyx',"support.pyx","core.pyx",],
       #            'parabam.command':["subset.pyx","stat.pyx",]},
