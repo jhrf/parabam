@@ -403,9 +403,9 @@ class PrimaryTask(ChaserClass):
                 class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
                 return "%d-%d" % tuple(class_bins)
         elif read.is_unmapped and read.mate_is_unmapped:
-            return "u-u"
+            return "U-U"
         else:
-            return "u-m"
+            return "U-M"
 
     def __order_reference_number__(self,read_ref,mate_ref):
         if min((read_ref,mate_ref)) == read_ref:

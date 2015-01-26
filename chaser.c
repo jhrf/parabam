@@ -951,6 +951,8 @@ static char __pyx_k_pr[] = "pr";
 static char __pyx_k_rb[] = "rb";
 static char __pyx_k_wb[] = "wb";
 static char __pyx_k_0_0[] = "0-0";
+static char __pyx_k_U_M[] = "U-M";
+static char __pyx_k_U_U[] = "U-U";
 static char __pyx_k_d_d[] = "%d-%d";
 static char __pyx_k_doc[] = "__doc__";
 static char __pyx_k_end[] = "end";
@@ -961,7 +963,6 @@ static char __pyx_k_put[] = "put";
 static char __pyx_k_run[] = "run";
 static char __pyx_k_sys[] = "sys";
 static char __pyx_k_u_m[] = "u-m";
-static char __pyx_k_u_u[] = "u-u";
 static char __pyx_k_args[] = "args";
 static char __pyx_k_bins[] = "bins";
 static char __pyx_k_core[] = "core";
@@ -1321,6 +1322,8 @@ static PyObject *__pyx_kp_s_Status_Couldn_t_find_pairs_for;
 static PyObject *__pyx_n_s_TaskClass;
 static PyObject *__pyx_n_s_TaskClass_2;
 static PyObject *__pyx_kp_s_Total_d_d_Ratio_5f_Tasks_d;
+static PyObject *__pyx_kp_s_U_M;
+static PyObject *__pyx_kp_s_U_U;
 static PyObject *__pyx_kp_s_Users_farmer01_proj_parabam_cha;
 static PyObject *__pyx_kp_s__4;
 static PyObject *__pyx_n_s_active_count;
@@ -1543,7 +1546,6 @@ static PyObject *__pyx_n_s_time;
 static PyObject *__pyx_n_s_total;
 static PyObject *__pyx_n_s_total_loners;
 static PyObject *__pyx_kp_s_u_m;
-static PyObject *__pyx_kp_s_u_u;
 static PyObject *__pyx_n_s_unique;
 static PyObject *__pyx_n_s_unsorted_object;
 static PyObject *__pyx_n_s_unsorted_path;
@@ -12060,7 +12062,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_11PrimaryTask_9__get_loner_type__(CYT
  *                 class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
  *                 return "%d-%d" % tuple(class_bins)             # <<<<<<<<<<<<<<
  *         elif read.is_unmapped and read.mate_is_unmapped:
- *             return "u-u"
+ *             return "U-U"
  */
       __Pyx_XDECREF(__pyx_r);
       __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -12084,7 +12086,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_11PrimaryTask_9__get_loner_type__(CYT
  *                 class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
  *                 return "%d-%d" % tuple(class_bins)
  *         elif read.is_unmapped and read.mate_is_unmapped:             # <<<<<<<<<<<<<<
- *             return "u-u"
+ *             return "U-U"
  *         else:
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_read, __pyx_n_s_is_unmapped); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -12107,27 +12109,27 @@ static PyObject *__pyx_pf_7parabam_6chaser_11PrimaryTask_9__get_loner_type__(CYT
     /* "parabam/chaser.pyx":406
  *                 return "%d-%d" % tuple(class_bins)
  *         elif read.is_unmapped and read.mate_is_unmapped:
- *             return "u-u"             # <<<<<<<<<<<<<<
+ *             return "U-U"             # <<<<<<<<<<<<<<
  *         else:
- *             return "u-m"
+ *             return "U-M"
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_INCREF(__pyx_kp_s_u_u);
-    __pyx_r = __pyx_kp_s_u_u;
+    __Pyx_INCREF(__pyx_kp_s_U_U);
+    __pyx_r = __pyx_kp_s_U_U;
     goto __pyx_L0;
   }
   /*else*/ {
 
     /* "parabam/chaser.pyx":408
- *             return "u-u"
+ *             return "U-U"
  *         else:
- *             return "u-m"             # <<<<<<<<<<<<<<
+ *             return "U-M"             # <<<<<<<<<<<<<<
  * 
  *     def __order_reference_number__(self,read_ref,mate_ref):
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_INCREF(__pyx_kp_s_u_m);
-    __pyx_r = __pyx_kp_s_u_m;
+    __Pyx_INCREF(__pyx_kp_s_U_M);
+    __pyx_r = __pyx_kp_s_U_M;
     goto __pyx_L0;
   }
 
@@ -12159,7 +12161,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_11PrimaryTask_9__get_loner_type__(CYT
 }
 
 /* "parabam/chaser.pyx":410
- *             return "u-m"
+ *             return "U-M"
  * 
  *     def __order_reference_number__(self,read_ref,mate_ref):             # <<<<<<<<<<<<<<
  *         if min((read_ref,mate_ref)) == read_ref:
@@ -12323,7 +12325,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_11PrimaryTask_11__order_reference_num
   }
 
   /* "parabam/chaser.pyx":410
- *             return "u-m"
+ *             return "U-M"
  * 
  *     def __order_reference_number__(self,read_ref,mate_ref):             # <<<<<<<<<<<<<<
  *         if min((read_ref,mate_ref)) == read_ref:
@@ -17441,6 +17443,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_TaskClass, __pyx_k_TaskClass, sizeof(__pyx_k_TaskClass), 0, 0, 1, 1},
   {&__pyx_n_s_TaskClass_2, __pyx_k_TaskClass_2, sizeof(__pyx_k_TaskClass_2), 0, 0, 1, 1},
   {&__pyx_kp_s_Total_d_d_Ratio_5f_Tasks_d, __pyx_k_Total_d_d_Ratio_5f_Tasks_d, sizeof(__pyx_k_Total_d_d_Ratio_5f_Tasks_d), 0, 0, 1, 0},
+  {&__pyx_kp_s_U_M, __pyx_k_U_M, sizeof(__pyx_k_U_M), 0, 0, 1, 0},
+  {&__pyx_kp_s_U_U, __pyx_k_U_U, sizeof(__pyx_k_U_U), 0, 0, 1, 0},
   {&__pyx_kp_s_Users_farmer01_proj_parabam_cha, __pyx_k_Users_farmer01_proj_parabam_cha, sizeof(__pyx_k_Users_farmer01_proj_parabam_cha), 0, 0, 1, 0},
   {&__pyx_kp_s__4, __pyx_k__4, sizeof(__pyx_k__4), 0, 0, 1, 0},
   {&__pyx_n_s_active_count, __pyx_k_active_count, sizeof(__pyx_k_active_count), 0, 0, 1, 1},
@@ -17663,7 +17667,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_total, __pyx_k_total, sizeof(__pyx_k_total), 0, 0, 1, 1},
   {&__pyx_n_s_total_loners, __pyx_k_total_loners, sizeof(__pyx_k_total_loners), 0, 0, 1, 1},
   {&__pyx_kp_s_u_m, __pyx_k_u_m, sizeof(__pyx_k_u_m), 0, 0, 1, 0},
-  {&__pyx_kp_s_u_u, __pyx_k_u_u, sizeof(__pyx_k_u_u), 0, 0, 1, 0},
   {&__pyx_n_s_unique, __pyx_k_unique, sizeof(__pyx_k_unique), 0, 0, 1, 1},
   {&__pyx_n_s_unsorted_object, __pyx_k_unsorted_object, sizeof(__pyx_k_unsorted_object), 0, 0, 1, 1},
   {&__pyx_n_s_unsorted_path, __pyx_k_unsorted_path, sizeof(__pyx_k_unsorted_path), 0, 0, 1, 1},
@@ -18125,7 +18128,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_codeobj__71 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__70, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_cha, __pyx_n_s_get_loner_type, 398, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__71)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 398; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "parabam/chaser.pyx":410
- *             return "u-m"
+ *             return "U-M"
  * 
  *     def __order_reference_number__(self,read_ref,mate_ref):             # <<<<<<<<<<<<<<
  *         if min((read_ref,mate_ref)) == read_ref:
@@ -19267,7 +19270,7 @@ PyMODINIT_FUNC PyInit_chaser(void)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "parabam/chaser.pyx":410
- *             return "u-m"
+ *             return "U-M"
  * 
  *     def __order_reference_number__(self,read_ref,mate_ref):             # <<<<<<<<<<<<<<
  *         if min((read_ref,mate_ref)) == read_ref:
