@@ -149,8 +149,6 @@ class HandlerChaser(parabam.core.Handler):
                 self._total_loners += loner_count
                 self._primary_store[new_package.source].append(path)
 
-        self.__test_primary_tasks__()
-
     def __handle_match_maker__(self,new_package):
         source = new_package.source
         loner_type = new_package.loner_type
@@ -176,7 +174,8 @@ class HandlerChaser(parabam.core.Handler):
 
         for source in task_sent:
             self._primary_store[source] = []
-        gc.collect()
+            gc.collect()
+            time.sleep(1)
           
     def __start_primary_task__(self,source):        
         self.__wait_for_tasks__(self._tasks) #wait for existing tasks
@@ -200,18 +199,21 @@ class HandlerChaser(parabam.core.Handler):
 
     def __periodic_action__(self,iterations):
         if self._processing:
-            idle_threshold = 300
-            self.__test_primary_tasks__()
+            idle_threshold = 25
+            required_paths = 10
+            
         else:
             idle_threshold = 5
-            self.__test_primary_tasks__(required_paths=1)
+            required_paths=1
 
-        if iterations % 10 == 0 :
+        self.__update_tasks__(self._tasks)
+        if iterations % 15 == 0 :
             sys.stdout.write(self.__format_out_str__())                
             sys.stdout.flush()
 
         pyramid_idle_counts = self._pyramid_idle_counts 
         empty = True
+
         for source,loner_dict in self._loner_pyramid.items():
             for loner_type,pyramid in loner_dict.items():
                     for i,sub_pyramid in enumerate(reversed(pyramid)):
@@ -228,16 +230,17 @@ class HandlerChaser(parabam.core.Handler):
                             pyramid_idle_counts[loner_type] += 1
                         del paths
                     if pyramid_idle_counts[loner_type] >= idle_threshold:
-                        idle_success,idle_paths,idle_levels = self.__idle_routine__(pyramid,loner_type,source)
+                        idle_success,idle_paths,idle_levels,running = self.__idle_routine__(pyramid,loner_type,source)
                         pyramid_idle_counts[loner_type] = 0
 
                         #delete after idle success or when processing has finished and idle fails
-                        if self.__clear_subpyramid__(idle_success,self._processing):  
+                        if self.__clear_subpyramid__(idle_success,self._processing,running):  
                             for idle_level,idle_path in izip(idle_levels,idle_paths):
                                 pyramid[idle_level].remove(idle_path)
                         del idle_paths,idle_levels
 
-        self.__update_tasks__(self._tasks)              
+        self.__test_primary_tasks__(required_paths=required_paths)
+        self.__update_tasks__(self._tasks)
         if empty and not self._processing and len(self._tasks) == 0:
             print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
             self.__send_final_kill_signal__()
@@ -254,12 +257,11 @@ class HandlerChaser(parabam.core.Handler):
                     break
         return paths
         
-    def __clear_subpyramid__(self,success,processing):
+    def __clear_subpyramid__(self,success,processing,running):
         if success:
             #If the idle task was sent, clear pyramid
             return True
         elif not processing and not success:
-            running = self.__update_tasks__(self._tasks)
             if running == 0:
                 #if main process has finished and no tasks run
                 #clear the pyramid
@@ -289,24 +291,26 @@ class HandlerChaser(parabam.core.Handler):
         
         success = False
         if (len(idle_paths) > 1) or (len(idle_paths) > 0 and levels[-1] == 0): #level 0 may not be unique
+            running = self.__update_tasks__(self._tasks)
             self.__start_matchmaker_task__(idle_paths,source,loner_type,levels[-1])
             success = True
-        
-        return success,idle_paths,levels
+
+        return success,idle_paths,levels,running
        
     def __get_task_size__(self,level,loner_type):
         if loner_type == "0-0":
             if level % 2 == 0:
-                return 2
+                task_size = 4
             else:
-                return 3
-        elif loner_type == "u-m" and level == 0:
-            return 30
+                task_size = 3
+        elif loner_type == "U-M" and level == 0:
+            task_size = 30
         else:
             if level % 2 == 0:
-                return 4
+                task_size = 4
             else:
-                return 3
+                task_size = 5
+        return task_size
 
     def __format_out_str__(self):
 
@@ -529,7 +533,7 @@ class MatchMakerTask(ChaserClass):
         return dict(filter( lambda tup : tup[1], iter(pairs.items()) ))
 
     def __read_generator__(self,second_pass=False):
-        count = 3000000 // len(self._loner_paths)
+        count = 5000000 // len(self._loner_paths)
         count_limit = False
         for path in self._loner_paths:
             loner_object = pysam.AlignmentFile(path,"rb")

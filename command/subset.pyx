@@ -103,6 +103,10 @@ class TaskSubset(parabam.core.Task):
                 print self.__class__
                 sys.stdout.flush()
 
+    def __get_temp_path__(self,typ,ext=".bam"):
+        #self.pid ensures that the temp names are unique.
+        return "%s/%s_%s_%s_parabam_temp%s" % (self._temp_dir,self._source,typ,self.pid,ext)
+
     def __engine__(self,read,user_constants,master):
         return self.const.user_engine(read,user_constants,master)
         
@@ -254,7 +258,6 @@ class HandlerSubset(parabam.core.Handler):
                                 source=source,chaser_type="origin",total=total,
                                 processing=(self._destroy_count < ( self._destroy_limit - 1 ))) 
             self._chasequeue.put(res)
-
         else:
             res = MergePackage(name=name,results=list(results),
                                 subset_type=subset_type,source=source,
