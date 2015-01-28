@@ -4,6 +4,7 @@ __init__.py
 chaser.c
 core.c
 setup.py
+setup_local.py
 support.c
 bin/parabam
 command/__init__.py
