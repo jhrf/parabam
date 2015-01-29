@@ -216,14 +216,6 @@ class HandlerSubset(parabam.core.Handler):
 
         self._chasequeue = chaserqu
 
-    def __get_total_processed_reads__(self):
-        total = 0
-        for source,deep_stat in self._stats.items():
-            for name,value in deep_stat.items():
-                if name == "total":
-                    total += value
-        return total
-
     def __new_package_action__(self,new_package,**kwargs):
         results = new_package.results
         source = results["source"]
@@ -239,8 +231,7 @@ class HandlerSubset(parabam.core.Handler):
 
                     self.__add_merge_task__(name=self._output_paths[source][subset],
                                             results=self._merge_stores[source][subset],
-                                            subset_type=subset,source=source,
-                                            total=self._stats[source]["total"])
+                                            subset_type=subset,source=source)
                     self.__update_merge_store__(source,subset)
                     
     def __update_merge_store__(self,source,subset):
@@ -252,24 +243,16 @@ class HandlerSubset(parabam.core.Handler):
         #Test whether there are any temporary bams to be merged
         return len(self._merge_stores[source][subset]) > 0
             
-    def __add_merge_task__(self,name,results,subset_type,source,total,destroy=False):
+    def __add_merge_task__(self,name,results,subset_type,source,destroy=False):
         if subset_type == "index":
             res = OriginPackage(results=results,destroy=destroy,
-                                source=source,chaser_type="origin",total=total,
+                                source=source,chaser_type="origin",
                                 processing=(self._destroy_count < ( self._destroy_limit - 1 ))) 
             self._chasequeue.put(res)
         else:
-            try:
-                res = MergePackage(name=name,results=results,
-                                    subset_type=subset_type,source=source,
-                                    destroy=destroy,total=total)
-            except OverflowError:
-                print self._stats
-                print total
-                print "Overflow error. Trying again without total int"
-                res = MergePackage(name=name,results=results,
-                                    subset_type=subset_type,source=source,
-                                    destroy=destroy,total=0)
+            res = MergePackage(name=name,results=results,
+                        subset_type=subset_type,source=source,
+                        destroy=destroy)
             self._mergequeue.put(res)
 
     def __total_reads__(self):
@@ -285,8 +268,7 @@ class HandlerSubset(parabam.core.Handler):
             for subset in self._subset_types:
                 self.__add_merge_task__(name=self._output_paths[source][subset],
                                 results=self._merge_stores[source][subset],subset_type=subset,
-                                source=source,total=self._stats[source]["total"],
-                                destroy=True)
+                                source=source,destroy=True)
                 self.__update_merge_store__(source,subset)
 
 class ProcessorSubset(parabam.core.Processor):

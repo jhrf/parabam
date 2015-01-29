@@ -19,17 +19,15 @@ from parabam.core import Package
 from parabam.core import Handler
 
 class MergePackage(Package):
-    def __init__(self,str name,object results,str subset_type,str source,object destroy,int total):
+    def __init__(self,str name,object results,str subset_type,str source,object destroy):
         super(MergePackage,self).__init__(name,results,destroy)
         self.subset_type = subset_type
         self.source = source
-        self.total = total
 
 class HandlerMerge(Handler):
     def __init__(self,object inqu, object const,int destroy_limit=1):
         super(HandlerMerge,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)
         
-        self._total = Counter()
         self._sources = const.sources
         self._subset_types = list(const.subset_types)
         self._out_file_objects = self.__get_out_file_objects__()
@@ -73,7 +71,6 @@ class HandlerMerge(Handler):
         #Handle the result. Result will always be of type parabam.support.MergePackage
         subset_type = new_package.subset_type
         source = new_package.source
-        self._total[subset_type] = new_package.total
 
         for merge_count,merge_path in new_package.results:
             try:

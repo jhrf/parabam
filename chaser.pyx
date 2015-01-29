@@ -17,25 +17,21 @@ from multiprocessing import Queue,Process
 from parabam.core import Package,CorePackage
 
 class ChaserPackage(Package):
-    def __init__(self,results,destroy,source,chaser_type,total):
+    def __init__(self,results,destroy,source,chaser_type):
         super(ChaserPackage,self).__init__("ChaserPackage",results,destroy)
         
         self.chaser_type=chaser_type
         self.source = source
-        self.total = total        
 
 class OriginPackage(ChaserPackage):
-    def __init__(self,results,destroy,source,chaser_type,total,processing=True):
-        super(OriginPackage,self).__init__(results,destroy,source,chaser_type,total)
+    def __init__(self,results,destroy,source,chaser_type,processing=True):
+        super(OriginPackage,self).__init__(results,destroy,source,chaser_type)
         self.processing = processing
 
-class PrimaryPackage(ChaserPackage):
-    def __init__(self,results,source,chaser_type,total):
-        super(PrimaryPackage,self).__init__(results,False,source,chaser_type,total)
-
 class MatchMakerPackage(ChaserPackage):
-    def __init__(self,loner_type,results,source,chaser_type,total,level):
-        super(MatchMakerPackage,self).__init__(results,False,source,chaser_type,total)
+    def __init__(self,loner_type,results,source,chaser_type,rescued,level):
+        super(MatchMakerPackage,self).__init__(results,False,source,chaser_type)
+        self.rescued = rescued
         self.loner_type = loner_type
         self.level = level
 
@@ -152,7 +148,7 @@ class HandlerChaser(parabam.core.Handler):
         level = new_package.level
 
         #this number is by pairs to get read num we times 2
-        self._rescued["total"] += (new_package.total*2)    
+        self._rescued["total"] += (new_package.rescued*2)    
 
         if new_package.results: #This ensures that there are leftover loners
             self._pyramid_idle_counts[loner_type] = 0
@@ -227,6 +223,7 @@ class HandlerChaser(parabam.core.Handler):
                         level = len(pyramid) - (i+1)
                         paths = self.__get_paths__(loner_type,sub_pyramid,level)
                         if len(paths) > 0:
+                            empty = False
                             self.__start_matchmaker_task__(paths,source,loner_type,level)
                             pyramid_idle_counts[loner_type] = 0
                             for path in paths:#remove sent paths
@@ -257,10 +254,12 @@ class HandlerChaser(parabam.core.Handler):
             else:
                 self._stale_count = 0
 
-            if empty or self._stale_count == 100:
+            if (empty and len(self._tasks) ==0) or self._stale_count == 100:
                 if not empty:
+                    print "Stale death"
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
                     self.__tidy_pyramid__()
+
                 print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
                 self.__send_final_kill_signal__()
             self._prev_rescued = self._rescued["total"]
@@ -344,9 +343,9 @@ class HandlerChaser(parabam.core.Handler):
                 task_size = 2
             else:
                 task_size = 3
-        elif loner_type == "U-M" and level == 0 and not self._processing:
-            task_size = 50
-        elif loner_type == "U-M" and level == 1 and not self._processing:
+        elif loner_type == "U-M" and level == 0 and self._processing:
+            task_size = 30
+        elif loner_type == "U-M" and level == 1 and self._processing:
             task_size = 15
         else:
             if level % 2 == 0:
@@ -571,7 +570,7 @@ class MatchMakerTask(ChaserClass):
                 return_paths.append((self._level,leftover_path))
 
         loner_pack = MatchMakerPackage(loner_type=self._loner_type,results=return_paths,level=self._level+1,
-                source=self._source,chaser_type="match_maker",total=rescued)
+                source=self._source,chaser_type="match_maker",rescued=rescued)
         self._outqu.put(loner_pack)
 
     def __get_header__(self,path):
@@ -601,11 +600,11 @@ class MatchMakerTask(ChaserClass):
             bam_iterator = loner_object.fetch(until_eof=True)
            
             for i,read in enumerate(bam_iterator):
+                yield read
                 if i == count:
                     count_limit = True
                     break 
-                yield read
-            
+
             if second_pass:
                 if count_limit:
                     count_limit = False
