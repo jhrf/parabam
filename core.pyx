@@ -88,7 +88,10 @@ cdef class Handler:
             self._update_output = self.__standard_output__
 
     def __level_1_output__(self,out_str):
-        total_procd = self.__get_total_processed_reads__()
+        #BUG! the fact this makes a call to __total_reads__ is ridiculous
+        #this is making calls to a sub class method and just expecting it to be there.
+
+        total_procd = self.__total_reads__()
         time = out_str.partition("Time: ")[2]
         sys.stdout.write("[Update] Processed: %d Time: %s\n" % (total_procd,time))
         sys.stdout.flush()
