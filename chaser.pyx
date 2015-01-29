@@ -72,7 +72,7 @@ class HandlerChaser(parabam.core.Handler):
 
     #START -- BORROWED FROM PROCESOR
     #Need to refactor here to stop code duplication
-    def __wait_for_tasks__(self,list active_tasks,int max_tasks=8,processing=True):
+    def __wait_for_tasks__(self,list active_tasks,int max_tasks=8):
         update_tasks = self.__update_tasks__ #optimising alias
         update_tasks(active_tasks)
         cdef int currently_active = len(active_tasks)
@@ -81,7 +81,7 @@ class HandlerChaser(parabam.core.Handler):
         if max_tasks > currently_active:
             return
 
-        if processing:
+        if self._processing:
             self._pause_qu.put(True)
 
         while(max_tasks <= currently_active and currently_active > 0):
@@ -89,7 +89,7 @@ class HandlerChaser(parabam.core.Handler):
             currently_active = len(active_tasks)
             time.sleep(1)
 
-        if processing:
+        if self._processing:
             self._pause_qu.put(False)
 
         return 
@@ -207,7 +207,7 @@ class HandlerChaser(parabam.core.Handler):
 
     def __periodic_action__(self,iterations):
         if self._processing:
-            idle_threshold = 300
+            idle_threshold = 250
             required_paths = 10
         else:
             idle_threshold = 5
@@ -243,6 +243,8 @@ class HandlerChaser(parabam.core.Handler):
                         #delete after idle success or when processing has finished and idle fails
                         if self.__clear_subpyramid__(idle_success,self._processing,running):  
                             for idle_level,idle_path in izip(idle_levels,idle_paths):
+                                if not idle_success:
+                                    self.__print_complete_loners__(idle_path)
                                 pyramid[idle_level].remove(idle_path)
                         del idle_paths,idle_levels
 
@@ -255,15 +257,28 @@ class HandlerChaser(parabam.core.Handler):
             else:
                 self._stale_count = 0
 
-            if empty or self._stale_count == 500:
-                self.__wait_for_tasks__(self._tasks,max_tasks=0,processing=False)
-                self.__tidy_pyramid__()
+            if empty or self._stale_count == 100:
+                if not empty:
+                    self.__wait_for_tasks__(self._tasks,max_tasks=0)
+                    self.__tidy_pyramid__()
                 print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
                 self.__send_final_kill_signal__()
-            
             self._prev_rescued = self._rescued["total"]
 
         gc.collect()
+
+    def __print_complete_loners__(self,path):
+        dumpfile = open("dumpfile%s.txt" % (self.const.sources[0],),"a")
+        try:
+            loner = pysam.AlignmentFile(path,"rb")
+            dumpfile.write("+++++Lonley Heart File:\n%s\n" %  (path,))
+            for read in loner.fetch(until_eof=True):
+                dumpfile.write("%s\n" % (read.qname,))
+            dumpfile.flush()
+            loner.close()
+        except IOError:
+            pass
+        dumpfile.close()
 
     def __get_paths__(self,loner_type,sub_pyramid,level):
         task_size = self.__get_task_size__(level,loner_type)
@@ -324,13 +339,15 @@ class HandlerChaser(parabam.core.Handler):
         return success,idle_paths,levels,running
        
     def __get_task_size__(self,level,loner_type):
-        if loner_type == "0-0":
+        if "XX" in loner_type:
             if level % 2 == 0:
-                task_size = 4
+                task_size = 2
             else:
                 task_size = 3
-        elif loner_type == "U-M" and level == 0:
-            task_size = 30
+        elif loner_type == "U-M" and level == 0 and not self._processing:
+            task_size = 50
+        elif loner_type == "U-M" and level == 1 and not self._processing:
+            task_size = 15
         else:
             if level % 2 == 0:
                 task_size = 4
@@ -339,7 +356,6 @@ class HandlerChaser(parabam.core.Handler):
         return task_size
 
     def __format_out_str__(self):
-
         return "\rTotal: %d/%d Ratio: %.5f Tasks:%d " %\
             (self._rescued["total"],self._total_loners,
             float(self._rescued["total"]+1)/(self._total_loners+1),
@@ -440,7 +456,7 @@ class PrimaryTask(ChaserClass):
     def __get_loner_type__(self,read,bins):
         if not read.is_unmapped and not read.mate_is_unmapped:
             if read.reference_id == read.next_reference_id:
-                return "0-0"
+                return "XX%d-%d" % (read.reference_id,read.next_reference_id,)
             else:
                 class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
                 return "%d-%d" % tuple(class_bins)
@@ -553,17 +569,6 @@ class MatchMakerTask(ChaserClass):
         if len(self._leftover_paths) > 0:
             for leftover_path in self._leftover_paths:
                 return_paths.append((self._level,leftover_path))
-
-        if len(self._leftover_paths) > len(self._loner_paths):
-            #DEBUG
-            print "What the fuck happened here?"
-            print len(self._leftover_paths)
-            print len(self._loner_paths)
-            print self._loner_paths
-            print self._leftover_paths
-            print written
-            print rescued
-            print self._level
 
         loner_pack = MatchMakerPackage(loner_type=self._loner_type,results=return_paths,level=self._level+1,
                 source=self._source,chaser_type="match_maker",total=rescued)
