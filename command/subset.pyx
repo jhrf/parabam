@@ -259,9 +259,17 @@ class HandlerSubset(parabam.core.Handler):
                                 processing=(self._destroy_count < ( self._destroy_limit - 1 ))) 
             self._chasequeue.put(res)
         else:
-            res = MergePackage(name=name,results=list(results),
-                                subset_type=subset_type,source=source,
-                                destroy=destroy,total=total,time_added=time.time())
+            try:
+                res = MergePackage(name=name,results=results,
+                                    subset_type=subset_type,source=source,
+                                    destroy=destroy,total=total)
+            except OverflowError:
+                print self._stats
+                print total
+                print "Overflow error. Trying again without total int"
+                res = MergePackage(name=name,results=results,
+                                    subset_type=subset_type,source=source,
+                                    destroy=destroy,total=0)
             self._mergequeue.put(res)
 
     def __total_reads__(self):
