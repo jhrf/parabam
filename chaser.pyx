@@ -131,10 +131,10 @@ class HandlerChaser(parabam.core.Handler):
             self.__handle_match_maker__(new_package)
         else:
             print "Error!"
+        self.__update_tasks__(self._tasks)
 
     def __handle_origin_task__(self,new_package):
         self._processing = new_package.processing
-
         for loner_count,path in new_package.results:
             if loner_count == 0:
                 os.remove(path)
@@ -202,6 +202,8 @@ class HandlerChaser(parabam.core.Handler):
         return pack
 
     def __periodic_action__(self,iterations):
+        running = len(self._tasks)
+
         if self._processing:
             idle_threshold = 250
             required_paths = 10
@@ -209,7 +211,6 @@ class HandlerChaser(parabam.core.Handler):
             idle_threshold = 5
             required_paths=1
 
-        self.__update_tasks__(self._tasks)
         if iterations % 15 == 0 :
             sys.stdout.write(self.__format_out_str__())                
             sys.stdout.flush()
@@ -225,6 +226,7 @@ class HandlerChaser(parabam.core.Handler):
                         if len(paths) > 0:
                             empty = False
                             self.__start_matchmaker_task__(paths,source,loner_type,level)
+                            running += 1
                             pyramid_idle_counts[loner_type] = 0
                             for path in paths:#remove sent paths
                                 sub_pyramid.remove(path)
@@ -234,9 +236,10 @@ class HandlerChaser(parabam.core.Handler):
                             pyramid_idle_counts[loner_type] += 1
                         del paths
                     if pyramid_idle_counts[loner_type] >= idle_threshold:
-                        idle_success,idle_paths,idle_levels,running = self.__idle_routine__(pyramid,loner_type,source)
-                        pyramid_idle_counts[loner_type] = 0
-
+                        idle_success,idle_paths,idle_levels = self.__idle_routine__(pyramid,loner_type,source)
+                        if idle_success:
+                            running += 1
+                            pyramid_idle_counts[loner_type] = 0
                         #delete after idle success or when processing has finished and idle fails
                         if self.__clear_subpyramid__(idle_success,self._processing,running):  
                             for idle_level,idle_path in izip(idle_levels,idle_paths):
@@ -246,24 +249,33 @@ class HandlerChaser(parabam.core.Handler):
                         del idle_paths,idle_levels
 
         self.__test_primary_tasks__(required_paths=required_paths)
-        self.__update_tasks__(self._tasks)
 
         if not self._processing:
             if self._rescued["total"] == self._prev_rescued:
                 self._stale_count += 1
             else:
                 self._stale_count = 0
+            self._prev_rescued = self._rescued["total"]
 
-            if (empty and len(self._tasks) ==0) or self._stale_count == 100:
+            if (empty and running == 0) or self._stale_count == 250:
+                send_kill = True
                 if not empty:
                     print "Stale death"
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
                     self.__tidy_pyramid__()
-
-                print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
-                self.__send_final_kill_signal__()
-            self._prev_rescued = self._rescued["total"]
-
+                else:
+                    print "Empty death"
+                    print self._loner_pyramid
+                    print os.listdir(self.const.temp_dir)
+                    try:
+                        pack = self._inqu.get(250)
+                        self._inqu.put(pack)
+                        send_kill = False
+                    except Queue2.Empty:
+                        pass
+                if send_kill:
+                    print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
+                    self.__send_final_kill_signal__()
         gc.collect()
 
     def __print_complete_loners__(self,path):
@@ -321,21 +333,17 @@ class HandlerChaser(parabam.core.Handler):
         idle_paths = []
         levels = []
         task_size = 5
-
         for i,sub_pyramid in enumerate(pyramid):
             for path in sub_pyramid:
                 idle_paths.append(path)
                 levels.append(i)
                 if len(idle_paths) == task_size:
-                    break
-        
-        running = self.__update_tasks__(self._tasks)
+                    break 
         success = False
         if len(idle_paths) > 1:
             self.__start_matchmaker_task__(idle_paths,source,loner_type,levels[-1])
             success = True
-
-        return success,idle_paths,levels,running
+        return success,idle_paths,levels
        
     def __get_task_size__(self,level,loner_type):
         if "XX" in loner_type:
