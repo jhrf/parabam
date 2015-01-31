@@ -134,7 +134,8 @@ class HandlerChaser(parabam.core.Handler):
         self.__update_tasks__(self._tasks)
 
     def __handle_origin_task__(self,new_package):
-        self._processing = new_package.processing
+        if new_package.processing:
+            self._processing = new_package.processing
         for loner_count,path in new_package.results:
             if loner_count == 0:
                 os.remove(path)
@@ -179,11 +180,9 @@ class HandlerChaser(parabam.core.Handler):
           
     def __start_primary_task__(self,source):        
         self.__wait_for_tasks__(self._tasks) #wait for existing tasks
-
         paths = self._primary_store[source]
-
         new_task = PrimaryTask(paths,self._inqu,self.const,
-                    source,self._max_reads,self.__get_pack_with_task_args__(source) )
+                    source,self._max_reads,self.__get_pack_with_task_args__(source))
         new_task.start()
         self._tasks.append(new_task)
 
