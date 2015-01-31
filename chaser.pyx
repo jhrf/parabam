@@ -204,7 +204,7 @@ class HandlerChaser(parabam.core.Handler):
         running = len(self._tasks)
 
         if self._processing:
-            idle_threshold = 250
+            idle_threshold = 75
             required_paths = 10
         else:
             idle_threshold = 5

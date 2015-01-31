@@ -6420,7 +6420,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_13HandlerChaser_24__periodic_action__
  *         running = len(self._tasks)
  * 
  *         if self._processing:             # <<<<<<<<<<<<<<
- *             idle_threshold = 250
+ *             idle_threshold = 75
  *             required_paths = 10
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_processing_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -6432,15 +6432,15 @@ static PyObject *__pyx_pf_7parabam_6chaser_13HandlerChaser_24__periodic_action__
     /* "parabam/chaser.pyx":207
  * 
  *         if self._processing:
- *             idle_threshold = 250             # <<<<<<<<<<<<<<
+ *             idle_threshold = 75             # <<<<<<<<<<<<<<
  *             required_paths = 10
  *         else:
  */
-    __pyx_v_idle_threshold = 250;
+    __pyx_v_idle_threshold = 75;
 
     /* "parabam/chaser.pyx":208
  *         if self._processing:
- *             idle_threshold = 250
+ *             idle_threshold = 75
  *             required_paths = 10             # <<<<<<<<<<<<<<
  *         else:
  *             idle_threshold = 5
