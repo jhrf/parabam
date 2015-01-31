@@ -15,7 +15,6 @@ from itertools import izip
 from collections import Counter
 from multiprocessing import Queue,Process
 from parabam.core import Package,CorePackage
-from pprint import pprint as ppr
 
 class ChaserPackage(Package):
     def __init__(self,results,destroy,source,chaser_type):
@@ -183,9 +182,6 @@ class HandlerChaser(parabam.core.Handler):
 
         paths = self._primary_store[source]
 
-        #ppr(paths)
-        #ppr(os.listdir(self.const.temp_dir))
-
         new_task = PrimaryTask(paths,self._inqu,self.const,
                     source,self._max_reads,self.__get_pack_with_task_args__(source) )
         new_task.start()
@@ -268,7 +264,7 @@ class HandlerChaser(parabam.core.Handler):
                     self.__tidy_pyramid__()
                 else:
                     try:
-                        pack = self._inqu.get(False,250)
+                        pack = self._inqu.get(False,60)
                         self._inqu.put(pack)
                         send_kill = False
                     except Queue2.Empty:

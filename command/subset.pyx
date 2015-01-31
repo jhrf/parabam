@@ -137,8 +137,6 @@ class PairTaskSubset(TaskSubset):
             self.__handle_list_task_set__(task_set,engine,user_constants,master)
 
     def __handle_dict_task_set__(self,task_set,engine,user_constants,master):
-        from pprint import pprint as pp
-
         for qname,(read1,read2) in task_set.items():
             self.__read_pair_decision__(read1,read2,engine,user_constants,master)
 
@@ -220,7 +218,7 @@ class HandlerSubset(parabam.core.Handler):
         results = new_package.results
         source = results["source"]
         self.__auto_handle__(results,source)
-
+       
         for subset in self._subset_types:
             self._merge_stores[source][subset].append((results["counts"][subset],results["temp_paths"][subset],))
 
@@ -368,15 +366,13 @@ class Interface(parabam.core.UserInterface):
         #AT SOME POINT WE SHOULD HANDLE UNSORTED BAMS. EITHER HERE OR AT THE PROCESSOR
         final_files = []
 
+        if pair_process and not "index" in subset_types:
+            subset_types.append("index")
+
         for input_group,output_group in self.__get_group__(input_bams,outputs,multi=side_by_side):
             
             output_paths = dict([(source,{}) for source in output_group])
             master_file_path = {}
-
-            if pair_process:
-                #This index subset records the failed attempts to find mates
-                #if we are pair processing
-                subset_types.append("index")
 
             for mst,source in zip(input_group,output_group):
                 master_file_path[source] = mst
@@ -508,7 +504,8 @@ class Interface(parabam.core.UserInterface):
         print "[Status] This run will output the following files:"
         for src,subset_paths in output_paths.items():
             for subset,output_path in subset_paths.items():
-                print "\t%s" % (output_path.split("/")[-1],)
+                if not subset == "index":
+                    print "\t%s" % (output_path.split("/")[-1],)
         print ""
 
     def __move_output_files__(self,output_paths):
