@@ -134,7 +134,7 @@ class HandlerChaser(parabam.core.Handler):
         self.__update_tasks__(self._tasks)
 
     def __handle_origin_task__(self,new_package):
-        if new_package.processing:
+        if not new_package.processing:
             self._processing = new_package.processing
         for loner_count,path in new_package.results:
             if loner_count == 0:
