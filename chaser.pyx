@@ -264,19 +264,19 @@ class HandlerChaser(parabam.core.Handler):
             else:
                 self._stale_count = 0
             self._prev_rescued = self._rescued["total"]
+            saved = self.__save_purgatory_loners__()
 
             if (empty and running == 0) or self._stale_count == 200:
                 send_kill = True
                 if not empty:
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
                     self.__tidy_pyramid__()
-                else:
-                    if not self.__is_queue_empty__():
-                        send_kill = False
-                    saved = self.__save_purgatory_loners__()
+                else: 
                     if saved > 0:
                         send_kill = False
-                    
+                    if not self.__is_queue_empty__():
+                        send_kill = False
+                                       
                 if send_kill:
                     print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
                     self.__send_final_kill_signal__()
@@ -293,17 +293,16 @@ class HandlerChaser(parabam.core.Handler):
 
     def __save_purgatory_loners__(self):
         saved = 0
+        saved_keys = []
         for (source,loner_type),paths in self._loner_purgatory.items():
             if len(paths) > 1:
                 saved += 1
+                saved_keys.append((source,loner_type))
                 self._pyramid_idle_counts[loner_type] = 100
                 for path in paths:
                     self._loner_pyramid[source][loner_type][0].append(path)
-            else:
-                for path in paths:
-                    os.remove(path)
-        del self._loner_purgatory
-        self._loner_purgatory = {}
+        for key in saved_keys:
+            del self._loner_purgatory[key]
         gc.collect()
         return saved
 
