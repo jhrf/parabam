@@ -212,6 +212,7 @@ class HandlerSubset(parabam.core.Handler):
         self._mergequeue = outqu
         self._mergecount = 0
 
+        self._proc_flag_sent = False
         self._chasequeue = chaserqu
 
     def __new_package_action__(self,new_package,**kwargs):
@@ -239,13 +240,20 @@ class HandlerSubset(parabam.core.Handler):
 
     def __test_merge_store__(self,source,subset):
         #Test whether there are any temporary bams to be merged
-        return len(self._merge_stores[source][subset]) > 0
-            
+        if subset == "index" and not self.__is_processing__() and not self._proc_flag_sent:
+            self._proc_flag_sent = True
+            return True
+        else:
+            return len(self._merge_stores[source][subset]) > 0
+    
+    def __is_processing__(self):
+        return self._destroy_count < (self._destroy_limit - 1)
+
     def __add_merge_task__(self,name,results,subset_type,source,destroy=False):
         if subset_type == "index":
             res = OriginPackage(results=results,destroy=destroy,
                                 source=source,chaser_type="origin",
-                                processing=(self._destroy_count < ( self._destroy_limit - 1 ))) 
+                                processing= self.__is_processing__()  ) 
             self._chasequeue.put(res)
         else:
             res = MergePackage(name=name,results=results,

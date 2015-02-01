@@ -49,6 +49,7 @@ class HandlerChaser(parabam.core.Handler):
         
         self._loner_pyramid = self.__instalise_loner_pyramid__()
         self._pyramid_idle_counts = Counter()
+        self._loner_purgatory = {}
 
         self._periodic_interval = 5
         self._total_loners = 0
@@ -63,6 +64,7 @@ class HandlerChaser(parabam.core.Handler):
         self._primary_store = self.__instalise_primary_store__()
 
         self._processing = True
+        self._primary_complete = True
 
         self._max_reads = 5000000
 
@@ -123,7 +125,6 @@ class HandlerChaser(parabam.core.Handler):
         return loner_pyramid
 
     def __new_package_action__(self,new_package,**kwargs):
-
         chaser_type = new_package.chaser_type
         if chaser_type == "origin":
             self.__handle_origin_task__(new_package)
@@ -134,14 +135,16 @@ class HandlerChaser(parabam.core.Handler):
         self.__update_tasks__(self._tasks)
 
     def __handle_origin_task__(self,new_package):
-        if not new_package.processing:
-            self._processing = new_package.processing
         for loner_count,path in new_package.results:
             if loner_count == 0:
                 os.remove(path)
             else:
                 self._total_loners += loner_count
-                self._primary_store[new_package.source].append(path)
+                self._primary_store[new_package.source].append(path) 
+        if not new_package.processing:
+            self._processing = new_package.processing
+            self.__test_primary_tasks__(required_paths=1)
+            self.__wait_for_tasks__(self._tasks,0)
 
     def __handle_match_maker__(self,new_package):
         source = new_package.source
@@ -236,15 +239,21 @@ class HandlerChaser(parabam.core.Handler):
                         del paths
                     if pyramid_idle_counts[loner_type] >= idle_threshold:
                         idle_success,idle_paths,idle_levels = self.__idle_routine__(pyramid,loner_type,source)
-                        if idle_success:
-                            running += 1
-                            pyramid_idle_counts[loner_type] = 0
+
                         #delete after idle success or when processing has finished and idle fails
-                        if self.__clear_subpyramid__(idle_success,self._processing,running):  
+                        if self.__clear_subpyramid__(idle_success,self._processing,running):
+                            pyramid_idle_counts[loner_type]=0
                             for idle_level,idle_path in izip(idle_levels,idle_paths):
                                 if not idle_success:
-                                    self.__print_complete_loners__(idle_path)
-                                pyramid[idle_level].remove(idle_path)
+                                    try:
+                                        self._loner_purgatory[(source,loner_type)].append(idle_path)
+                                    except KeyError:
+                                        self._loner_purgatory[(source,loner_type)] = [idle_path]
+                                    pyramid[idle_level].remove(idle_path)
+                                else:
+                                    pyramid[idle_level].remove(idle_path)
+                                    running += 1
+
                         del idle_paths,idle_levels
 
         self.__test_primary_tasks__(required_paths=required_paths)
@@ -262,16 +271,41 @@ class HandlerChaser(parabam.core.Handler):
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
                     self.__tidy_pyramid__()
                 else:
-                    try:
-                        pack = self._inqu.get(False,60)
-                        self._inqu.put(pack)
+                    if not self.__is_queue_empty__():
                         send_kill = False
-                    except Queue2.Empty:
-                        pass
+                    saved = self.__save_purgatory_loners__()
+                    if saved > 0:
+                        send_kill = False
+                    
                 if send_kill:
                     print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
                     self.__send_final_kill_signal__()
+            #print "Empty",empty,"Stale",self._stale_count,"Running",running,"Saved",saved,"Processing",self._processing
         gc.collect()
+
+    def __is_queue_empty__(self):
+        try:
+            pack = self._inqu.get(False,60)
+            self._inqu.put(pack)
+            return False
+        except Queue2.Empty:
+            return True
+
+    def __save_purgatory_loners__(self):
+        saved = 0
+        for (source,loner_type),paths in self._loner_purgatory.items():
+            if len(paths) > 1:
+                saved += 1
+                self._pyramid_idle_counts[loner_type] = 100
+                for path in paths:
+                    self._loner_pyramid[source][loner_type][0].append(path)
+            else:
+                for path in paths:
+                    os.remove(path)
+        del self._loner_purgatory
+        self._loner_purgatory = {}
+        gc.collect()
+        return saved
 
     def __print_complete_loners__(self,path):
         dumpfile = open("dumpfile%s.txt" % (self.const.sources[0],),"a")
