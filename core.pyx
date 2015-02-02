@@ -11,7 +11,6 @@ import pysam
 
 import multiprocessing
 from abc import ABCMeta, abstractmethod
-import resource
 
 #Tasks are started by parabam.Processor. Once started 
 #they will carryout a predefined task on the provided
@@ -20,13 +19,14 @@ class Task(multiprocessing.Process):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self,object task_set,object outqu,int curproc,object destroy,object const):
+    def __init__(self,object task_set,object outqu,int curproc,object destroy,object const,str parent_class):
         multiprocessing.Process.__init__(self)
         self._task_set = task_set
         self._outqu = outqu
         self._curproc = curproc
         self._temp_dir = const.temp_dir
         self._destroy = destroy
+        self._parent_class = parent_class
         self.const = const
 
     def run(self):
@@ -36,7 +36,8 @@ class Task(multiprocessing.Process):
         self._outqu.put(CorePackage(name=self.name,
                                 results=results,
                                 destroy=self._destroy,
-                                curproc=self._curproc))
+                                curproc=self._curproc,
+                                parent_class=self._parent_class))
         #Trying to control mem useage
         del self._task_set
         gc.collect()
@@ -82,10 +83,10 @@ cdef class Handler:
         elif const.verbose == 2 or const.verbose == True:
             #In the case verbose is simply "True" or "level 2"
             self._verbose = True
-            self._update_output = self.__standard_output__
+            self._update_output = self.__level_2_output__
         else:#catching False and -v0
             self._verbose = False
-            self._update_output = self.__standard_output__
+            self._update_output = self.__level_2_output__
 
     def __level_1_output__(self,out_str):
         #BUG! the fact this makes a call to __total_reads__ is ridiculous
@@ -96,9 +97,13 @@ cdef class Handler:
         sys.stdout.write("[Update] Processed: %d Time: %s\n" % (total_procd,time))
         sys.stdout.flush()
 
-    def __standard_output__(self,outstr):
+    def __level_2_output__(self,outstr):
         sys.stdout.write("\r" + outstr)
         sys.stdout.flush()
+
+    #Must be overwritten if stats architecture is modififed
+    def __total_reads__(self):
+        return self._stats["total"]
 
     def listen(self,update_interval):
         destroy = False
@@ -122,10 +127,11 @@ cdef class Handler:
                     if self._destroy_count == self._destroy_limit:
                         destroy = True
 
-                curproc = new_package.curproc 
                 if not new_package.results == {}:#If results are present...
                     self.__new_package_action__(new_package) #Handle the results
                     dealt += 1
+                    if type(new_package) == CorePackage:
+                        curproc = new_package.curproc
 
             except Queue2.Empty:
                 #Queue empty. Continue with loop
@@ -162,15 +168,7 @@ cdef class Handler:
     #This code is a little ugly. Essentially, given a results
     #dictionary, it will go through and create a sensible output
     #string.
-    def __auto_handle__(self,results,deep=None):
-        stats = self._stats 
-
-        if deep not in self._stats:
-            self._stats[deep] = {}
-
-        if deep:
-            stats = self._stats[deep]
-
+    def __auto_handle__(self,results,stats):
         for key_one in results:
             if type(results[key_one]) is int:
                 if key_one in stats:
@@ -267,11 +265,6 @@ cdef class Processor:
         start_task(collection,destroy=True)
         self.__end_processing__(master_bam)
 
-    def __output__(self,outstr):
-        if self._verbose:
-            sys.stdout.write(outstr)
-            sys.stdout.flush()
-
     #__wait_for_tasks__ controls the amount of currently running processors
     #it waits until a processor is free and then allows the creation of a new
     #process
@@ -308,7 +301,7 @@ cdef class Processor:
             gc.collect()
                     
     def __start_task__(self,collection,destroy=False):
-        args = [collection,self._outqu,self._active_count,destroy,self.const]
+        args = [collection,self._outqu,self._active_count,destroy,self.const,self.__class__.__name__]
         args.extend(self._task_args)
         task = self._TaskClass(*args)
         task.start()
@@ -516,11 +509,11 @@ class Package(object):
         self.name = name
         self.results = results
         self.destroy = destroy
-        self.curproc = 0
 
 class CorePackage(Package):
-    def __init__(self,name,results,destroy,curproc):
+    def __init__(self,name,results,destroy,curproc,parent_class):
         super(CorePackage,self).__init__(name,results,destroy)
         self.curproc = curproc
+        self.parent_class = parent_class
 
 #And they all lived happily ever after...

@@ -213,10 +213,6 @@ class HandlerChaser(parabam.core.Handler):
             idle_threshold = 5
             required_paths=1
 
-        if iterations % 15 == 0 :
-            sys.stdout.write(self.__format_out_str__())                
-            sys.stdout.flush()
-
         pyramid_idle_counts = self._pyramid_idle_counts 
 
         empty = True
@@ -306,19 +302,6 @@ class HandlerChaser(parabam.core.Handler):
         gc.collect()
         return saved
 
-    def __print_complete_loners__(self,path):
-        dumpfile = open("dumpfile%s.txt" % (self.const.sources[0],),"a")
-        try:
-            loner = pysam.AlignmentFile(path,"rb")
-            dumpfile.write("+++++Lonley Heart File:\n%s\n" %  (path,))
-            for read in loner.fetch(until_eof=True):
-                dumpfile.write("%s\n" % (read.qname,))
-            dumpfile.flush()
-            loner.close()
-        except IOError:
-            pass
-        dumpfile.close()
-
     def __get_paths__(self,loner_type,sub_pyramid,level):
         task_size = self.__get_task_size__(level,loner_type)
         paths = []
@@ -389,12 +372,6 @@ class HandlerChaser(parabam.core.Handler):
             else:
                 task_size = 5
         return task_size
-
-    def __format_out_str__(self):
-        return "\rTotal: %d/%d Ratio: %.5f Tasks:%d " %\
-            (self._rescued["total"],self._total_loners,
-            float(self._rescued["total"]+1)/(self._total_loners+1),
-            len(self._tasks))
 
     def __handler_exit__(self,**kwargs):
         pass
@@ -661,7 +638,7 @@ class MatchMakerTask(ChaserClass):
 
     def __launch_child_task__(self,pairs):
         child_pack = self._child_package
-        args = [pairs,child_pack["queue"],0,False,child_pack["const"]]
+        args = [pairs,child_pack["queue"],0,False,child_pack["const"],self.__class__.__name__]
         args.extend(child_pack["task_args"])
         task = child_pack["TaskClass"](*args)
         task.start()

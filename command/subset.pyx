@@ -19,12 +19,13 @@ from parabam.chaser import HandlerChaser,OriginPackage
 
 class TaskSubset(parabam.core.Task):
 
-    def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
+    def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str parent_class,str source):
         super(TaskSubset, self).__init__(task_set=task_set,
                                         outqu=outqu,
                                         curproc=curproc*len(const.sources),
                                         destroy=destroy,
-                                        const=const)
+                                        const=const,
+                                        parent_class=parent_class)
         self._source = source
         self._master_file_path = const.master_file_path[self._source]
         self._subset_types = const.subset_types
@@ -112,12 +113,13 @@ class TaskSubset(parabam.core.Task):
         
 class PairTaskSubset(TaskSubset):
 
-    def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str source):
+    def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str parent_class,str source):
         super(PairTaskSubset, self).__init__(task_set=task_set,
                                         outqu=outqu,
-                                        curproc=curproc*len(const.sources),
+                                        curproc=curproc,
                                         destroy=destroy,
                                         const=const,
+                                        parent_class=parent_class,
                                         source=source)
         if const.include_duplicates:
             self.__read_filter__ = self.__filter__
@@ -217,11 +219,24 @@ class HandlerSubset(parabam.core.Handler):
 
     def __new_package_action__(self,new_package,**kwargs):
         results = new_package.results
+        handle_dict = dict(results)
         source = results["source"]
-        self.__auto_handle__(results,source)
-       
+
+        #hack so as not record rescued paired reads twice in total
+        if new_package.parent_class == "MatchMakerTask":
+            results["total"] = 0
+        if "index" in results["counts"].keys():
+            handle_dict["counts"] = dict(handle_dict["counts"])
+            del handle_dict["counts"]["index"]
+
+        self.__auto_handle__(handle_dict,self._stats,source)       
         for subset in self._subset_types:
             self._merge_stores[source][subset].append((results["counts"][subset],results["temp_paths"][subset],))
+
+    def __auto_handle__(self,results,stats,source):
+        if source not in stats.keys():
+            stats[source] = {}
+        super(HandlerSubset,self).__auto_handle__(results,stats[source])
 
     def __periodic_action__(self,iterations):
         for source in self._sources:
@@ -318,7 +333,7 @@ class ProcessorSubsetPair(ProcessorSubset):
                         if not pause:
                             break
                     except Queue2.Empty:
-                        time.sleep(5)
+                        time.sleep(2)
         except Queue2.Empty:
             pass
 
