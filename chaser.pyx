@@ -37,13 +37,13 @@ class MatchMakerPackage(ChaserPackage):
 
 class HandlerChaser(parabam.core.Handler):
 
-    def __init__(self,object inqu,object mainqu,object pause_qu,object const,object destroy_limit, object TaskClass):
+    def __init__(self,object inqu,object mainqu,object pause_qus,object const,object destroy_limit, object TaskClass):
         super(HandlerChaser,self).__init__(inqu,const,destroy_limit=destroy_limit,report=False)
 
         self._sources = const.sources
         self._subset_types = const.subset_types
         
-        self._pause_qu = pause_qu
+        self._pause_qus = pause_qus
         self._mainqu = mainqu
         self._TaskClass = TaskClass
         
@@ -80,7 +80,8 @@ class HandlerChaser(parabam.core.Handler):
             return
 
         if self._processing:
-            self._pause_qu.put(True)
+            for qu in self._pause_qus:
+                qu.put(True)
 
         while(max_tasks <= currently_active and currently_active > 0):
             update_tasks(active_tasks)
@@ -88,8 +89,8 @@ class HandlerChaser(parabam.core.Handler):
             time.sleep(1)
 
         if self._processing:
-            self._pause_qu.put(False)
-
+            for qu in self._pause_qus:
+                qu.put(False)
         return 
 
     def __instalise_primary_store__(self):
@@ -274,7 +275,7 @@ class HandlerChaser(parabam.core.Handler):
                         send_kill = False
                                        
                 if send_kill:
-                    print "\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],)
+                    self.__standard_output__("\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],))
                     self.__send_final_kill_signal__()
             #print "Empty",empty,"Stale",self._stale_count,"Running",running,"Saved",saved,"Processing",self._processing
         gc.collect()
@@ -337,7 +338,7 @@ class HandlerChaser(parabam.core.Handler):
             return False
 
     def __send_final_kill_signal__(self):
-        kill_package = CorePackage(name="",results={},destroy=True,curproc=0)
+        kill_package = CorePackage(name="",results={},destroy=True,curproc=0,parent_class=self.__class__.__name__)
         self._mainqu.put(kill_package)
 
     def __idle_routine__(self,pyramid,loner_type,source):

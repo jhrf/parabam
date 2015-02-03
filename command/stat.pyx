@@ -78,7 +78,7 @@ class HandlerStat(parabam.core.Handler):
     def __new_package_action__(self,new_package,**kwargs):
         results = new_package.results
         source = results["source"]
-        self.__auto_handle__(results,self.stats,source)
+        self.__auto_handle__(results,self._stats,source)
         for name,data in results["structures"]:
             final_struc = self._final_structures[source][name]
             final_struc.merge(data)

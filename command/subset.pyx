@@ -223,8 +223,8 @@ class HandlerSubset(parabam.core.Handler):
         source = results["source"]
 
         #hack so as not record rescued paired reads twice in total
-        if new_package.parent_class == "MatchMakerTask":
-            results["total"] = 0
+        if self.const.pair_process and not new_package.parent_class == "ProcessorSubsetPair":
+            handle_dict["total"] = 0
         if "index" in results["counts"].keys():
             handle_dict["counts"] = dict(handle_dict["counts"])
             del handle_dict["counts"]["index"]
@@ -281,8 +281,8 @@ class HandlerSubset(parabam.core.Handler):
 
     def __handler_exit__(self,**kwargs):
         if self._verbose:
-            self.__standard_output__("\n[Status] Processed %d reads from bam files\n" % (self.__total_reads__(),))
-            self.__standard_output__("[Status] Waiting for merge operation to finish...\n")
+            self.__standard_output__("\n[Status] Processed %d reads from bam files" % (self.__total_reads__(),))
+            self.__standard_output__("[Status] Waiting for merge operation to finish...")
 
         #Kill the handlers handler
         for source in self._sources:
@@ -419,9 +419,8 @@ class Interface(parabam.core.UserInterface):
                                 include_duplicates=include_duplicates)
 
             task_qu = Queue()
-            pause_qu = Queue()
-            processors,task_class = self.__create_processors__(task_qu,pause_qu,const,debug,engine_is_class)
-            handlers = self.__create_handlers__(task_qu,pause_qu,const,task_class)
+            processors,task_class,pause_qus = self.__create_processors__(task_qu,const,debug,engine_is_class)
+            handlers = self.__create_handlers__(task_qu,pause_qus,const,task_class)
 
             if verbose == 1: 
                 update_interval = 199
@@ -458,7 +457,7 @@ class Interface(parabam.core.UserInterface):
                     subset_paths[source][subset] = path
         return index_paths,subset_paths
 
-    def __create_handlers__(self,task_qu,pause_qu,object const,task_class):
+    def __create_handlers__(self,task_qu,pause_qus,object const,task_class):
         handlers = []
         merge_qu = Queue()
         chaser_qu = Queue()
@@ -479,13 +478,14 @@ class Interface(parabam.core.UserInterface):
                         destroy_limit=len(const.sources)*(len(const.subset_types) - destroy_modifier) ))
 
         if const.pair_process:
-            handlers.append(HandlerChaser(inqu=chaser_qu,pause_qu=pause_qu,mainqu=task_qu,
+            handlers.append(HandlerChaser(inqu=chaser_qu,pause_qus=pause_qus,mainqu=task_qu,
                                 const=const,destroy_limit=1,TaskClass=task_class))
 
         return handlers
 
-    def __create_processors__(self,task_qu,pause_qu,object const,debug,engine_is_class):
+    def __create_processors__(self,task_qu,object const,debug,engine_is_class):
         processors = []
+        pause_qus = []
 
         if const.pair_process:
             task_class = PairTaskSubset
@@ -508,11 +508,12 @@ class Interface(parabam.core.UserInterface):
 
         for source in const.sources:
             if const.pair_process:
+                pause_qus.append(Queue())
                 processors.append(ProcessorSubsetPair(outqu=task_qu,
                     const=const,
                     TaskClass=task_class,
                     task_args=[source],
-                    inqu = pause_qu,
+                    inqu = pause_qus[-1],
                     debug = debug))
             else:
                 processors.append(ProcessorSubset(outqu=task_qu,
@@ -521,7 +522,7 @@ class Interface(parabam.core.UserInterface):
                     task_args=[source],
                     debug = debug))
             
-        return processors,task_class
+        return processors,task_class,pause_qus
 
     def __report_file_names__(self,output_paths):
         print "[Status] This run will output the following files:"

@@ -88,6 +88,10 @@ cdef class Handler:
             self._verbose = False
             self._update_output = self.__level_2_output__
 
+    def __standard_output__(self,out_str):
+        sys.stdout.write(out_str + "\n")
+        sys.stdout.flush()
+
     def __level_1_output__(self,out_str):
         #BUG! the fact this makes a call to __total_reads__ is ridiculous
         #this is making calls to a sub class method and just expecting it to be there.

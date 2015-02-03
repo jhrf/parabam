@@ -928,7 +928,7 @@ static char __pyx_k_numpy[] = "numpy";
 static char __pyx_k_outqu[] = "outqu";
 static char __pyx_k_pysam[] = "pysam";
 static char __pyx_k_s_csv[] = "./%s.csv";
-static char __pyx_k_stats[] = "stats";
+static char __pyx_k_stats[] = "_stats";
 static char __pyx_k_struc[] = "struc";
 static char __pyx_k_super[] = "super";
 static char __pyx_k_write[] = "write";
@@ -975,6 +975,7 @@ static char __pyx_k_results[] = "results";
 static char __pyx_k_run_cmd[] = "run_cmd";
 static char __pyx_k_savetxt[] = "savetxt";
 static char __pyx_k_sources[] = "sources";
+static char __pyx_k_stats_2[] = "stats";
 static char __pyx_k_task_qu[] = "task_qu";
 static char __pyx_k_verbose[] = "verbose";
 static char __pyx_k_Sample_s[] = "Sample,%s\n";
@@ -1417,6 +1418,7 @@ static PyObject *__pyx_n_s_source_structures;
 static PyObject *__pyx_n_s_sources;
 static PyObject *__pyx_n_s_sources_2;
 static PyObject *__pyx_n_s_stats;
+static PyObject *__pyx_n_s_stats_2;
 static PyObject *__pyx_n_s_store_method;
 static PyObject *__pyx_n_s_struc;
 static PyObject *__pyx_n_s_struc_type;
@@ -3640,7 +3642,7 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_2__new_package_a
  *     def __new_package_action__(self,new_package,**kwargs):
  *         results = new_package.results             # <<<<<<<<<<<<<<
  *         source = results["source"]
- *         self.__auto_handle__(results,self.stats,source)
+ *         self.__auto_handle__(results,self._stats,source)
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_new_package, __pyx_n_s_results); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -3651,7 +3653,7 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_2__new_package_a
  *     def __new_package_action__(self,new_package,**kwargs):
  *         results = new_package.results
  *         source = results["source"]             # <<<<<<<<<<<<<<
- *         self.__auto_handle__(results,self.stats,source)
+ *         self.__auto_handle__(results,self._stats,source)
  *         for name,data in results["structures"]:
  */
   __pyx_t_1 = PyObject_GetItem(__pyx_v_results, __pyx_n_s_source); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
@@ -3662,7 +3664,7 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_2__new_package_a
   /* "parabam/command/stat.pyx":81
  *         results = new_package.results
  *         source = results["source"]
- *         self.__auto_handle__(results,self.stats,source)             # <<<<<<<<<<<<<<
+ *         self.__auto_handle__(results,self._stats,source)             # <<<<<<<<<<<<<<
  *         for name,data in results["structures"]:
  *             final_struc = self._final_structures[source][name]
  */
@@ -3704,7 +3706,7 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_2__new_package_a
 
   /* "parabam/command/stat.pyx":82
  *         source = results["source"]
- *         self.__auto_handle__(results,self.stats,source)
+ *         self.__auto_handle__(results,self._stats,source)
  *         for name,data in results["structures"]:             # <<<<<<<<<<<<<<
  *             final_struc = self._final_structures[source][name]
  *             final_struc.merge(data)
@@ -3805,7 +3807,7 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_2__new_package_a
     __pyx_t_3 = 0;
 
     /* "parabam/command/stat.pyx":83
- *         self.__auto_handle__(results,self.stats,source)
+ *         self.__auto_handle__(results,self._stats,source)
  *         for name,data in results["structures"]:
  *             final_struc = self._final_structures[source][name]             # <<<<<<<<<<<<<<
  *             final_struc.merge(data)
@@ -3860,7 +3862,7 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_11HandlerStat_2__new_package_a
 
     /* "parabam/command/stat.pyx":82
  *         source = results["source"]
- *         self.__auto_handle__(results,self.stats,source)
+ *         self.__auto_handle__(results,self._stats,source)
  *         for name,data in results["structures"]:             # <<<<<<<<<<<<<<
  *             final_struc = self._final_structures[source][name]
  *             final_struc.merge(data)
@@ -3921,7 +3923,7 @@ static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_5__auto_handle__
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__auto_handle__ (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_results,&__pyx_n_s_stats,&__pyx_n_s_source,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_results,&__pyx_n_s_stats_2,&__pyx_n_s_source,0};
     PyObject* values[4] = {0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -3945,7 +3947,7 @@ static PyObject *__pyx_pw_7parabam_7command_4stat_11HandlerStat_5__auto_handle__
           __Pyx_RaiseArgtupleInvalid("__auto_handle__", 1, 4, 4, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
-        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_stats)) != 0)) kw_args--;
+        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_stats_2)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("__auto_handle__", 1, 4, 4, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
@@ -15213,6 +15215,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_sources, __pyx_k_sources, sizeof(__pyx_k_sources), 0, 0, 1, 1},
   {&__pyx_n_s_sources_2, __pyx_k_sources_2, sizeof(__pyx_k_sources_2), 0, 0, 1, 1},
   {&__pyx_n_s_stats, __pyx_k_stats, sizeof(__pyx_k_stats), 0, 0, 1, 1},
+  {&__pyx_n_s_stats_2, __pyx_k_stats_2, sizeof(__pyx_k_stats_2), 0, 0, 1, 1},
   {&__pyx_n_s_store_method, __pyx_k_store_method, sizeof(__pyx_k_store_method), 0, 0, 1, 1},
   {&__pyx_n_s_struc, __pyx_k_struc, sizeof(__pyx_k_struc), 0, 0, 1, 1},
   {&__pyx_n_s_struc_type, __pyx_k_struc_type, sizeof(__pyx_k_struc_type), 0, 0, 1, 1},
@@ -15419,7 +15422,7 @@ static int __Pyx_InitCachedConstants(void) {
  *         if source not in stats.keys():
  *             stats[source] = {}
  */
-  __pyx_tuple__24 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_results, __pyx_n_s_stats, __pyx_n_s_source); if (unlikely(!__pyx_tuple__24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__24 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_results, __pyx_n_s_stats_2, __pyx_n_s_source); if (unlikely(!__pyx_tuple__24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__24);
   __Pyx_GIVEREF(__pyx_tuple__24);
   __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_auto_handle, 86, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
