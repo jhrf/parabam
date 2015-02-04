@@ -281,8 +281,8 @@ class HandlerSubset(parabam.core.Handler):
 
     def __handler_exit__(self,**kwargs):
         if self._verbose:
-            self.__standard_output__("\n[Status] Processed %d reads from bam files" % (self.__total_reads__(),))
-            self.__standard_output__("[Status] Waiting for merge operation to finish...")
+            self.__standard_output__("\n[Status] Processing complete. %d reads processed" % (self.__total_reads__(),))
+            self.__standard_output__("[Status] Waiting for merge operation to finish")
 
         #Kill the handlers handler
         for source in self._sources:
@@ -362,7 +362,6 @@ class Interface(parabam.core.UserInterface):
 
         self.run(
             input_bams=cmd_args.input,
-            outputs= cmd_args.output,
             proc= cmd_args.p,
             chunk= cmd_args.c,
             verbose= verbose,
@@ -374,20 +373,20 @@ class Interface(parabam.core.UserInterface):
             pair_process=cmd_args.pair,
             include_duplicates=cmd_args.d,
             side_by_side = cmd_args.s,
-            debug = cmd_args.debug
+            debug = cmd_args.debug,
+            ensure_unique_output=cmd_args.u
             )
     
-    def run(self,input_bams,outputs,proc,chunk,subset_types,
+    def run(self,input_bams,proc,chunk,subset_types,
             user_constants,user_engine,fetch_region=None,side_by_side=2,
             keep_in_temp=False,engine_is_class=False,verbose=False,
-            pair_process=False,include_duplicates=False,debug=False):
+            pair_process=False,include_duplicates=False,debug=False,ensure_unique_output=False):
 
-        if not outputs or not len(outputs) == len(input_bams):
-            print "[Status] Using default naming scheme."
-            outputs = [ self.__get_basename__(b) for b in input_bams ]
 
         #AT SOME POINT WE SHOULD HANDLE UNSORTED BAMS. EITHER HERE OR AT THE PROCESSOR
         final_files = []
+
+        outputs = self.__get_outputs__(input_bams,unique=ensure_unique_output) 
 
         if pair_process and not "index" in subset_types:
             subset_types.append("index")
@@ -397,10 +396,10 @@ class Interface(parabam.core.UserInterface):
             output_paths = dict([(source,{}) for source in output_group])
             master_file_path = {}
 
-            for mst,source in zip(input_group,output_group):
-                master_file_path[source] = mst
-                for typ in subset_types:
-                    output_paths[source][typ] = "%s/%s_%s.bam" % (self._temp_dir,source.replace(".bam",""),typ,)
+            for master_path,source in zip(input_group,output_group):
+                master_file_path[source] = master_path
+                for subset_type in subset_types:
+                    output_paths[source][subset_type] = "%s/%s_%s.bam" % (self._temp_dir,source,subset_type,)
                     
             if verbose: self.__report_file_names__(output_paths)
 
@@ -443,6 +442,15 @@ class Interface(parabam.core.UserInterface):
             gc.collect()
 
         return final_files
+
+    def __get_outputs__(self,input_bam_paths,unique):
+        outputs = []
+        if unique:
+            unique_str = "_%d%s" % (os.getpid(),str(time.time()).replace(".",""),)
+        else:
+            unique_str = ""
+            
+        return [ "%s%s" % (self.__get_basename__(b),unique_str) for b in input_bam_paths ]
 
     def __seperate_subset_and_index__(self,output_paths):
         index_paths = {}
@@ -525,7 +533,7 @@ class Interface(parabam.core.UserInterface):
         return processors,task_class,pause_qus
 
     def __report_file_names__(self,output_paths):
-        print "[Status] This run will output the following files:"
+        print "\n[Status] This run will output the following files:"
         for src,subset_paths in output_paths.items():
             for subset,output_path in subset_paths.items():
                 if not subset == "index":
@@ -569,6 +577,8 @@ class Interface(parabam.core.UserInterface):
             ,help="Further parralise subset by running this many samples side-by-side. [Default 2]")
         parser.add_argument('-d',action="store_true",default=False,
             help="parabam will process reads marked PCR duplicate. Including this parameter may crash pair processing")
+        parser.add_argument('-u',action="store_true",default=False,
+            help="The files will be appended with a unique identifier. In the format <input_name>_<unique_id>_<subset_type>.bam")
         parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
             help="Indicate the amount of information output by the program:\n"\
             "\t0: No output [Default]\n"\

@@ -275,9 +275,7 @@ class HandlerChaser(parabam.core.Handler):
                         send_kill = False
                                        
                 if send_kill:
-                    self.__standard_output__("\n[Status] Couldn't find pairs for %d reads" % (self._total_loners - self._rescued["total"],))
                     self.__send_final_kill_signal__()
-            #print "Empty",empty,"Stale",self._stale_count,"Running",running,"Saved",saved,"Processing",self._processing
         gc.collect()
 
     def __is_queue_empty__(self):
@@ -375,7 +373,12 @@ class HandlerChaser(parabam.core.Handler):
         return task_size
 
     def __handler_exit__(self,**kwargs):
-        pass
+        if self.const.verbose:
+            if self._total_loners - self._rescued["total"] == 0:
+                self.__standard_output__("[Status] All reads succesfully paired") 
+            else:
+                self.__standard_output__("[Status] Couldn't find pairs for %d reads" %\
+                    (self._total_loners - self._rescued["total"],))
 
 class ChaserClass(Process):
     def __init__(self,object const,str source):

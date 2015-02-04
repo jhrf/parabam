@@ -396,13 +396,13 @@ class Interface(object):
     def __get_group__(self,bams,names,multi):
         if multi == 0:
             multi = 1
+        if names == []:
+            names = [""] * len(bams)
         for i in xrange(0,len(bams),multi):
             yield (bams[i:i+multi],names[i:i+multi])
 
     def __get_basename__(self,path):
-        base = os.path.basename(path)
-        if "." in base:
-            base = base.rpartition(".")[0]
+        base = os.path.splitext(os.path.basename(path))[0]
         return base
 
     def __sort_and_index__(self,fnm,verbose=False,tempDir=".",name=False):
