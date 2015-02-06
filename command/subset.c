@@ -1256,7 +1256,7 @@ static char __pyx_k_Interface___seperate_subset_and[] = "Interface.__seperate_su
 static char __pyx_k_ProcessorSubset___get_next_alig[] = "ProcessorSubset.__get_next_alig__";
 static char __pyx_k_ProcessorSubset___pre_processor[] = "ProcessorSubset.__pre_processor__";
 static char __pyx_k_Status_Processing_complete_d_re[] = "\n[Status] Processing complete. %d reads processed";
-static char __pyx_k_Status_This_run_will_output_the[] = "[Status] This run will output the following files:";
+static char __pyx_k_Status_This_run_will_output_the[] = "\n[Status] This run will output the following files:";
 static char __pyx_k_Status_Waiting_for_merge_operat[] = "[Status] Waiting for merge operation to finish";
 static char __pyx_k_The_files_will_be_appended_with[] = "The files will be appended with a unique identifier. In the format <input_name>_<unique_id>_<subset_type>.bam";
 static char __pyx_k_The_interface_to_parabam_subset[] = "The interface to parabam subset.\n    Users will primarily make use of the ``run`` function.";
@@ -16006,7 +16006,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_12__create_proces
  *         return processors,task_class,pause_qus
  * 
  *     def __report_file_names__(self,output_paths):             # <<<<<<<<<<<<<<
- *         print "[Status] This run will output the following files:"
+ *         print "\n[Status] This run will output the following files:"
  *         for src,subset_paths in output_paths.items():
  */
 
@@ -16100,7 +16100,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_14__report_file_n
   /* "parabam/command/subset.pyx":536
  * 
  *     def __report_file_names__(self,output_paths):
- *         print "[Status] This run will output the following files:"             # <<<<<<<<<<<<<<
+ *         print "\n[Status] This run will output the following files:"             # <<<<<<<<<<<<<<
  *         for src,subset_paths in output_paths.items():
  *             for subset,output_path in subset_paths.items():
  */
@@ -16108,7 +16108,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_14__report_file_n
 
   /* "parabam/command/subset.pyx":537
  *     def __report_file_names__(self,output_paths):
- *         print "[Status] This run will output the following files:"
+ *         print "\n[Status] This run will output the following files:"
  *         for src,subset_paths in output_paths.items():             # <<<<<<<<<<<<<<
  *             for subset,output_path in subset_paths.items():
  *                 if not subset == "index":
@@ -16227,7 +16227,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_14__report_file_n
     __pyx_t_6 = 0;
 
     /* "parabam/command/subset.pyx":538
- *         print "[Status] This run will output the following files:"
+ *         print "\n[Status] This run will output the following files:"
  *         for src,subset_paths in output_paths.items():
  *             for subset,output_path in subset_paths.items():             # <<<<<<<<<<<<<<
  *                 if not subset == "index":
@@ -16387,7 +16387,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_14__report_file_n
       __pyx_L11:;
 
       /* "parabam/command/subset.pyx":538
- *         print "[Status] This run will output the following files:"
+ *         print "\n[Status] This run will output the following files:"
  *         for src,subset_paths in output_paths.items():
  *             for subset,output_path in subset_paths.items():             # <<<<<<<<<<<<<<
  *                 if not subset == "index":
@@ -16398,7 +16398,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_14__report_file_n
 
     /* "parabam/command/subset.pyx":537
  *     def __report_file_names__(self,output_paths):
- *         print "[Status] This run will output the following files:"
+ *         print "\n[Status] This run will output the following files:"
  *         for src,subset_paths in output_paths.items():             # <<<<<<<<<<<<<<
  *             for subset,output_path in subset_paths.items():
  *                 if not subset == "index":
@@ -16419,7 +16419,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_14__report_file_n
  *         return processors,task_class,pause_qus
  * 
  *     def __report_file_names__(self,output_paths):             # <<<<<<<<<<<<<<
- *         print "[Status] This run will output the following files:"
+ *         print "\n[Status] This run will output the following files:"
  *         for src,subset_paths in output_paths.items():
  */
 
@@ -18848,7 +18848,7 @@ static int __Pyx_InitCachedConstants(void) {
  *         return processors,task_class,pause_qus
  * 
  *     def __report_file_names__(self,output_paths):             # <<<<<<<<<<<<<<
- *         print "[Status] This run will output the following files:"
+ *         print "\n[Status] This run will output the following files:"
  *         for src,subset_paths in output_paths.items():
  */
   __pyx_tuple__116 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_output_paths, __pyx_n_s_src, __pyx_n_s_subset_paths, __pyx_n_s_subset, __pyx_n_s_output_path); if (unlikely(!__pyx_tuple__116)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -19996,7 +19996,7 @@ PyMODINIT_FUNC PyInit_subset(void)
  *         return processors,task_class,pause_qus
  * 
  *     def __report_file_names__(self,output_paths):             # <<<<<<<<<<<<<<
- *         print "[Status] This run will output the following files:"
+ *         print "\n[Status] This run will output the following files:"
  *         for src,subset_paths in output_paths.items():
  */
   __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_6subset_9Interface_15__report_file_names__, 0, __pyx_n_s_Interface___report_file_names, NULL, __pyx_n_s_parabam_command_subset, __pyx_d, ((PyObject *)__pyx_codeobj__117)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
