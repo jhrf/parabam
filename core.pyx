@@ -464,7 +464,7 @@ class UserInterface(Interface):
             module = __import__(code_path, fromlist=[''])
 
         except ImportError:
-            sys.stderr.write("[ERROR] parabam can't find user module. Ensure code is in current working directory\n")
+            sys.stderr.write("[Error] parabam can't find user module. Ensure code is in current working directory\n")
             raise SystemExit
 
         user_engine = module.engine

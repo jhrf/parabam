@@ -37,7 +37,7 @@ class MatchMakerPackage(ChaserPackage):
 
 class HandlerChaser(parabam.core.Handler):
 
-    def __init__(self,object inqu,object mainqu,object pause_qus,object const,object destroy_limit, object TaskClass):
+    def __init__(self,object inqu,object mainqu,object pause_qus,object const,object destroy_limit, object TaskClass, int chaser_task_max):
         super(HandlerChaser,self).__init__(inqu,const,destroy_limit=destroy_limit,report=False)
 
         self._sources = const.sources
@@ -60,6 +60,7 @@ class HandlerChaser(parabam.core.Handler):
         self._child_pack = {"queue":self._mainqu,"const":self.const,
                             "source":"","TaskClass":self._TaskClass}
 
+        self._chaser_task_max = chaser_task_max
         self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
 
@@ -70,7 +71,7 @@ class HandlerChaser(parabam.core.Handler):
 
     #START -- BORROWED FROM PROCESOR
     #Need to refactor here to stop code duplication
-    def __wait_for_tasks__(self,list active_tasks,int max_tasks=8):
+    def __wait_for_tasks__(self,list active_tasks,int max_tasks):
         update_tasks = self.__update_tasks__ #optimising alias
         update_tasks(active_tasks)
         cdef int currently_active = len(active_tasks)
@@ -183,7 +184,7 @@ class HandlerChaser(parabam.core.Handler):
             time.sleep(1)
           
     def __start_primary_task__(self,source):        
-        self.__wait_for_tasks__(self._tasks) #wait for existing tasks
+        self.__wait_for_tasks__(self._tasks,self._chaser_task_max) #wait for existing tasks
         paths = self._primary_store[source]
         new_task = PrimaryTask(paths,self._inqu,self.const,
                     source,self._max_reads,self.__get_pack_with_task_args__(source))
@@ -191,7 +192,7 @@ class HandlerChaser(parabam.core.Handler):
         self._tasks.append(new_task)
 
     def __start_matchmaker_task__(self,paths,source,loner_type,level):
-        self.__wait_for_tasks__(self._tasks)
+        self.__wait_for_tasks__(self._tasks,self._chaser_task_max)
 
         new_task = MatchMakerTask(paths,self._inqu,self.const,source,
                     loner_type,level,self._max_reads,self.__get_pack_with_task_args__(source))

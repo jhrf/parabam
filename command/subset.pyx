@@ -373,7 +373,7 @@ class ProcessorSubsetPair(ProcessorSubset):
                         if not pause:
                             break
                     except Queue2.Empty:
-                        time.sleep(2)
+                        pass
         except Queue2.Empty:
             pass
 
@@ -445,10 +445,12 @@ class Interface(parabam.core.UserInterface):
                     
             if verbose: self.__report_file_names__(output_paths)
 
+            proc_per_processor = self.__get_max_proc__(proc,len(input_group),pair_process)
+
             const = parabam.core.Const(output_paths=output_paths,
                                 temp_dir=self._temp_dir,
                                 master_file_path=master_file_path,
-                                chunk=chunk,proc=(proc // len(input_group)),
+                                chunk=chunk,proc=proc_per_processor,
                                 verbose=verbose,thresh=0,
                                 subset_types=subset_types,
                                 sources=output_group,
@@ -462,7 +464,7 @@ class Interface(parabam.core.UserInterface):
 
             task_qu = Queue()
             processors,task_class,pause_qus = self.__create_processors__(task_qu,const,debug,engine_is_class)
-            handlers = self.__create_handlers__(task_qu,pause_qus,const,task_class)
+            handlers = self.__create_handlers__(task_qu,pause_qus,const,task_class,proc)
 
             if verbose == 1: 
                 update_interval = 199
@@ -486,6 +488,17 @@ class Interface(parabam.core.UserInterface):
 
         return final_files
 
+    def __get_max_proc__(self,proc,input_size,pair_process):
+        max_proc = (proc // input_size)
+        if pair_process:
+            max_proc = max_proc // 2
+        if max_proc == 0:
+            sys.stderr.write('[Error] Too many side-by-side inputs and too few processors.\n')
+            sys.stderr.write('\tNot enough processors to go round. Reduce -s or increase -p')
+            sys.stderr.flush()
+            raise SystemExit()
+        return max_proc
+
     def __get_outputs__(self,input_bam_paths,unique):
         outputs = []
         if unique:
@@ -508,7 +521,7 @@ class Interface(parabam.core.UserInterface):
                     subset_paths[source][subset] = path
         return index_paths,subset_paths
 
-    def __create_handlers__(self,task_qu,pause_qus,object const,task_class):
+    def __create_handlers__(self,task_qu,pause_qus,object const,task_class,proc):
         handlers = []
         merge_qu = Queue()
         chaser_qu = Queue()
@@ -530,7 +543,7 @@ class Interface(parabam.core.UserInterface):
 
         if const.pair_process:
             handlers.append(HandlerChaser(inqu=chaser_qu,pause_qus=pause_qus,mainqu=task_qu,
-                                const=const,destroy_limit=1,TaskClass=task_class))
+                                const=const,destroy_limit=1,TaskClass=task_class,chaser_task_max= (proc//2)))
 
         return handlers
 

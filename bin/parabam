@@ -63,12 +63,12 @@ if __name__ == "__main__":
 				interface = module.Interface(temp_dir,exe_dir)
 				interface.run_cmd(interface.get_parser())
 			except SystemExit:
-				print "-"
-				print "[Status] parabam is quitting gracefully %d\n" % (time.time(),)
+				print " "
+				print "[Status] parabam is quitting gracefully\n"
 			except BaseException as exception:
-				print "-"
-				print "[ERROR] parabam stopped unexpecedtly, sorry!"
-				#traceback.print_exception(*sys.exc_info())
+				print " "
+				print "[Error] parabam stopped unexpecedtly, sorry!"
+				traceback.print_exception(*sys.exc_info())
 				die_gracefully(temp_dir)
 				raise
 		else:

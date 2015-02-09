@@ -1231,7 +1231,7 @@ static char __pyx_k_Processor___get_next_alig[] = "Processor.__get_next_alig__";
 static char __pyx_k_Update_Processed_d_Time_s[] = "[Update] Processed: %d Time: %s\n";
 static char __pyx_k_Interface___sort_and_index[] = "Interface.__sort_and_index__";
 static char __pyx_k_UserInterface_default_parser[] = "UserInterface.default_parser";
-static char __pyx_k_ERROR_parabam_can_t_find_user_m[] = "[ERROR] parabam can't find user module. Ensure code is in current working directory\n";
+static char __pyx_k_Error_parabam_can_t_find_user_m[] = "[Error] parabam can't find user module. Ensure code is in current working directory\n";
 static char __pyx_k_Processor___get_next_alig_debug[] = "Processor.__get_next_alig_debug__";
 static char __pyx_k_The_instruction_file_written_in[] = "The instruction file, written in python, that we wishto carry out on the input BAM.";
 static char __pyx_k_The_maximum_amount_of_tasks_run[] = "The maximum amount of tasks run concurrently. This number should\nbe less than or equal to the amount of cores on your machine [Default: 4]";
@@ -1250,8 +1250,8 @@ static PyObject *__pyx_n_s_Const___init;
 static PyObject *__pyx_n_s_Const_add;
 static PyObject *__pyx_n_s_CorePackage;
 static PyObject *__pyx_n_s_CorePackage___init;
-static PyObject *__pyx_kp_s_ERROR_parabam_can_t_find_user_m;
 static PyObject *__pyx_n_s_Empty;
+static PyObject *__pyx_kp_s_Error_parabam_can_t_find_user_m;
 static PyObject *__pyx_kp_s_How_many_reads_each_parallel_tas;
 static PyObject *__pyx_n_s_INPUT;
 static PyObject *__pyx_n_s_INSTRUCTION;
@@ -11069,7 +11069,7 @@ static PyObject *__pyx_pf_7parabam_4core_13UserInterface_2__get_module_and_vital
  *             module = __import__(code_path, fromlist=[''])
  * 
  *         except ImportError:             # <<<<<<<<<<<<<<
- *             sys.stderr.write("[ERROR] parabam can't find user module. Ensure code is in current working directory\n")
+ *             sys.stderr.write("[Error] parabam can't find user module. Ensure code is in current working directory\n")
  *             raise SystemExit
  */
     __pyx_t_11 = PyErr_ExceptionMatches(__pyx_builtin_ImportError);
@@ -11083,7 +11083,7 @@ static PyObject *__pyx_pf_7parabam_4core_13UserInterface_2__get_module_and_vital
       /* "parabam/core.pyx":467
  * 
  *         except ImportError:
- *             sys.stderr.write("[ERROR] parabam can't find user module. Ensure code is in current working directory\n")             # <<<<<<<<<<<<<<
+ *             sys.stderr.write("[Error] parabam can't find user module. Ensure code is in current working directory\n")             # <<<<<<<<<<<<<<
  *             raise SystemExit
  * 
  */
@@ -11102,7 +11102,7 @@ static PyObject *__pyx_pf_7parabam_4core_13UserInterface_2__get_module_and_vital
 
       /* "parabam/core.pyx":468
  *         except ImportError:
- *             sys.stderr.write("[ERROR] parabam can't find user module. Ensure code is in current working directory\n")
+ *             sys.stderr.write("[Error] parabam can't find user module. Ensure code is in current working directory\n")
  *             raise SystemExit             # <<<<<<<<<<<<<<
  * 
  *         user_engine = module.engine
@@ -12895,8 +12895,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_Const_add, __pyx_k_Const_add, sizeof(__pyx_k_Const_add), 0, 0, 1, 1},
   {&__pyx_n_s_CorePackage, __pyx_k_CorePackage, sizeof(__pyx_k_CorePackage), 0, 0, 1, 1},
   {&__pyx_n_s_CorePackage___init, __pyx_k_CorePackage___init, sizeof(__pyx_k_CorePackage___init), 0, 0, 1, 1},
-  {&__pyx_kp_s_ERROR_parabam_can_t_find_user_m, __pyx_k_ERROR_parabam_can_t_find_user_m, sizeof(__pyx_k_ERROR_parabam_can_t_find_user_m), 0, 0, 1, 0},
   {&__pyx_n_s_Empty, __pyx_k_Empty, sizeof(__pyx_k_Empty), 0, 0, 1, 1},
+  {&__pyx_kp_s_Error_parabam_can_t_find_user_m, __pyx_k_Error_parabam_can_t_find_user_m, sizeof(__pyx_k_Error_parabam_can_t_find_user_m), 0, 0, 1, 0},
   {&__pyx_kp_s_How_many_reads_each_parallel_tas, __pyx_k_How_many_reads_each_parallel_tas, sizeof(__pyx_k_How_many_reads_each_parallel_tas), 0, 0, 1, 0},
   {&__pyx_n_s_INPUT, __pyx_k_INPUT, sizeof(__pyx_k_INPUT), 0, 0, 1, 1},
   {&__pyx_n_s_INSTRUCTION, __pyx_k_INSTRUCTION, sizeof(__pyx_k_INSTRUCTION), 0, 0, 1, 1},
@@ -13317,11 +13317,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "parabam/core.pyx":467
  * 
  *         except ImportError:
- *             sys.stderr.write("[ERROR] parabam can't find user module. Ensure code is in current working directory\n")             # <<<<<<<<<<<<<<
+ *             sys.stderr.write("[Error] parabam can't find user module. Ensure code is in current working directory\n")             # <<<<<<<<<<<<<<
  *             raise SystemExit
  * 
  */
-  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_s_ERROR_parabam_can_t_find_user_m); if (unlikely(!__pyx_tuple__18)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_s_Error_parabam_can_t_find_user_m); if (unlikely(!__pyx_tuple__18)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
