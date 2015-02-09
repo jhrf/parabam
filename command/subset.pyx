@@ -19,13 +19,14 @@ from parabam.chaser import HandlerChaser,OriginPackage
 
 class TaskSubset(parabam.core.Task):
 
-    def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str parent_class,str source):
+    def __init__(self, object task_set, object outqu, object curproc,
+                 object destroy, object const, str parent_class, str source):
         super(TaskSubset, self).__init__(task_set=task_set,
-                                        outqu=outqu,
-                                        curproc=curproc*len(const.sources),
-                                        destroy=destroy,
-                                        const=const,
-                                        parent_class=parent_class)
+                                         outqu=outqu,
+                                         curproc=curproc*len(const.sources),
+                                         destroy=destroy,
+                                         const=const,
+                                         parent_class=parent_class)
         self._source = source
         self._master_file_path = const.master_file_path[self._source]
         self._subset_types = const.subset_types
@@ -97,6 +98,8 @@ class TaskSubset(parabam.core.Task):
             elif type(subset_decision) == int:
                 if not subset_decision == -1:
                     subset_write(subset_types[subset_decision],read)
+            elif type(subset_decision) == None:
+                pass
             else:
                 sys.stdout.write("[ERROR] Unrecognised return type from user engine!\n")
                 print subset_decision
@@ -110,17 +113,18 @@ class TaskSubset(parabam.core.Task):
 
     def __engine__(self,read,user_constants,master):
         return self.const.user_engine(read,user_constants,master)
-        
-class PairTaskSubset(TaskSubset):
 
-    def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str parent_class,str source):
+class PairTaskSubset(TaskSubset):
+    def __init__(self,object task_set,object outqu,object curproc,
+                 object destroy,object const,str parent_class,str source):
+        
         super(PairTaskSubset, self).__init__(task_set=task_set,
-                                        outqu=outqu,
-                                        curproc=curproc,
-                                        destroy=destroy,
-                                        const=const,
-                                        parent_class=parent_class,
-                                        source=source)
+                                             outqu=outqu,
+                                             curproc=curproc,
+                                             destroy=destroy,
+                                             const=const,
+                                             parent_class=parent_class,
+                                             source=source)
         if const.include_duplicates:
             self.__read_filter__ = self.__filter__
         else:
@@ -166,7 +170,7 @@ class PairTaskSubset(TaskSubset):
         for qname,read in loners.items():
             subset_write("index",read)
 
-    def __read_pair_decision__(self,read1,read2,engine,user_constants,master):
+    def __read_pair_decision__(self,read1,read2 ,engine,user_constants,master):
         subset_decision = engine((read1,read2),user_constants,master)
         if type(subset_decision) == list:
             for subset,cur_read in subset_decision:
@@ -198,7 +202,9 @@ class PairTaskSubset(TaskSubset):
 
 class HandlerSubset(parabam.core.Handler):
 
-    def __init__(self,object inqu,object outqu,object const,object destroy_limit,object chaserqu):
+    def __init__(self,object inqu,object outqu,object const,
+                 object destroy_limit,object chaserqu):
+        
         super(HandlerSubset,self).__init__(inqu,const,destroy_limit=destroy_limit)
 
         self._sources = const.sources
@@ -279,7 +285,39 @@ class HandlerSubset(parabam.core.Handler):
     def __total_reads__(self):
         return sum(map(lambda s : self._stats[s]["total"],self._sources))
 
-    def __handler_exit__(self,**kwargs):
+    def __write_counts_csv__(self):
+        if self.const.output_counts:
+            count_path = "./subset_counts_csv_%d.csv" % (time.time(),)
+            self.__standard_output__("[Status] Outputting counts to following file: %s" % (count_path,))
+
+            with open(count_path, "w") as count_file:
+                key_order,header = self.__get_count_header__()
+                count_file.write(header)
+                for line in self.__generate_count_line__(key_order):
+                    count_file.write(line)
+
+    def __generate_count_line__(self,key_order):
+        for source,stats in self._stats.items():
+            line = ""
+            line += "%s" % (source,)
+            for key in key_order:
+                line += ",%s" % (stats[key],)
+            line += "\n"
+            yield line
+
+    def __get_count_header__(self):
+        header = "Sample"
+        keys = []
+        for source, stats in self._stats.items():
+            for key, val in stats.items():
+                header += ","
+                header += key
+                keys.append(key)
+            break
+        header += "\n"
+        return keys, header
+
+    def __handler_exit__(self, **kwargs):
         if self._verbose:
             self.__standard_output__("\n[Status] Processing complete. %d reads processed" % (self.__total_reads__(),))
             self.__standard_output__("[Status] Waiting for merge operation to finish")
@@ -291,6 +329,8 @@ class HandlerSubset(parabam.core.Handler):
                                 results=self._merge_stores[source][subset],subset_type=subset,
                                 source=source,destroy=True)
                 self.__update_merge_store__(source,subset)
+
+        self.__write_counts_csv__()
 
 class ProcessorSubset(parabam.core.Processor):
 
@@ -374,13 +414,15 @@ class Interface(parabam.core.UserInterface):
             include_duplicates=cmd_args.d,
             side_by_side = cmd_args.s,
             debug = cmd_args.debug,
-            ensure_unique_output=cmd_args.u
+            ensure_unique_output=cmd_args.u,
+            output_counts=cmd_args.counts
             )
     
     def run(self,input_bams,proc,chunk,subset_types,
             user_constants,user_engine,fetch_region=None,side_by_side=2,
             keep_in_temp=False,engine_is_class=False,verbose=False,
-            pair_process=False,include_duplicates=False,debug=False,ensure_unique_output=False):
+            pair_process=False,include_duplicates=False,debug=False,
+            ensure_unique_output=False,output_counts=False):
 
 
         #AT SOME POINT WE SHOULD HANDLE UNSORTED BAMS. EITHER HERE OR AT THE PROCESSOR
@@ -415,7 +457,8 @@ class Interface(parabam.core.UserInterface):
                                 user_engine=user_engine,
                                 fetch_region=fetch_region,
                                 pair_process=pair_process,
-                                include_duplicates=include_duplicates)
+                                include_duplicates=include_duplicates,
+                                output_counts=output_counts)
 
             task_qu = Queue()
             processors,task_class,pause_qus = self.__create_processors__(task_qu,const,debug,engine_is_class)
@@ -579,6 +622,8 @@ class Interface(parabam.core.UserInterface):
             help="parabam will process reads marked PCR duplicate. Including this parameter may crash pair processing")
         parser.add_argument('-u',action="store_true",default=False,
             help="The files will be appended with a unique identifier. In the format <input_name>_<unique_id>_<subset_type>.bam")
+        parser.add_argument('--counts',action="store_true",default=False,
+            help="The amount of reads in each subset will be output as a .CSV alongside the .BAM file.")
         parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
             help="Indicate the amount of information output by the program:\n"\
             "\t0: No output [Default]\n"\
