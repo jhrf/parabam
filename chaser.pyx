@@ -279,17 +279,17 @@ class HandlerChaser(parabam.core.Handler):
                     self.__send_final_kill_signal__()
         gc.collect()
 
-        if iterations % 30 == 0:
-            sys.stdout.write("\r %d/%d=%.5f | Processing:%d Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
-                (self._rescued["total"],
-                self._total_loners,
-                float(self._rescued["total"]+1)/(self._total_loners+1),
-                self._processing,
-                empty,
-                len(self._loner_purgatory),
-                self._stale_count,
-                len(self._tasks)))
-            sys.stdout.flush()
+#        if iterations % 30 == 0:
+#            sys.stdout.write("\r %d/%d=%.5f | Processing:%d Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
+#                (self._rescued["total"],
+#                self._total_loners,
+#                float(self._rescued["total"]+1)/(self._total_loners+1),
+#                self._processing,
+#                empty,
+#                len(self._loner_purgatory),
+#                self._stale_count,
+#                len(self._tasks)))
+#            sys.stdout.flush()
 
     def __is_queue_empty__(self):
         try:
