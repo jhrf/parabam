@@ -373,12 +373,24 @@ class ProcessorSubsetPair(ProcessorSubset):
                         if not pause:
                             break
                     except Queue2.Empty:
-                        pass
+                        time.sleep(3)
         except Queue2.Empty:
             pass
 
+        last = False   
+        while True:
+            try:
+                pause = self._inqu.get(False)
+                last = pause
+            except Queue2.Empty:
+                break
+        return last
+
     def __start_task__(self,collection,destroy=False):
-        self.__query_pause_qu__()
+        while True:
+            pause = self.__query_pause_qu__()
+            if not pause:
+                break
         super(ProcessorSubsetPair,self).__start_task__(collection,destroy)
 
 class Interface(parabam.core.UserInterface):
