@@ -18,7 +18,7 @@ from parabam.core import Package,CorePackage
 
 class ChaserPackage(Package):
     def __init__(self,results,destroy,source,chaser_type):
-        super(ChaserPackage,self).__init__("ChaserPackage",results,destroy)
+        super(ChaserPackage,self).__init__(results,destroy)
         
         self.chaser_type=chaser_type
         self.source = source
@@ -37,11 +37,14 @@ class MatchMakerPackage(ChaserPackage):
 
 class HandlerChaser(parabam.core.Handler):
 
-    def __init__(self,object inqu,object mainqu,object pause_qus,object const,object destroy_limit, object TaskClass, int chaser_task_max):
-        super(HandlerChaser,self).__init__(inqu,const,destroy_limit=destroy_limit,report=False)
+    def __init__(self,object inqu,object mainqu,object pause_qus,
+                 object const,object destroy_limit, 
+                 object TaskClass, int chaser_task_max):
+        
+        super(HandlerChaser,self).__init__(inqu,const,destroy_limit=destroy_limit,
+                                           report=False)
 
         self._sources = const.sources
-        self._subset_types = const.subset_types
         
         self._pause_qus = pause_qus
         self._mainqu = mainqu
@@ -117,7 +120,6 @@ class HandlerChaser(parabam.core.Handler):
             gc.collect()
 
         return len(active_tasks)
-
     #END -- BORROWED FROM PROCESOR
 
     def __instalise_loner_pyramid__(self):

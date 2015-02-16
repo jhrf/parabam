@@ -19,8 +19,8 @@ from parabam.core import Package
 from parabam.core import Handler
 
 class MergePackage(Package):
-    def __init__(self,str name,object results,str subset_type,str source,object destroy):
-        super(MergePackage,self).__init__(name,results,destroy)
+    def __init__(self,object results,str subset_type,str source,object destroy):
+        super(MergePackage,self).__init__(results,destroy)
         self.subset_type = subset_type
         self.source = source
 
@@ -29,12 +29,9 @@ class HandlerMerge(Handler):
         super(HandlerMerge,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)
         
         self._sources = const.sources
-        self._subset_types = list(const.subset_types)
+        self._user_subsets = list(const.user_subsets)
         self._out_file_objects = self.__get_out_file_objects__()
         self._merged = 0
-
-        if const.pair_process:
-            self._subset_types.remove("index")
 
     def __get_out_file_objects__(self):
         file_objects = {}
@@ -42,7 +39,7 @@ class HandlerMerge(Handler):
         for src in self._sources:
             master = pysam.Samfile(self.const.master_file_path[src],"rb")
             file_objects[src] = {}
-            for subset in self._subset_types:
+            for subset in self._user_subsets:
                 merge_type = self.__get_subset_merge_type__(output_paths[src][subset])
                 cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_paths[src][subset],master)
                 file_objects[src][subset] = cur_file_obj
@@ -115,7 +112,7 @@ class HandlerMerge(Handler):
     def __add_source_to_header__(self):
         #This could be moved before processing to cut down on the pysam cat overhead.
         for source in self._sources:
-            for subset in self._subset_types:
+            for subset in self._user_subsets:
                 telbam_path = self.const.output_paths[source][subset]
                 if self.__get_subset_merge_type__(telbam_path) == "pysam":
                     master_path = self.const.master_file_path[source]

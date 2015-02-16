@@ -33,8 +33,7 @@ class Task(multiprocessing.Process):
         cdef dict results = self.__generate_results__()
         results["total"] = len(self._task_set)
 
-        self._outqu.put(CorePackage(name=self.name,
-                                results=results,
+        self._outqu.put(CorePackage(results=results,
                                 destroy=self._destroy,
                                 curproc=self._curproc,
                                 parent_class=self._parent_class))
@@ -514,14 +513,13 @@ class Const(object):
         setattr(self,key,val)
 
 class Package(object):
-    def __init__(self,name,results,destroy):
-        self.name = name
+    def __init__(self,results,destroy):
         self.results = results
         self.destroy = destroy
 
 class CorePackage(Package):
-    def __init__(self,name,results,destroy,curproc,parent_class):
-        super(CorePackage,self).__init__(name,results,destroy)
+    def __init__(self,results,destroy,curproc,parent_class):
+        super(CorePackage,self).__init__(results,destroy)
         self.curproc = curproc
         self.parent_class = parent_class
 
