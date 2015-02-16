@@ -266,8 +266,8 @@ class ArrayStructure(UserStructure):
 
 class Interface(parabam.core.UserInterface):
 
-    def __init__(self,temp_dir,exe_dir):
-        super(Interface,self).__init__(temp_dir,exe_dir)
+    def __init__(self,temp_dir):
+        super(Interface,self).__init__(temp_dir)
     
     def run_cmd(self,parser):
 
@@ -323,7 +323,6 @@ class Interface(parabam.core.UserInterface):
                                 chunk=chunk,proc=(proc // len(input_group)),
                                 verbose=verbose,thresh=0,
                                 sources=output_group,
-                                exe_dir=self._exe_dir,
                                 user_constants=user_constants,
                                 user_structures=user_structures,
                                 user_engine=user_engine,

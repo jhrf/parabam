@@ -378,9 +378,8 @@ class Interface(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self,temp_dir,exe_dir):
+    def __init__(self,temp_dir):
         self._temp_dir = temp_dir
-        self._exe_dir = exe_dir
 
     def __introduce__(self,name):
         intro =  "%s has started. Start Time: " % (name,)\
@@ -422,7 +421,7 @@ class Interface(object):
 
     def default_parser(self):
 
-        parser = argparse.ArgumentParser(conflict_handler='resolve',
+        parser = ParabamParser(conflict_handler='resolve',
                     formatter_class=argparse.RawTextHelpFormatter)
 
         parser.add_argument('-p',type=int,nargs='?',default=4
@@ -454,8 +453,8 @@ class UserInterface(Interface):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self,temp_dir,exe_dir):
-        super(UserInterface,self).__init__(temp_dir,exe_dir)
+    def __init__(self,temp_dir):
+        super(UserInterface,self).__init__(temp_dir)
 
     def __get_module_and_vitals__(self,code_path):
         if os.getcwd not in sys.path:
@@ -491,6 +490,12 @@ class UserInterface(Interface):
     @abstractmethod
     def get_parser(self):
         pass
+
+class ParabamParser(argparse.ArgumentParser):
+    def error(self, message):
+        self.print_help()
+        sys.stderr.write('\nerror: %s\n' % message)
+        sys.exit(2)
 
 class Const(object):
     

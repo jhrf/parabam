@@ -397,8 +397,8 @@ class Interface(parabam.core.UserInterface):
     """The interface to parabam subset.
     Users will primarily make use of the ``run`` function."""
 
-    def __init__(self,temp_dir,exe_dir):
-        super(Interface,self).__init__(temp_dir,exe_dir)
+    def __init__(self,temp_dir):
+        super(Interface,self).__init__(temp_dir)
 
     def run_cmd(self,parser):
         cmd_args = parser.parse_args()
@@ -463,10 +463,9 @@ class Interface(parabam.core.UserInterface):
                                 temp_dir=self._temp_dir,
                                 master_file_path=master_file_path,
                                 chunk=chunk,proc=proc_per_processor,
-                                verbose=verbose,thresh=0,
+                                verbose=verbose,
                                 subset_types=subset_types,
                                 sources=output_group,
-                                exe_dir=self._exe_dir,
                                 user_constants=user_constants,
                                 user_engine=user_engine,
                                 fetch_region=fetch_region,
@@ -492,6 +491,7 @@ class Interface(parabam.core.UserInterface):
             if keep_in_temp:
                 for source,subset_paths in output_paths.items():
                     for subset,path in subset_paths.items():
+                        if not subset == "index": 
                             final_files.append(path)
             else:
                 final_files.extend(self.__move_output_files__(output_paths))
