@@ -15,18 +15,15 @@ from collections import Counter
 from multiprocessing import Queue,Process
 from itertools import izip
 
-from parabam.core import Package
-from parabam.core import Handler
-
-class MergePackage(Package):
+class MergePackage(parabam.core.Package):
     def __init__(self,object results,str subset_type,str source,object destroy):
         super(MergePackage,self).__init__(results,destroy)
         self.subset_type = subset_type
         self.source = source
 
-class HandlerMerge(Handler):
+class Handler(parabam.core.Handler):
     def __init__(self,object inqu, object const,int destroy_limit=1):
-        super(HandlerMerge,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)
+        super(Handler,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)
         
         self._sources = const.sources
         self._user_subsets = list(const.user_subsets)
@@ -109,34 +106,6 @@ class HandlerMerge(Handler):
             return
         file_object.close()
 
-    def __add_source_to_header__(self):
-        #This could be moved before processing to cut down on the pysam cat overhead.
-        for source in self._sources:
-            for subset in self._user_subsets:
-                telbam_path = self.const.output_paths[source][subset]
-                if self.__get_subset_merge_type__(telbam_path) == "pysam":
-                    master_path = self.const.master_file_path[source]
-                    telbam_object = pysam.Samfile(telbam_path,"rb") 
-                    new_header = telbam_object.header
-                    telbam_object.close()
-                    
-                    source_info = "parabam_source:%s" % (master_path,)
-                    if 'CO' in new_header:
-                        new_header['CO'].append(source_info)
-                    else:
-                        new_header['CO'] = [source_info]
-
-                    header_temp_path = self.__get_unique_temp_path__("header",temp_dir=self.const.temp_dir)
-                    header_temp_object = pysam.Samfile(header_temp_path,"wb",header=new_header)
-                    header_temp_object.close()
-
-                    cat_temp_path = self.__get_unique_temp_path__("cat",temp_dir=self.const.temp_dir)
-                    pysam.cat("-o",cat_temp_path,header_temp_path,telbam_path)
-
-                    os.remove(header_temp_path)
-                    os.remove(telbam_path)
-                    os.rename(cat_temp_path,telbam_path)
-
     def __get_unique_temp_path__(self,temp_type,temp_dir="."):
         return "%s/%sTEMP%d.bam" % (temp_dir,temp_type,int(time.time()),)
 
@@ -148,6 +117,5 @@ class HandlerMerge(Handler):
 
     def __handler_exit__(self,**kwargs):
         self.__close_all_out_files__()
-        self.__add_source_to_header__()
-
+        
 #...happily ever after

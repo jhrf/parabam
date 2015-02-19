@@ -12,8 +12,6 @@ from abc import ABCMeta, abstractmethod
 
 class TaskStat(parabam.core.Task):
 
-    __metaclass__ = ABCMeta
-
     def __init__(self,object task_set,object outqu,object curproc,object destroy,object const,str parent_class,str source):
         super(TaskStat, self).__init__(task_set=task_set,
                                         outqu=outqu,
@@ -62,12 +60,10 @@ class TaskStat(parabam.core.Task):
                     self._counts[name] += 1
                     local_structures[name].add(**package)
 
-class HandlerStat(parabam.core.Handler):
+class Handler(parabam.command.Handler):
 
-    def __init__(self,object inqu,object const):
-        super(HandlerStat,self).__init__(inqu,const,destroy_limit=len(const.sources))
-
-        self._sources = const.sources
+    def __init__(self,object inqu,object const,dict out_qu_dict):
+        super(HandlerStat,self).__init__(inqu,const,destroy_limit=len(const.sources),out_qu_dict=out_qu_dict)
         self._final_structures = {}
 
         for source in self._sources:
@@ -76,6 +72,7 @@ class HandlerStat(parabam.core.Handler):
                 self._final_structures[source][struc.name] = struc.empty_clone()
 
     def __new_package_action__(self,new_package,**kwargs):
+        super(Handler,self).__new_package_action__(new_package)
         results = new_package.results
         source = results["source"]
         self.__auto_handle__(results,self._stats,source)
@@ -83,15 +80,8 @@ class HandlerStat(parabam.core.Handler):
             final_struc = self._final_structures[source][name]
             final_struc.merge(data)
 
-    def __auto_handle__(self,results,stats,source):
-        if source not in stats.keys():
-            stats[source] = {}
-        super(HandlerStat,self).__auto_handle__(results,stats[source])
-
-    def __periodic_action__(self,iterations):
-        pass
-
-    def __handler_exit__(self,**kwargs):
+    def __handler_exit__(self):
+        super(Handler,self).__handler_exit__()
         const = self.const
         if const.outmode == "d":
             for source in self._sources:
@@ -117,21 +107,6 @@ class HandlerStat(parabam.core.Handler):
             cur_data = user_structures[name].data
             data_str += ",%.3f" % (cur_data,)
         return data_str
-
-class ProcessorStat(parabam.core.Processor):
-
-    def __init__(self,object outqu,object const,object TaskClass,list task_args):
-        super(ProcessorStat,self).__init__(outqu,const,TaskClass,task_args)
-        self._source = task_args[0] #Defined in the run function within Interface
-
-    def __get_master_bam__(self,master_file_path):
-        return pysam.Samfile(master_file_path[self._source],"rb")
-
-    def __add_to_collection__(self,master,alig,collection):
-        collection.append(alig)
-
-    def __pre_processor__(self,master_file_path):
-        pass
 
 class UserStructure(object):
 
@@ -264,7 +239,7 @@ class ArrayStructure(UserStructure):
     def write_to_csv(self,out_path,source,mode):
         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
 
-class Interface(parabam.core.UserInterface):
+class Interface(parabam.command.Interface):
 
     def __init__(self,temp_dir):
         super(Interface,self).__init__(temp_dir)
@@ -312,14 +287,14 @@ class Interface(parabam.core.UserInterface):
 
         for input_group,output_group in self.__get_group__(input_bams,super_sources,multi=multi):
             
-            master_file_path = self.__create_master_file_paths__(input_group,output_group)
+            master_file_paths = self.__create_master_file_paths__(input_group,output_group)
 
             if not outmode == "d":
                 output_path = self.__create_individual_output_files__(outmode,output_group,user_structures)
                 master_output_paths.update(output_path)
 
             const = parabam.core.Const(output_paths=output_path,temp_dir=self._temp_dir,
-                                master_file_path=master_file_path,
+                                master_file_paths=master_file_paths,
                                 chunk=chunk,proc=(proc // len(input_group)),
                                 verbose=verbose,thresh=0,
                                 sources=output_group,

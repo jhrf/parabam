@@ -13,7 +13,8 @@ setup(name='parabam',
       package_data={'parabam.interface':['master',]},
       scripts=['bin/parabam'],
       ext_modules=cythonize(("chaser.pyx",
-                             "support.pyx", 
+                             "merger.pyx", 
                              "core.pyx", 
-                             "command/subset.pyx", 
-                             "command/stat.pyx")))
+                             "command/core.pyx",
+                             "command/subset.pyx",)))
+                             #"command/stat.pyx")))

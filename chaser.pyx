@@ -1,22 +1,19 @@
 #Once upon a time
 import pysam
-import pdb
-import parabam
 import time
 import sys
 import os
 import gc
+import parabam
 
 import Queue as Queue2
 import numpy as np
 
-from random import randint
 from itertools import izip
 from collections import Counter
 from multiprocessing import Queue,Process
-from parabam.core import Package,CorePackage
 
-class ChaserPackage(Package):
+class ChaserPackage(parabam.core.Package):
     def __init__(self,results,destroy,source,chaser_type):
         super(ChaserPackage,self).__init__(results,destroy)
         
@@ -35,13 +32,13 @@ class MatchMakerPackage(ChaserPackage):
         self.loner_type = loner_type
         self.level = level
 
-class HandlerChaser(parabam.core.Handler):
+class Handler(parabam.core.Handler):
 
     def __init__(self,object inqu,object mainqu,object pause_qus,
                  object const,object destroy_limit, 
-                 object TaskClass, int chaser_task_max):
+                 object TaskClass):
         
-        super(HandlerChaser,self).__init__(inqu,const,destroy_limit=destroy_limit,
+        super(Handler,self).__init__(inqu,const,destroy_limit=destroy_limit,
                                            report=False)
 
         self._sources = const.sources
@@ -63,7 +60,7 @@ class HandlerChaser(parabam.core.Handler):
         self._child_pack = {"queue":self._mainqu,"const":self.const,
                             "source":"","TaskClass":self._TaskClass}
 
-        self._chaser_task_max = chaser_task_max
+        self._chaser_task_max = const.proc // 2
         self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
 
@@ -351,7 +348,8 @@ class HandlerChaser(parabam.core.Handler):
             return False
 
     def __send_final_kill_signal__(self):
-        kill_package = CorePackage(name="",results={},destroy=True,curproc=0,parent_class=self.__class__.__name__)
+        kill_package = parabam.core.CorePackage(results={},destroy=True,curproc=0,
+                                                parent_class=self.__class__.__name__)
         self._mainqu.put(kill_package)
 
     def __idle_routine__(self,pyramid,loner_type,source):
@@ -394,6 +392,8 @@ class HandlerChaser(parabam.core.Handler):
             else:
                 self.__standard_output__("[Status] Couldn't find pairs for %d reads" %\
                     (self._total_loners - self._rescued["total"],))
+        for qu in self._pause_qus:
+            qu.close()
 
 class ChaserClass(Process):
     def __init__(self,object const,str source):

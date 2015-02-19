@@ -45,15 +45,6 @@ class Task(multiprocessing.Process):
         #self.pid ensures that the temp names are unique.
         return "%s/%s_%s_parabam_temp%s" % (self._temp_dir,typ,self.pid,ext)
 
-    def __get_mate__(self,master,alig):
-        try:
-            start = master.tell()
-            mate = master.mate(alig)
-            master.seek(start)
-        except ValueError:
-            mate = None
-        return mate
-
     #Generate a dictionary of results using self._task_set
     @abstractmethod
     def __generate_results__(self):
@@ -391,18 +382,6 @@ class Interface(object):
         print "%s has finished. End Time: " % (name,)\
             + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
-    def __get_group__(self,bams,names,multi):
-        if multi == 0:
-            multi = 1
-        if names == []:
-            names = [""] * len(bams)
-        for i in xrange(0,len(bams),multi):
-            yield (bams[i:i+multi],names[i:i+multi])
-
-    def __get_basename__(self,path):
-        base = os.path.splitext(os.path.basename(path))[0]
-        return base
-
     def __sort_and_index__(self,fnm,verbose=False,tempDir=".",name=False):
         if not os.path.exists(fnm+".bai"):
             if verbose: print "%s is not indexed. Sorting and creating index file." % (fnm,)
@@ -417,6 +396,18 @@ class Interface(object):
         #TODO: Duplicated from parabam.interface.merger. Find a way to reformat code
         #to remove this duplication
         return "%s/%sTEMP%d.bam" % (temp_dir,temp_type,int(time.time()),)
+
+    def __get_group__(self,bams,names=[],multi=1):
+        if multi == 0:
+            multi = 1
+        if names == []:
+            names = [self.__get_basename__(path) for path in bams]
+        for i in xrange(0,len(bams),multi):
+            yield (bams[i:i+multi],names[i:i+multi])
+
+    def __get_basename__(self,path):
+        base,ext = os.path.splitext(os.path.basename(path))
+        return base
 
     def default_parser(self):
 
@@ -448,48 +439,6 @@ class Interface(object):
     def get_parser(self):
         pass
 
-class UserInterface(Interface):
-
-    __metaclass__ = ABCMeta
-
-    def __init__(self,temp_dir):
-        super(UserInterface,self).__init__(temp_dir)
-
-    def __get_module_and_vitals__(self,code_path):
-        if os.getcwd not in sys.path:
-            sys.path.append(os.getcwd())
-        try:
-            module = __import__(code_path, fromlist=[''])
-
-        except ImportError:
-            sys.stderr.write("[Error] parabam can't find user module. Ensure code is in current working directory\n")
-            raise SystemExit
-
-        user_engine = module.engine
-        user_constants = {}
-        if hasattr(module,"set_constants"):
-            module.set_constants(user_constants)
-
-        return module,user_engine,user_constants
-
-    def default_parser(self):
-        parser = super(UserInterface,self).default_parser()
-
-        parser.add_argument('--instruc','-i',metavar='INSTRUCTION',required=True
-            ,help='The instruction file, written in python, that we wish'\
-            'to carry out on the input BAM.')
-        parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
-            ,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
-        return parser
-        
-    @abstractmethod
-    def run(self):
-        pass
-
-    @abstractmethod
-    def get_parser(self):
-        pass
-
 class ParabamParser(argparse.ArgumentParser):
     def error(self, message):
         self.print_help()
@@ -498,10 +447,8 @@ class ParabamParser(argparse.ArgumentParser):
 
 class Const(object):
     
-    def __init__(self,output_paths,temp_dir,master_file_path,verbose,chunk,proc,**kwargs):
-        self.output_paths = output_paths
+    def __init__(self,temp_dir,verbose,chunk,proc,**kwargs):
         self.temp_dir = temp_dir
-        self.master_file_path = master_file_path
         self.verbose = verbose
         self.chunk = chunk
         self.proc = proc
