@@ -14,6 +14,8 @@ from itertools import izip
 from multiprocessing import Queue,Process
 from abc import ABCMeta, abstractmethod
 
+#TODO: error handle incorrect return from user engine
+
 class Task(parabam.core.Task):
     __metaclass__=ABCMeta
     def __init__(self,object task_set, object outqu,object curproc,
@@ -39,7 +41,6 @@ class Task(parabam.core.Task):
         engine = self.__engine__
         handle_engine = self.__handle_engine_output__
         user_constants = self.const.user_constants
-        user_subsets = self.const.user_subsets
 
         for read in task_set:
             decision = engine(read,user_constants,master)
@@ -126,7 +127,6 @@ class PairTask(Task):
         del loners
 
     def __stash_loners__(self,loners,master):
-        subset_write = self.__write_to_subset_bam__
         loner_path = self.__get_temp_path__("chaser")
         loner_file = pysam.AlignmentFile(loner_path,"wb",template=master)
         loner_count = 0
@@ -185,7 +185,6 @@ class Handler(parabam.core.Handler):
         source = results["source"]
         #hack so as not record rescued paired reads twice in total
         if self.const.pair_process and not new_package.parent_class == "PairProcessor":
-            print new_package.parent_class
             handle_dict["total"] = 0
         self.__auto_handle__(handle_dict,self._stats,source)
 
@@ -238,7 +237,7 @@ class Handler(parabam.core.Handler):
         return sum(map(lambda s : self._stats[s]["total"],self._sources))
 
     def __send_destroy__(self,source,subset):
-        self.__add_staged_task__(results=self._stage_stores[source][subset],
+        self.__add_staged_system_task__(results=self._stage_stores[source][subset],
                             subset_type=subset,source=source,destroy=True)
         self.__update_stage_store__(source,subset)
 
@@ -341,11 +340,11 @@ class Interface(parabam.core.Interface):
         return module,user_engine,user_constants
 
     @abstractmethod
-    def __get_processor_bundle__(self,**kwargs):
+    def __get_processor_bundle__(self,queues,object const,task_class,**kwargs):
         pass
 
     @abstractmethod
-    def __get_handler_bundle__(self,**kwargs):
+    def __get_handler_bundle__(self,queues,object const,task_class,**kwargs):
         pass
 
     @abstractmethod
@@ -353,7 +352,7 @@ class Interface(parabam.core.Interface):
         pass
 
     @abstractmethod
-    def __get_output_paths__(self,**kwargs):
+    def __get_output_paths__(self,sources,input_paths,**kwargs):
         pass
 
     @abstractmethod
@@ -361,7 +360,7 @@ class Interface(parabam.core.Interface):
         pass
 
     @abstractmethod
-    def __get_queues__(self):
+    def __get_queues__(self,object const):
         '''predefine queue objects for communication 
         between processors and handlers. Should return
         a dict of queues'''
@@ -373,13 +372,17 @@ class Interface(parabam.core.Interface):
 
         args = {}
         args["temp_dir"] = self._temp_dir
-        defaults = ["chunk","verbose","proc","user_constants",
+        defaults = ["chunk","verbose","user_constants",
                     "user_constants", "user_engine", "fetch_region", 
                     "pair_process", "include_duplicates"]
                     #TODO: Handle proc division __getmaxproc__
         for key,val in kwargs.items():
             if key in defaults:
                 args[key] = val
+
+        args[proc] = self.__get_max_proc__(kwargs["proc"],
+                                           kwargs["side_by_side"],
+                                           kwargs["pair_process"])
 
         if args["pair_process"]:
             args["system_subsets"] = ["chaser"]
@@ -405,7 +408,7 @@ class Interface(parabam.core.Interface):
 
     def __update_final_output_paths__(self,sources,master_file_path,output_paths,final_output_paths):
         if "global" in output_paths.keys():
-            final_output_paths["global"].append(output_paths["global"])
+            final_output_paths["global"].extend(output_paths["global"])
 
         for source in sources:
             master_path = master_file_path[source]
@@ -454,10 +457,20 @@ class Interface(parabam.core.Interface):
 
     def __report_file_names__(self,output_paths):
         sys.stdout.write("\n[Status] This run will output the following files:\n")
-        for src,subset_paths in output_paths.items():
-            for subset,output_path in subset_paths.items():
-                sys.stdout.write("\t%s\n" % (os.path.split(output_path)[1],))
+        outputers = []
+        for src,paths in output_paths.items():
+            for path in self.__get_print_paths__(paths):
+                sys.stdout.write("\t%s\n" % (path,))            
         sys.stdout.write("\n")
+
+    def __get_print_paths__(self,paths):
+        if type(paths) == dict:
+            iterobj = paths.items()
+        elif type(paths) == list:
+            iterobj = zip(len(paths) * [""],paths)
+    
+        for x,path in iterobj:
+            yield os.path.split(path)[1]
 
     def __add_run_details_to_const__(self,object const,master_file_path,output_paths,sources):
         #put the run sensistive information into const
@@ -518,8 +531,8 @@ class Interface(parabam.core.Interface):
             lev.run()
             del lev
 
-        if not const.keep_in_temp:
-            final_output_paths = self.__output_files_to_cwd__(final_output_paths,const.keep_in_temp)
+        if not kwargs["keep_in_temp"]:
+            final_output_paths = self.__output_files_to_cwd__(final_output_paths)
         return final_output_paths
 
     def __prepare_for_pair_processing__(self,processor_bundle,handler_bundle,task_class,object const):
@@ -531,7 +544,7 @@ class Interface(parabam.core.Interface):
         for source in const.sources:
             newqu = Queue()
             processor_bundle[source]["inqu"] = newqu
-            pause_qus.append(pause_qus)
+            pause_qus.append(newqu)
         processor_bundle["class"] = PairProcessor
 
         for entry_class,args in handler_bundle.items():
@@ -573,6 +586,8 @@ class Interface(parabam.core.Interface):
         parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
             ,help="The subset process will be run only on reads from this region\n"\
             "Regions should be colon seperated as specified by samtools (eg \'chr1:1000,5000\')")
+        parser.add_argument('-s',type=int,metavar="INT",nargs='?',default=2
+            ,help="Further parralise by running this many samples simultaneously [Default 2]")
         parser.add_argument('-d',action="store_true",default=False,
             help="parabam will not process reads marked PCR duplicate.")
         parser.add_argument('-v', choices=[0,1,2],default=0,type=int,

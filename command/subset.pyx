@@ -80,12 +80,6 @@ class Task(SubsetCore,parabam.command.Task):
                 subset_write(self.const.user_subsets[engine_output],read)
         elif type(engine_output) == None:
             pass
-        else:
-            sys.stdout.write("[ERROR] Unrecognised return type from user engine!\n")
-            print engine_output
-            print type(engine_output)
-            print self.__class__
-            sys.stdout.flush()
 
 class PairTask(SubsetCore,parabam.command.PairTask):
     def __init__(self,object task_set,object outqu,object curproc,
@@ -100,14 +94,8 @@ class PairTask(SubsetCore,parabam.command.PairTask):
                         parent_class=parent_class)
 
     def __handle_engine_output__(self,engine_output,read):
-        if type(engine_output) == list:
-            for subset,cur_read in engine_output:
-                self.__write_to_subset_bam__(subset,cur_read)
-        else:
-            sys.stdout.write("[ERROR] Unrecognised return type from user engine!\n")
-            sys.stdout.write("[ERROR] In paired subset mode engine must return like-so:\n")
-            sys.stdout.write("\t[ (subset_type,read), ... ]")
-            sys.stdout.flush()
+        for subset,cur_read in engine_output:
+            self.__write_to_subset_bam__(subset,cur_read)
 
 class Handler(parabam.command.Handler):
 
@@ -149,9 +137,15 @@ class Handler(parabam.command.Handler):
         #Kill the handlers handler
         for source in self._sources:
             for subset in self._user_subsets:
-                self.__send_destroy__(source,subset)
+                self.__destroy_user_subset__(source,subset)
         self.__write_counts_csv__()
-                    
+    
+    def __destroy_user_subset__(self,source,subset,**kwargs):
+        self.__add_merge_task__(results=self._stage_stores[source][subset],
+                                subset_type=subset,
+                                source=source,
+                                destroy=True)
+
     def __add_merge_task__(self,results,subset_type,source,destroy=False):
         res = parabam.merger.MergePackage(results=results,
                     subset_type=subset_type,source=source,
@@ -227,8 +221,8 @@ class Interface(parabam.command.Interface):
     
     def run(self,input_bams,proc,chunk,user_constants,user_engine,
             user_subsets,fetch_region=None,side_by_side=2,
-            keep_in_temp=False,engine_is_class=False,verbose=False,
-            pair_process=False,include_duplicates=False,debug=False,
+            keep_in_temp=False,engine_is_class=False,verbose=0,
+            pair_process=False,include_duplicates=True,debug=False,
             ensure_unique_output=False,output_counts=False):
         ''' Docstring! '''
         args = dict(locals())

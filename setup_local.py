@@ -16,5 +16,5 @@ setup(name='parabam',
                              "merger.pyx", 
                              "core.pyx", 
                              "command/core.pyx",
-                             "command/subset.pyx",)))
-                             #"command/stat.pyx")))
+                             "command/subset.pyx",
+                             "command/stat.pyx")))
