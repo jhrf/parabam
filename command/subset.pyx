@@ -51,16 +51,16 @@ class SubsetCore(object):
 
 class Task(SubsetCore,parabam.command.Task):
 
-    def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
-                 object destroy, object const, str parent_class,str source):
+    def __init__(self, object task_set, object outqu, object curproc,object destroy, 
+                 object parent_bam, object const, str parent_class,str source):
         SubsetCore.__init__(self,const,source)
         parabam.command.Task.__init__(self,task_set=task_set,
                                       outqu=outqu,
                                       curproc=curproc*len(const.sources),
                                       destroy=destroy,
+                                      parent_bam = parent_bam,
                                       const=const,
-                                      parent_class=parent_class,
-                                      parent_bam = parent_bam)
+                                      parent_class=parent_class)
 
     def __handle_engine_output__(self,engine_output,read):
         subset_write = self.__write_to_subset_bam__

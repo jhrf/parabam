@@ -817,7 +817,7 @@ static PyObject *__pyx_builtin_Exception;
 static PyObject *__pyx_pf_7parabam_7command_6subset_10SubsetCore___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_const, PyObject *__pyx_v_source); /* proto */
 static PyObject *__pyx_pf_7parabam_7command_6subset_10SubsetCore_2__generate_results__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7parabam_7command_6subset_10SubsetCore_4__write_to_subset_bam__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_subset_type, PyObject *__pyx_v_read); /* proto */
-static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_outqu, PyObject *__pyx_v_curproc, PyObject *__pyx_v_parent_bam, PyObject *__pyx_v_destroy, PyObject *__pyx_v_const, PyObject *__pyx_v_parent_class, PyObject *__pyx_v_source); /* proto */
+static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_outqu, PyObject *__pyx_v_curproc, PyObject *__pyx_v_destroy, PyObject *__pyx_v_parent_bam, PyObject *__pyx_v_const, PyObject *__pyx_v_parent_class, PyObject *__pyx_v_source); /* proto */
 static PyObject *__pyx_pf_7parabam_7command_6subset_4Task_2__handle_engine_output__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_engine_output, PyObject *__pyx_v_read); /* proto */
 static PyObject *__pyx_pf_7parabam_7command_6subset_8PairTask___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_outqu, PyObject *__pyx_v_curproc, PyObject *__pyx_v_parent_bam, PyObject *__pyx_v_destroy, PyObject *__pyx_v_const, PyObject *__pyx_v_parent_class, PyObject *__pyx_v_source); /* proto */
 static PyObject *__pyx_pf_7parabam_7command_6subset_8PairTask_2__handle_engine_output__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_engine_output, CYTHON_UNUSED PyObject *__pyx_v_read); /* proto */
@@ -2356,8 +2356,8 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_10SubsetCore_4__write_to_sub
 /* "parabam/command/subset.pyx":54
  * class Task(SubsetCore,parabam.command.Task):
  * 
- *     def __init__(self, object task_set, object outqu, object curproc,object parent_bam,             # <<<<<<<<<<<<<<
- *                  object destroy, object const, str parent_class,str source):
+ *     def __init__(self, object task_set, object outqu, object curproc,object destroy,             # <<<<<<<<<<<<<<
+ *                  object parent_bam, object const, str parent_class,str source):
  *         SubsetCore.__init__(self,const,source)
  */
 
@@ -2369,8 +2369,8 @@ static PyObject *__pyx_pw_7parabam_7command_6subset_4Task_1__init__(PyObject *__
   PyObject *__pyx_v_task_set = 0;
   PyObject *__pyx_v_outqu = 0;
   PyObject *__pyx_v_curproc = 0;
-  PyObject *__pyx_v_parent_bam = 0;
   PyObject *__pyx_v_destroy = 0;
+  PyObject *__pyx_v_parent_bam = 0;
   PyObject *__pyx_v_const = 0;
   PyObject *__pyx_v_parent_class = 0;
   PyObject *__pyx_v_source = 0;
@@ -2381,7 +2381,7 @@ static PyObject *__pyx_pw_7parabam_7command_6subset_4Task_1__init__(PyObject *__
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_task_set_2,&__pyx_n_s_outqu,&__pyx_n_s_curproc,&__pyx_n_s_parent_bam,&__pyx_n_s_destroy,&__pyx_n_s_const,&__pyx_n_s_parent_class,&__pyx_n_s_source,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_task_set_2,&__pyx_n_s_outqu,&__pyx_n_s_curproc,&__pyx_n_s_destroy,&__pyx_n_s_parent_bam,&__pyx_n_s_const,&__pyx_n_s_parent_class,&__pyx_n_s_source,0};
     PyObject* values[9] = {0,0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -2420,12 +2420,12 @@ static PyObject *__pyx_pw_7parabam_7command_6subset_4Task_1__init__(PyObject *__
           __Pyx_RaiseArgtupleInvalid("__init__", 1, 9, 9, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  4:
-        if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_parent_bam)) != 0)) kw_args--;
+        if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_destroy)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("__init__", 1, 9, 9, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  5:
-        if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_destroy)) != 0)) kw_args--;
+        if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_parent_bam)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("__init__", 1, 9, 9, 5); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
@@ -2465,8 +2465,8 @@ static PyObject *__pyx_pw_7parabam_7command_6subset_4Task_1__init__(PyObject *__
     __pyx_v_task_set = values[1];
     __pyx_v_outqu = values[2];
     __pyx_v_curproc = values[3];
-    __pyx_v_parent_bam = values[4];
-    __pyx_v_destroy = values[5];
+    __pyx_v_destroy = values[4];
+    __pyx_v_parent_bam = values[5];
     __pyx_v_const = values[6];
     __pyx_v_parent_class = ((PyObject*)values[7]);
     __pyx_v_source = ((PyObject*)values[8]);
@@ -2481,7 +2481,7 @@ static PyObject *__pyx_pw_7parabam_7command_6subset_4Task_1__init__(PyObject *__
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_parent_class), (&PyString_Type), 1, "parent_class", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_source), (&PyString_Type), 1, "source", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 55; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7parabam_7command_6subset_4Task___init__(__pyx_self, __pyx_v_self, __pyx_v_task_set, __pyx_v_outqu, __pyx_v_curproc, __pyx_v_parent_bam, __pyx_v_destroy, __pyx_v_const, __pyx_v_parent_class, __pyx_v_source);
+  __pyx_r = __pyx_pf_7parabam_7command_6subset_4Task___init__(__pyx_self, __pyx_v_self, __pyx_v_task_set, __pyx_v_outqu, __pyx_v_curproc, __pyx_v_destroy, __pyx_v_parent_bam, __pyx_v_const, __pyx_v_parent_class, __pyx_v_source);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2492,7 +2492,7 @@ static PyObject *__pyx_pw_7parabam_7command_6subset_4Task_1__init__(PyObject *__
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_outqu, PyObject *__pyx_v_curproc, PyObject *__pyx_v_parent_bam, PyObject *__pyx_v_destroy, PyObject *__pyx_v_const, PyObject *__pyx_v_parent_class, PyObject *__pyx_v_source) {
+static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_task_set, PyObject *__pyx_v_outqu, PyObject *__pyx_v_curproc, PyObject *__pyx_v_destroy, PyObject *__pyx_v_parent_bam, PyObject *__pyx_v_const, PyObject *__pyx_v_parent_class, PyObject *__pyx_v_source) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2507,8 +2507,8 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED
   __Pyx_RefNannySetupContext("__init__", 0);
 
   /* "parabam/command/subset.pyx":56
- *     def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
- *                  object destroy, object const, str parent_class,str source):
+ *     def __init__(self, object task_set, object outqu, object curproc,object destroy,
+ *                  object parent_bam, object const, str parent_class,str source):
  *         SubsetCore.__init__(self,const,source)             # <<<<<<<<<<<<<<
  *         parabam.command.Task.__init__(self,task_set=task_set,
  *                                       outqu=outqu,
@@ -2551,7 +2551,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "parabam/command/subset.pyx":57
- *                  object destroy, object const, str parent_class,str source):
+ *                  object parent_bam, object const, str parent_class,str source):
  *         SubsetCore.__init__(self,const,source)
  *         parabam.command.Task.__init__(self,task_set=task_set,             # <<<<<<<<<<<<<<
  *                                       outqu=outqu,
@@ -2591,7 +2591,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED
  *                                       outqu=outqu,
  *                                       curproc=curproc*len(const.sources),             # <<<<<<<<<<<<<<
  *                                       destroy=destroy,
- *                                       const=const,
+ *                                       parent_bam = parent_bam,
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_const, __pyx_n_s_sources); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 59; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
@@ -2609,40 +2609,40 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED
  *                                       outqu=outqu,
  *                                       curproc=curproc*len(const.sources),
  *                                       destroy=destroy,             # <<<<<<<<<<<<<<
+ *                                       parent_bam = parent_bam,
  *                                       const=const,
- *                                       parent_class=parent_class,
  */
   if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_destroy, __pyx_v_destroy) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "parabam/command/subset.pyx":61
  *                                       curproc=curproc*len(const.sources),
  *                                       destroy=destroy,
- *                                       const=const,             # <<<<<<<<<<<<<<
- *                                       parent_class=parent_class,
- *                                       parent_bam = parent_bam)
- */
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_const, __pyx_v_const) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-
-  /* "parabam/command/subset.pyx":62
- *                                       destroy=destroy,
+ *                                       parent_bam = parent_bam,             # <<<<<<<<<<<<<<
  *                                       const=const,
- *                                       parent_class=parent_class,             # <<<<<<<<<<<<<<
- *                                       parent_bam = parent_bam)
- * 
- */
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_parent_class, __pyx_v_parent_class) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-
-  /* "parabam/command/subset.pyx":63
- *                                       const=const,
- *                                       parent_class=parent_class,
- *                                       parent_bam = parent_bam)             # <<<<<<<<<<<<<<
- * 
- *     def __handle_engine_output__(self,engine_output,read):
+ *                                       parent_class=parent_class)
  */
   if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_parent_bam, __pyx_v_parent_bam) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
+  /* "parabam/command/subset.pyx":62
+ *                                       destroy=destroy,
+ *                                       parent_bam = parent_bam,
+ *                                       const=const,             # <<<<<<<<<<<<<<
+ *                                       parent_class=parent_class)
+ * 
+ */
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_const, __pyx_v_const) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+
+  /* "parabam/command/subset.pyx":63
+ *                                       parent_bam = parent_bam,
+ *                                       const=const,
+ *                                       parent_class=parent_class)             # <<<<<<<<<<<<<<
+ * 
+ *     def __handle_engine_output__(self,engine_output,read):
+ */
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_parent_class, __pyx_v_parent_class) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+
   /* "parabam/command/subset.pyx":57
- *                  object destroy, object const, str parent_class,str source):
+ *                  object parent_bam, object const, str parent_class,str source):
  *         SubsetCore.__init__(self,const,source)
  *         parabam.command.Task.__init__(self,task_set=task_set,             # <<<<<<<<<<<<<<
  *                                       outqu=outqu,
@@ -2658,8 +2658,8 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED
   /* "parabam/command/subset.pyx":54
  * class Task(SubsetCore,parabam.command.Task):
  * 
- *     def __init__(self, object task_set, object outqu, object curproc,object parent_bam,             # <<<<<<<<<<<<<<
- *                  object destroy, object const, str parent_class,str source):
+ *     def __init__(self, object task_set, object outqu, object curproc,object destroy,             # <<<<<<<<<<<<<<
+ *                  object parent_bam, object const, str parent_class,str source):
  *         SubsetCore.__init__(self,const,source)
  */
 
@@ -2681,7 +2681,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_4Task___init__(CYTHON_UNUSED
 }
 
 /* "parabam/command/subset.pyx":65
- *                                       parent_bam = parent_bam)
+ *                                       parent_class=parent_class)
  * 
  *     def __handle_engine_output__(self,engine_output,read):             # <<<<<<<<<<<<<<
  *         subset_write = self.__write_to_subset_bam__
@@ -3116,7 +3116,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_4Task_2__handle_engine_outpu
   __pyx_L3:;
 
   /* "parabam/command/subset.pyx":65
- *                                       parent_bam = parent_bam)
+ *                                       parent_class=parent_class)
  * 
  *     def __handle_engine_output__(self,engine_output,read):             # <<<<<<<<<<<<<<
  *         subset_write = self.__write_to_subset_bam__
@@ -11230,17 +11230,17 @@ static int __Pyx_InitCachedConstants(void) {
   /* "parabam/command/subset.pyx":54
  * class Task(SubsetCore,parabam.command.Task):
  * 
- *     def __init__(self, object task_set, object outqu, object curproc,object parent_bam,             # <<<<<<<<<<<<<<
- *                  object destroy, object const, str parent_class,str source):
+ *     def __init__(self, object task_set, object outqu, object curproc,object destroy,             # <<<<<<<<<<<<<<
+ *                  object parent_bam, object const, str parent_class,str source):
  *         SubsetCore.__init__(self,const,source)
  */
-  __pyx_tuple__15 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_task_set_2, __pyx_n_s_outqu, __pyx_n_s_curproc, __pyx_n_s_parent_bam, __pyx_n_s_destroy, __pyx_n_s_const, __pyx_n_s_parent_class, __pyx_n_s_source); if (unlikely(!__pyx_tuple__15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__15 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_task_set_2, __pyx_n_s_outqu, __pyx_n_s_curproc, __pyx_n_s_destroy, __pyx_n_s_parent_bam, __pyx_n_s_const, __pyx_n_s_parent_class, __pyx_n_s_source); if (unlikely(!__pyx_tuple__15)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
   __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(9, 0, 9, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_com, __pyx_n_s_init, 54, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "parabam/command/subset.pyx":65
- *                                       parent_bam = parent_bam)
+ *                                       parent_class=parent_class)
  * 
  *     def __handle_engine_output__(self,engine_output,read):             # <<<<<<<<<<<<<<
  *         subset_write = self.__write_to_subset_bam__
@@ -11837,7 +11837,7 @@ PyMODINIT_FUNC PyInit_subset(void)
  * 
  * class Task(SubsetCore,parabam.command.Task):             # <<<<<<<<<<<<<<
  * 
- *     def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
+ *     def __init__(self, object task_set, object outqu, object curproc,object destroy,
  */
   __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_SubsetCore); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -11865,8 +11865,8 @@ PyMODINIT_FUNC PyInit_subset(void)
   /* "parabam/command/subset.pyx":54
  * class Task(SubsetCore,parabam.command.Task):
  * 
- *     def __init__(self, object task_set, object outqu, object curproc,object parent_bam,             # <<<<<<<<<<<<<<
- *                  object destroy, object const, str parent_class,str source):
+ *     def __init__(self, object task_set, object outqu, object curproc,object destroy,             # <<<<<<<<<<<<<<
+ *                  object parent_bam, object const, str parent_class,str source):
  *         SubsetCore.__init__(self,const,source)
  */
   __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_6subset_4Task_1__init__, 0, __pyx_n_s_Task___init, NULL, __pyx_n_s_parabam_command_subset, __pyx_d, ((PyObject *)__pyx_codeobj__16)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 54; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -11875,7 +11875,7 @@ PyMODINIT_FUNC PyInit_subset(void)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "parabam/command/subset.pyx":65
- *                                       parent_bam = parent_bam)
+ *                                       parent_class=parent_class)
  * 
  *     def __handle_engine_output__(self,engine_output,read):             # <<<<<<<<<<<<<<
  *         subset_write = self.__write_to_subset_bam__
@@ -11891,7 +11891,7 @@ PyMODINIT_FUNC PyInit_subset(void)
  * 
  * class Task(SubsetCore,parabam.command.Task):             # <<<<<<<<<<<<<<
  * 
- *     def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
+ *     def __init__(self, object task_set, object outqu, object curproc,object destroy,
  */
   __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_Task, __pyx_t_3, __pyx_t_1, NULL, 0, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 52; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);

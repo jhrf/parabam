@@ -668,7 +668,9 @@ class MatchMakerTask(ChaserClass):
         child_pack = self._child_package
         
         args = [pairs,
-                child_pack["queue"],0,False,
+                child_pack["queue"],
+                0,
+                False,
                 child_pack["parent_bam"],
                 child_pack["const"],
                 self.__class__.__name__]
