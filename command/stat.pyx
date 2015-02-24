@@ -48,8 +48,8 @@ class StatCore(object):
 
 class Task(StatCore,parabam.command.Task):
 
-    def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
-                 object destroy, object const, str parent_class,str source):
+    def __init__(self, object task_set, object outqu, object curproc,object destroy,
+                 object parent_bam, object const, str parent_class,str source):
         
         StatCore.__init__(self,const,source)
         parabam.command.Task.__init__(self,task_set=task_set,
@@ -62,8 +62,8 @@ class Task(StatCore,parabam.command.Task):
         
 class PairTask(StatCore,parabam.command.PairTask):
 
-    def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
-                 object destroy, object const, str parent_class,str source):
+    def __init__(self, object task_set, object outqu, object curproc,object destroy,
+                 object parent_bam,object const, str parent_class,str source):
         
         StatCore.__init__(self,const,source)
         parabam.command.PairTask.__init__(self,task_set=task_set,
@@ -263,7 +263,6 @@ class Interface(parabam.command.Interface):
         module.set_structures(user_struc_blueprint)
 
         self.run(
-
             input_bams=cmd_args.input,
             user_specified_outpath=cmd_args.output,
             proc=cmd_args.p,
@@ -276,11 +275,12 @@ class Interface(parabam.command.Interface):
             side_by_side=cmd_args.s,
             pair_process=cmd_args.pair)
     
-    def run(self,input_bams,user_specified_outpath,proc,chunk,user_constants,user_engine,
-            user_struc_blueprint,fetch_region=None,side_by_side=2,
-            keep_in_temp=False,engine_is_class=False,verbose=0,
-            pair_process=False,include_duplicates=True,debug=False,
-            ensure_unique_output=False):
+    def run(self,input_bams,proc,chunk,user_constants,user_engine,
+            user_struc_blueprint,user_specified_outpath=None,
+            fetch_region=None,side_by_side=2,keep_in_temp=False,
+            engine_is_class=False,verbose=0,pair_process=False,
+            include_duplicates=True,ensure_unique_output=False,
+            debug=False,input_is_sam=False):
 
         ''' Docstring! '''
         args = dict(locals())

@@ -78,17 +78,18 @@ class Task(SubsetCore,parabam.command.Task):
             pass
 
 class PairTask(SubsetCore,parabam.command.PairTask):
-    def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
-                 object destroy, object const, str parent_class,str source):
+    def __init__(self, object task_set, object outqu, object curproc,
+                 object destroy, object parent_bam,object const,
+                 str parent_class,str source):
         
         SubsetCore.__init__(self,const,source)
         parabam.command.PairTask.__init__(self,task_set=task_set,
                         outqu=outqu,
                         curproc=curproc,
                         destroy=destroy,
+                        parent_bam = parent_bam,
                         const=const,
-                        parent_class=parent_class,
-                        parent_bam = parent_bam)
+                        parent_class=parent_class)
 
     def __handle_engine_output__(self,engine_output,read):
         for subset,cur_read in engine_output:
@@ -220,7 +221,9 @@ class Interface(parabam.command.Interface):
             user_subsets,fetch_region=None,side_by_side=2,
             keep_in_temp=False,engine_is_class=False,verbose=0,
             pair_process=False,include_duplicates=True,debug=False,
-            ensure_unique_output=False,output_counts=False):
+            ensure_unique_output=False,output_counts=False,
+            input_is_sam=False):
+
         ''' Docstring! '''
         args = dict(locals())
         del args["self"]

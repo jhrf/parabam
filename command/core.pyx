@@ -262,10 +262,13 @@ class Processor(parabam.core.Processor):
         super(Processor,self).__init__(outqu,const,TaskClass,task_args,debug)
 
     def __get_parent_bam__(self, master_file_path):
-        return parabam.core.ParentAlignmentFile(master_file_path[self._source])
+        return parabam.core.ParentAlignmentFile(master_file_path[self._source],self.const.input_is_sam)
 
     def __get_master_bam__(self,master_file_path):
-        return pysam.Samfile(self.const.master_file_path[self._source],"rb")
+        if self.const.input_is_sam:
+            return pysam.Samfile(self.const.master_file_path[self._source],"r")
+        else:
+            return pysam.Samfile(self.const.master_file_path[self._source],"rb")
 
     def __add_to_collection__(self,master,alig,collection):
         collection.append(alig)
@@ -379,7 +382,7 @@ class Interface(parabam.core.Interface):
         args["temp_dir"] = self._temp_dir
         defaults = ["chunk","verbose","user_constants",
                     "user_constants", "user_engine", "fetch_region", 
-                    "pair_process", "include_duplicates"]
+                    "pair_process", "include_duplicates","input_is_sam"]
                     #TODO: Handle proc division __getmaxproc__
         for key,val in kwargs.items():
             if key in defaults:
@@ -420,10 +423,9 @@ class Interface(parabam.core.Interface):
             final_output_paths[master_path] = []
             if source in output_paths.keys():
                 output_path = output_paths[source]
-                if type(output_paths) == dict:
-                    for key,path_dict in output_paths.items():
-                        for subset,path in path_dict.items():
-                            final_output_paths[master_path].append(path)    
+                if type(output_path) == dict:
+                    for subset,path in output_path.items():
+                        final_output_paths[master_path].append(path)    
                 elif type(output_paths) == list:
                     final_output_paths[master_path] = output_path
                 elif type(output_paths) == str:
@@ -461,22 +463,14 @@ class Interface(parabam.core.Interface):
             shutil.move(current_path,alternate_path)
             return alternate_path
 
-    def __report_file_names__(self,output_paths):
+    def __report_file_names__(self,final_output_paths,input_paths):
         sys.stdout.write("\n[Status] This run will output the following files:\n")
-        outputers = []
-        for src,paths in output_paths.items():
-            for path in self.__get_print_paths__(paths):
-                sys.stdout.write("\t%s\n" % (path,))            
+        for master_path,child_paths in final_output_paths.items():
+            if master_path in input_paths:
+                for path in child_paths:
+                    root,name = os.path.split(path)
+                    sys.stdout.write("\t%s\n" % (name,))            
         sys.stdout.write("\n")
-
-    def __get_print_paths__(self,paths):
-        if type(paths) == dict:
-            iterobj = paths.items()
-        elif type(paths) == list:
-            iterobj = zip(len(paths) * [""],paths)
-    
-        for x,path in iterobj:
-            yield os.path.split(path)[1]
 
     def __add_run_details_to_const__(self,object const,master_file_path,output_paths,sources):
         #put the run sensistive information into const
@@ -506,7 +500,7 @@ class Interface(parabam.core.Interface):
                                               output_paths=output_paths,sources=sources)
 
             if const.verbose: 
-                self.__report_file_names__(output_paths)
+                self.__report_file_names__(final_output_paths,input_paths)
 
             queues = self.__get_queues__(const,**kwargs)
 

@@ -206,7 +206,7 @@ cdef class Processor:
     def __init__(self,object outqu,object const,object TaskClass,list task_args,object debug=False):
 
         self._debug = debug
-
+        self.const = const
         self._chunk = const.chunk
         self._proc = const.proc
 
@@ -216,7 +216,6 @@ cdef class Processor:
         self._temp_dir = const.temp_dir
 
         self._outqu = outqu
-        self.const = const
 
         #Class which we wish to run on each read
         self._TaskClass = TaskClass
@@ -485,16 +484,28 @@ class CorePackage(Package):
 
 class ParentAlignmentFile(object):
     
-    def __init__(self,path):
-        parent = pysam.AlignmentFile(path,"rb")
+    def __init__(self,path,input_is_sam=False):
+        if input_is_sam:
+            mode = "r"
+        else:
+            mode = "rb"
+        parent = pysam.AlignmentFile(path,mode)
         self.filename = parent.filename
         self.references = parent.references
         self.header = parent.header
         self.lengths = parent.lengths
-        self.mapped = parent.mapped
-        self.nocoordinate = parent.nocoordinate
-        self.nreferences = parent.nreferences
-        self.unmapped = parent.unmapped
+
+        if not input_is_sam:
+            self.mapped = parent.mapped
+            self.nocoordinate = parent.nocoordinate
+            self.nreferences = parent.nreferences
+            self.unmapped = parent.unmapped
+        else:
+            self.mapped = 0
+            self.nocoordinate = 0
+            self.nreferences = 0
+            self.unmapped = 0
+
         parent.close()
 
     def getrname(self,tid):

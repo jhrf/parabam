@@ -74,7 +74,7 @@ class Handler(parabam.core.Handler):
     def __get_parent_bams__(self,master_file_path):
         parent_bams = {}
         for source,path in master_file_path.items():
-            parent_bams[source] = parabam.core.ParentAlignmentFile(path)
+            parent_bams[source] = parabam.core.ParentAlignmentFile(path,self.const.input_is_sam)
         return parent_bams            
 
     #START -- BORROWED FROM PROCESOR

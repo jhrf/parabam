@@ -6,7 +6,7 @@ cmdclass = {}
 ext_modules = [
       Extension("parabam.core", [ "core.c" ]),
       Extension("parabam.chaser", ["chaser.c"]),
-      Extension("parabam.support", ["merger.c"]),
+      Extension("parabam.merger", ["merger.c"]),
       Extension("parabam.command.subset", ["command/subset.c"]),
       Extension("parabam.command.stat", ["command/stat.c"]),
       Extension("parabam.command.core", ["command/core.c"])] 
@@ -21,7 +21,7 @@ cmdclass['sdist'] = sdist
 
 setup(name='parabam',
       description='Parallel BAM File Analysis',
-      version='0.2.dev0',
+      version='0.2.dev2',
       author="JHR Farmery",
       license='GPL',
       author_email = 'jhrf2@cam.ac.uk',
