@@ -13,7 +13,6 @@ class SubsetCore(object):
 
     def __init__(self,object const,source):
         self._source = source
-        self._master_file_path = const.master_file_path[self._source]
         self._user_subsets = const.user_subsets
         self._counts = {}
         self._system = {}
@@ -21,8 +20,6 @@ class SubsetCore(object):
         self._temp_objects = {}
 
     def __generate_results__(self):
-        master = pysam.Samfile(self._master_file_path,"rb")
-
         cdef dict temp_paths = self._temp_paths
         cdef dict temp_objects = self._temp_objects
         cdef dict counts = self._counts
@@ -31,16 +28,14 @@ class SubsetCore(object):
         for subset in self._user_subsets:
             ext = self.__get_extension__(self.const.output_paths[self._source][subset])
             temp_paths[subset] = self.__get_temp_path__(subset,ext)
-            temp_objects[subset] = self.__get_temp_object__(temp_paths[subset],ext,master)
+            temp_objects[subset] = self.__get_temp_object__(temp_paths[subset],ext)
             counts[subset] = 0
 
-        self.__process_task_set__(self._task_set,master)
+        self.__process_task_set__(self._task_set)
 
-        #Close the master bamfile
         for subset,file_object in temp_objects.items():
             file_object.close() #close all the other bams
         del self._temp_objects
-        master.close()
 
         results = {}
         results["source"] = self._source
@@ -56,15 +51,16 @@ class SubsetCore(object):
 
 class Task(SubsetCore,parabam.command.Task):
 
-    def __init__(self, object task_set, object outqu, object curproc,
-                 object destroy, object const, str parent_class, str source):
+    def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
+                 object destroy, object const, str parent_class,str source):
         SubsetCore.__init__(self,const,source)
         parabam.command.Task.__init__(self,task_set=task_set,
                                       outqu=outqu,
                                       curproc=curproc*len(const.sources),
                                       destroy=destroy,
                                       const=const,
-                                      parent_class=parent_class)
+                                      parent_class=parent_class,
+                                      parent_bam = parent_bam)
 
     def __handle_engine_output__(self,engine_output,read):
         subset_write = self.__write_to_subset_bam__
@@ -82,8 +78,8 @@ class Task(SubsetCore,parabam.command.Task):
             pass
 
 class PairTask(SubsetCore,parabam.command.PairTask):
-    def __init__(self,object task_set,object outqu,object curproc,
-                 object destroy,object const,str parent_class,str source):
+    def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
+                 object destroy, object const, str parent_class,str source):
         
         SubsetCore.__init__(self,const,source)
         parabam.command.PairTask.__init__(self,task_set=task_set,
@@ -91,7 +87,8 @@ class PairTask(SubsetCore,parabam.command.PairTask):
                         curproc=curproc,
                         destroy=destroy,
                         const=const,
-                        parent_class=parent_class)
+                        parent_class=parent_class,
+                        parent_bam = parent_bam)
 
     def __handle_engine_output__(self,engine_output,read):
         for subset,cur_read in engine_output:
@@ -227,7 +224,7 @@ class Interface(parabam.command.Interface):
         ''' Docstring! '''
         args = dict(locals())
         del args["self"]
-        super(Interface,self).run(**args)
+        return super(Interface,self).run(**args)
 
     def __get_queues__(self,object const,pair_process,**kwargs):
         queues = {}

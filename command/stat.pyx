@@ -15,21 +15,16 @@ class StatCore(object):
 
     def __init__(self,object const,source):
         self._source = source
-        self._master_file_path = const.master_file_path[self._source]
         self._counts = {}
         self._local_structures = {}
         self._system = {}
 
     def __generate_results__(self):
-        master = pysam.Samfile(self._master_file_path,"rb")
-
         for name,structure in self.const.user_structures.items():
             self._local_structures[name] = structure.empty_clone()
             self._counts[name] = 0
 
-        self.__process_task_set__(self._task_set,master)
-
-        master.close() #Close the master bamfile
+        self.__process_task_set__(self._task_set)
 
         results = {}
         results["source"] = self._source
@@ -53,8 +48,8 @@ class StatCore(object):
 
 class Task(StatCore,parabam.command.Task):
 
-    def __init__(self,object task_set,object outqu,object curproc,
-                 object destroy,object const,str parent_class,str source):
+    def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
+                 object destroy, object const, str parent_class,str source):
         
         StatCore.__init__(self,const,source)
         parabam.command.Task.__init__(self,task_set=task_set,
@@ -62,12 +57,13 @@ class Task(StatCore,parabam.command.Task):
                                         curproc=curproc,
                                         destroy=destroy,
                                         const=const,
-                                        parent_class = parent_class)
+                                        parent_class = parent_class,
+                                        parent_bam = parent_bam)
         
 class PairTask(StatCore,parabam.command.PairTask):
 
-    def __init__(self,object task_set,object outqu,object curproc,
-                 object destroy,object const,str parent_class,str source):
+    def __init__(self, object task_set, object outqu, object curproc,object parent_bam,
+                 object destroy, object const, str parent_class,str source):
         
         StatCore.__init__(self,const,source)
         parabam.command.PairTask.__init__(self,task_set=task_set,
@@ -75,7 +71,8 @@ class PairTask(StatCore,parabam.command.PairTask):
                                         curproc=curproc,
                                         destroy=destroy,
                                         const=const,
-                                        parent_class = parent_class)
+                                        parent_class = parent_class,
+                                        parent_bam = parent_bam)
 
 
 class Handler(parabam.command.Handler):
@@ -288,7 +285,7 @@ class Interface(parabam.command.Interface):
         ''' Docstring! '''
         args = dict(locals())
         del args["self"]
-        super(Interface,self).run(**args)
+        return super(Interface,self).run(**args)
 
     def __get_processor_bundle__(self,queues,object const,task_class,pair_process,debug,**kwargs):
         processor_bundle = {}

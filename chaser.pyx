@@ -69,6 +69,14 @@ class Handler(parabam.core.Handler):
 
         self._max_reads = 5000000
 
+        self._parent_bams = self.__get_parent_bams__(const.master_file_path)
+
+    def __get_parent_bams__(self,master_file_path):
+        parent_bams = {}
+        for source,path in master_file_path.items():
+            parent_bams[source] = parabam.core.ParentAlignmentFile(path)
+        return parent_bams            
+
     #START -- BORROWED FROM PROCESOR
     #Need to refactor here to stop code duplication
     def __wait_for_tasks__(self,list active_tasks,int max_tasks):
@@ -202,6 +210,7 @@ class Handler(parabam.core.Handler):
     def __get_pack_with_task_args__(self,source):
         pack = dict(self._child_pack)
         pack["task_args"] = [source]
+        pack["parent_bam"] = self._parent_bams[source]
         return pack
 
     def __periodic_action__(self,iterations):
@@ -657,8 +666,14 @@ class MatchMakerTask(ChaserClass):
 
     def __launch_child_task__(self,pairs):
         child_pack = self._child_package
-        args = [pairs,child_pack["queue"],0,False,child_pack["const"],self.__class__.__name__]
+        
+        args = [pairs,
+                child_pack["queue"],0,False,
+                child_pack["parent_bam"],
+                child_pack["const"],
+                self.__class__.__name__]
         args.extend(child_pack["task_args"])
+
         task = child_pack["TaskClass"](*args)
         task.start()
         task.join()

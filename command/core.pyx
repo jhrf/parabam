@@ -19,12 +19,13 @@ from abc import ABCMeta, abstractmethod
 class Task(parabam.core.Task):
     __metaclass__=ABCMeta
     def __init__(self,object task_set, object outqu,object curproc,
-        object destroy,object const,str parent_class):
+        object destroy,object parent_bam,object const,str parent_class):
 
         super(Task, self).__init__(task_set=task_set,
             outqu=outqu,
             curproc=curproc*len(const.sources),
             destroy=destroy,
+            parent_bam = parent_bam,
             const=const,
             parent_class=parent_class)
 
@@ -37,22 +38,22 @@ class Task(parabam.core.Task):
     def __handle_engine_output__(self,engine_output,read):
         pass
 
-    def __process_task_set__(self,task_set,master):
+    def __process_task_set__(self,task_set):
         engine = self.__engine__
         handle_engine = self.__handle_engine_output__
         user_constants = self.const.user_constants
 
         for read in task_set:
-            decision = engine(read,user_constants,master)
+            decision = engine(read,user_constants,self._parent_bam)
             handle_engine(decision,read)
 
-    def __get_temp_object__(self,path,ext,master):
+    def __get_temp_object__(self,path,ext):
         if ext == ".gz" or ext == ".gzip":
             return gzip.open(path,"wb")
         elif ext == ".txt":
             return open(path,"w")
         else:
-            return pysam.AlignmentFile(path,"wb",template=master)
+            return pysam.AlignmentFile(path,"wb",header=self._parent_bam.header)
 
     def __get_extension__(self,path):
         root,extension = os.path.splitext(path)
@@ -63,19 +64,20 @@ class Task(parabam.core.Task):
         return "%s/%s_%s_%s_parabam_temp%s" %\
             (self._temp_dir,self._source,typ,self.pid,ext)
 
-    def __engine__(self,read,user_constants,master):
-        return self.const.user_engine(read,user_constants,master)
+    def __engine__(self,read,user_constants,parent):
+        return self.const.user_engine(read,user_constants,parent)
 
 class PairTask(Task):
     __metaclass__ = ABCMeta
 
     def __init__(self,object task_set,object outqu,object curproc,
-                 object destroy,object const,str parent_class):
+                 object destroy,object parent_bam,object const,str parent_class):
         
         super(PairTask, self).__init__(task_set=task_set,
                                        outqu=outqu,
                                        curproc=curproc,
                                        destroy=destroy,
+                                       parent_bam = parent_bam,
                                        const=const,
                                        parent_class=parent_class)
 
@@ -93,21 +95,21 @@ class PairTask(Task):
     def __handle_engine_output__(self,engine_output,read):
         pass
 
-    def __process_task_set__(self,task_set,master):
+    def __process_task_set__(self,task_set):
         if type(task_set) == dict:
-            self.__process_dict_task_set__(task_set,master)
+            self.__process_dict_task_set__(task_set)
         elif type(task_set) == list:
-            self.__process_list_task_set__(task_set,master)
+            self.__process_list_task_set__(task_set)
 
-    def __process_dict_task_set__(self,task_set,master):
+    def __process_dict_task_set__(self,task_set):
         user_constants = self.const.user_constants
         engine = self.__engine__
 
         for qname,reads in task_set.items():
-            output = engine( reads, user_constants, master )
+            output = engine( reads, user_constants, self._parent_bam)
             self.__handle_engine_output__(output, reads)
 
-    def __process_list_task_set__(self,task_set,master):
+    def __process_list_task_set__(self,task_set):
         #speedup
         user_constants = self.const.user_constants
         engine = self.__engine__
@@ -120,15 +122,15 @@ class PairTask(Task):
         for read in task_set:
             read1,read2 = query_loners(read,loners)
             if read1:
-                output = engine( (read1,read2) , user_constants, master )
-                self.__handle_engine_output__(output, (read1,read2,) )
+                output = engine((read1,read2),user_constants,self._parent_bam)
+                self.__handle_engine_output__(output,(read1,read2,))
 
-        self.__stash_loners__(loners,master)
+        self.__stash_loners__(loners)
         del loners
 
-    def __stash_loners__(self,loners,master):
+    def __stash_loners__(self,loners):
         loner_path = self.__get_temp_path__("chaser")
-        loner_file = pysam.AlignmentFile(loner_path,"wb",template=master)
+        loner_file = pysam.AlignmentFile(loner_path,"wb",header=self._parent_bam.header)
         loner_count = 0
         for qname,read in loners.items():
             loner_count += 1
@@ -256,8 +258,11 @@ class Processor(parabam.core.Processor):
     def __init__(self,str source,object outqu,object const,object TaskClass,
                  object task_args,object debug=False):
 
+        self._source = source
         super(Processor,self).__init__(outqu,const,TaskClass,task_args,debug)
-        self._source = task_args[0] #Defined in the run function within Interface
+
+    def __get_parent_bam__(self, master_file_path):
+        return parabam.core.ParentAlignmentFile(master_file_path[self._source])
 
     def __get_master_bam__(self,master_file_path):
         return pysam.Samfile(self.const.master_file_path[self._source],"rb")
@@ -380,7 +385,7 @@ class Interface(parabam.core.Interface):
             if key in defaults:
                 args[key] = val
 
-        args[proc] = self.__get_max_proc__(kwargs["proc"],
+        args["proc"] = self.__get_max_proc__(kwargs["proc"],
                                            kwargs["side_by_side"],
                                            kwargs["pair_process"])
 
@@ -416,8 +421,9 @@ class Interface(parabam.core.Interface):
             if source in output_paths.keys():
                 output_path = output_paths[source]
                 if type(output_paths) == dict:
-                    for key,path in output_paths.items():
-                        final_output_paths[master_path].append(path)    
+                    for key,path_dict in output_paths.items():
+                        for subset,path in path_dict.items():
+                            final_output_paths[master_path].append(path)    
                 elif type(output_paths) == list:
                     final_output_paths[master_path] = output_path
                 elif type(output_paths) == str:
@@ -533,7 +539,14 @@ class Interface(parabam.core.Interface):
 
         if not kwargs["keep_in_temp"]:
             final_output_paths = self.__output_files_to_cwd__(final_output_paths)
+        
+        self.__remove_empty_entries__(final_output_paths)
         return final_output_paths
+
+    def __remove_empty_entries__(self,final_output_paths):
+        for master_path,child_paths in final_output_paths.items():
+            if len(child_paths) == 0:
+                del final_output_paths[master_path]
 
     def __prepare_for_pair_processing__(self,processor_bundle,handler_bundle,task_class,object const):
 
@@ -602,4 +615,4 @@ class Interface(parabam.core.Interface):
     def get_parser(self):
         pass
 
-# #...happily ever after
+#...happily ever after

@@ -19,7 +19,8 @@ class Task(multiprocessing.Process):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self,object task_set,object outqu,int curproc,object destroy,object const,str parent_class):
+    def __init__(self,object task_set,object outqu,int curproc,
+                 object destroy,object parent_bam,object const,str parent_class):
         multiprocessing.Process.__init__(self)
         self._task_set = task_set
         self._outqu = outqu
@@ -27,6 +28,7 @@ class Task(multiprocessing.Process):
         self._temp_dir = const.temp_dir
         self._destroy = destroy
         self._parent_class = parent_class
+        self._parent_bam = parent_bam
         self.const = const
 
     def run(self):
@@ -209,6 +211,7 @@ cdef class Processor:
         self._proc = const.proc
 
         self._master_file_path = const.master_file_path
+        self._parent_bam = self.__get_parent_bam__(const.master_file_path)
         self._verbose = const.verbose
         self._temp_dir = const.temp_dir
 
@@ -295,7 +298,14 @@ cdef class Processor:
             gc.collect()
                     
     def __start_task__(self,collection,destroy=False):
-        args = [collection,self._outqu,self._active_count,destroy,self.const,self.__class__.__name__]
+        args = [collection,
+                self._outqu,
+                self._active_count,
+                destroy,
+                self._parent_bam,
+                self.const,
+                self.__class__.__name__]
+
         args.extend(self._task_args)
         task = self._TaskClass(*args)
         task.start()
@@ -329,6 +339,9 @@ cdef class Processor:
 
     def __add_to_collection__(self,master,item,collection):
         pass
+
+    def __get_parent_bam__(self, master_file_path):
+        return ParentAlignmentFile(master_file_path)
 
 class Leviathon(object):
     #Leviathon takes objects of processors and handlers and
@@ -469,5 +482,29 @@ class CorePackage(Package):
         super(CorePackage,self).__init__(results,destroy)
         self.curproc = curproc
         self.parent_class = parent_class
+
+class ParentAlignmentFile(object):
+    
+    def __init__(self,path):
+        parent = pysam.AlignmentFile(path,"rb")
+        self.filename = parent.filename
+        self.references = parent.references
+        self.header = parent.header
+        self.lengths = parent.lengths
+        self.mapped = parent.mapped
+        self.nocoordinate = parent.nocoordinate
+        self.nreferences = parent.nreferences
+        self.unmapped = parent.unmapped
+        parent.close()
+
+    def getrname(self,tid):
+        return self.references[tid]
+
+    def gettid(self,reference):
+        for i,ref in enumerate(self.references):
+            if reference == ref:
+                return i
+        return -1
+
 
 #And they all lived happily ever after...
