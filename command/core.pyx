@@ -308,7 +308,7 @@ class PairProcessor(Processor):
                         if not pause:
                             break
                     except Queue2.Empty:
-                        time.sleep(3)
+                        time.sleep(1)
         except Queue2.Empty:
             pass
 
