@@ -64,7 +64,7 @@ class Task(SubsetCore,parabam.command.Task):
 
     def __handle_engine_output__(self,engine_output,read):
         subset_write = self.__write_to_subset_bam__
-                
+             
         if type(engine_output) == bool:
             if engine_output:
                 subset_write(self.const.user_subsets[0],read)          

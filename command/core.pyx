@@ -238,20 +238,19 @@ class Handler(parabam.core.Handler):
     def __total_reads__(self):
         return sum(map(lambda s : self._stats[s]["total"],self._sources))
 
-    def __send_destroy__(self,source,subset):
-        self.__add_staged_system_task__(results=self._stage_stores[source][subset],
-                            subset_type=subset,source=source,destroy=True)
-        self.__update_stage_store__(source,subset)
+    def __destroy_chaser__(self):
+        for source in self._sources:
+            for subset in self._system_subsets:
+                self.__add_staged_system_task__(results=self._stage_stores[source][subset],
+                                    subset_type=subset,source=source,destroy=True)
+                self.__update_stage_store__(source,subset)
 
     #Child classes MUST call super
     def __handler_exit__(self, **kwargs):
         if self._verbose:
             self.__standard_output__("\n[Status] Processing complete. %d reads processed" \
                                         % (self.__total_reads__(),))
-        
-        for source in self._sources:
-            for subset in self._system_subsets:
-                self.__send_destroy__(source,subset)
+        self.__destroy_chaser__()
 
 class Processor(parabam.core.Processor):
 
@@ -292,9 +291,16 @@ class PairProcessor(Processor):
         super(PairProcessor,self).__init__(source,outqu,const,TaskClass,task_args,debug)
         self._inqu = inqu
 
-    def __query_pause_qu__(self):
+    def __query_pause_qu__(self,bypass):
+        #This fairly obfuscated code is to fix
+        #a race condition when a pause can
+        #be missed due to waiting on a previous pause
         try:
-            pause = self._inqu.get(False)
+            if bypass:
+                pause = True
+            else:
+                pause = self._inqu.get(False)
+
             if pause:
                 while True:
                     try:
@@ -306,7 +312,7 @@ class PairProcessor(Processor):
         except Queue2.Empty:
             pass
 
-        last = False   
+        last = False  
         while True:
             try:
                 pause = self._inqu.get(False)
@@ -316,10 +322,12 @@ class PairProcessor(Processor):
         return last
 
     def __start_task__(self,collection,destroy=False):
-        while True:
-            pause = self.__query_pause_qu__()
-            if not pause:
-                break
+        pause = self.__query_pause_qu__(False)
+        if pause:
+            while True:
+                pause = self.__query_pause_qu__(True)
+                if not pause:
+                    break
         super(PairProcessor,self).__start_task__(collection,destroy)
 
 class Interface(parabam.core.Interface):
@@ -564,7 +572,7 @@ class Interface(parabam.core.Interface):
                                                   "pause_qus":pause_qus,
                                                   "mainqu":main_qu,
                                                   "const":const,
-                                                  "destroy_limit":1,
+                                                  "destroy_limit":len(const.sources),
                                                   "TaskClass":task_class}
 
     def __get_max_proc__(self,proc,input_size,pair_process):

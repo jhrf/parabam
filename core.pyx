@@ -214,7 +214,6 @@ cdef class Processor:
         self._parent_bam = self.__get_parent_bam__(const.master_file_path)
         self._verbose = const.verbose
         self._temp_dir = const.temp_dir
-
         self._outqu = outqu
 
         #Class which we wish to run on each read
@@ -485,6 +484,8 @@ class CorePackage(Package):
 class ParentAlignmentFile(object):
     
     def __init__(self,path,input_is_sam=False):
+        has_index = os.path.exists(os.path.join("%s%s" % (path,".bai")))
+
         if input_is_sam:
             mode = "r"
         else:
@@ -495,7 +496,7 @@ class ParentAlignmentFile(object):
         self.header = parent.header
         self.lengths = parent.lengths
 
-        if not input_is_sam:
+        if not input_is_sam and has_index:
             self.mapped = parent.mapped
             self.nocoordinate = parent.nocoordinate
             self.nreferences = parent.nreferences
