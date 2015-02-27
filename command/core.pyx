@@ -152,10 +152,10 @@ class PairTask(Task):
             return None,None
 
     def __filter__(self,read):
-        return read.is_secondary
+        return read.is_secondary or (read.flag & 2048 == 2048)
 
     def __filter_duplicates__(self,read):
-        return read.is_secondary or read.is_duplicate
+        return read.is_secondary or (read.flag & 2048 == 2048) or read.is_duplicate
 
 class Handler(parabam.core.Handler):
     __metaclass__=ABCMeta
@@ -603,8 +603,8 @@ class Interface(parabam.core.Interface):
             "Regions should be colon seperated as specified by samtools (eg \'chr1:1000,5000\')")
         parser.add_argument('-s',type=int,metavar="INT",nargs='?',default=2
             ,help="Further parralise by running this many samples simultaneously [Default 2]")
-        parser.add_argument('-d',action="store_true",default=False,
-            help="parabam will not process reads marked PCR duplicate.")
+        parser.add_argument('-d',action="store_false",default=True,
+            help="parabam will not process reads marked duplicate.")
         parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
             help="Indicate the amount of information output by the program:\n"\
             "\t0: No output [Default]\n"\

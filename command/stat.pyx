@@ -135,6 +135,8 @@ class UserStructure(object):
         elif store_method == "min":
             self.add = self.add_min
             self.merge = self.merge_min
+            self.data = float('inf')
+            self.org_data = copy.copy(float('inf'))
         else:
             self.add = self.add_cumu
             self.merge = self.merge_cumu
