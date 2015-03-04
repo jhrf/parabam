@@ -538,7 +538,8 @@ class Leviathon(object):
             del terminated_qus
             gc.collect()
 
-    def __create_handlers__(self,handler_order,handler_bundle,queues,parent_bam,output_paths):
+    def __create_handlers__(self,handler_order,handler_bundle,
+                            queues,parent_bam,output_paths):
         handlers = []
         handler_inqus = []
 

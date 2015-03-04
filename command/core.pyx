@@ -19,12 +19,11 @@ from abc import ABCMeta, abstractmethod
 class Task(parabam.core.Task):
     __metaclass__=ABCMeta
     def __init__(self,object task_set, object outqu,object curproc,
-        object destroy,object parent_bam,object const,str parent_class):
+        object parent_bam,object const,str parent_class):
 
         super(Task, self).__init__(task_set=task_set,
             outqu=outqu,
             curproc=curproc,
-            destroy=destroy,
             parent_bam = parent_bam,
             const=const,
             parent_class=parent_class)
@@ -434,20 +433,10 @@ class Interface(parabam.core.Interface):
             if len(child_paths) == 0:
                 del final_output_paths[master_path]
 
-    def __prepare_for_pair_processing__(self,processor_bundle,handler_bundle,task_class,object const):
-
-        chaser_qu = Queue()
-        processor_bundle["class"] = PairProcessor
-
-        main_qu = None
-        for entry_class,args in handler_bundle.items():
-            if issubclass(entry_class,Handler):
-                main_qu = args["inqu"]
-                args["out_qu_dict"]["chaser"] = chaser_qu
-        
-        handler_bundle[parabam.chaser.Handler] = {"inqu":chaser_qu,
-                                                  "mainqu":main_qu,
+    def __prepare_for_pair_processing__(self,handler_bundle,task_class,object const):        
+        handler_bundle[parabam.chaser.Handler] = {"inqu":"chaser",
                                                   "const":const,
+                                                  "out_qu_dict" = ["main"],
                                                   "TaskClass":task_class}
 
     def __get_max_proc__(self,proc,input_size,pair_process):

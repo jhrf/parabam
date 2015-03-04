@@ -49,13 +49,12 @@ class SubsetCore(object):
 
 class Task(SubsetCore,parabam.command.Task):
 
-    def __init__(self, object task_set, object outqu, object curproc,object destroy, 
+    def __init__(self, object task_set, object outqu, object curproc,
                  object parent_bam, object const, str parent_class):
         SubsetCore.__init__(self,const)
         parabam.command.Task.__init__(self,task_set=task_set,
                                       outqu=outqu,
                                       curproc=curproc,
-                                      destroy=destroy,
                                       parent_bam = parent_bam,
                                       const=const,
                                       parent_class=parent_class)
@@ -77,14 +76,13 @@ class Task(SubsetCore,parabam.command.Task):
 
 class PairTask(SubsetCore,parabam.command.PairTask):
     def __init__(self, object task_set, object outqu, object curproc,
-                 object destroy, object parent_bam,object const,
+                 object parent_bam,object const,
                  str parent_class):
         
         SubsetCore.__init__(self,const)
         parabam.command.PairTask.__init__(self,task_set=task_set,
                         outqu=outqu,
                         curproc=curproc,
-                        destroy=destroy,
                         parent_bam = parent_bam,
                         const=const,
                         parent_class=parent_class)
@@ -228,7 +226,7 @@ class Interface(parabam.command.Interface):
                             "task_args":{},
                             "debug":debug,
                             "class":parabam.core.Processor}
-                            
+
         return processor_bundle
 
     def __get_handler_bundle__(self,object const,task_class,pair_process,**kwargs):
@@ -237,7 +235,7 @@ class Interface(parabam.command.Interface):
         #queues transformed by leviathon
         handler_bundle[Handler] = {"inqu":"main",
                                    "const":const, 
-                                   "out_qu_dict":["merge"]}
+                                   "out_qu_dict":["merge","chaser"]}
 
         handler_bundle[parabam.merger.Handler] = {"inqu":"merge",
                                                   "const":const,
