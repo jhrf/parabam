@@ -27,7 +27,6 @@ class StatCore(object):
         self.__process_task_set__(self._task_set)
 
         results = {}
-        results["source"] = self._source
         results["structures"] = self.__unpack_structures__(self._local_structures)
         results["counts"] = self._counts
         results["system"] = self._system

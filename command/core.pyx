@@ -23,7 +23,7 @@ class Task(parabam.core.Task):
 
         super(Task, self).__init__(task_set=task_set,
             outqu=outqu,
-            curproc=curproc*len(const.sources),
+            curproc=curproc,
             destroy=destroy,
             parent_bam = parent_bam,
             const=const,
@@ -160,21 +160,20 @@ class PairTask(Task):
 class Handler(parabam.core.Handler):
     __metaclass__=ABCMeta
 
-    def __init__(self,object inqu,object const,
-                 object destroy_limit,object out_qu_dict):
+    def __init__(self,object parent_bam, object output_paths,object inqu,
+                object const,object pause_qu,dict out_qu_dict,object report=True):
         
-        super(Handler,self).__init__(inqu,const,destroy_limit=destroy_limit)
+        super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
+                                     inqu=inqu,const=const,pause_qu=pause_qu,
+                                     out_qu_dict=out_qu_dict)
 
-        self._sources = const.sources
         self._system_subsets = const.system_subsets
 
         #Stage stores serve as a staging area
         #for packages to be sent on to subhandlers
-        self._stage_stores = {}
-        for source in self._sources:
-            self._stage_stores[source] = {} 
-            for subset in self._system_subsets:
-                self._stage_stores[source][subset] = []
+        self._stage_stores = {} 
+        for subset in self._system_subsets:
+            self._stage_stores[subset] = []
 
         self._out_qu_dict = out_qu_dict
         self._proc_flag_sent = False
@@ -184,151 +183,60 @@ class Handler(parabam.core.Handler):
     def __new_package_action__(self,new_package,**kwargs):
         results = new_package.results
         handle_dict = dict(results)
-        source = results["source"]
         #hack so as not record rescued paired reads twice in total
         if self.const.pair_process and not new_package.parent_class == "PairProcessor":
             handle_dict["total"] = 0
-        self.__auto_handle__(handle_dict,self._stats,source)
+        self.__auto_handle__(handle_dict,self._stats)
 
         if "system" in results.keys():
-            self.__add_system_to_stage__(results["system"],source)
+            self.__add_system_to_stage__(results["system"])
         
-    def __add_system_to_stage__(self,system_results,source):
+    def __add_system_to_stage__(self,system_results):
         for subset,(count,path) in system_results.items():
-             self._stage_stores[source][subset].append((count,path))
-
-    def __auto_handle__(self,results,stats,source):
-        if source not in stats.keys():
-            #if we autoupdate before receiving a package
-            stats[source] = {}
-        super(Handler,self).__auto_handle__(results,stats[source])
+             self._stage_stores[subset].append((count,path))
 
     #Child classes MUST call super
     def __periodic_action__(self,iterations):
-        for source in self._sources:
-            for subset in self._system_subsets:
-                if self.__test_stage_store__(source,subset):
-                    self.__add_staged_system_task__(results=self._stage_stores[source][subset],
-                                            subset_type=subset,source=source)
-                    self.__update_stage_store__(source,subset)
+        self.__decide_if_finished__()
+
+        for subset in self._system_subsets:
+            if self.__test_stage_store__(subset):
+                self.__add_staged_system_task__(results=self._stage_stores[subset],
+                                        subset_type=subset)
+                self.__update_stage_store__(subset)
+
+    def __decide_if_finished__(self):
+        if self._destroy:
+            has_stage_tasks = False
+            for subset,staged in self._stage_stores.items():
+                if len(staged) > 0:
+                    has_stage_tasks = True 
+                    break
+            if not has_stage_tasks:
+                self._finished = True
                     
-    def __update_stage_store__(self,source,subset):
+    def __update_stage_store__(self,subset):
         self._stagecount += 1
-        self._stage_stores[source][subset] = []
+        self._stage_stores[subset] = []
         gc.collect()
 
-    def __test_stage_store__(self,source,subset):
-        #Test whether there are any temporary bams to be merged
-        if subset == "chaser" and not self.__is_processing__() and not self._proc_flag_sent:
-            self._proc_flag_sent = True
-            return True
-        else:
-            return len(self._stage_stores[source][subset]) > 0
+    def __test_stage_store__(self,subset):
+        return len(self._stage_stores[subset]) > 0
     
     def __is_processing__(self):
         return self._destroy_count < (self._destroy_limit - 1)
 
-    def __add_staged_system_task__(self,results,subset_type,source,destroy=False):
+    def __add_staged_system_task__(self,results,subset_type,destroy=False):
         if subset_type == "chaser":
             res = parabam.chaser.OriginPackage(results=results,destroy=destroy,
-                                source=source,chaser_type="origin",
-                                processing= self.__is_processing__())
+                                chaser_type="origin",processing= self.__is_processing__())
             self._out_qu_dict["chaser"].put(res)
-
-    def __total_reads__(self):
-        return sum(map(lambda s : self._stats[s]["total"],self._sources))
-
-    def __destroy_chaser__(self):
-        for source in self._sources:
-            for subset in self._system_subsets:
-                self.__add_staged_system_task__(results=self._stage_stores[source][subset],
-                                    subset_type=subset,source=source,destroy=True)
-                self.__update_stage_store__(source,subset)
 
     #Child classes MUST call super
     def __handler_exit__(self, **kwargs):
         if self._verbose:
             self.__standard_output__("\n[Status] Processing complete. %d reads processed" \
                                         % (self.__total_reads__(),))
-        self.__destroy_chaser__()
-
-class Processor(parabam.core.Processor):
-
-    def __init__(self,str source,object outqu,object const,object TaskClass,
-                 object task_args,object debug=False):
-
-        self._source = source
-        super(Processor,self).__init__(outqu,const,TaskClass,task_args,debug)
-
-    def __get_parent_bam__(self, master_file_path):
-        return parabam.core.ParentAlignmentFile(master_file_path[self._source],self.const.input_is_sam)
-
-    def __get_master_bam__(self,master_file_path):
-        if self.const.input_is_sam:
-            return pysam.Samfile(self.const.master_file_path[self._source],"r")
-        else:
-            return pysam.Samfile(self.const.master_file_path[self._source],"rb")
-
-    def __add_to_collection__(self,master,alig,collection):
-        collection.append(alig)
-
-    def __get_next_alig__(self,master_bam):
-        if not self.const.fetch_region:
-            for alig in master_bam.fetch(until_eof=True):
-                yield alig
-        else:
-            for alig in master_bam.fetch(region=self.const.fetch_region):
-                yield alig
-
-    def __pre_processor__(self,master_file_path):
-        pass
-
-class PairProcessor(Processor):
-
-    def __init__(self,str source,object outqu,object const,object TaskClass,
-                 object task_args,object inqu,object debug=False):
-
-        super(PairProcessor,self).__init__(source,outqu,const,TaskClass,task_args,debug)
-        self._inqu = inqu
-
-    def __query_pause_qu__(self,bypass):
-        #This fairly obfuscated code is to fix
-        #a race condition when a pause can
-        #be missed due to waiting on a previous pause
-        try:
-            if bypass:
-                pause = True
-            else:
-                pause = self._inqu.get(False)
-
-            if pause:
-                while True:
-                    try:
-                        pause = self._inqu.get(False)
-                        if not pause:
-                            break
-                    except Queue2.Empty:
-                        time.sleep(1)
-        except Queue2.Empty:
-            pass
-
-        last = False  
-        while True:
-            try:
-                pause = self._inqu.get(False)
-                last = pause
-            except Queue2.Empty:
-                break
-        return last
-
-    def __start_task__(self,collection,destroy=False):
-        pause = self.__query_pause_qu__(False)
-        if pause:
-            while True:
-                pause = self.__query_pause_qu__(True)
-                if not pause:
-                    break
-        super(PairProcessor,self).__start_task__(collection,destroy)
 
 class Interface(parabam.core.Interface):
 
@@ -364,11 +272,7 @@ class Interface(parabam.core.Interface):
         pass
 
     @abstractmethod
-    def __get_master_file_path__(self,sources,input_paths,**kwargs):
-        pass
-
-    @abstractmethod
-    def __get_output_paths__(self,sources,input_paths,**kwargs):
+    def __get_output_paths__(self,input_paths,**kwargs):
         pass
 
     @abstractmethod
@@ -422,28 +326,26 @@ class Interface(parabam.core.Interface):
             processor_objects.append(processor_class(**args))
         return processor_objects
 
-    def __update_final_output_paths__(self,sources,master_file_path,output_paths,final_output_paths):
+    def __update_final_output_paths__(self,input_path,output_paths,final_output_paths):
         if "global" in output_paths.keys():
             final_output_paths["global"].extend(output_paths["global"])
 
-        for source in sources:
-            master_path = master_file_path[source]
-            final_output_paths[master_path] = []
-            if source in output_paths.keys():
-                output_path = output_paths[source]
-                if type(output_path) == dict:
-                    for subset,path in output_path.items():
-                        final_output_paths[master_path].append(path)    
-                elif type(output_paths) == list:
-                    final_output_paths[master_path] = output_path
-                elif type(output_paths) == str:
-                    final_output_paths[master_path].append(output_path)
-                else:
-                    sys.stderr.write("[Error] Unexpected output path type: %s \n" \
-                        % (type(output_paths[source])))
-                    raise SystemExit
+        final_output_paths[input_path] = []
+        if input_path in output_paths.keys():
+            output_path = output_paths[input_paths]
+            if type(output_path) == dict:
+                for subset,path in output_path.items():
+                    final_output_paths[master_path].append(path)    
+            elif type(output_paths) == list:
+                final_output_paths[master_path] = output_path
+            elif type(output_paths) == str:
+                final_output_paths[master_path].append(output_path)
             else:
-                continue
+                sys.stderr.write("[Error] Unexpected output path type: %s \n" \
+                    % (type(output_paths[input_path])))
+                raise SystemExit
+        else:
+            continue
 
     def __output_files_to_cwd__(self,final_output_paths):
         revised_output_paths = {}
@@ -480,64 +382,46 @@ class Interface(parabam.core.Interface):
                     sys.stdout.write("\t%s\n" % (name,))            
         sys.stdout.write("\n")
 
-    def __add_run_details_to_const__(self,object const,master_file_path,output_paths,sources):
-        #put the run sensistive information into const
-        const.add("master_file_path",master_file_path)
-        const.add("sources",sources)
-        const.add("output_paths",output_paths)
-
     def run(self,**kwargs):
 
-        input_bams = kwargs["input_bams"]
-        side_by_side = kwargs["side_by_side"]
+        input_paths = kwargs["input_bams"]
 
         const_args = self.__get_const_args__(**kwargs)
         const = parabam.core.Const(**const_args)
         final_output_paths = {"global":[]}
         task_class = self.__get_task_class__(**kwargs)
 
-        for input_paths,sources in self.__get_group__(input_bams,multi=side_by_side):
-
-            master_file_path = self.__get_master_file_path__(sources=sources,
-                                                               input_paths=input_paths,**kwargs)
-            output_paths = self.__get_output_paths__(sources=sources,
-                                                     input_paths=input_paths,**kwargs)
-
-            self.__update_final_output_paths__(sources,master_file_path,output_paths,final_output_paths)
-            self.__add_run_details_to_const__(const=const,master_file_path=master_file_path,
-                                              output_paths=output_paths,sources=sources)
-
-            if const.verbose: 
-                self.__report_file_names__(final_output_paths,input_paths)
-
-            queues = self.__get_queues__(const,**kwargs)
-
-            handler_bundle = self.__get_handler_bundle__(queues=queues,
-                                                         const=const,
+        handler_bundle = self.__get_handler_bundle__(const=const,
                                                          task_class=task_class,
                                                          **kwargs)
 
-            processor_bundle = self.__get_processor_bundle__(queues=queues,
-                                                             const=const,
-                                                             task_class=task_class,
-                                                             **kwargs)
+        processor_bundle = self.__get_processor_bundle__(const=const,
+                                                         task_class=task_class,
+                                                         **kwargs)
 
-            if const.pair_process:
-                self.__prepare_for_pair_processing__(processor_bundle,
-                                                     handler_bundle,
-                                                     task_class,
-                                                     const)
+        if const.pair_process:
+            self.__prepare_for_pair_processing__(processor_bundle,
+                                                 handler_bundle,
+                                                 task_class,
+                                                 const)
 
-            handler_objects = self.__create_handlers__(handler_bundle)
-            processor_objects = self.__create_processors__(processor_bundle)
+        if const.verbose == 1: 
+            update_interval = 199
+        else:
+            update_interval = 3
 
-            if const.verbose == 1: 
-                update_interval = 199
-            else:
-                update_interval = 3
-            lev = parabam.core.Leviathon(processor_objects,handler_objects,update_interval)
-            lev.run()
-            del lev
+        leviathon = parabam.core.Leviathon(max_processors,processor_bundle,
+                                           handler_bundle,update_interval)
+
+        for input_path in input_paths:
+
+            output_paths = self.__get_output_paths__(input_path=input_path,**kwargs)
+            self.__update_final_output_paths__(input_path,output_paths,
+                                               final_output_paths)
+            if const.verbose: 
+                self.__report_file_names__(final_output_paths,input_path)
+
+            leviathon.run(input_path)
 
         if not kwargs["keep_in_temp"]:
             final_output_paths = self.__output_files_to_cwd__(final_output_paths)
@@ -553,26 +437,17 @@ class Interface(parabam.core.Interface):
     def __prepare_for_pair_processing__(self,processor_bundle,handler_bundle,task_class,object const):
 
         chaser_qu = Queue()
-        pause_qus = []
-        main_qu = None
-
-        for source in const.sources:
-            newqu = Queue()
-            processor_bundle[source]["inqu"] = newqu
-            pause_qus.append(newqu)
         processor_bundle["class"] = PairProcessor
 
+        main_qu = None
         for entry_class,args in handler_bundle.items():
             if issubclass(entry_class,Handler):
-                args["destroy_limit"] += 1
                 main_qu = args["inqu"]
                 args["out_qu_dict"]["chaser"] = chaser_qu
         
         handler_bundle[parabam.chaser.Handler] = {"inqu":chaser_qu,
-                                                  "pause_qus":pause_qus,
                                                   "mainqu":main_qu,
                                                   "const":const,
-                                                  "destroy_limit":len(const.sources),
                                                   "TaskClass":task_class}
 
     def __get_max_proc__(self,proc,input_size,pair_process):

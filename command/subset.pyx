@@ -11,8 +11,7 @@ from multiprocessing import Queue
 
 class SubsetCore(object):
 
-    def __init__(self,object const,source):
-        self._source = source
+    def __init__(self,object const):
         self._user_subsets = const.user_subsets
         self._counts = {}
         self._system = {}
@@ -26,7 +25,7 @@ class SubsetCore(object):
         cdef dict system = self._system
 
         for subset in self._user_subsets:
-            ext = self.__get_extension__(self.const.output_paths[self._source][subset])
+            ext = self.__get_extension__(self.output_paths[subset])
             temp_paths[subset] = self.__get_temp_path__(subset,ext)
             temp_objects[subset] = self.__get_temp_object__(temp_paths[subset],ext)
             counts[subset] = 0
@@ -38,7 +37,6 @@ class SubsetCore(object):
         del self._temp_objects
 
         results = {}
-        results["source"] = self._source
         results["temp_paths"] = temp_paths
         results["counts"] = counts
         results["system"] = system
@@ -52,11 +50,11 @@ class SubsetCore(object):
 class Task(SubsetCore,parabam.command.Task):
 
     def __init__(self, object task_set, object outqu, object curproc,object destroy, 
-                 object parent_bam, object const, str parent_class,str source):
-        SubsetCore.__init__(self,const,source)
+                 object parent_bam, object const, str parent_class):
+        SubsetCore.__init__(self,const)
         parabam.command.Task.__init__(self,task_set=task_set,
                                       outqu=outqu,
-                                      curproc=curproc*len(const.sources),
+                                      curproc=curproc,
                                       destroy=destroy,
                                       parent_bam = parent_bam,
                                       const=const,
@@ -80,9 +78,9 @@ class Task(SubsetCore,parabam.command.Task):
 class PairTask(SubsetCore,parabam.command.PairTask):
     def __init__(self, object task_set, object outqu, object curproc,
                  object destroy, object parent_bam,object const,
-                 str parent_class,str source):
+                 str parent_class):
         
-        SubsetCore.__init__(self,const,source)
+        SubsetCore.__init__(self,const)
         parabam.command.PairTask.__init__(self,task_set=task_set,
                         outqu=outqu,
                         curproc=curproc,
@@ -97,57 +95,44 @@ class PairTask(SubsetCore,parabam.command.PairTask):
 
 class Handler(parabam.command.Handler):
 
-    def __init__(self,object inqu,object const,
-                 object destroy_limit,object out_qu_dict):
+    def __init__(self,object parent_bam, object output_paths,object inqu,
+                object const,object pause_qu,dict out_qu_dict):
         
-        super(Handler,self).__init__(inqu=inqu,const=const,
-                                           destroy_limit=destroy_limit,
-                                           out_qu_dict=out_qu_dict)
+        super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
+                                     inqu=inqu,const=const,pause_qu=pause_qu,
+                                     out_qu_dict=out_qu_dict)
 
         self._user_subsets = const.user_subsets
-        for source in self._sources:
-            for subset in self._user_subsets:
-                self._stage_stores[source][subset] = []
+        for subset in self._user_subsets:
+            self._stage_stores[subset] = []
 
     def __new_package_action__(self,new_package):
         super(Handler,self).__new_package_action__(new_package)
         results = new_package.results
-        source = results["source"]
 
         for subset in self._user_subsets:
-            self._stage_stores[source][subset].append((
-                results["counts"][subset],results["temp_paths"][subset],))
+            self._stage_stores[subset].append((results["counts"][subset],
+                                               results["temp_paths"][subset],))
 
     def __periodic_action__(self,iterations):
         super(Handler,self).__periodic_action__(iterations)
-        for source in self._sources:
-            for subset in self._user_subsets:
-                if self.__test_stage_store__(source,subset):
-                    self.__add_merge_task__(results=self._stage_stores[source][subset],
-                                            subset_type=subset,source=source)
-                    self.__update_stage_store__(source,subset)
+
+        for subset in self._user_subsets:
+            if self.__test_stage_store__(subset):
+                self.__add_merge_task__(results=self._stage_stores[subset],subset_type=subset)
+                self.__update_stage_store__(subset)
 
     def __handler_exit__(self, **kwargs):
         super(Handler,self).__handler_exit__()
-        if self._verbose:
-            self.__standard_output__("[Status] Waiting for merge operation to finish")
-
         #Kill the handlers handler
-        for source in self._sources:
-            for subset in self._user_subsets:
-                self.__destroy_user_subset__(source,subset)
+
+        for subset in self._user_subsets:
+            #merge task 
+            self.__add_merge_task__(subset)
         self.__write_counts_csv__()
     
-    def __destroy_user_subset__(self,source,subset,**kwargs):
-        self.__add_merge_task__(results=self._stage_stores[source][subset],
-                                subset_type=subset,
-                                source=source,
-                                destroy=True)
-
-    def __add_merge_task__(self,results,subset_type,source,destroy=False):
-        res = parabam.merger.MergePackage(results=results,
-                    subset_type=subset_type,source=source,
-                    destroy=destroy)
+    def __add_merge_task__(self,results,subset_type):
+        res = parabam.merger.MergePackage(results=results,subset_type=subset_type)
         self._out_qu_dict["merge"].put(res)
 
     def __write_counts_csv__(self):
@@ -230,51 +215,44 @@ class Interface(parabam.command.Interface):
         return super(Interface,self).run(**args)
 
     def __get_queues__(self,object const,pair_process,**kwargs):
-        queues = {}
-        queues["merge"] = Queue()
-        queues["main"] = Queue()   
+        queues = ["merge","main"]
+        if pair_process:
+            queues = ["chaser"]
+
         return queues
 
-    def __get_processor_bundle__(self,queues,object const,task_class,pair_process,debug,**kwargs):
-        processor_bundle = {}
-
-        processor_bundle["class"] = parabam.command.Processor
-
-        for i,source in enumerate(const.sources):
-            processor_bundle[source] = {"source":source,
-                                        "outqu":queues["main"],
-                                        "const":const,
-                                        "TaskClass":task_class,
-                                        "task_args":[source],
-                                        "debug":debug}
+    def __get_processor_bundle__(self,object const,task_class,debug,**kwargs): 
+        processor_bundle = {"outqu":"main",
+                            "const":const,
+                            "TaskClass":task_class,
+                            "task_args":{},
+                            "debug":debug,
+                            "class":parabam.core.Processor}
+                            
         return processor_bundle
 
-    def __get_handler_bundle__(self,queues,object const,task_class,pair_process,**kwargs):
-        out_qu_dict = {"merge":queues["merge"]}
-
+    def __get_handler_bundle__(self,object const,task_class,pair_process,**kwargs):
         handler_bundle = {}
-        handler_bundle[Handler] = {"inqu":queues["main"],
-                                           "const":const,
-                                           "destroy_limit":len(const.sources),
-                                           "out_qu_dict":out_qu_dict}
 
-        handler_bundle[parabam.merger.Handler] = {"inqu":queues["merge"],
-                                          "const":const,
-                                          "destroy_limit":len(const.sources)*len(const.user_subsets) }
+        #queues transformed by leviathon
+        handler_bundle[Handler] = {"inqu":"main",
+                                   "const":const, 
+                                   "out_qu_dict":["merge"]}
+
+        handler_bundle[parabam.merger.Handler] = {"inqu":"merge",
+                                                  "const":const,
+                                                  "out_qu_dict":[]}
         return handler_bundle
 
-    def __get_master_file_path__(self,sources,input_paths,**kwargs):
-        return dict( zip(sources,input_paths) )
-
-    def __get_output_paths__(self,sources,input_paths,user_subsets,ensure_unique_output,**kwargs):
+    def __get_output_paths__(self,input_paths,user_subsets,ensure_unique_output,**kwargs):
         output_paths = {}
-        for salt_x,(source,input_path) in enumerate(izip(sources,input_paths)):
-            output_paths[source] = {}
+        for salt_x,(input_path) in enumerate(input_paths)):
+            output_paths[input_path] = {}
             for salt_y,subset in enumerate(user_subsets):
-                output_paths[source][subset] = self.__get_path__(input_path,
-                                                                 subset,
-                                                                 ensure_unique_output,
-                                                                 "%d%d" % (salt_x,salt_y))
+                output_paths[input_path][subset] = self.__get_path__(input_path,
+                                                                     subset,
+                                                                     ensure_unique_output,
+                                                                     "%d%d" % (salt_x,salt_y))
         return output_paths
 
     def __get_path__(self,input_path,subset,ensure_unique_output,salt):

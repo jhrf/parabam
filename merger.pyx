@@ -16,39 +16,40 @@ from multiprocessing import Queue,Process
 from itertools import izip
 
 class MergePackage(parabam.core.Package):
-    def __init__(self,object results,str subset_type,str source,object destroy):
+    def __init__(self,object results,str subset_type, object destroy):
         super(MergePackage,self).__init__(results,destroy)
         self.subset_type = subset_type
-        self.source = source
 
 class Handler(parabam.core.Handler):
-    def __init__(self,object inqu, object const,int destroy_limit=1):
-        super(Handler,self).__init__(inqu,const,report=False,destroy_limit=destroy_limit)
+
+    def __init__(self,object parent_bam, object output_paths,object inqu,
+                      object const,object pause_qu,dict out_qu_dict):
+
+        super(Handler,self).__init__(parent_bam,output_paths,inqu,const,pause_qu,
+                                        out_qu_dict,report=False)
         
-        self._sources = const.sources
         self._user_subsets = list(const.user_subsets)
         self._out_file_objects = self.__get_out_file_objects__()
         self._merged = 0
 
     def __get_out_file_objects__(self):
         file_objects = {}
-        output_paths = self.const.output_paths
-        for src in self._sources:
-            master = pysam.Samfile(self.const.master_file_path[src],"rb")
-            file_objects[src] = {}
-            for subset in self._user_subsets:
-                merge_type = self.__get_subset_merge_type__(output_paths[src][subset])
-                cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_paths[src][subset],master)
-                file_objects[src][subset] = cur_file_obj
-            master.close()
+        output_paths = self._output_paths
+
+        file_objects = {}
+        for subset in self._user_subsets:
+            merge_type = self.__get_subset_merge_type__(output_paths[subset])
+            cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_paths[subset])
+            file_objects[subset] = cur_file_obj
+
         return file_objects
 
-    def __get_file_for_merge_type__(self,merge,path,master):
+    def __get_file_for_merge_type__(self,merge,path):
         if merge == "gzip":
             return gzip.open(path,"wb")
         elif merge == "txt":
             return open(path,"w")
-        return pysam.AlignmentFile(path,"wb",template=master)
+        return pysam.AlignmentFile(path,"wb",header=self._parent_bam.header)
 
     def __get_subset_merge_type__(self,path):
         root,extension = os.path.splitext(path)
@@ -64,13 +65,12 @@ class Handler(parabam.core.Handler):
     def __new_package_action__(self,new_package,**kwargs):
         #Handle the result. Result will always be of type parabam.support.MergePackage
         subset_type = new_package.subset_type
-        source = new_package.source
 
         for merge_count,merge_path in new_package.results:
             try:
                 if merge_count > 0:
                     for item in self.__get_entries_from_file__(merge_path,subset_type):
-                        self._out_file_objects[source][subset_type].write(item)
+                        self._out_file_objects[subset_type].write(item)
                 os.remove(merge_path)
 
             except IOError:
@@ -110,9 +110,8 @@ class Handler(parabam.core.Handler):
         return "%s/%sTEMP%d.bam" % (temp_dir,temp_type,int(time.time()),)
 
     def __close_all_out_files__(self):
-        for source,file_dict in self._out_file_objects.items():
-            for subset,file_obj in file_dict.items():
-                file_obj.close()
+        for subset,file_obj in self._out_file_objects.items():
+            file_obj.close()
         del self._out_file_objects
 
     def __handler_exit__(self,**kwargs):

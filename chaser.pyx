@@ -34,12 +34,13 @@ class MatchMakerPackage(ChaserPackage):
 
 class Handler(parabam.core.Handler):
 
-    def __init__(self,object inqu,object mainqu,object pause_qus,
-                 object const,object destroy_limit, 
-                 object TaskClass):
+    def __init__(self,object parent_bam, object output_paths,
+                      object inqu,object const,object pause_qu,
+                      dict out_qu_dict,object mainqu, object TaskClass):
         
-        super(Handler,self).__init__(inqu,const,destroy_limit=destroy_limit,
-                                           report=False)
+        super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
+                                     inqu=inqu,const=const,pause_qu=pause_qu,
+                                     out_qu_dict=out_qu_dict)
 
         self._sources = const.sources
         
@@ -68,14 +69,6 @@ class Handler(parabam.core.Handler):
         self._primary_complete = True
 
         self._max_reads = 5000000
-
-        self._parent_bams = self.__get_parent_bams__(const.master_file_path)
-
-    def __get_parent_bams__(self,master_file_path):
-        parent_bams = {}
-        for source,path in master_file_path.items():
-            parent_bams[source] = parabam.core.ParentAlignmentFile(path,self.const.input_is_sam)
-        return parent_bams            
 
     #START -- BORROWED FROM PROCESOR
     #Need to refactor here to stop code duplication
