@@ -203,17 +203,21 @@ cdef class Processor:
 
     cdef int _chunk,_proc,_verbose
 
-    def __init__(self,object outqu,object const,object TaskClass,list task_args,object debug=False):
+    def __init__(self,object parent_path,object outqu,object const,
+                 object TaskClass,list task_args,str region = None,
+                 object debug=False):
 
         self._debug = debug
         self.const = const
         self._chunk = const.chunk
         self._proc = const.proc
-
-        self._master_file_path = const.master_file_path
-        self._parent_bam = self.__get_parent_bam__(const.master_file_path)
         self._verbose = const.verbose
         self._temp_dir = const.temp_dir
+
+        self._region = region
+        self._parent_path = parent_path
+        self._parent_bam = self.__get_parent_bam__(self._parent_path)
+        
         self._outqu = outqu
 
         #Class which we wish to run on each read
@@ -228,9 +232,9 @@ cdef class Processor:
     #and divide pertaining to the chromosome that it is aligned to
     def run(self,int update):
     
-        self.__pre_processor__(self._master_file_path)
+        self.__pre_processor__(self._parent_path)
         
-        cdef object master_bam = self.__get_master_bam__(self._master_file_path)
+        cdef object parent_object = self.__get_parent_object__(self._parent_path)
         cdef list collection = []
         cdef int collection_count = 0
 
@@ -241,12 +245,12 @@ cdef class Processor:
 
         #Insert a debug iterator into the processor, this workaround doesn't
         #slow processing when not in debug mode.
-        bam_iterator = self.__get_next_alig__(master_bam) if not self._debug \
-                            else self.__get_next_alig_debug__(master_bam)
+        parent_generator = self.__get_next_alig__(parent_object) if not self._debug \
+                            else self.__get_next_alig_debug__(parent_object)
 
-        for i,alig in enumerate(bam_iterator):
+        for i,alig in enumerate(parent_generator):
 
-            add_to_collection(master_bam,alig,collection)
+            add_to_collection(parent_object,alig,collection)
             collection_count += 1
 
             if collection_count == self._chunk:
@@ -258,7 +262,7 @@ cdef class Processor:
 
         wait_for_tasks(self._active_tasks,0)
         start_task(collection,destroy=True)
-        self.__end_processing__(master_bam)
+        self.__end_processing__(parent_object)
 
     #__wait_for_tasks__ controls the amount of currently running processors
     #it waits until a processor is free and then allows the creation of a new
@@ -314,8 +318,12 @@ cdef class Processor:
 
     #Should be over written if we don't want data from BAM file.
     def __get_next_alig__(self,master_bam):
-        for alig in master_bam.fetch(until_eof=True):
-            yield alig
+        if not self._region:
+            for alig in master_bam.fetch(until_eof=True):
+                yield alig
+        else:
+            for alig in master_bam.fetch(region=self.const.fetch_region):
+                yield alig
 
     def __get_next_alig_debug__(self,master_bam):
         for i,alig in enumerate(master_bam.fetch(until_eof=True)):
@@ -344,23 +352,55 @@ cdef class Processor:
 class Leviathon(object):
     #Leviathon takes objects of processors and handlers and
     #chains them together.
-    def __init__(self,list processors,list handlers,int update=10000000):
+    def __init__(self,input_path,object const,list processor_bundle,list handler_bundle,int update=10000000):
+        self._input_path = input_path
+        self._sources = sources
         self._processors = processors 
         self._handlers  = handlers
         self._update = update
     
     def run(self):
-        procs = []
+
+        input_path = self._input_path
+        parent = ParentAlignmentFile(input_path)
+        references = parent.references
+        lengths = parent.lengths
+
+        chrm_by_length = reversed(sorted(zip(references,lengths),key=lambda tup: tup[1]))
+        active_processors = []
+        proc_pause_qus = []
+
+        max_processors = #???
+        handlers = self.__create_handlers__(handler_bundle)
+        handler_processes = self.__start_handlers__(handlers)
+
+        while True:
+
+            self.__update_processors__(active_processors,proc_pause_qus)
+            self.__pause_routine__()
+
+            if len(active_processors) < max_processors:
+                #start a new processor
+                try:
+                    for chrm,length in chrm_by_length:
+                    proc_class = processor_bundle["class"]
+                    del processor_bundle["class"]
+
+                    processor_bundle["input_path"] = input_path
+                    proc = proc_class(**processor_bundle)
+
+                    ppr = multiprocessing.Process(target=proc.run,args=(self._update,))
+                    ppr.start()
+                    active_processors.append(ppr)
+                except StopIteration:
+                    break    
+
+        #join remaining procs
 
         for p in self._processors:
             ppr = multiprocessing.Process(target=p.run,args=(self._update,))
             ppr.start()
             procs.append(ppr)
-
-        for h in self._handlers:
-            hpr = multiprocessing.Process(target=h.listen,args=(self._update,))
-            hpr.start()
-            procs.append(hpr)
 
         procs[-1].join() #Wait on the last handler that we started.
 
@@ -371,6 +411,96 @@ class Leviathon(object):
         del self._processors
         del self._handlers
         del procs
+
+    def __pause_routine__(self,in_pause_qu,proc_pause_qus):
+        pause = self.__pause_query__(in_pause_qu,proc_pause_qus)
+        if pause:
+            while True:
+                pause = self.__pause_query__(in_pause_qu,proc_pause_qus,bypass=True)
+                if not pause:
+                    break
+
+    #TODO: similar to code in the Processor class
+    def __pause_query__(self,in_pause_qu,proc_pause_qus,bypass=True):
+        try:
+            if bypass:
+                pause = True
+            else:
+                pause = in_pause_qu.get(False)
+                if pause:
+                    for qu in proc_pause_qus:
+                        qu.put(True)
+
+            if pause:
+                while True:
+                    try:
+                        pause = in_pause_qu.get(False)
+                        if not pause:
+                            for qu in proc_pause_qus:
+                                qu.put(False)
+            
+                    except Queue2.Empty:
+                        time.sleep(1)
+        except Queue2.Empty:
+            pass
+
+        last = False  
+        while True:
+            try:
+                pause = self._inqu.get(False)
+                last = pause
+            except Queue2.Empty:
+                break
+        return last
+
+    #TODO: modified from Processor
+     def __update_processors__(self,active_tasks,proc_pause_qus):
+        terminated_procs = []
+        terminated_qus = []
+        for pr,pause_qu in active_tasks,proc_pause_qus:
+            if not pr.is_alive():
+                pr.terminate()
+                terminated_procs.append(pr)
+                terminated_qus.append(pause_qu)
+
+        for pr,qu in (terminated_procs,proc_pause_qus):
+            active_tasks.remove(pr)
+            
+            qu.close()
+            proc_pause_qus.remove(qu)
+
+        if len(terminated_procs) > 0:
+            #Only invoked the GC if there is the possibility of
+            #collecting any memory.
+            del terminated_procs
+            del terminated_qus
+            gc.collect()
+
+    def __create_handlers__(self,handler_order,handler_bundle,pause_qu):
+        handlers = []
+        handler_inqus = []
+
+        for handler_class in handler_order:
+            handler_args = hander_bundle[handler_class]
+            handler_args["pause_qu"] = pause_qu
+
+            handler_inqus.append(handler_args["inqu"])
+            handlers.append(handler_class(**handler_args))
+
+        return handlers,handler_inqus
+
+    def __start_handlers__(self,handlers):
+        handler_processes = []
+        for handler in handlers:
+            hpr = multiprocessing.Process(target=h.listen,args=(self._update,))
+            hpr.start()
+            handler_processes.append(hpr)
+        return handler_processes
+
+    def __destory__handlers__(self,handler_processes,handler_inqus):
+        for process,queue in izip(handler_processes,handler_inqus):
+            queue.put(DestroyPackage())
+            process.join()
 
 #Provides a conveinant way for providing an Interface to parabam
 #programs. Includes default command_args and framework for 
@@ -480,6 +610,10 @@ class CorePackage(Package):
         super(CorePackage,self).__init__(results,destroy)
         self.curproc = curproc
         self.parent_class = parent_class
+
+class DestroyPackage(Package):
+    def __init__(self):
+        super(DestroyPackage,self).__init__(results={},destroy=True)
 
 class ParentAlignmentFile(object):
     
