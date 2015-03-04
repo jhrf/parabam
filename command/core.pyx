@@ -168,7 +168,7 @@ class Handler(parabam.core.Handler):
         self._sources = const.sources
         self._system_subsets = const.system_subsets
 
-        #Stage stores keep serve as a staging area
+        #Stage stores serve as a staging area
         #for packages to be sent on to subhandlers
         self._stage_stores = {}
         for source in self._sources:
