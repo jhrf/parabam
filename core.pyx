@@ -9,13 +9,14 @@ import argparse
 
 import pysam
 
-import multiprocessing
+from itertools import izip
+from multiprocessing import Process,Queue
 from abc import ABCMeta, abstractmethod
 
 #Tasks are started by parabam.Processor. Once started 
 #they will carryout a predefined task on the provided
 #subset of reads (task_set).
-class Task(multiprocessing.Process):
+class Task(Process):
 
     __metaclass__ = ABCMeta
 
@@ -23,7 +24,7 @@ class Task(multiprocessing.Process):
                      object outqu,int curproc,
                      object const,str parent_class):
         
-        multiprocessing.Process.__init__(self)
+        Process.__init__(self)
         self._task_set = task_set
         self._outqu = outqu
         self._curproc = curproc
@@ -33,11 +34,10 @@ class Task(multiprocessing.Process):
         self.const = const
 
     def run(self):
-        cdef dict results = self.__generate_results__()
+        results = self.__generate_results__()
         results["total"] = len(self._task_set)
 
         self._outqu.put(CorePackage(results=results,
-                                destroy=self._destroy,
                                 curproc=self._curproc,
                                 parent_class=self._parent_class))
         #Trying to control mem useage
@@ -59,6 +59,7 @@ cdef class Handler:
     def __init__(self,object parent_bam, object output_paths,object inqu,
                 object const,object pause_qu,dict out_qu_dict,object report=True):
 
+        self._parent_bam = parent_bam
         self._inqu = inqu
         self._pause_qu = pause_qu
         self._out_qu_dict = out_qu_dict
@@ -124,7 +125,7 @@ cdef class Handler:
             #Listen for a process coming in...
             try:
                 new_package = self._inqu.get(False)
-                if new_package.destroy:
+                if type(new_package) == DestroyPackage:
                     self._destroy = True
 
                 if not new_package.results == {}:#If results are present...
@@ -147,7 +148,7 @@ cdef class Handler:
         self._inqu.close()
         self.__handler_exit__()
 
-    def __is_finished__():
+    def __is_finished__(self):
         if not self._destroy or not self._finished:
             return False
         return True
@@ -208,13 +209,10 @@ cdef class Handler:
 
 #The Processor iterates over a BAM, subsets reads and
 #then starts a parbam.Task process on the subsetted reads
-cdef class Processor:
-
-    cdef int _chunk,_proc,_verbose
-
-    def __init__(self,object parent_bam,object outqu,object const,
-                 object TaskClass,list task_args,object pause_qu,
-                 str region = None,object debug=False):
+class Processor:
+    def __init__(self,object parent_bam,object outqu,
+                object const,object TaskClass,dict task_args,
+                object pause_qu,str region = None,object debug=False):
 
         self._debug = debug
         self.const = const
@@ -226,8 +224,9 @@ cdef class Processor:
         self._region = region
         self._parent_bam = parent_bam
         self._parent_path = parent_bam.filename
-        
+
         self._outqu = outqu
+        self._pause_qu = pause_qu
 
         #Class which we wish to run on each read
         self._TaskClass = TaskClass
@@ -243,7 +242,7 @@ cdef class Processor:
     
         self.__pre_processor__()
         
-        cdef object parent_object = self.__get_parent_object__(self._parent_path)
+        cdef object parent_object = self.__get_master_bam__(self._parent_bam.filename)
         cdef list collection = []
         cdef int collection_count = 0
 
@@ -254,6 +253,7 @@ cdef class Processor:
 
         #Insert a debug iterator into the processor, this workaround doesn't
         #slow processing when not in debug mode.
+
         parent_generator = self.__get_next_alig__(parent_object) if not self._debug \
                             else self.__get_next_alig_debug__(parent_object)
 
@@ -321,18 +321,20 @@ cdef class Processor:
                 "curproc":self._active_count,
                 "parent_bam":self._parent_bam,
                 "const":self.const,
-                "parent_class"self.__class__.__name__}
+                "parent_class":self.__class__.__name__}
+
         args.update(self._task_args)
 
         task = self._TaskClass(**args)
         task.start()
         self._active_tasks.append(task)
 
-    def __get_master_bam__(self,master_file_path):
+    def __get_master_bam__(self,input_path):
         if self.const.input_is_sam:
-            return pysam.Samfile(self.const.master_file_path[self._source],"r")
+            mode = "r"
         else:
-            return pysam.Samfile(self.const.master_file_path[self._source],"rb")
+            mode = "rb"
+        return pysam.Samfile(input_path,mode)
 
     #Should be over written if we don't want data from BAM file.
     def __get_next_alig__(self,master_bam):
@@ -345,7 +347,7 @@ cdef class Processor:
 
     def __get_next_alig_debug__(self,master_bam):
         for i,alig in enumerate(master_bam.fetch(until_eof=True)):
-            if i < 10000000:
+            if i < 1000:
                 yield alig
             else:
                 return
@@ -365,20 +367,21 @@ cdef class Processor:
     def __get_parent_bam__(self, master_file_path):
         return ParentAlignmentFile(master_file_path,self.const.input_is_sam)
 
-     def __query_pause_qu__(self,bypass):
+    def __query_pause_qu__(self,bypass):
         #This fairly obfuscated code is to fix
         #a race condition when a pause can
         #be missed due to waiting on a previous pause
+        pause_qu = self._pause_qu
         try:
             if bypass:
                 pause = True
             else:
-                pause = self._inqu.get(False)
+                pause = pause_qu.get(False)
 
             if pause:
                 while True:
                     try:
-                        pause = self._inqu.get(False)
+                        pause = pause_qu.get(False)
                         if not pause:
                             break
                     except Queue2.Empty:
@@ -389,7 +392,7 @@ cdef class Processor:
         last = False  
         while True:
             try:
-                pause = self._inqu.get(False)
+                pause = pause_qu.get(False)
                 last = pause
             except Queue2.Empty:
                 break
@@ -398,32 +401,32 @@ cdef class Processor:
 class Leviathon(object):
     #Leviathon takes objects of processors and handlers and
     #chains them together.
-    def __init__(self,int max_processors, object const,list 
-                processor_bundle,list handler_bundle,list queue_names,
-                int update=10000000):
+    def __init__(self,int max_processors, object const,dict processor_bundle,
+                dict handler_bundle,list handler_order,list queue_names,int update=100):
 
         self._max_processors = max_processors
-        self._sources = sources
-        self._processors = processors 
-        self._handlers  = handlers
+        self._processor_bundle = processor_bundle 
+        self._handler_bundle  = handler_bundle
+        self._handler_order = handler_order
         self._update = update
         self._queue_names = queue_names
     
     def run(self,input_path,output_paths):
         parent = ParentAlignmentFile(input_path)
-        references = parent.references
-        lengths = parent.lengths
-
-        chrm_by_length = reversed(sorted(zip(references,lengths),key=lambda tup: tup[1]))
-        active_processors = []
-        proccesor_pause_qus = []
-
-        max_processors = self.max_processors
 
         default_qus = self.__create_queues__(self._queue_names) 
 
-        handlers = self.__create_handlers__(handler_bundle,default_qus)
+        processor_bundle = dict(self._processor_bundle)
+        self.__run_info_to_bundle__(processor_bundle,default_qus,parent)
+
+        handlers,handler_inqus = self.__create_handlers__(self._handler_order,self._handler_bundle,
+                                                          default_qus,parent,output_paths)
         handler_processes = self.__start_handlers__(handlers)
+
+        chrm_by_length = reversed(sorted(zip(parent.references,parent.lengths),key=lambda tup: tup[1]))
+        max_processors = self._max_processors
+        proccesor_pause_qus = []
+        active_processors = []
 
         while True:
 
@@ -432,24 +435,23 @@ class Leviathon(object):
 
             if len(active_processors) < max_processors:
                 try:
-                    chrm,length chrm_by_length.next()
-                    proc_class = processor_bundle["class"]
-                    del processor_bundle["class"]
+                    chrm,length = chrm_by_length.next()
+
+                    cur_bundle = dict(processor_bundle)
 
                     new_pause = Queue()
-                    processor_bundle["out_qu"] = default_qus["main"]
-                    processor_bundle["pause_qu"] = new_pause
-                    processor_bundle["parent_bam"] = parent
-                    processor_bundle["region"] = "%s" % (chrm,)
+                    cur_bundle["pause_qu"] = new_pause
+                    cur_bundle["region"] = "%s" % (chrm,)
 
-                    proc = proc_class(**processor_bundle)
-
-                    ppr = multiprocessing.Process(target=proc.run,args=(self._update,))
+                    proc = Processor(**cur_bundle)
+                    ppr = Process(target=proc.run,args=(self._update,))
                     ppr.start()
 
                     proccesor_pause_qus.append(new_pause)
                     active_processors.append(ppr)
 
+                    del cur_bundle
+                    
                 except StopIteration:
                     break    
 
@@ -463,10 +465,15 @@ class Leviathon(object):
 
         gc.collect()
 
+    def __run_info_to_bundle__(self,processor_bundle,default_qus,parent):
+        processor_bundle["outqu"] = default_qus[processor_bundle["outqu"]]
+        processor_bundle["parent_bam"] = parent
+
     def __create_queues__(self,queue_names):
         queues = {}
         for name in queue_names:
             queues[name] = Queue()
+        queues["pause"] = Queue()
         return queues
 
     def __wait_and_destroy_processors__(self,active_processors,proccesor_pause_qus):
@@ -483,7 +490,7 @@ class Leviathon(object):
                     break
 
     #TODO: similar to code in the Processor class
-    def __pause_query__(self,in_pause_qu,proccesor_pause_qus,bypass=True):
+    def __pause_query__(self,in_pause_qu,proccesor_pause_qus,bypass=False):
         try:
             if bypass:
                 pause = True
@@ -500,7 +507,7 @@ class Leviathon(object):
                         if not pause:
                             for qu in proccesor_pause_qus:
                                 qu.put(False)
-            
+                            break
                     except Queue2.Empty:
                         time.sleep(1)
         except Queue2.Empty:
@@ -509,25 +516,25 @@ class Leviathon(object):
         last = False  
         while True:
             try:
-                pause = self._inqu.get(False)
+                pause = in_pause_qu.get(False)
                 last = pause
             except Queue2.Empty:
                 break
         return last
 
     #TODO: modified from Processor
-     def __update_processors__(self,active_tasks,proccesor_pause_qus):
+    def __update_processors__(self,active_tasks,proccesor_pause_qus):
         terminated_procs = []
         terminated_qus = []
-        for pr,pause_qu in active_tasks,proccesor_pause_qus:
+        for pr,pause_qu in izip(active_tasks,proccesor_pause_qus):
             if not pr.is_alive():
                 pr.terminate()
                 terminated_procs.append(pr)
                 terminated_qus.append(pause_qu)
 
-        for pr,qu in (terminated_procs,proccesor_pause_qus):
+        for pr,qu in izip(terminated_procs,terminated_qus):
             active_tasks.remove(pr)
-            
+
             qu.close()
             proccesor_pause_qus.remove(qu)
 
@@ -544,7 +551,7 @@ class Leviathon(object):
         handler_inqus = []
 
         for handler_class in handler_order:
-            handler_args = dict(hander_bundle[handler_class])
+            handler_args = dict(handler_bundle[handler_class])
 
             handler_args["parent_bam"] = parent_bam
             handler_args["output_paths"] = output_paths
@@ -563,7 +570,7 @@ class Leviathon(object):
     def __start_handlers__(self,handlers):
         handler_processes = []
         for handler in handlers:
-            hpr = multiprocessing.Process(target=h.listen,args=(self._update,))
+            hpr = Process(target=handler.listen,args=(self._update,))
             hpr.start()
             handler_processes.append(hpr)
         return handler_processes

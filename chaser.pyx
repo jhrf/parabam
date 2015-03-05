@@ -15,14 +15,12 @@ from multiprocessing import Queue,Process
 
 class ChaserPackage(parabam.core.Package):
     def __init__(self,results,chaser_type):
-        super(ChaserPackage,self).__init__(results,destroy)
-        
+        super(ChaserPackage,self).__init__(results)
         self.chaser_type=chaser_type
 
 class OriginPackage(ChaserPackage):
-    def __init__(self,results,destroy,chaser_type,processing=True):
+    def __init__(self,results,chaser_type):
         super(OriginPackage,self).__init__(results,chaser_type)
-        self.processing = processing
 
 class MatchMakerPackage(ChaserPackage):
     def __init__(self,loner_type,results,chaser_type,rescued,level):
@@ -41,7 +39,6 @@ class Handler(parabam.core.Handler):
                                      inqu=inqu,const=const,pause_qu=pause_qu,
                                      out_qu_dict=out_qu_dict)
         
-        self._pause_qus = pause_qus
         self._TaskClass = TaskClass
         
         self._loner_pyramid = self.__instalise_loner_pyramid__()
@@ -61,7 +58,6 @@ class Handler(parabam.core.Handler):
         self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
 
-        self._processing = True
         self._primary_complete = True
 
         self._max_reads = 5000000
@@ -77,18 +73,17 @@ class Handler(parabam.core.Handler):
         if max_tasks > currently_active:
             return
 
-        if self._processing:
-            for qu in self._pause_qus:
-                qu.put(True)
+        if not self._destroy:
+            self._pause_qu.put(True)
 
         while(max_tasks <= currently_active and currently_active > 0):
             update_tasks(active_tasks)
             currently_active = len(active_tasks)
             time.sleep(1)
 
-        if self._processing:
-            for qu in self._pause_qus:
-                qu.put(False)
+        if not self._destroy:
+            self._pause_qu.put(False)
+
         return 
 
     def __instalise_primary_store__(self):
@@ -118,7 +113,7 @@ class Handler(parabam.core.Handler):
         loner_pyramid = {}
         return loner_pyramid
 
-    def __new_package_action__(self,new_package,**kwargs):
+    def __new_package_action__(self,new_package,**kwargs):        
         chaser_type = new_package.chaser_type
         if chaser_type == "origin":
             self.__handle_origin_task__(new_package)
@@ -135,10 +130,12 @@ class Handler(parabam.core.Handler):
             else:
                 self._total_loners += loner_count
                 self._primary_store.append(path) 
-        if not new_package.processing:
-            self._processing = new_package.processing
-            self.__test_primary_tasks__(required_paths=1)
-            self.__wait_for_tasks__(self._tasks,0)
+
+        # Removed logic because of the new way destroy is handeled 
+        # if not new_package.processing:
+        #     self._processing = new_package.processing
+        #     self.__test_primary_tasks__(required_paths=1)
+        #     self.__wait_for_tasks__(self._tasks,0)
 
     def __handle_match_maker__(self,new_package):
         loner_type = new_package.loner_type
@@ -164,7 +161,7 @@ class Handler(parabam.core.Handler):
 
     def __test_primary_tasks__(self,required_paths=10):
         task_sent = False
-        if len(primary_store) >= required_paths:
+        if len(self._primary_store) >= required_paths:
             self.__start_primary_task__()
             task_sent = True
 
@@ -192,7 +189,7 @@ class Handler(parabam.core.Handler):
     def __periodic_action__(self,iterations):
         running = len(self._tasks)
 
-        if self._processing:
+        if not self._destroy:
             idle_threshold = 75
             required_paths = 10
         else:
@@ -223,7 +220,7 @@ class Handler(parabam.core.Handler):
                     idle_success,idle_paths,idle_levels = self.__idle_routine__(pyramid,loner_type)
 
                     #delete after idle success or when processing has finished and idle fails
-                    if self.__clear_subpyramid__(idle_success,self._processing,running):
+                    if self.__clear_subpyramid__(idle_success, self._destroy ,running):
                         pyramid_idle_counts[loner_type]=0
                         for idle_level,idle_path in izip(idle_levels,idle_paths):
                             if not idle_success:
@@ -240,7 +237,7 @@ class Handler(parabam.core.Handler):
 
         self.__test_primary_tasks__(required_paths=required_paths)
 
-        if not self._processing:
+        if self._destroy:
             if self._rescued["total"] == self._prev_rescued:
                 self._stale_count += 1
             else:
@@ -249,18 +246,19 @@ class Handler(parabam.core.Handler):
             saved = self.__save_purgatory_loners__()
 
             if (empty and running == 0) or self._stale_count == 200:
-                send_kill = True
+                finished = True
                 if not empty:
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
                     self.__tidy_pyramid__()
                 else: 
                     if saved > 0:
-                        send_kill = False
+                        finished = False
                     if not self.__is_queue_empty__():
-                        send_kill = False
+                        finished = False
                                        
-                if send_kill:
-                    self.__send_final_kill_signal__()
+                if finished:
+                    self._finished = True
+
         gc.collect()
 
 #        if iterations % 30 == 0:
@@ -315,11 +313,11 @@ class Handler(parabam.core.Handler):
                     os.remove(sub_pyramid.pop())
         gc.collect()
             
-    def __clear_subpyramid__(self,success,processing,running):
+    def __clear_subpyramid__(self,success,destroy,running):
         if success:
             #If the idle task was sent, clear pyramid
             return True
-        elif not processing and not success:
+        elif destroy and not success:
             if running == 0:
                 #if main process has finished and no tasks run
                 #clear the pyramid
@@ -330,11 +328,6 @@ class Handler(parabam.core.Handler):
         else:
             #Idle task not sent, don't clear pyramid
             return False
-
-    def __send_final_kill_signal__(self):
-        kill_package = parabam.core.CorePackage(results={},destroy=True,curproc=0,
-                                                parent_class=self.__class__.__name__)
-        self._mainqu.put(kill_package)
 
     def __idle_routine__(self,pyramid,loner_type):
         idle_paths = []
@@ -358,9 +351,9 @@ class Handler(parabam.core.Handler):
                 task_size = 2
             else:
                 task_size = 3
-        elif loner_type == "U-M" and level == 0 and self._processing:
+        elif loner_type == "U-M" and level == 0 and not self._destroy:
             task_size = 30
-        elif loner_type == "U-M" and level == 1 and self._processing:
+        elif loner_type == "U-M" and level == 1 and self._destroy:
             task_size = 15
         else:
             if level % 2 == 0:
@@ -380,7 +373,7 @@ class Handler(parabam.core.Handler):
             qu.close()
 
 class ChaserClass(Process):
-    def __init__(self,self parent_bam,object const):
+    def __init__(self,object parent_bam,object const):
         super(ChaserClass,self).__init__()
         self.const = const
 
@@ -657,7 +650,7 @@ class MatchMakerTask(ChaserClass):
         task = child_pack["TaskClass"](**args)
         task.start()
         task.join()
-        
+
         return len(pairs)
 
     def __get_leftover_object__(self,unique):

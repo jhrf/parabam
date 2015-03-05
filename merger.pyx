@@ -16,8 +16,8 @@ from multiprocessing import Queue,Process
 from itertools import izip
 
 class MergePackage(parabam.core.Package):
-    def __init__(self,object results,str subset_type, object destroy):
-        super(MergePackage,self).__init__(results,destroy)
+    def __init__(self,object results,str subset_type):
+        super(MergePackage,self).__init__(results)
         self.subset_type = subset_type
 
 class Handler(parabam.core.Handler):
@@ -38,8 +38,9 @@ class Handler(parabam.core.Handler):
 
         file_objects = {}
         for subset in self._user_subsets:
-            merge_type = self.__get_subset_merge_type__(output_paths[subset])
-            cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_paths[subset])
+            output_path = output_paths[self._parent_bam.filename][subset]
+            merge_type = self.__get_subset_merge_type__(output_path)
+            cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_path)
             file_objects[subset] = cur_file_obj
 
         return file_objects
@@ -60,7 +61,12 @@ class Handler(parabam.core.Handler):
         return "pysam"
 
     def __periodic_action__(self,iterations):
-        pass
+        if self._destroy:
+            try:
+                pack = self._inqu.get(False,20)
+                self._inqu.put(pack)
+            except Queue2.Empty:
+                self._finished = True
 
     def __new_package_action__(self,new_package,**kwargs):
         #Handle the result. Result will always be of type parabam.support.MergePackage

@@ -25,7 +25,7 @@ class SubsetCore(object):
         cdef dict system = self._system
 
         for subset in self._user_subsets:
-            ext = self.__get_extension__(self.output_paths[subset])
+            ext = ".bam"
             temp_paths[subset] = self.__get_temp_path__(subset,ext)
             temp_objects[subset] = self.__get_temp_object__(temp_paths[subset],ext)
             counts[subset] = 0
@@ -212,11 +212,8 @@ class Interface(parabam.command.Interface):
         del args["self"]
         return super(Interface,self).run(**args)
 
-    def __get_queues__(self,object const,pair_process,**kwargs):
+    def __get_queue_names__(self,pair_process,**kwargs):
         queues = ["merge","main"]
-        if pair_process:
-            queues = ["chaser"]
-
         return queues
 
     def __get_processor_bundle__(self,object const,task_class,debug,**kwargs): 
@@ -224,10 +221,12 @@ class Interface(parabam.command.Interface):
                             "const":const,
                             "TaskClass":task_class,
                             "task_args":{},
-                            "debug":debug,
-                            "class":parabam.core.Processor}
+                            "debug":debug}
 
         return processor_bundle
+
+    def __get_destroy_handler_order__(self):
+        return [Handler,parabam.merger.Handler]
 
     def __get_handler_bundle__(self,object const,task_class,pair_process,**kwargs):
         handler_bundle = {}
@@ -242,15 +241,13 @@ class Interface(parabam.command.Interface):
                                                   "out_qu_dict":[]}
         return handler_bundle
 
-    def __get_output_paths__(self,input_paths,user_subsets,ensure_unique_output,**kwargs):
-        output_paths = {}
-        for salt_x,(input_path) in enumerate(input_paths)):
-            output_paths[input_path] = {}
-            for salt_y,subset in enumerate(user_subsets):
-                output_paths[input_path][subset] = self.__get_path__(input_path,
-                                                                     subset,
-                                                                     ensure_unique_output,
-                                                                     "%d%d" % (salt_x,salt_y))
+    def __get_output_paths__(self,input_path,user_subsets,ensure_unique_output,**kwargs):
+        output_paths = {input_path:{}}
+        for salt,subset in enumerate(user_subsets):
+            output_paths[input_path][subset] = self.__get_path__(input_path,
+                                                                 subset,
+                                                                 ensure_unique_output,
+                                                                 salt)
         return output_paths
 
     def __get_path__(self,input_path,subset,ensure_unique_output,salt):
@@ -259,7 +256,7 @@ class Interface(parabam.command.Interface):
         unique = ""
 
         if ensure_unique_output:
-            unique = "_%d%s" % (time.time(),salt)
+            unique = "_%d%d" % (time.time(),salt)
 
         return os.path.join(".",self._temp_dir, "%s_%s%s%s" % (tail,subset,unique,ext))
             
@@ -281,7 +278,6 @@ class Interface(parabam.command.Interface):
                 #TODO: Untested exception here. Class name might be ABCMeta also
                 raise Exception("[ERROR] User engine class must inherit %s\n" \
                     % (base_class.__class__,))
-                sys.exit(1)
             else:
                 task_class = user_engine
         else:
@@ -289,8 +285,8 @@ class Interface(parabam.command.Interface):
 
         return task_class
 
-    def __get_const_args__(self,**kwargs):
-        args = super(Interface,self).__get_const_args__(**kwargs)
+    def __get_extra_const_args__(self,**kwargs):
+        args = {}
         args["user_subsets"] = kwargs["user_subsets"]
         args["output_counts"] = kwargs["output_counts"]
         return args

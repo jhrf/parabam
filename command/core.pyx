@@ -60,8 +60,8 @@ class Task(parabam.core.Task):
 
     def __get_temp_path__(self,typ,ext=".bam"):
         #self.pid ensures that the temp names are unique.
-        return "%s/%s_%s_%s_parabam_temp%s" %\
-            (self._temp_dir,self._source,typ,self.pid,ext)
+        return "%s/%s_%s_parabam_temp%s" %\
+            (self._temp_dir,typ,self.pid,ext)
 
     def __engine__(self,read,user_constants,parent):
         return self.const.user_engine(read,user_constants,parent)
@@ -70,12 +70,11 @@ class PairTask(Task):
     __metaclass__ = ABCMeta
 
     def __init__(self,object task_set,object outqu,object curproc,
-                 object destroy,object parent_bam,object const,str parent_class):
+                 object parent_bam,object const,str parent_class):
         
         super(PairTask, self).__init__(task_set=task_set,
                                        outqu=outqu,
                                        curproc=curproc,
-                                       destroy=destroy,
                                        parent_bam = parent_bam,
                                        const=const,
                                        parent_class=parent_class)
@@ -175,7 +174,6 @@ class Handler(parabam.core.Handler):
             self._stage_stores[subset] = []
 
         self._out_qu_dict = out_qu_dict
-        self._proc_flag_sent = False
         self._stagecount = 0
 
     #Child classes MUST call super
@@ -183,7 +181,7 @@ class Handler(parabam.core.Handler):
         results = new_package.results
         handle_dict = dict(results)
         #hack so as not record rescued paired reads twice in total
-        if self.const.pair_process and not new_package.parent_class == "PairProcessor":
+        if self.const.pair_process and not new_package.parent_class == "Processor":
             handle_dict["total"] = 0
         self.__auto_handle__(handle_dict,self._stats)
 
@@ -222,13 +220,10 @@ class Handler(parabam.core.Handler):
     def __test_stage_store__(self,subset):
         return len(self._stage_stores[subset]) > 0
     
-    def __is_processing__(self):
-        return self._destroy_count < (self._destroy_limit - 1)
-
-    def __add_staged_system_task__(self,results,subset_type,destroy=False):
+    def __add_staged_system_task__(self,results,subset_type):
         if subset_type == "chaser":
-            res = parabam.chaser.OriginPackage(results=results,destroy=destroy,
-                                chaser_type="origin",processing= self.__is_processing__())
+            res = parabam.chaser.OriginPackage(results=results,
+                                chaser_type="origin")
             self._out_qu_dict["chaser"].put(res)
 
     #Child classes MUST call super
@@ -271,6 +266,13 @@ class Interface(parabam.core.Interface):
         pass
 
     @abstractmethod
+    def __get_destroy_handler_order__(self):
+        '''Should return a list of hanlder classes in the 
+        order that they are to be destroyed by the leviathon
+        all hanlder class should have a corresponding bundle entry'''
+        pass 
+
+    @abstractmethod
     def __get_output_paths__(self,input_paths,**kwargs):
         pass
 
@@ -279,18 +281,25 @@ class Interface(parabam.core.Interface):
         pass
 
     @abstractmethod
-    def __get_queues__(self,object const):
-        '''predefine queue objects for communication 
-        between processors and handlers. Should return
-        a dict of queues'''
+    def __get_queue_names__(self,**kwargs):
+        '''Predefine the names of queues in this implementation
+        these names are converted to queue objects by the leviathon
+        use these names when reference queus in processor and handler
+        bundles'''
         pass
 
-    def __get_const_args__(self,**kwargs):
+    @abstractmethod
+    def __get_extra_const_args__(self,**kwargs):
+        '''return empty dict if not needed'''
+        pass
+
+    def __get_const_args__(self,adjusted_proc,**kwargs):
         '''Any function overwriting this one MUST make a super call to this function.
         i.e args = super(<class_name>,self).__get_const_args__(**kwargs)'''
 
         args = {}
         args["temp_dir"] = self._temp_dir
+        args["proc"] = adjusted_proc
         defaults = ["chunk","verbose","user_constants",
                     "user_constants", "user_engine", "fetch_region", 
                     "pair_process", "include_duplicates","input_is_sam"]
@@ -299,10 +308,6 @@ class Interface(parabam.core.Interface):
             if key in defaults:
                 args[key] = val
 
-        args["proc"] = self.__get_max_proc__(kwargs["proc"],
-                                           kwargs["side_by_side"],
-                                           kwargs["pair_process"])
-
         if args["pair_process"]:
             args["system_subsets"] = ["chaser"]
         else:
@@ -310,41 +315,24 @@ class Interface(parabam.core.Interface):
 
         return args
 
-    def __create_handlers__(self,handler_bundle):
-        handler_objects = []
-        for handler_class,handler_arguments in handler_bundle.items():
-            handler_objects.append(handler_class(**handler_arguments))
-        return handler_objects
-
-    def __create_processors__(self,processor_bundle):
-        processor_objects = []
-        processor_class = processor_bundle["class"]
-        del processor_bundle["class"]
-
-        for source,args in processor_bundle.items():
-            processor_objects.append(processor_class(**args))
-        return processor_objects
-
     def __update_final_output_paths__(self,input_path,output_paths,final_output_paths):
         if "global" in output_paths.keys():
             final_output_paths["global"].extend(output_paths["global"])
 
         final_output_paths[input_path] = []
         if input_path in output_paths.keys():
-            output_path = output_paths[input_paths]
+            output_path = output_paths[input_path]
             if type(output_path) == dict:
                 for subset,path in output_path.items():
-                    final_output_paths[master_path].append(path)    
+                    final_output_paths[input_path].append(path)    
             elif type(output_paths) == list:
-                final_output_paths[master_path] = output_path
+                final_output_paths[input_path] = output_path
             elif type(output_paths) == str:
-                final_output_paths[master_path].append(output_path)
+                final_output_paths[input_path].append(output_path)
             else:
                 sys.stderr.write("[Error] Unexpected output path type: %s \n" \
                     % (type(output_paths[input_path])))
                 raise SystemExit
-        else:
-            continue
 
     def __output_files_to_cwd__(self,final_output_paths):
         revised_output_paths = {}
@@ -381,36 +369,46 @@ class Interface(parabam.core.Interface):
                     sys.stdout.write("\t%s\n" % (name,))            
         sys.stdout.write("\n")
 
+    def __get_max_proc__(self,proc,pair_process,**kwargs):
+        #TODO: Need to think about this more
+        task_per_processor = 2
+        max_proc = proc / task_per_processor 
+        if max_proc < 0:
+            return 1,1
+        return max_proc,task_per_processor
+
     def run(self,**kwargs):
 
         input_paths = kwargs["input_bams"]
 
-        const_args = self.__get_const_args__(**kwargs)
-        const = parabam.core.Const(**const_args)
-        final_output_paths = {"global":[]}
-        task_class = self.__get_task_class__(**kwargs)
+        max_processors,adjusted_proc = self.__get_max_proc__(**kwargs)
 
+        const_args = self.__get_const_args__(adjusted_proc,**kwargs)
+        const_args.update(self.__get_extra_const_args__(**kwargs))
+        const = parabam.core.Const(**const_args)
+
+        task_class = self.__get_task_class__(**kwargs)
+        queue_names = self.__get_queue_names__(**kwargs)
+
+        handler_order = self.__get_destroy_handler_order__()
         handler_bundle = self.__get_handler_bundle__(const=const,
-                                                         task_class=task_class,
-                                                         **kwargs)
+                                                     task_class=task_class,
+                                                     **kwargs)
 
         processor_bundle = self.__get_processor_bundle__(const=const,
                                                          task_class=task_class,
                                                          **kwargs)
-
         if const.pair_process:
-            self.__prepare_for_pair_processing__(processor_bundle,
-                                                 handler_bundle,
-                                                 task_class,
-                                                 const)
+            self.__prepare_for_pair_processing__(handler_bundle,handler_order,
+                                                 task_class,queue_names,const)
+        
+        update_interval = self.__get_update_interval__(const.verbose)
 
-        if const.verbose == 1: 
-            update_interval = 199
-        else:
-            update_interval = 3
+        leviathon = parabam.core.Leviathon(max_processors,const,processor_bundle,
+                                           handler_bundle,handler_order,queue_names,
+                                           update_interval)
 
-        leviathon = parabam.core.Leviathon(max_processors,processor_bundle,
-                                           handler_bundle,update_interval)
+        final_output_paths = {"global":[]}
 
         for input_path in input_paths:
 
@@ -420,7 +418,7 @@ class Interface(parabam.core.Interface):
             if const.verbose: 
                 self.__report_file_names__(final_output_paths,input_path)
 
-            leviathon.run(input_path)
+            leviathon.run(input_path,output_paths)
 
         if not kwargs["keep_in_temp"]:
             final_output_paths = self.__output_files_to_cwd__(final_output_paths)
@@ -428,27 +426,24 @@ class Interface(parabam.core.Interface):
         self.__remove_empty_entries__(final_output_paths)
         return final_output_paths
 
+    def __get_update_interval__(self,verbose):
+        if verbose == 1: 
+            return 200
+        else:
+            return 3
+
     def __remove_empty_entries__(self,final_output_paths):
         for master_path,child_paths in final_output_paths.items():
             if len(child_paths) == 0:
                 del final_output_paths[master_path]
 
-    def __prepare_for_pair_processing__(self,handler_bundle,task_class,object const):        
+    def __prepare_for_pair_processing__(self,handler_bundle,handler_order,task_class,queue_names,object const):        
         handler_bundle[parabam.chaser.Handler] = {"inqu":"chaser",
                                                   "const":const,
-                                                  "out_qu_dict" = ["main"],
+                                                  "out_qu_dict":["main"],
                                                   "TaskClass":task_class}
-
-    def __get_max_proc__(self,proc,input_size,pair_process):
-        max_proc = (proc // input_size)
-        if pair_process:
-            max_proc = max_proc // 2
-        if max_proc == 0:
-            sys.stderr.write('[Error] Too many side-by-side inputs and too few processors.\n')
-            sys.stderr.write('\tNot enough processors to go round. Reduce -s or increase -p')
-            sys.stderr.flush()
-            raise SystemExit()
-        return max_proc
+        handler_order.insert(0,parabam.chaser.Handler)
+        queue_names.append("chaser")
 
     def default_parser(self):
         parser = super(Interface,self).default_parser()
