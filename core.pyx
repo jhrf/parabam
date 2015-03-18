@@ -16,7 +16,7 @@ from abc import ABCMeta, abstractmethod
 #Tasks are started by parabam.Processor. Once started 
 #they will carryout a predefined task on the provided
 #subset of reads (task_set).
-class Task(Process):
+class TTask(Process):
 
     __metaclass__ = ABCMeta
 
@@ -34,7 +34,9 @@ class Task(Process):
         self.const = const
 
     def run(self):
+        #print "Task Started %d" % (self.pid,)
         results = self.__generate_results__()
+        #print "Task Finished %d" % (self.pid,)
         results["total"] = len(self._task_set)
 
         self._outqu.put(CorePackage(results=results,
@@ -106,6 +108,8 @@ cdef class Handler:
 
     #Must be overwritten if stats architecture is modififed
     def __total_reads__(self):
+        if self._stats == {}:
+            return 0
         return self._stats["total"]
 
     def listen(self,update_interval):
@@ -136,7 +140,7 @@ cdef class Handler:
 
             except Queue2.Empty:
                 #Queue empty. Continue with loop
-                time.sleep(1)
+                time.sleep(.5)
 
             if iterations % periodic_interval == 0: 
                 self.__periodic_action__(iterations)
@@ -207,207 +211,107 @@ cdef class Handler:
         #When the handler finishes, do this
         pass
 
+class Task(Process):
+
+    def __init__(self,parent_bam,seek,mod,outqu,size,header,temp_dir):
+        super(Task,self).__init__()
+        self._parent_bam = parent_bam
+        self._seek = seek
+        self._mod = mod
+        self._outqu = outqu
+        self._size = size
+        self._header = header
+        self._temp_dir = temp_dir
+
+    def run(self):
+        cdef int size = self._size
+        cdef int sub_count = 0
+
+        temp = pysam.AlignmentFile("%s/%s_%d_%d_subset.bam" % (self._temp_dir,self._mod,self.pid,time.time()),"wb",header = self._header)
+        bamfile = pysam.AlignmentFile(self._parent_bam.filename,"rb")
+        bamiter = bamfile.fetch(until_eof=True)
+        bamfile.seek(self._seek)
+
+        next_read = bamiter.next
+
+        for i in xrange(size):
+            try:
+                read = next_read()
+                if "TTAGGGTTAGGG" in read.seq:
+                    temp.write(read)
+                    sub_count += 1
+            except StopIteration:
+                break
+
+        results = {"temp_paths":{"subset":temp.filename},
+                   "counts": {"subset":sub_count},
+                   "total" : size}
+        temp.close()
+        self._outqu.put(CorePackage(results=results,
+                        curproc=self._mod,
+                        parent_class=self.__class__.__name__))
+
 #The Processor iterates over a BAM, subsets reads and
 #then starts a parbam.Task process on the subsetted reads
-class Processor:
-    def __init__(self,object parent_bam,object outqu,
-                object const,object TaskClass,dict task_args,
-                object pause_qu,str region = None,object debug=False):
+class Processor(Process):
+    def __init__(self,str input_path,int mod,object outqu,object const,int size):
+        super(Processor,self).__init__()
 
-        self._debug = debug
-        self.const = const
-        self._chunk = const.chunk
+        self._mod = mod
+        self._input_path = input_path
         self._proc = const.proc
-        self._verbose = const.verbose
         self._temp_dir = const.temp_dir
-
-        self._region = region
-        self._parent_bam = parent_bam
-        self._parent_path = parent_bam.filename
-
         self._outqu = outqu
-        self._pause_qu = pause_qu
-
-        #Class which we wish to run on each read
-        self._TaskClass = TaskClass
-        self._task_args = task_args 
-
-        self._active_tasks = []
-        self._active_count = 0
-        self._prev = 0
+        self._size = size
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
-    def run(self,int update):
-    
-        self.__pre_processor__()
-        
-        cdef object parent_object = self.__get_master_bam__(self._parent_bam.filename)
-        cdef list collection = []
-        cdef int collection_count = 0
-
-        #function alias, for optimisation
-        add_to_collection = self.__add_to_collection__
-        start_task = self.__start_task__
-        wait_for_tasks = self.__wait_for_tasks__
+    def run(self):
 
         #Insert a debug iterator into the processor, this workaround doesn't
         #slow processing when not in debug mode.
 
-        parent_generator = self.__get_next_alig__(parent_object) if not self._debug \
-                            else self.__get_next_alig_debug__(parent_object)
-
-        for i,alig in enumerate(parent_generator):
-
-            add_to_collection(parent_object,alig,collection)
-            collection_count += 1
-
-            if collection_count == self._chunk:
-                wait_for_tasks(self._active_tasks,self._proc) # -2 for proc and handler 
-                start_task(collection)      
-                del collection
-                collection = [] # already running
-                collection_count = 0
-
-        wait_for_tasks(self._active_tasks,0)
-        start_task(collection,destroy=True)
-        self.__end_processing__(parent_object)
-
-    #__wait_for_tasks__ controls the amount of currently running processors
-    #it waits until a processor is free and then allows the creation of a new
-    #process
-    def __wait_for_tasks__(self,list active_tasks,int max_tasks):
-        update_tasks = self.__update_tasks__ #optimising alias
-        update_tasks(active_tasks)
-        cdef int currently_active = len(active_tasks)
-        self._active_count = currently_active
-
-        if max_tasks > currently_active:
-            return
-
-        while(max_tasks <= currently_active and currently_active > 0):
-            update_tasks(active_tasks)
-            currently_active = len(active_tasks)
-            time.sleep(1)
-
-        return
-
-    def __update_tasks__(self,active_tasks):
-        terminated_procs = []
-        for pr in active_tasks:
-            if not pr.is_alive():
-                pr.terminate()
-                terminated_procs.append(pr)
+        parent_bam = pysam.AlignmentFile(self._input_path,"rb")
+        parent_iter = parent_bam.fetch(until_eof=True)
+        parent_generator = self.__bam_generator__(parent_iter)
         
-        for pr in terminated_procs:
-            active_tasks.remove(pr)
+        for i,command in enumerate(parent_generator):
+            task = Task(parent_bam,parent_bam.tell(),self._mod,self._outqu,1000000,parent_bam.header,self._temp_dir)
+            task.start()
+        parent_bam.close()
+        print "generator finished %d" % (self._mod,)
 
-        if len(terminated_procs) > 0:
-            #Only invoked the GC if there is the possibility of
-            #collecting any memory.
-            del terminated_procs
-            gc.collect()
-                   
-    def __start_task__(self,collection,destroy=False):
-        pause = self.__query_pause_qu__(False)
-        if pause:
-            while True:
-                pause = self.__query_pause_qu__(True)
-                if not pause:
-                    break
-        
-        args = {"task_set":collection,
-                "outqu":self._outqu,
-                "curproc":self._active_count,
-                "parent_bam":self._parent_bam,
-                "const":self.const,
-                "parent_class":self.__class__.__name__}
+    def __bam_generator__(self,parent_iter):
+        cdef int mod = self._mod
+        cdef int proc = self._proc
+        cdef int iterations = 0
+        cdef int chunk = 1000000
 
-        args.update(self._task_args)
-
-        task = self._TaskClass(**args)
-        task.start()
-        self._active_tasks.append(task)
-
-    def __get_master_bam__(self,input_path):
-        if self.const.input_is_sam:
-            mode = "r"
-        else:
-            mode = "rb"
-        return pysam.Samfile(input_path,mode)
-
-    #Should be over written if we don't want data from BAM file.
-    def __get_next_alig__(self,master_bam):
-        if not self._region:
-            for alig in master_bam.fetch(until_eof=True):
-                yield alig
-        else:
-            for alig in master_bam.fetch(region=self._region):
-                yield alig
-
-    def __get_next_alig_debug__(self,master_bam):
-        for i,alig in enumerate(master_bam.fetch(until_eof=True)):
-            if i < 1000:
-                yield alig
-            else:
-                return
-
-    def __end_processing__(self,master):
-        master.close()
-        for proc in self._active_tasks:
-            proc.join()
-            proc.terminate()
-
-    def __pre_processor__(self):
-        pass
-
-    def __add_to_collection__(self,master,item,collection):
-        collection.append(item)
-
-    def __get_parent_bam__(self, master_file_path):
-        return ParentAlignmentFile(master_file_path,self.const.input_is_sam)
-
-    def __query_pause_qu__(self,bypass):
-        #This fairly obfuscated code is to fix
-        #a race condition when a pause can
-        #be missed due to waiting on a previous pause
-        pause_qu = self._pause_qu
-        try:
-            if bypass:
-                pause = True
-            else:
-                pause = pause_qu.get(False)
-
-            if pause:
-                while True:
-                    try:
-                        pause = pause_qu.get(False)
-                        if not pause:
-                            break
-                    except Queue2.Empty:
-                        time.sleep(1)
-        except Queue2.Empty:
-            pass
-
-        last = False  
-        while True:
+        while True:            
             try:
-                pause = pause_qu.get(False)
-                last = pause
-            except Queue2.Empty:
+                if iterations % proc == mod:
+                    yield True
+                    for i in xrange(chunk):
+                        parent_iter.next()
+                else:
+                    for i in xrange(chunk):
+                        parent_iter.next()
+                iterations += 1
+            except StopIteration:
                 break
-        return last
-
+        return
+        
 class Leviathon(object):
     #Leviathon takes objects of processors and handlers and
     #chains them together.
     def __init__(self,int max_processors, object const,dict processor_bundle,
-                dict handler_bundle,list handler_order,list queue_names,int update=100):
+                dict handler_bundle,list handler_order,list queue_names,int update,str region):
 
         self._max_processors = max_processors
         self._processor_bundle = processor_bundle 
         self._handler_bundle  = handler_bundle
         self._handler_order = handler_order
+        self._region = region
         self._update = update
         self._queue_names = queue_names
     
@@ -423,51 +327,44 @@ class Leviathon(object):
                                                           default_qus,parent,output_paths)
         handler_processes = self.__start_handlers__(handlers)
 
-        chrm_by_length = reversed(sorted(zip(parent.references,parent.lengths),key=lambda tup: tup[1]))
         max_processors = self._max_processors
         proccesor_pause_qus = []
         active_processors = []
 
-        while True:
+            #self.__update_processors__(active_processors,proccesor_pause_qus)
+            #self.__pause_routine__(default_qus["pause"],proccesor_pause_qus)
 
-            self.__update_processors__(active_processors,proccesor_pause_qus)
-            self.__pause_routine__(default_qus["pause"],proccesor_pause_qus)
+        for submit_size,proc_num in izip(self.__power_generator__(),self.__proc_num_generator__(self._max_processors)):
+            proc_proc = Processor(input_path,proc_num,default_qus["main"],self._processor_bundle["const"],2*(10**submit_size))
+            proc_proc.start()
+            active_processors.append(proc_proc)
 
-            if len(active_processors) < max_processors:
-                try:
-                    chrm,length = chrm_by_length.next()
+        for proc_proc in active_processors:
+            proc_proc.join()
 
-                    cur_bundle = dict(processor_bundle)
-
-                    new_pause = Queue()
-                    cur_bundle["pause_qu"] = new_pause
-                    cur_bundle["region"] = "%s" % (chrm,)
-
-                    proc = Processor(**cur_bundle)
-                    ppr = Process(target=proc.run,args=(self._update,))
-                    ppr.start()
-
-                    proccesor_pause_qus.append(new_pause)
-                    active_processors.append(ppr)
-
-                    del cur_bundle
-                    
-                except StopIteration:
-                    break    
-
-        self.__wait_and_destroy_processors__(active_processors,proccesor_pause_qus)
         self.__destory__handlers__(handler_processes,handler_inqus)
+
+        for hand_proc in handler_processes:
+            hand_proc.join()
 
         del active_processors
         del proccesor_pause_qus
-        del handler_processes
         del handler_inqus
 
         gc.collect()
 
+    def __proc_num_generator__(self,total_proc):
+        for i in reversed(xrange(total_proc)):
+            yield i
+
+    def __power_generator__(self):
+        while True:
+            yield 5
+            yield 6
+
     def __run_info_to_bundle__(self,processor_bundle,default_qus,parent):
         processor_bundle["outqu"] = default_qus[processor_bundle["outqu"]]
-        processor_bundle["parent_bam"] = parent
+        processor_bundle["parent_bam"] = parent.filename
 
     def __create_queues__(self,queue_names):
         queues = {}
@@ -509,7 +406,7 @@ class Leviathon(object):
                                 qu.put(False)
                             break
                     except Queue2.Empty:
-                        time.sleep(1)
+                        time.sleep(.5)
         except Queue2.Empty:
             pass
 

@@ -71,7 +71,7 @@ class Handler(parabam.core.Handler):
     def __new_package_action__(self,new_package,**kwargs):
         #Handle the result. Result will always be of type parabam.support.MergePackage
         subset_type = new_package.subset_type
-
+        self._pause_qu.put(True)
         for merge_count,merge_path in new_package.results:
             try:
                 if merge_count > 0:
@@ -90,13 +90,18 @@ class Handler(parabam.core.Handler):
                 print "--"
 
                 raise
-                
-            self._merged += 1       
+            self._merged += 1
+        time.sleep(1)
+        self._pause_qu.put(False)
 
     def __get_entries_from_file__(self,path,subset):
         merge_type = self.__get_subset_merge_type__(path)
         if merge_type == "pysam":
-            file_object = pysam.AlignmentFile(path,"rb")
+            try:
+                file_object = pysam.AlignmentFile(path,"rb")
+            except IOError:
+                print "fail on path %s" % (path,)
+                return
             for read in file_object.fetch(until_eof=True):
                 yield read
         elif merge_type == "gzip":

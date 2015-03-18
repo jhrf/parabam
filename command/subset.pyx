@@ -107,7 +107,6 @@ class Handler(parabam.command.Handler):
     def __new_package_action__(self,new_package):
         super(Handler,self).__new_package_action__(new_package)
         results = new_package.results
-
         for subset in self._user_subsets:
             self._stage_stores[subset].append((results["counts"][subset],
                                                results["temp_paths"][subset],))
@@ -234,7 +233,7 @@ class Interface(parabam.command.Interface):
         #queues transformed by leviathon
         handler_bundle[Handler] = {"inqu":"main",
                                    "const":const, 
-                                   "out_qu_dict":["merge","chaser"]}
+                                   "out_qu_dict":["merge"]}
 
         handler_bundle[parabam.merger.Handler] = {"inqu":"merge",
                                                   "const":const,

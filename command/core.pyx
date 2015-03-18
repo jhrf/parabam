@@ -218,7 +218,7 @@ class Handler(parabam.core.Handler):
         gc.collect()
 
     def __test_stage_store__(self,subset):
-        return len(self._stage_stores[subset]) > 0
+        return len(self._stage_stores[subset]) > 20
     
     def __add_staged_system_task__(self,results,subset_type):
         if subset_type == "chaser":
@@ -299,8 +299,8 @@ class Interface(parabam.core.Interface):
 
         args = {}
         args["temp_dir"] = self._temp_dir
-        args["proc"] = adjusted_proc
-        defaults = ["chunk","verbose","user_constants",
+        #args["proc"] =  #adjusted_proc
+        defaults = ["proc","chunk","verbose","user_constants",
                     "user_constants", "user_engine", "fetch_region", 
                     "pair_process", "include_duplicates","input_is_sam"]
                     #TODO: Handle proc division __getmaxproc__
@@ -404,9 +404,9 @@ class Interface(parabam.core.Interface):
         
         update_interval = self.__get_update_interval__(const.verbose)
 
-        leviathon = parabam.core.Leviathon(max_processors,const,processor_bundle,
+        leviathon = parabam.core.Leviathon(kwargs["proc"],const,processor_bundle,
                                            handler_bundle,handler_order,queue_names,
-                                           update_interval)
+                                           update_interval,kwargs["fetch_region"])
 
         final_output_paths = {"global":[]}
 
@@ -428,9 +428,9 @@ class Interface(parabam.core.Interface):
 
     def __get_update_interval__(self,verbose):
         if verbose == 1: 
-            return 200
+            return 12
         else:
-            return 3
+            return 1
 
     def __remove_empty_entries__(self,final_output_paths):
         for master_path,child_paths in final_output_paths.items():
@@ -442,8 +442,12 @@ class Interface(parabam.core.Interface):
                                                   "const":const,
                                                   "out_qu_dict":["main"],
                                                   "TaskClass":task_class}
-        handler_order.insert(0,parabam.chaser.Handler)
+
+        for handler_class,handler_args in handler_bundle.items():
+            if issubclass(handler_class,Handler):
+                handler_bundle[handler_class]["out_qu_dict"].append("chaser")
         queue_names.append("chaser")
+        handler_order.insert(0,parabam.chaser.Handler)
 
     def default_parser(self):
         parser = super(Interface,self).default_parser()

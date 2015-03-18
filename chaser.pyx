@@ -37,7 +37,7 @@ class Handler(parabam.core.Handler):
         
         super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
                                      inqu=inqu,const=const,pause_qu=pause_qu,
-                                     out_qu_dict=out_qu_dict)
+                                     out_qu_dict=out_qu_dict,report = False)
         
         self._TaskClass = TaskClass
         
@@ -52,9 +52,10 @@ class Handler(parabam.core.Handler):
         self._stale_count = 0
 
         self._child_pack = {"queue":out_qu_dict["main"],"const":self.const,
-                            "TaskClass":self._TaskClass,"parent_bam":parent_bam}
+                            "TaskClass":self._TaskClass,"task_args":{},#TODO: need to get real task_args
+                            "parent_bam":parent_bam}
 
-        self._chaser_task_max = const.proc // 2
+        self._chaser_task_max = 8 #TODO: work this out properly
         self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
 
