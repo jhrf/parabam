@@ -213,44 +213,57 @@ cdef class Handler:
 
 class Task(Process):
 
-    def __init__(self,parent_bam,seek,mod,outqu,size,header,temp_dir):
+    def __init__(self,parent_path,inqu,outqu,size,header,temp_dir):
         super(Task,self).__init__()
-        self._parent_bam = parent_bam
-        self._seek = seek
-        self._mod = mod
+        self._parent_path = parent_path
         self._outqu = outqu
+        self._inqu = inqu
         self._size = size
         self._header = header
         self._temp_dir = temp_dir
 
     def run(self):
+        bamfile = pysam.AlignmentFile(self._parent_path,"rb")
         cdef int size = self._size
         cdef int sub_count = 0
 
-        temp = pysam.AlignmentFile("%s/%s_%d_%d_subset.bam" % (self._temp_dir,self._mod,self.pid,time.time()),"wb",header = self._header)
-        bamfile = pysam.AlignmentFile(self._parent_bam.filename,"rb")
-        bamiter = bamfile.fetch(until_eof=True)
-        bamfile.seek(self._seek)
-
-        next_read = bamiter.next
-
-        for i in xrange(size):
+        while True:
             try:
-                read = next_read()
-                if "TTAGGGTTAGGG" in read.seq:
-                    temp.write(read)
-                    sub_count += 1
-            except StopIteration:
-                break
+                package = self._inqu.get(True,1)
 
-        results = {"temp_paths":{"subset":temp.filename},
-                   "counts": {"subset":sub_count},
-                   "total" : size}
-        temp.close()
-        self._outqu.put(CorePackage(results=results,
-                        curproc=self._mod,
-                        parent_class=self.__class__.__name__))
+                if type(package) == DestroyPackage:
+                    break
 
+                seek = package.results
+                
+                temp = pysam.AlignmentFile("%s/%d_%d_subset.bam" %\
+                    (self._temp_dir,self.pid,time.time()),"wb",header = self._header)
+                
+                bamiter = bamfile.fetch(until_eof=True)
+                bamfile.seek(self._seek)
+                next_read = bamiter.next
+
+                for i in xrange(size):
+                    try:
+                        read = next_read()
+                        if "TTAGGGTTAGGG" in read.seq:
+                            temp.write(read)
+                            sub_count += 1
+                    except StopIteration:
+                        break
+
+                results = {"temp_paths":{"subset":temp.filename},
+                           "counts": {"subset":sub_count},
+                           "total" : size}
+                sub_count = 0
+                temp.close()
+                self._outqu.put(CorePackage(results=results,
+                                curproc=self._mod,
+                                parent_class=self.__class__.__name__))
+
+            except Queue2.Empty:
+                pass
+        
 #The Processor iterates over a BAM, subsets reads and
 #then starts a parbam.Task process on the subsetted reads
 class Processor(Process):
@@ -262,22 +275,28 @@ class Processor(Process):
         self._proc = const.proc
         self._temp_dir = const.temp_dir
         self._outqu = outqu
+        self._task_qu = Queue()
         self._size = size
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
     def run(self):
-
-        #Insert a debug iterator into the processor, this workaround doesn't
-        #slow processing when not in debug mode.
-
         parent_bam = pysam.AlignmentFile(self._input_path,"rb")
         parent_iter = parent_bam.fetch(until_eof=True)
         parent_generator = self.__bam_generator__(parent_iter)
         
+        tasks = [ Task(parent_path=self._input_path,
+                       inqu=self._task_qu,
+                       outqu=self._outqu,
+                       size=1000000,
+                       header=parent_bam.header,
+                       temp_dir=self._temp_dir) for i in xrange(3) ]
+
+        [task.start() for task in tasks]
+
         for i,command in enumerate(parent_generator):
-            task = Task(parent_bam,parent_bam.tell(),self._mod,self._outqu,1000000,parent_bam.header,self._temp_dir)
-            task.start()
+            self._task_qu.put(parent_bam.tell())
+
         parent_bam.close()
         print "generator finished %d" % (self._mod,)
 
