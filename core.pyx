@@ -224,44 +224,46 @@ class Task(Process):
 
     def run(self):
         bamfile = pysam.AlignmentFile(self._parent_path,"rb")
+        bamiter = bamfile.fetch(until_eof=True)
+        next_read = bamiter.next
+
         cdef int size = self._size
         cdef int sub_count = 0
 
         while True:
             try:
-                package = self._inqu.get(True,1)
-
+                package = self._inqu.get(False)
+                
                 if type(package) == DestroyPackage:
                     break
 
-                seek = package.results
-                
+                seek = package
                 temp = pysam.AlignmentFile("%s/%d_%d_subset.bam" %\
                     (self._temp_dir,self.pid,time.time()),"wb",header = self._header)
                 
-                bamiter = bamfile.fetch(until_eof=True)
-                bamfile.seek(self._seek)
-                next_read = bamiter.next
-
+                bamfile.seek(seek)
+                time.sleep(.05)
                 for i in xrange(size):
-                    try:
-                        read = next_read()
-                        if "TTAGGGTTAGGG" in read.seq:
-                            temp.write(read)
-                            sub_count += 1
-                    except StopIteration:
-                        break
+                    read = next_read()
+                    if "TTAGGGTTAGGG" in read.seq:
+                       temp.write(read)
+                       sub_count += 1
 
                 results = {"temp_paths":{"subset":temp.filename},
                            "counts": {"subset":sub_count},
                            "total" : size}
+                
                 sub_count = 0
                 temp.close()
+                time.sleep(0.005)
+                #print self.pid,"send"
                 self._outqu.put(CorePackage(results=results,
-                                curproc=self._mod,
+                                curproc=6,
                                 parent_class=self.__class__.__name__))
 
             except Queue2.Empty:
+                time.sleep(5)
+            except StopIteration:
                 pass
         
 #The Processor iterates over a BAM, subsets reads and
@@ -276,7 +278,8 @@ class Processor(Process):
         self._temp_dir = const.temp_dir
         self._outqu = outqu
         self._task_qu = Queue()
-        self._size = size
+        # self._size = 1000000 #good
+        self._size = 2500000
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
@@ -284,18 +287,24 @@ class Processor(Process):
         parent_bam = pysam.AlignmentFile(self._input_path,"rb")
         parent_iter = parent_bam.fetch(until_eof=True)
         parent_generator = self.__bam_generator__(parent_iter)
-        
-        tasks = [ Task(parent_path=self._input_path,
-                       inqu=self._task_qu,
-                       outqu=self._outqu,
-                       size=1000000,
-                       header=parent_bam.header,
-                       temp_dir=self._temp_dir) for i in xrange(3) ]
+       
+        task_qu = Queue()
 
-        [task.start() for task in tasks]
+        tasks = [ Task(parent_path=self._input_path,
+                       inqu=task_qu,
+                       outqu=self._outqu,
+                       size=self._size,
+                       header=parent_bam.header,
+                       temp_dir=self._temp_dir) for i in xrange(6) ]
+
+        for task in tasks:
+            task.start()
 
         for i,command in enumerate(parent_generator):
-            self._task_qu.put(parent_bam.tell())
+            #print i,self.pid
+            #time.sleep(.05)
+            time.sleep(.02)
+            task_qu.put(parent_bam.tell())
 
         parent_bam.close()
         print "generator finished %d" % (self._mod,)
@@ -304,17 +313,14 @@ class Processor(Process):
         cdef int mod = self._mod
         cdef int proc = self._proc
         cdef int iterations = 0
-        cdef int chunk = 1000000
+        cdef int chunk = self._size
 
         while True:            
             try:
                 if iterations % proc == mod:
                     yield True
-                    for i in xrange(chunk):
-                        parent_iter.next()
-                else:
-                    for i in xrange(chunk):
-                        parent_iter.next()
+                for i in xrange(chunk):
+                    parent_iter.next()
                 iterations += 1
             except StopIteration:
                 break
@@ -357,6 +363,7 @@ class Leviathon(object):
             proc_proc = Processor(input_path,proc_num,default_qus["main"],self._processor_bundle["const"],2*(10**submit_size))
             proc_proc.start()
             active_processors.append(proc_proc)
+            time.sleep(2)
 
         for proc_proc in active_processors:
             proc_proc.join()
@@ -622,8 +629,7 @@ class ParentAlignmentFile(object):
         self.header = parent.header
         self.lengths = parent.lengths
 
-        if not input_is_sam and has_index:
-            self.mapped = parent.mapped
+        if has_index:
             self.nocoordinate = parent.nocoordinate
             self.nreferences = parent.nreferences
             self.unmapped = parent.unmapped
