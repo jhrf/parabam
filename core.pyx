@@ -13,7 +13,7 @@ from itertools import izip
 from multiprocessing import Process,Queue
 from abc import ABCMeta, abstractmethod
 
-#Tasks are started by parabam.Processor. Once started 
+#Tasks are started by parabam.FileReader. Once started 
 #they will carryout a predefined task on the provided
 #subset of reads (task_set).
 class TTask(Process):
@@ -229,6 +229,7 @@ class Task(Process):
 
         cdef int size = self._size
         cdef int sub_count = 0
+        cdef int dealt = 0
 
         while True:
             try:
@@ -238,11 +239,11 @@ class Task(Process):
                     break
 
                 seek = package
-                temp = pysam.AlignmentFile("%s/%d_%d_subset.bam" %\
-                    (self._temp_dir,self.pid,time.time()),"wb",header = self._header)
+                temp = pysam.AlignmentFile("%s/%d_%d_%d_subset.bam" %\
+                    (self._temp_dir,dealt,self.pid,time.time()),"wb",header = self._header)
                 
                 bamfile.seek(seek)
-                time.sleep(.05)
+                time.sleep(.01)
                 for i in xrange(size):
                     read = next_read()
                     if "TTAGGGTTAGGG" in read.seq:
@@ -254,6 +255,7 @@ class Task(Process):
                            "total" : size}
                 
                 sub_count = 0
+                dealt += 1
                 temp.close()
                 time.sleep(0.005)
                 #print self.pid,"send"
@@ -266,20 +268,24 @@ class Task(Process):
             except StopIteration:
                 pass
         
-#The Processor iterates over a BAM, subsets reads and
+#The FileReader iterates over a BAM, subsets reads and
 #then starts a parbam.Task process on the subsetted reads
-class Processor(Process):
-    def __init__(self,str input_path,int mod,object outqu,object const,int size):
-        super(Processor,self).__init__()
+class FileReader(Process):
+    def __init__(self,str input_path,int proc_id,object outqu,int task_n,object const):
+        super(FileReader,self).__init__()
 
-        self._mod = mod
         self._input_path = input_path
-        self._proc = const.proc
-        self._temp_dir = const.temp_dir
+        self._proc_id = proc_id
+        
         self._outqu = outqu
-        self._task_qu = Queue()
-        # self._size = 1000000 #good
-        self._size = 2500000
+
+        self._task_n = task_n
+        self._task_size = const.task_size
+        self._reader_n = const.reader_n
+
+        self._temp_dir = const.temp_dir
+
+        self._debug = const.debug
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
@@ -287,39 +293,60 @@ class Processor(Process):
         parent_bam = pysam.AlignmentFile(self._input_path,"rb")
         parent_iter = parent_bam.fetch(until_eof=True)
         parent_generator = self.__bam_generator__(parent_iter)
-       
+        if self._debug:
+            parent_generator = self.__debug_generator__(parent_iter)
+
         task_qu = Queue()
 
-        tasks = [ Task(parent_path=self._input_path,
-                       inqu=task_qu,
-                       outqu=self._outqu,
-                       size=self._size,
-                       header=parent_bam.header,
-                       temp_dir=self._temp_dir) for i in xrange(6) ]
+        tasks = [Task(parent_path=self._input_path,
+                      inqu=task_qu,
+                      outqu=self._outqu,
+                      size=self._task_size,
+                      header=parent_bam.header,
+                      temp_dir=self._temp_dir) for i in xrange(self._task_n)]
 
         for task in tasks:
             task.start()
 
         for i,command in enumerate(parent_generator):
-            #print i,self.pid
-            #time.sleep(.05)
-            time.sleep(.02)
+            time.sleep(.005)
             task_qu.put(parent_bam.tell())
 
         parent_bam.close()
         print "generator finished %d" % (self._mod,)
 
-    def __bam_generator__(self,parent_iter):
-        cdef int mod = self._mod
-        cdef int proc = self._proc
+    def __debug_generator__(self,parent_iter):
+        cdef int proc_id = self._proc_id
+        cdef int reader_n = self._reader_n
         cdef int iterations = 0
-        cdef int chunk = self._size
+        cdef int task_size = self._task_size
 
         while True:            
             try:
-                if iterations % proc == mod:
+                if iterations % reader_n == proc_id:
                     yield True
-                for i in xrange(chunk):
+                for x in xrange(task_size):
+                    parent_iter.next()
+                iterations += 1
+
+                if iterations == 2:
+                    break
+
+            except StopIteration:
+                break
+        return
+
+    def __bam_generator__(self,parent_iter):
+        cdef int proc_id = self._proc_id
+        cdef int reader_n = self._reader_n
+        cdef int iterations = 0
+        cdef int task_size = self._task_size
+
+        while True:            
+            try:
+                if iterations % reader_n == proc_id:
+                    yield True
+                for x in xrange(task_size):
                     parent_iter.next()
                 iterations += 1
             except StopIteration:
@@ -327,16 +354,14 @@ class Processor(Process):
         return
         
 class Leviathon(object):
-    #Leviathon takes objects of processors and handlers and
+    #Leviathon takes objects of file_readers and handlers and
     #chains them together.
-    def __init__(self,int max_processors, object const,dict processor_bundle,
-                dict handler_bundle,list handler_order,list queue_names,int update,str region):
+    def __init__(self,object const,dict handler_bundle,
+                 list handler_order,list queue_names,int update):
 
-        self._max_processors = max_processors
-        self._processor_bundle = processor_bundle 
+        self.const = const
         self._handler_bundle  = handler_bundle
         self._handler_order = handler_order
-        self._region = region
         self._update = update
         self._queue_names = queue_names
     
@@ -345,128 +370,83 @@ class Leviathon(object):
 
         default_qus = self.__create_queues__(self._queue_names) 
 
-        processor_bundle = dict(self._processor_bundle)
-        self.__run_info_to_bundle__(processor_bundle,default_qus,parent)
-
-        handlers,handler_inqus = self.__create_handlers__(self._handler_order,self._handler_bundle,
+        handlers_objects,handler_inqus = self.__create_handlers__(self._handler_order,
+                                                          self._handler_bundle,
                                                           default_qus,parent,output_paths)
-        handler_processes = self.__start_handlers__(handlers)
+        handlers = self.__get_handlers__(handlers_objects)
 
-        max_processors = self._max_processors
-        proccesor_pause_qus = []
-        active_processors = []
+        task_n = self.__get_task_n__(self.const,handlers)
+        file_reader_bundles = self.__get_file_reader_bundles__(default_qus,parent,
+                                                               task_n,self.const)
+        file_readers,pause_qus = self.__get_file_readers__(file_reader_bundles)
 
-            #self.__update_processors__(active_processors,proccesor_pause_qus)
-            #self.__pause_routine__(default_qus["pause"],proccesor_pause_qus)
-
-        for submit_size,proc_num in izip(self.__power_generator__(),self.__proc_num_generator__(self._max_processors)):
-            proc_proc = Processor(input_path,proc_num,default_qus["main"],self._processor_bundle["const"],2*(10**submit_size))
-            proc_proc.start()
-            active_processors.append(proc_proc)
+        #Start file_readers
+        for file_reader in file_readers:
+            file_reader.start()
             time.sleep(2)
 
-        for proc_proc in active_processors:
-            proc_proc.join()
+        #Start handlers:
+        for handler in handlers:
+            handler.start()
 
-        self.__destory__handlers__(handler_processes,handler_inqus)
+        #Wait for file_readers to finish
+        for file_reader in file_readers:
+            file_reader.join()
 
-        for hand_proc in handler_processes:
-            hand_proc.join()
+        #Destory handlers
+        for handler,queue in izip(handlers,handler_inqus):
+            queue.put(DestroyPackage())
+            handler.join()
 
-        del active_processors
-        del proccesor_pause_qus
+        del default_qus
+        del file_reader_bundles
+        del file_readers
+        del pause_qus
         del handler_inqus
+        del handlers_objects
+        del handlers
 
         gc.collect()
 
-    def __proc_num_generator__(self,total_proc):
-        for i in reversed(xrange(total_proc)):
+    def __get_task_n__(self,object const,handlers):
+        task_n = (const.total_procs - len(handlers) - const.reader_n) / const.reader_n
+        if task_n > 0:
+            return task_n
+        else:
+            return 1
+
+    def __get_file_readers__(self,file_reader_bundles):
+        file_readers = []
+        for bundle in file_reader_bundles: 
+            file_reader = FileReader(**bundle)
+            file_readers.append(file_reader)
+        return file_readers,[]
+
+    def __proc_id_generator__(self,reader_n):
+        for i in reversed(xrange(reader_n)):
             yield i
 
-    def __power_generator__(self):
-        while True:
-            yield 5
-            yield 6
+    def __get_file_reader_bundles__(self,default_qus,parent,task_n,object const):
+        bundles = []
 
-    def __run_info_to_bundle__(self,processor_bundle,default_qus,parent):
-        processor_bundle["outqu"] = default_qus[processor_bundle["outqu"]]
-        processor_bundle["parent_bam"] = parent.filename
+        for proc_id in self.__proc_id_generator__(const.reader_n):
+            current_bundle = {}
+            current_bundle["input_path"] = parent.filename
+            current_bundle["proc_id"] = proc_id
+            current_bundle["task_n"] = task_n
+            current_bundle["outqu"] = default_qus["main"]
+            current_bundle["const"] = const 
 
+            bundles.append(current_bundle)
+
+        return bundles
+ 
     def __create_queues__(self,queue_names):
         queues = {}
         for name in queue_names:
             queues[name] = Queue()
         queues["pause"] = Queue()
         return queues
-
-    def __wait_and_destroy_processors__(self,active_processors,proccesor_pause_qus):
-        for p,pause_qu in izip(active_processors,proccesor_pause_qus):
-            p.join()
-            pause_qu.close()
-
-    def __pause_routine__(self,in_pause_qu,proccesor_pause_qus):
-        pause = self.__pause_query__(in_pause_qu,proccesor_pause_qus)
-        if pause:
-            while True:
-                pause = self.__pause_query__(in_pause_qu,proccesor_pause_qus,bypass=True)
-                if not pause:
-                    break
-
-    #TODO: similar to code in the Processor class
-    def __pause_query__(self,in_pause_qu,proccesor_pause_qus,bypass=False):
-        try:
-            if bypass:
-                pause = True
-            else:
-                pause = in_pause_qu.get(False)
-                if pause:
-                    for qu in proccesor_pause_qus:
-                        qu.put(True)
-
-            if pause:
-                while True:
-                    try:
-                        pause = in_pause_qu.get(False)
-                        if not pause:
-                            for qu in proccesor_pause_qus:
-                                qu.put(False)
-                            break
-                    except Queue2.Empty:
-                        time.sleep(.5)
-        except Queue2.Empty:
-            pass
-
-        last = False  
-        while True:
-            try:
-                pause = in_pause_qu.get(False)
-                last = pause
-            except Queue2.Empty:
-                break
-        return last
-
-    #TODO: modified from Processor
-    def __update_processors__(self,active_tasks,proccesor_pause_qus):
-        terminated_procs = []
-        terminated_qus = []
-        for pr,pause_qu in izip(active_tasks,proccesor_pause_qus):
-            if not pr.is_alive():
-                pr.terminate()
-                terminated_procs.append(pr)
-                terminated_qus.append(pause_qu)
-
-        for pr,qu in izip(terminated_procs,terminated_qus):
-            active_tasks.remove(pr)
-
-            qu.close()
-            proccesor_pause_qus.remove(qu)
-
-        if len(terminated_procs) > 0:
-            #Only invoked the GC if there is the possibility of
-            #collecting any memory.
-            del terminated_procs
-            del terminated_qus
-            gc.collect()
 
     def __create_handlers__(self,handler_order,handler_bundle,
                             queues,parent_bam,output_paths):
@@ -490,18 +470,12 @@ class Leviathon(object):
 
         return handlers,handler_inqus
 
-    def __start_handlers__(self,handlers):
+    def __get_handlers__(self,handlers):
         handler_processes = []
         for handler in handlers:
             hpr = Process(target=handler.listen,args=(self._update,))
-            hpr.start()
             handler_processes.append(hpr)
         return handler_processes
-
-    def __destory__handlers__(self,handler_processes,handler_inqus):
-        for process,queue in izip(handler_processes,handler_inqus):
-            queue.put(DestroyPackage())
-            process.join()
 
 #Provides a conveinant way for providing an Interface to parabam
 #programs. Includes default command_args and framework for 
@@ -557,11 +531,10 @@ class Interface(object):
                     formatter_class=argparse.RawTextHelpFormatter)
 
         parser.add_argument('-p',type=int,nargs='?',default=4
-            ,help="The maximum amount of tasks run concurrently. This number should\n"\
-            "be less than or equal to the amount of cores on your machine [Default: 4]")
-        parser.add_argument('-c',type=int,nargs='?',default=100000
-            ,help="How many reads each parallel task is given. A higher number\n"\
-            "will mean faster analysis but also a greater burden on memory [Default:100000]")
+            ,help="The maximum amount of processes you wish parabam to use. This should"\
+                  "be less than or equal to the amount of processor cores in your machine.")
+        parser.add_argument('-s',type=int,nargs='?',default=2500000
+            ,help="The amount of reads considered by each distributed task.")
         return parser
 
     @abstractmethod
@@ -587,11 +560,12 @@ class ParabamParser(argparse.ArgumentParser):
 
 class Const(object):
     
-    def __init__(self,temp_dir,verbose,chunk,proc,**kwargs):
+    def __init__(self,temp_dir,verbose,task_size,total_procs,**kwargs):
+        #TODO: Update with real required const values
         self.temp_dir = temp_dir
         self.verbose = verbose
-        self.chunk = chunk
-        self.proc = proc
+        self.task_size = task_size
+        self.total_procs = total_procs
 
         for key, val in kwargs.items():
             setattr(self,key,val)

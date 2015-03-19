@@ -125,7 +125,7 @@ class Handler(parabam.command.Handler):
 
         for subset in self._user_subsets:
             #merge task 
-            self.__add_merge_task__(subset)
+            self.__add_merge_task__(self._stage_stores[subset],subset)
         self.__write_counts_csv__()
     
     def __add_merge_task__(self,results,subset_type):
@@ -183,8 +183,8 @@ class Interface(parabam.command.Interface):
 
         self.run(
             input_bams=cmd_args.input,
-            proc= cmd_args.p,
-            chunk= cmd_args.c,
+            total_procs = cmd_args.p,
+            task_size = cmd_args.s,
             verbose= cmd_args.v,
             user_subsets= user_subsets,
             user_constants = user_constants,
@@ -199,8 +199,8 @@ class Interface(parabam.command.Interface):
             output_counts=cmd_args.counts
             )
     
-    def run(self,input_bams,proc,chunk,user_constants,user_engine,
-            user_subsets,fetch_region=None,side_by_side=2,
+    def run(self,input_bams,total_procs,task_size,user_constants,user_engine,
+            user_subsets,reader_n = 2,fetch_region=None,side_by_side=2,
             keep_in_temp=False,engine_is_class=False,verbose=0,
             pair_process=False,include_duplicates=True,debug=False,
             ensure_unique_output=False,output_counts=False,
@@ -214,15 +214,6 @@ class Interface(parabam.command.Interface):
     def __get_queue_names__(self,pair_process,**kwargs):
         queues = ["merge","main"]
         return queues
-
-    def __get_processor_bundle__(self,object const,task_class,debug,**kwargs): 
-        processor_bundle = {"outqu":"main",
-                            "const":const,
-                            "TaskClass":task_class,
-                            "task_args":{},
-                            "debug":debug}
-
-        return processor_bundle
 
     def __get_destroy_handler_order__(self):
         return [Handler,parabam.merger.Handler]

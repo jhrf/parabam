@@ -258,10 +258,6 @@ class Interface(parabam.core.Interface):
         return module,user_engine,user_constants
 
     @abstractmethod
-    def __get_processor_bundle__(self,queues,object const,task_class,**kwargs):
-        pass
-
-    @abstractmethod
     def __get_handler_bundle__(self,queues,object const,task_class,**kwargs):
         pass
 
@@ -293,17 +289,18 @@ class Interface(parabam.core.Interface):
         '''return empty dict if not needed'''
         pass
 
-    def __get_const_args__(self,adjusted_proc,**kwargs):
+    def __get_const_args__(self,**kwargs):
         '''Any function overwriting this one MUST make a super call to this function.
         i.e args = super(<class_name>,self).__get_const_args__(**kwargs)'''
 
         args = {}
         args["temp_dir"] = self._temp_dir
-        #args["proc"] =  #adjusted_proc
-        defaults = ["proc","chunk","verbose","user_constants",
-                    "user_constants", "user_engine", "fetch_region", 
-                    "pair_process", "include_duplicates","input_is_sam"]
-                    #TODO: Handle proc division __getmaxproc__
+
+
+        defaults = ["total_procs","task_size","verbose","user_constants",
+                    "reader_n","user_constants", "user_engine", "fetch_region", 
+                    "pair_process", "include_duplicates","input_is_sam","debug"]
+
         for key,val in kwargs.items():
             if key in defaults:
                 args[key] = val
@@ -369,21 +366,11 @@ class Interface(parabam.core.Interface):
                     sys.stdout.write("\t%s\n" % (name,))            
         sys.stdout.write("\n")
 
-    def __get_max_proc__(self,proc,pair_process,**kwargs):
-        #TODO: Need to think about this more
-        task_per_processor = 2
-        max_proc = proc / task_per_processor 
-        if max_proc < 0:
-            return 1,1
-        return max_proc,task_per_processor
-
     def run(self,**kwargs):
 
         input_paths = kwargs["input_bams"]
 
-        max_processors,adjusted_proc = self.__get_max_proc__(**kwargs)
-
-        const_args = self.__get_const_args__(adjusted_proc,**kwargs)
+        const_args = self.__get_const_args__(**kwargs)
         const_args.update(self.__get_extra_const_args__(**kwargs))
         const = parabam.core.Const(**const_args)
 
@@ -395,18 +382,15 @@ class Interface(parabam.core.Interface):
                                                      task_class=task_class,
                                                      **kwargs)
 
-        processor_bundle = self.__get_processor_bundle__(const=const,
-                                                         task_class=task_class,
-                                                         **kwargs)
         if const.pair_process:
             self.__prepare_for_pair_processing__(handler_bundle,handler_order,
                                                  task_class,queue_names,const)
         
         update_interval = self.__get_update_interval__(const.verbose)
 
-        leviathon = parabam.core.Leviathon(kwargs["proc"],const,processor_bundle,
-                                           handler_bundle,handler_order,queue_names,
-                                           update_interval,kwargs["fetch_region"])
+        leviathon = parabam.core.Leviathon(const,handler_bundle,
+                                           handler_order,queue_names,
+                                           update_interval)
 
         final_output_paths = {"global":[]}
 
@@ -428,7 +412,7 @@ class Interface(parabam.core.Interface):
 
     def __get_update_interval__(self,verbose):
         if verbose == 1: 
-            return 12
+            return 60
         else:
             return 1
 
@@ -464,8 +448,6 @@ class Interface(parabam.core.Interface):
         parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
             ,help="The subset process will be run only on reads from this region\n"\
             "Regions should be colon seperated as specified by samtools (eg \'chr1:1000,5000\')")
-        parser.add_argument('-s',type=int,metavar="INT",nargs='?',default=2
-            ,help="Further parralise by running this many samples simultaneously [Default 2]")
         parser.add_argument('-d',action="store_false",default=True,
             help="parabam will not process reads marked duplicate.")
         parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
