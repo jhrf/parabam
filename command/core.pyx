@@ -28,23 +28,23 @@ class Task(parabam.core.Task):
 
         self._engine = constants.user_engine
         self._user_constants = constants.user_constants
+        self._system = {}
 
     @abstractmethod
-    def __generate_results__(self,bam_iterator,**kwargs):
+    def __generate_results__(self,iterator,**kwargs):
         #Must make call to self.__process_task_set__
         pass
 
-    @abstractmethod
     def __post_run_routine__(self,**kwargs):
-        pass
+        self._system = {}
 
     @abstractmethod
     def __handle_engine_output__(self,engine_output,read):
         pass
 
-    def __process_task_set__(self,bam_iterator):
+    def __process_task_set__(self,iterator):
         engine = self._engine
-        next_read = bam_iterator.next 
+        next_read = iterator.next 
         parent_bam = self._parent_bam
         cdef int size = self._task_size
         handle_output = self.__handle_engine_output__
@@ -53,7 +53,7 @@ class Task(parabam.core.Task):
 
         #StopIteration caught in parabam.core.Task.run
         for i in xrange(size):
-            counts["total"] += 1
+            counts["total"] += 1 #TODO: think about how we record counts
             read = next_read()
             engine_output = engine(read,user_constants,parent_bam)
             handle_output(engine_output,read)
@@ -66,7 +66,7 @@ class PairTask(Task):
     __metaclass__ = ABCMeta
 
     def __init__(self,parent_bam,inqu,outqu,task_size,constants):
-        super(Task, self).__init__(parent_bam=parent_bam,
+        super(PairTask, self).__init__(parent_bam=parent_bam,
                                     inqu=inqu,
                                     outqu=outqu,
                                     task_size=task_size,
@@ -77,6 +77,10 @@ class PairTask(Task):
         else:
             self.__read_filter__ = self.__filter_duplicates__
 
+        self._loner_count = 0
+        self._loner_path = None
+        self._loner_file = None
+
     @abstractmethod
     def __generate_results__(self,**kwargs):
         #Must make call to self.__process_task_set__
@@ -86,58 +90,59 @@ class PairTask(Task):
     def __handle_engine_output__(self,engine_output,read):
         pass
 
-    def __process_task_set__(self,task_set):
-        if type(task_set) == dict:
-            self.__process_dict_task_set__(task_set)
-        elif type(task_set) == list:
-            self.__process_list_task_set__(task_set)
 
-    def __process_dict_task_set__(self,task_set):
-        user_constants = self._constants.user_constants
-        engine = self.__engine__
+    def __post_run_routine__(self,**kwargs):
+        super(PairTask,self).__post_run_routine__()
+        self._loner_count = 0
+        self._loner_path = None
+        self._loner_file = None
 
-        for qname,reads in task_set.items():
-            output = engine( reads, user_constants, self._parent_bam)
-            self.__handle_engine_output__(output, reads)
+    def __process_task_set__(self,iterator):
+        self._loner_path = self.__get_temp_path__("chaser")
+        self._loner_file = pysam.AlignmentFile(self._loner_path,"wb",
+                                               header=self._parent_bam.header)
 
-    def __process_list_task_set__(self,task_set):
-        #speedup
-        user_constants = self._constants.user_constants
-        engine = self.__engine__
+        engine = self._engine
+        next_read = iterator.next 
+        parent_bam = self._parent_bam
         query_loners = self.__query_loners__ 
-        read_pair_decision = self.__handle_engine_output__
-        #speedup
+        cdef int size = self._task_size
+        handle_output = self.__handle_engine_output__
+        user_constants = self._user_constants
+        counts = self._counts
 
-        loners = {}
+        cdef dict loners = {}
 
-        for read in task_set:
+        #StopIteration caught in parabam.core.Task.run
+        for i in xrange(size):
+            read = next_read()
             read1,read2 = query_loners(read,loners)
+
             if read1:
-                output = engine((read1,read2),user_constants,self._parent_bam)
-                self.__handle_engine_output__(output,(read1,read2,))
+                engine_output = engine((read1,read2),user_constants,parent_bam)
+                handle_output(engine_output,(read1,read2,))
 
         self.__stash_loners__(loners)
         del loners
 
     def __stash_loners__(self,loners):
-        loner_path = self.__get_temp_path__("chaser")
-        loner_file = pysam.AlignmentFile(loner_path,"wb",header=self._parent_bam.header)
-        loner_count = 0
+        loner_count = self._loner_count
+        loner_file = self._loner_file
+        loner_path = self._loner_path
+
         for qname,read in loners.items():
             loner_count += 1
             loner_file.write(read)
-        loner_file.close()
         self._system["chaser"] = (loner_count,loner_path,)
+        loner_file.close()
 
     def __query_loners__(self,read,loners):
         if self.__read_filter__(read):#Pair processing only handles primary pairs
             return None, None
-
         try:
             mate = loners[read.qname]
             del loners[read.qname]
             return read,mate
-
         except KeyError:
             loners[read.qname] = read
             return None,None
@@ -172,11 +177,7 @@ class Handler(parabam.core.Handler):
     #Child classes MUST call super
     def __new_package_action__(self,new_package,**kwargs):
         results = new_package.results
-        handle_dict = dict(results)
-        #hack so as not record rescued paired reads twice in total
-        if self._constants.pair_process and not new_package.parent_class == "Task":
-            handle_dict["total"] = 0
-        self.__auto_handle__(handle_dict,self._stats)
+        self.__auto_handle__(results,self._stats)
 
         if "system" in results.keys():
             self.__add_system_to_stage__(results["system"])
@@ -380,7 +381,7 @@ class Interface(parabam.core.Interface):
 
         if constants.pair_process:
             self.__prepare_for_pair_processing__(handler_bundle,handler_order,
-                                                 queue_names,constants)
+                                                 queue_names,constants,task_class)
         
         update_interval = self.__get_update_interval__(constants.verbose)
 
@@ -417,10 +418,11 @@ class Interface(parabam.core.Interface):
             if len(child_paths) == 0:
                 del final_output_paths[master_path]
 
-    def __prepare_for_pair_processing__(self,handler_bundle,handler_order,queue_names,constants):        
+    def __prepare_for_pair_processing__(self,handler_bundle,handler_order,queue_names,constants,Task):        
         handler_bundle[parabam.chaser.Handler] = {"inqu":"chaser",
                                                   "constants":constants,
-                                                  "out_qu_dict":["main"]}
+                                                  "out_qu_dict":["main"],
+                                                  "Task":Task}
 
         for handler_class,handler_args in handler_bundle.items():
             if issubclass(handler_class,Handler):

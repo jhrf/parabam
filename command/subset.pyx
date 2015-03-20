@@ -14,11 +14,10 @@ class SubsetCore(object):
     def __init__(self,object constants):
         self._user_subsets = constants.user_subsets
         self._counts = {}
-        self._system = {}
         self._temp_paths = {}
         self._temp_objects = {}
 
-    def __generate_results__(self,bam_iterator,**kwargs):
+    def __generate_results__(self,iterator,**kwargs):
         cdef dict temp_paths = self._temp_paths
         cdef dict temp_objects = self._temp_objects
         cdef dict counts = self._counts
@@ -30,7 +29,7 @@ class SubsetCore(object):
             counts[subset] = 0
         counts["total"] = 0
 
-        self.__process_task_set__(bam_iterator)
+        self.__process_task_set__(iterator)
 
         for subset,file_object in temp_objects.items():
             file_object.close() #close temp_bams
@@ -47,8 +46,8 @@ class SubsetCore(object):
         self._temp_objects[subset_type].write(read)
 
     def __post_run_routine__(self,**kwargs):
+        super(SubsetCore,self).__post_run_routine__()
         self._counts = {}
-        self._system = {}
         self._temp_paths = {}
         self._temp_objects = {}
 
@@ -56,12 +55,12 @@ class Task(SubsetCore,parabam.command.Task):
 
     def __init__(self,parent_bam,inqu,outqu,task_size,constants):
         
-        SubsetCore.__init__(self,constants)
         parabam.command.Task.__init__(self,parent_bam=parent_bam,
                                     inqu=inqu,
                                     outqu=outqu,
                                     task_size=task_size,
                                     constants=constants)
+        SubsetCore.__init__(self,constants)
 
     def __handle_engine_output__(self,engine_output,read):
         subset_write = self.__write_to_subset_bam__
@@ -76,17 +75,13 @@ class Task(SubsetCore,parabam.command.Task):
             pass
 
 class PairTask(SubsetCore,parabam.command.PairTask):
-    def __init__(self, object task_set, object outqu, object curproc,
-                 object parent_bam,object constants,
-                 str parent_class):
-        
+    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+        parabam.command.PairTask.__init__(self,parent_bam=parent_bam,
+                                                inqu=inqu,
+                                                outqu=outqu,
+                                                task_size=task_size,
+                                                constants=constants)
         SubsetCore.__init__(self,constants)
-        parabam.command.PairTask.__init__(self,task_set=task_set,
-                        outqu=outqu,
-                        curproc=curproc,
-                        parent_bam = parent_bam,
-                        constants=constants,
-                        parent_class=parent_class)
 
     def __handle_engine_output__(self,engine_output,read):
         for subset,cur_read in engine_output:

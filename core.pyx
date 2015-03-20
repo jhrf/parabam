@@ -92,8 +92,6 @@ cdef class Handler:
                 if not new_package.results == {}:#If results are present...
                     self.__new_package_action__(new_package) #Handle the results
                     dealt += 1
-                    if type(new_package) == CorePackage:
-                        curproc = new_package.curproc
 
             except Queue2.Empty:
                 #Queue empty. Continue with loop
@@ -188,8 +186,8 @@ class Task(Process):
 
     def run(self):
         bamfile = pysam.AlignmentFile(self._parent_path,"rb")
-        bam_iterator = bamfile.fetch(until_eof=True)
-        next_read = bam_iterator.next
+        iterator = bamfile.fetch(until_eof=True)
+        next_read = iterator.next
 
         while True:
             try:
@@ -197,7 +195,7 @@ class Task(Process):
                 
                 if type(package) == DestroyPackage:
                     bamfile.close()
-                    del bam_iterator
+                    del iterator
                     del bamfile
                     break
 
@@ -205,19 +203,19 @@ class Task(Process):
                 bamfile.seek(seek)
                 time.sleep(.01)
 
-                results = self.__generate_results__(bam_iterator)
+                results = self.__generate_results__(iterator)
+                results["total"] = self._task_size
                 
                 self._dealt += 1
                 time.sleep(0.005)
-                self._outqu.put(CorePackage(results=results,
-                                curproc=0,
-                                parent_class=self.__class__.__name__))
+                self._outqu.put(Package(results=results))
 
                 self.__post_run_routine__()
 
             except Queue2.Empty:
                 time.sleep(5)
             except StopIteration:
+                print "Fail to handle last stuff!"
                 pass
 
         return
@@ -226,11 +224,12 @@ class Task(Process):
         return pysam.AlignmentFile(path,"wb",header=self._parent_bam.header)
 
     def __get_temp_path__(self,identity):
-        file_name = "%s_%d_%d.bam" % (identity,self.pid,self._dealt)
+        file_name = "%s_%d_%d_%s" %\
+            (identity,self.pid,self._dealt, os.path.split(self._parent_bam.filename)[1])
         return os.path.join(self._temp_dir,file_name)
 
     @abstractmethod
-    def __generate_results__(self,bam_iterator,**kwargs):
+    def __generate_results__(self,iterator,**kwargs):
         pass
 
     @abstractmethod
@@ -458,7 +457,7 @@ class Leviathon(object):
         return handler_processes
 
 #Provides a conveinant way for providing an Interface to parabam
-#programs. Includes default command_args and framework for 
+#programs. Includes default command_args and framework for
 #command-line and programatic invocation. 
 class Interface(object):
 
@@ -556,12 +555,6 @@ class Constants(object):
 class Package(object):
     def __init__(self,results):
         self.results = results
-
-class CorePackage(Package):
-    def __init__(self,results,curproc,parent_class):
-        super(CorePackage,self).__init__(results)
-        self.curproc = curproc
-        self.parent_class = parent_class
 
 class DestroyPackage(Package):
     def __init__(self):

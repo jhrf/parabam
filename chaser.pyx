@@ -32,14 +32,45 @@ class MatchMakerPackage(ChaserPackage):
 class Handler(parabam.core.Handler):
 
     def __init__(self,object parent_bam, object output_paths,
-                      object inqu,object const,object pause_qu,
-                      dict out_qu_dict):
-        
+                      object inqu,object constants,object pause_qu,
+                      dict out_qu_dict,object Task):
+
         super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
-                                     inqu=inqu,const=const,pause_qu=pause_qu,
-                                     out_qu_dict=out_qu_dict,report = False)
+                             inqu=inqu,constants=constants,pause_qu=pause_qu,
+                             out_qu_dict=out_qu_dict,report = False)
         
-        
+        class ChaserTask(Task):
+            def __init__(self,parent_bam,constants):
+                super(ChaserTask,self).__init__(parent_bam=parent_bam,
+                                                        inqu=None,
+                                                        outqu=None,
+                                                        task_size=0,
+                                                        constants=constants)
+
+            def handle_pair_dict(self,pairs,unique):
+                self.unique = unique
+                results = self.__generate_results__(pairs)
+                self.__post_run_routine__()
+                self._dealt += 1
+                time.sleep(.01)
+                return results
+
+            def __process_task_set__(self,iterator):
+                engine = self._engine
+                parent_bam = self._parent_bam
+                handle_output = self.__handle_engine_output__
+                user_constants = self._user_constants
+
+                #StopIteration caught in parabam.core.Task.run
+                for read_name,pair in iterator.items():
+                    engine_output = engine(pair,user_constants,parent_bam)
+                    handle_output(engine_output,pair)
+
+            def __get_temp_path__(self,identity):
+                file_name = "%s_%d_%d_%s" %\
+                    (identity,self.unique,self._dealt, os.path.split(self._parent_bam.filename)[1])
+                return os.path.join(self._temp_dir,file_name)
+
         self._loner_pyramid = self.__instalise_loner_pyramid__()
         self._pyramid_idle_counts = Counter()
         self._loner_purgatory = {}
@@ -50,8 +81,9 @@ class Handler(parabam.core.Handler):
         self._prev_rescued = 0
         self._stale_count = 0
 
-        self._child_pack = {"queue":out_qu_dict["main"],"const":self.const,
-                            "parent_bam":parent_bam}
+        self._child_pack = {"parent_bam":parent_bam,
+                            "queue":out_qu_dict["main"],
+                            "chaser_task":ChaserTask(parent_bam,self._constants)}
 
         self._chaser_task_max = 8 #TODO: work this out properly
         self._tasks = []
@@ -172,14 +204,14 @@ class Handler(parabam.core.Handler):
     def __start_primary_task__(self):        
         self.__wait_for_tasks__(self._tasks,self._chaser_task_max) #wait for existing tasks
         paths = self._primary_store
-        new_task = PrimaryTask(paths,self._inqu,self.const,self._max_reads,self._child_pack)
+        new_task = PrimaryTask(paths,self._inqu,self._constants,self._max_reads,self._child_pack)
         new_task.start()
         self._tasks.append(new_task)
 
     def __start_matchmaker_task__(self,paths,loner_type,level):
         self.__wait_for_tasks__(self._tasks,self._chaser_task_max)
 
-        new_task = MatchMakerTask(paths,self._inqu,self.const,
+        new_task = MatchMakerTask(paths,self._inqu,self._constants,
                     loner_type,level,self._max_reads,self._child_pack)
         new_task.start()
 
@@ -362,7 +394,7 @@ class Handler(parabam.core.Handler):
         return task_size
 
     def __handler_exit__(self,**kwargs):
-        if self.const.verbose:
+        if self._constants.verbose:
             if self._total_loners - self._rescued["total"] == 0:
                 self.__standard_output__("[Status] All reads succesfully paired") 
             else:
@@ -372,9 +404,9 @@ class Handler(parabam.core.Handler):
             qu.close()
 
 class ChaserClass(Process):
-    def __init__(self,object parent_bam,object const):
+    def __init__(self,object parent_bam,object constants):
         super(ChaserClass,self).__init__()
-        self.const = const
+        self._constants = constants
 
         head,root = os.path.split(parent_bam.filename)
         name,ext = os.path.splitext(root)
@@ -385,12 +417,12 @@ class ChaserClass(Process):
 
     def __get_loner_temp_path__(self,loner_type,level=0,unique=""):
         return "%s/%s_%s_lvl%d_typ%s%s.bam" %\
-            (self.const.temp_dir,self.basename,self.pid,level,loner_type,unique)
+            (self._constants.temp_dir,self.basename,self.pid,level,loner_type,unique)
 
 class PrimaryTask(ChaserClass):
 
-    def __init__(self,object unsorted_paths,object outqu,object const, int max_reads, dict child_pack):
-        super(PrimaryTask,self).__init__(child_pack["parent_bam"],const)
+    def __init__(self,object unsorted_paths,object outqu,object constants, int max_reads, dict child_pack):
+        super(PrimaryTask,self).__init__(child_pack["parent_bam"],constants)
         
         self._unsorted_paths = unsorted_paths
         self._outqu = outqu
@@ -430,7 +462,9 @@ class PrimaryTask(ChaserClass):
         del loner_paths,loner_file_counts,loner_holder
 
     def __start_matchmaker_task__(self,paths,loner_type,level):
-        new_task = MatchMakerTask(paths,self._outqu,self.const,loner_type,level,self._max_reads,self._child_pack)
+        new_task = MatchMakerTask(paths,self._outqu,self._constants,
+                                  loner_type,level,self._max_reads,
+                                  self._child_pack)
         new_task.start()
         new_task.join()
         time.sleep(1)
@@ -512,10 +546,10 @@ class PrimaryTask(ChaserClass):
 
 class MatchMakerTask(ChaserClass):
 
-    def __init__(self,object loner_paths,object outqu,object const,
+    def __init__(self,object loner_paths,object outqu,object constants,
         str loner_type,int level,int max_reads,object child_pack):
 
-        super(MatchMakerTask,self).__init__(child_pack["parent_bam"],const)
+        super(MatchMakerTask,self).__init__(child_pack["parent_bam"],constants)
         
         self._max_reads = max_reads
         self._child_pack = child_pack
@@ -551,7 +585,7 @@ class MatchMakerTask(ChaserClass):
                     del read_pairs[read.qname]
 
                 #we are handling pairs so we divide chunk by two.
-                if len(send_pairs) >= (self.const.chunk//2):
+                if len(send_pairs) >= 100000:
                     rescued += self.__launch_child_task__(send_pairs)
                     send_pairs = {}
                     gc.collect()
@@ -636,18 +670,8 @@ class MatchMakerTask(ChaserClass):
 
     def __launch_child_task__(self,pairs):
         child_pack = self._child_pack
-        
-        args = {"task_set":pairs,
-                "outqu":child_pack["queue"],
-                "curproc":0,
-                "parent_bam":child_pack["parent_bam"],
-                "const":child_pack["const"],
-                "parent_class":self.__class__.__name__}
-
-        args.update(child_pack["task_args"])
-
-        #TODO HANDLE PAIRED READS
-
+        results = child_pack["chaser_task"].handle_pair_dict(pairs,self.pid)
+        child_pack["queue"].put(parabam.core.Package(results=results))
         return len(pairs)
 
     def __get_leftover_object__(self,unique):
