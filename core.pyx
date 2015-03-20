@@ -245,7 +245,7 @@ class Task(Process):
                 
                 bamfile.seek(seek)
                 time.sleep(.01)
-                
+
                 for i in xrange(size):
                     read = next_read()
                     if engine(read,{},bamfile):
@@ -260,7 +260,6 @@ class Task(Process):
                 dealt += 1
                 temp.close()
                 time.sleep(0.005)
-                #print self.pid,"send"
                 self._outqu.put(CorePackage(results=results,
                                 curproc=6,
                                 parent_class=self.__class__.__name__))
@@ -271,6 +270,10 @@ class Task(Process):
                 pass
 
         return
+
+    def generate_results(self,):
+        
+
         
 #The FileReader iterates over a BAM, subsets reads and
 #then starts a parbam.Task process on the subsetted reads
