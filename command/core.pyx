@@ -181,7 +181,7 @@ class Handler(parabam.core.Handler):
         results = new_package.results
         handle_dict = dict(results)
         #hack so as not record rescued paired reads twice in total
-        if self.const.pair_process and not new_package.parent_class == "Processor":
+        if self.const.pair_process and not new_package.parent_class == "Task":
             handle_dict["total"] = 0
         self.__auto_handle__(handle_dict,self._stats)
 
@@ -218,7 +218,10 @@ class Handler(parabam.core.Handler):
         gc.collect()
 
     def __test_stage_store__(self,subset):
-        return len(self._stage_stores[subset]) > 20
+        if self._destroy:
+            return True
+        else:
+            return len(self._stage_stores[subset]) > 20
     
     def __add_staged_system_task__(self,results,subset_type):
         if subset_type == "chaser":
@@ -384,7 +387,7 @@ class Interface(parabam.core.Interface):
 
         if const.pair_process:
             self.__prepare_for_pair_processing__(handler_bundle,handler_order,
-                                                 task_class,queue_names,const)
+                                                 queue_names,const)
         
         update_interval = self.__get_update_interval__(const.verbose)
 
@@ -421,11 +424,10 @@ class Interface(parabam.core.Interface):
             if len(child_paths) == 0:
                 del final_output_paths[master_path]
 
-    def __prepare_for_pair_processing__(self,handler_bundle,handler_order,task_class,queue_names,object const):        
+    def __prepare_for_pair_processing__(self,handler_bundle,handler_order,queue_names,object const):        
         handler_bundle[parabam.chaser.Handler] = {"inqu":"chaser",
                                                   "const":const,
-                                                  "out_qu_dict":["main"],
-                                                  "TaskClass":task_class}
+                                                  "out_qu_dict":["main"]}
 
         for handler_class,handler_args in handler_bundle.items():
             if issubclass(handler_class,Handler):

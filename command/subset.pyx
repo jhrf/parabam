@@ -189,7 +189,6 @@ class Interface(parabam.command.Interface):
             user_subsets= user_subsets,
             user_constants = user_constants,
             user_engine = user_engine,
-            engine_is_class = False,
             fetch_region = cmd_args.region,
             pair_process=cmd_args.pair,
             include_duplicates=cmd_args.d,
@@ -201,8 +200,8 @@ class Interface(parabam.command.Interface):
     
     def run(self,input_bams,total_procs,task_size,user_constants,user_engine,
             user_subsets,reader_n = 2,fetch_region=None,side_by_side=2,
-            keep_in_temp=False,engine_is_class=False,verbose=0,
-            pair_process=False,include_duplicates=True,debug=False,
+            keep_in_temp=False,verbose=0,pair_process=False,
+            include_duplicates=True,debug=False,
             ensure_unique_output=False,output_counts=False,
             input_is_sam=False):
 
@@ -250,30 +249,11 @@ class Interface(parabam.command.Interface):
 
         return os.path.join(".",self._temp_dir, "%s_%s%s%s" % (tail,subset,unique,ext))
             
-    def __get_task_class__(self,pair_process,user_engine,engine_is_class,**kwargs):
+    def __get_task_class__(self,pair_process,**kwargs):
         if pair_process:
-            base_class = PairTask
+            return PairTask
         else:
-            base_class = Task
-
-        if engine_is_class:
-            if not pair_process and not issubclass(user_engine,Task):
-                raise_exception = True
-            elif pair_process and not issubclass(user_engine,PairTask):
-                raise_exception = True
-            else:
-                raise_exception = False
-                
-            if raise_exception:
-                #TODO: Untested exception here. Class name might be ABCMeta also
-                raise Exception("[ERROR] User engine class must inherit %s\n" \
-                    % (base_class.__class__,))
-            else:
-                task_class = user_engine
-        else:
-            task_class = base_class
-
-        return task_class
+            return parabam.core.Task
 
     def __get_extra_const_args__(self,**kwargs):
         args = {}

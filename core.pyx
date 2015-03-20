@@ -46,10 +46,6 @@ class TTask(Process):
         del self._task_set
         gc.collect()
 
-    def __get_temp_path__(self,typ,ext=".bam"):
-        #self.pid ensures that the temp names are unique.
-        return "%s/%s_%s_parabam_temp%s" % (self._temp_dir,typ,self.pid,ext)
-
     #Generate a dictionary of results using self._task_set
     @abstractmethod
     def __generate_results__(self):
@@ -213,7 +209,7 @@ cdef class Handler:
 
 class Task(Process):
 
-    def __init__(self,parent_path,inqu,outqu,size,header,temp_dir):
+    def __init__(self,parent_path,inqu,outqu,size,header,temp_dir,engine):
         super(Task,self).__init__()
         self._parent_path = parent_path
         self._outqu = outqu
@@ -221,11 +217,13 @@ class Task(Process):
         self._size = size
         self._header = header
         self._temp_dir = temp_dir
+        self._engine = engine
 
     def run(self):
         bamfile = pysam.AlignmentFile(self._parent_path,"rb")
         bamiter = bamfile.fetch(until_eof=True)
         next_read = bamiter.next
+        engine = self._engine
 
         cdef int size = self._size
         cdef int sub_count = 0
@@ -236,6 +234,9 @@ class Task(Process):
                 package = self._inqu.get(False)
                 
                 if type(package) == DestroyPackage:
+                    bamfile.close()
+                    del bamiter
+                    del bamfile
                     break
 
                 seek = package
@@ -244,9 +245,10 @@ class Task(Process):
                 
                 bamfile.seek(seek)
                 time.sleep(.01)
+                
                 for i in xrange(size):
                     read = next_read()
-                    if "TTAGGGTTAGGG" in read.seq:
+                    if engine(read,{},bamfile):
                        temp.write(read)
                        sub_count += 1
 
@@ -267,6 +269,8 @@ class Task(Process):
                 time.sleep(5)
             except StopIteration:
                 pass
+
+        return
         
 #The FileReader iterates over a BAM, subsets reads and
 #then starts a parbam.Task process on the subsetted reads
@@ -286,6 +290,7 @@ class FileReader(Process):
         self._temp_dir = const.temp_dir
 
         self._debug = const.debug
+        self._engine = const.user_engine
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
@@ -303,7 +308,8 @@ class FileReader(Process):
                       outqu=self._outqu,
                       size=self._task_size,
                       header=parent_bam.header,
-                      temp_dir=self._temp_dir) for i in xrange(self._task_n)]
+                      temp_dir=self._temp_dir,
+                      engine=self._engine) for i in xrange(self._task_n)]
 
         for task in tasks:
             task.start()
@@ -312,8 +318,12 @@ class FileReader(Process):
             time.sleep(.005)
             task_qu.put(parent_bam.tell())
 
+        for n in xrange(self._task_n+1):
+            task_qu.put(DestroyPackage())
+        time.sleep(3)
         parent_bam.close()
-        print "generator finished %d" % (self._mod,)
+        task_qu.close()
+        return
 
     def __debug_generator__(self,parent_iter):
         cdef int proc_id = self._proc_id
@@ -329,7 +339,7 @@ class FileReader(Process):
                     parent_iter.next()
                 iterations += 1
 
-                if iterations == 2:
+                if iterations == 50:
                     break
 
             except StopIteration:
@@ -533,7 +543,7 @@ class Interface(object):
         parser.add_argument('-p',type=int,nargs='?',default=4
             ,help="The maximum amount of processes you wish parabam to use. This should"\
                   "be less than or equal to the amount of processor cores in your machine.")
-        parser.add_argument('-s',type=int,nargs='?',default=2500000
+        parser.add_argument('-s',type=int,nargs='?',default=250000
             ,help="The amount of reads considered by each distributed task.")
         return parser
 

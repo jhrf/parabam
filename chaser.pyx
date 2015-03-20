@@ -33,13 +33,12 @@ class Handler(parabam.core.Handler):
 
     def __init__(self,object parent_bam, object output_paths,
                       object inqu,object const,object pause_qu,
-                      dict out_qu_dict,object TaskClass):
+                      dict out_qu_dict):
         
         super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
                                      inqu=inqu,const=const,pause_qu=pause_qu,
                                      out_qu_dict=out_qu_dict,report = False)
         
-        self._TaskClass = TaskClass
         
         self._loner_pyramid = self.__instalise_loner_pyramid__()
         self._pyramid_idle_counts = Counter()
@@ -52,7 +51,6 @@ class Handler(parabam.core.Handler):
         self._stale_count = 0
 
         self._child_pack = {"queue":out_qu_dict["main"],"const":self.const,
-                            "TaskClass":self._TaskClass,"task_args":{},#TODO: need to get real task_args
                             "parent_bam":parent_bam}
 
         self._chaser_task_max = 8 #TODO: work this out properly
@@ -648,9 +646,7 @@ class MatchMakerTask(ChaserClass):
 
         args.update(child_pack["task_args"])
 
-        task = child_pack["TaskClass"](**args)
-        task.start()
-        task.join()
+        #TODO HANDLE PAIRED READS
 
         return len(pairs)
 
