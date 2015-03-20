@@ -13,49 +13,10 @@ from itertools import izip
 from multiprocessing import Process,Queue
 from abc import ABCMeta, abstractmethod
 
-#Tasks are started by parabam.FileReader. Once started 
-#they will carryout a predefined task on the provided
-#subset of reads (task_set).
-class TTask(Process):
-
-    __metaclass__ = ABCMeta
-
-    def __init__(self,object parent_bam,object task_set,
-                     object outqu,int curproc,
-                     object const,str parent_class):
-        
-        Process.__init__(self)
-        self._task_set = task_set
-        self._outqu = outqu
-        self._curproc = curproc
-        self._temp_dir = const.temp_dir
-        self._parent_class = parent_class
-        self._parent_bam = parent_bam
-        self.const = const
-
-    def run(self):
-        #print "Task Started %d" % (self.pid,)
-        results = self.__generate_results__()
-        #print "Task Finished %d" % (self.pid,)
-        results["total"] = len(self._task_set)
-
-        self._outqu.put(CorePackage(results=results,
-                                curproc=self._curproc,
-                                parent_class=self._parent_class))
-        #Trying to control mem useage
-        del self._task_set
-        gc.collect()
-
-    #Generate a dictionary of results using self._task_set
-    @abstractmethod
-    def __generate_results__(self):
-        #Should always return a dictionary
-        pass
-
 cdef class Handler:
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
-                object const,object pause_qu,dict out_qu_dict,object report=True):
+                object constants,object pause_qu,dict out_qu_dict,object report=True):
 
         self._parent_bam = parent_bam
         self._inqu = inqu
@@ -65,8 +26,8 @@ cdef class Handler:
         self._report = report
         self._stats = {}
 
-        self.const = const
-        self._verbose = const.verbose
+        self._constants = constants
+        self._verbose = constants.verbose
         self._output_paths = output_paths
 
         self._periodic_interval = 10
@@ -74,10 +35,10 @@ cdef class Handler:
         self._destroy = False
         self._finished = False
 
-        if const.verbose == 1:
+        if constants.verbose == 1:
             self._verbose = True
             self._update_output = self.__level_1_output__
-        elif const.verbose == 2 or const.verbose == True:
+        elif constants.verbose == 2 or constants.verbose == True:
             #In the case verbose is simply "True" or "level 2"
             self._verbose = True
             self._update_output = self.__level_2_output__
@@ -208,26 +169,27 @@ cdef class Handler:
         pass
 
 class Task(Process):
+    __metaclass__=ABCMeta
 
-    def __init__(self,parent_path,inqu,outqu,size,header,temp_dir,engine):
+    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
         super(Task,self).__init__()
-        self._parent_path = parent_path
+        self._parent_bam = parent_bam
+        self._parent_path = self._parent_bam.filename
+        self._header = self._parent_bam.header
+
         self._outqu = outqu
         self._inqu = inqu
-        self._size = size
-        self._header = header
-        self._temp_dir = temp_dir
-        self._engine = engine
+
+        self._task_size = task_size
+        self._temp_dir = constants.temp_dir
+        self._constants = constants 
+        
+        self._dealt = 0
 
     def run(self):
         bamfile = pysam.AlignmentFile(self._parent_path,"rb")
-        bamiter = bamfile.fetch(until_eof=True)
-        next_read = bamiter.next
-        engine = self._engine
-
-        cdef int size = self._size
-        cdef int sub_count = 0
-        cdef int dealt = 0
+        bam_iterator = bamfile.fetch(until_eof=True)
+        next_read = bam_iterator.next
 
         while True:
             try:
@@ -235,34 +197,23 @@ class Task(Process):
                 
                 if type(package) == DestroyPackage:
                     bamfile.close()
-                    del bamiter
+                    del bam_iterator
                     del bamfile
                     break
 
-                seek = package
-                temp = pysam.AlignmentFile("%s/%d_%d_%d_subset.bam" %\
-                    (self._temp_dir,dealt,self.pid,time.time()),"wb",header = self._header)
-                
+                seek = package                
                 bamfile.seek(seek)
                 time.sleep(.01)
 
-                for i in xrange(size):
-                    read = next_read()
-                    if engine(read,{},bamfile):
-                       temp.write(read)
-                       sub_count += 1
-
-                results = {"temp_paths":{"subset":temp.filename},
-                           "counts": {"subset":sub_count},
-                           "total" : size}
+                results = self.__generate_results__(bam_iterator)
                 
-                sub_count = 0
-                dealt += 1
-                temp.close()
+                self._dealt += 1
                 time.sleep(0.005)
                 self._outqu.put(CorePackage(results=results,
-                                curproc=6,
+                                curproc=0,
                                 parent_class=self.__class__.__name__))
+
+                self.__post_run_routine__()
 
             except Queue2.Empty:
                 time.sleep(5)
@@ -271,14 +222,27 @@ class Task(Process):
 
         return
 
-    def generate_results(self,):
-        
+    def __get_temp_object__(self,path):
+        return pysam.AlignmentFile(path,"wb",header=self._parent_bam.header)
 
-        
+    def __get_temp_path__(self,identity):
+        file_name = "%s_%d_%d.bam" % (identity,self.pid,self._dealt)
+        return os.path.join(self._temp_dir,file_name)
+
+    @abstractmethod
+    def __generate_results__(self,bam_iterator,**kwargs):
+        pass
+
+    @abstractmethod
+    def __post_run_routine__(self,**kwargs):
+        pass
+
 #The FileReader iterates over a BAM, subsets reads and
 #then starts a parbam.Task process on the subsetted reads
 class FileReader(Process):
-    def __init__(self,str input_path,int proc_id,object outqu,int task_n,object const):
+    def __init__(self,str input_path,int proc_id,object outqu,
+                 int task_n,object constants,object Task):
+        
         super(FileReader,self).__init__()
 
         self._input_path = input_path
@@ -286,18 +250,19 @@ class FileReader(Process):
         
         self._outqu = outqu
 
+        self._Task = Task
         self._task_n = task_n
-        self._task_size = const.task_size
-        self._reader_n = const.reader_n
 
-        self._temp_dir = const.temp_dir
-
-        self._debug = const.debug
-        self._engine = const.user_engine
+        self._constants = constants
+        self._task_size = constants.task_size
+        self._reader_n = constants.reader_n
+        self._temp_dir = constants.temp_dir
+        self._debug = constants.debug
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
     def run(self):
+        parent_bam_mem_obj = ParentAlignmentFile(self._input_path)
         parent_bam = pysam.AlignmentFile(self._input_path,"rb")
         parent_iter = parent_bam.fetch(until_eof=True)
         parent_generator = self.__bam_generator__(parent_iter)
@@ -306,13 +271,11 @@ class FileReader(Process):
 
         task_qu = Queue()
 
-        tasks = [Task(parent_path=self._input_path,
+        tasks = [self._Task(parent_bam=parent_bam_mem_obj,
                       inqu=task_qu,
                       outqu=self._outqu,
-                      size=self._task_size,
-                      header=parent_bam.header,
-                      temp_dir=self._temp_dir,
-                      engine=self._engine) for i in xrange(self._task_n)]
+                      task_size=self._task_size,
+                      constants=self._constants) for i in xrange(self._task_n)]
 
         for task in tasks:
             task.start()
@@ -323,6 +286,7 @@ class FileReader(Process):
 
         for n in xrange(self._task_n+1):
             task_qu.put(DestroyPackage())
+
         time.sleep(3)
         parent_bam.close()
         task_qu.close()
@@ -369,14 +333,16 @@ class FileReader(Process):
 class Leviathon(object):
     #Leviathon takes objects of file_readers and handlers and
     #chains them together.
-    def __init__(self,object const,dict handler_bundle,
-                 list handler_order,list queue_names,int update):
+    def __init__(self,object constants,dict handler_bundle,
+                 list handler_order,list queue_names,
+                 int update,object Task):
 
-        self.const = const
+        self._constants = constants
         self._handler_bundle  = handler_bundle
         self._handler_order = handler_order
         self._update = update
         self._queue_names = queue_names
+        self._Task = Task
     
     def run(self,input_path,output_paths):
         parent = ParentAlignmentFile(input_path)
@@ -388,9 +354,9 @@ class Leviathon(object):
                                                           default_qus,parent,output_paths)
         handlers = self.__get_handlers__(handlers_objects)
 
-        task_n = self.__get_task_n__(self.const,handlers)
+        task_n = self.__get_task_n__(self._constants,handlers)
         file_reader_bundles = self.__get_file_reader_bundles__(default_qus,parent,
-                                                               task_n,self.const)
+                                                               task_n,self._constants)
         file_readers,pause_qus = self.__get_file_readers__(file_reader_bundles)
 
         #Start file_readers
@@ -421,8 +387,8 @@ class Leviathon(object):
 
         gc.collect()
 
-    def __get_task_n__(self,object const,handlers):
-        task_n = (const.total_procs - len(handlers) - const.reader_n) / const.reader_n
+    def __get_task_n__(self,constants,handlers):
+        task_n = (constants.total_procs - len(handlers) - constants.reader_n) / constants.reader_n
         if task_n > 0:
             return task_n
         else:
@@ -439,16 +405,17 @@ class Leviathon(object):
         for i in reversed(xrange(reader_n)):
             yield i
 
-    def __get_file_reader_bundles__(self,default_qus,parent,task_n,object const):
+    def __get_file_reader_bundles__(self,default_qus,parent,task_n,constants):
         bundles = []
 
-        for proc_id in self.__proc_id_generator__(const.reader_n):
+        for proc_id in self.__proc_id_generator__(constants.reader_n):
             current_bundle = {}
             current_bundle["input_path"] = parent.filename
             current_bundle["proc_id"] = proc_id
             current_bundle["task_n"] = task_n
             current_bundle["outqu"] = default_qus["main"]
-            current_bundle["const"] = const 
+            current_bundle["constants"] = constants
+            current_bundle["Task"] = self._Task
 
             bundles.append(current_bundle)
 
@@ -571,10 +538,10 @@ class ParabamParser(argparse.ArgumentParser):
         sys.stderr.write('\nerror: %s\n' % message)
         sys.exit(2)
 
-class Const(object):
+class Constants(object):
     
     def __init__(self,temp_dir,verbose,task_size,total_procs,**kwargs):
-        #TODO: Update with real required const values
+        #TODO: Update with real required constants values
         self.temp_dir = temp_dir
         self.verbose = verbose
         self.task_size = task_size

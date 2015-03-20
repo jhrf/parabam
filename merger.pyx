@@ -23,12 +23,12 @@ class MergePackage(parabam.core.Package):
 class Handler(parabam.core.Handler):
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
-                      object const,object pause_qu,dict out_qu_dict):
+                      object constants,object pause_qu,dict out_qu_dict):
 
-        super(Handler,self).__init__(parent_bam,output_paths,inqu,const,pause_qu,
+        super(Handler,self).__init__(parent_bam,output_paths,inqu,constants,pause_qu,
                                         out_qu_dict,report=False)
         
-        self._user_subsets = list(const.user_subsets)
+        self._user_subsets = list(constants.user_subsets)
         self._out_file_objects = self.__get_out_file_objects__()
         self._merged = 0
 
@@ -83,7 +83,7 @@ class Handler(parabam.core.Handler):
                 print "FAILURE ON THIS PATH %s" % (merge_path,)
 
                 print "\nTEMP CONTENTS"
-                sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
+                sys.stdout.write("\n".join(os.listdir(self.constants.temp_dir)))
                 print "--"
                 print "Printing newpackage.results"
                 print new_package.results

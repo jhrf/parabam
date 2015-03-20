@@ -11,30 +11,29 @@ from multiprocessing import Queue
 
 class SubsetCore(object):
 
-    def __init__(self,object const):
-        self._user_subsets = const.user_subsets
+    def __init__(self,object constants):
+        self._user_subsets = constants.user_subsets
         self._counts = {}
         self._system = {}
         self._temp_paths = {}
         self._temp_objects = {}
 
-    def __generate_results__(self):
+    def __generate_results__(self,bam_iterator,**kwargs):
         cdef dict temp_paths = self._temp_paths
         cdef dict temp_objects = self._temp_objects
         cdef dict counts = self._counts
         cdef dict system = self._system
 
         for subset in self._user_subsets:
-            ext = ".bam"
-            temp_paths[subset] = self.__get_temp_path__(subset,ext)
-            temp_objects[subset] = self.__get_temp_object__(temp_paths[subset],ext)
+            temp_paths[subset] = self.__get_temp_path__(subset)
+            temp_objects[subset] = self.__get_temp_object__(temp_paths[subset])
             counts[subset] = 0
+        counts["total"] = 0
 
-        self.__process_task_set__(self._task_set)
+        self.__process_task_set__(bam_iterator)
 
         for subset,file_object in temp_objects.items():
-            file_object.close() #close all the other bams
-        del self._temp_objects
+            file_object.close() #close temp_bams
 
         results = {}
         results["temp_paths"] = temp_paths
@@ -47,44 +46,46 @@ class SubsetCore(object):
         self._counts[subset_type] += 1
         self._temp_objects[subset_type].write(read)
 
+    def __post_run_routine__(self,**kwargs):
+        self._counts = {}
+        self._system = {}
+        self._temp_paths = {}
+        self._temp_objects = {}
+
 class Task(SubsetCore,parabam.command.Task):
 
-    def __init__(self, object task_set, object outqu, object curproc,
-                 object parent_bam, object const, str parent_class):
-        SubsetCore.__init__(self,const)
-        parabam.command.Task.__init__(self,task_set=task_set,
-                                      outqu=outqu,
-                                      curproc=curproc,
-                                      parent_bam = parent_bam,
-                                      const=const,
-                                      parent_class=parent_class)
+    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+        
+        SubsetCore.__init__(self,constants)
+        parabam.command.Task.__init__(self,parent_bam=parent_bam,
+                                    inqu=inqu,
+                                    outqu=outqu,
+                                    task_size=task_size,
+                                    constants=constants)
 
     def __handle_engine_output__(self,engine_output,read):
         subset_write = self.__write_to_subset_bam__
              
         if type(engine_output) == bool:
             if engine_output:
-                subset_write(self.const.user_subsets[0],read)          
+                subset_write(self._constants.user_subsets[0],read)          
         elif type(engine_output) == list:
             for subset,cur_read in engine_output:
                 subset_write(subset,cur_read)
-        elif type(engine_output) == int:
-            if not engine_output == -1:
-                subset_write(self.const.user_subsets[engine_output],read)
         elif type(engine_output) == None:
             pass
 
 class PairTask(SubsetCore,parabam.command.PairTask):
     def __init__(self, object task_set, object outqu, object curproc,
-                 object parent_bam,object const,
+                 object parent_bam,object constants,
                  str parent_class):
         
-        SubsetCore.__init__(self,const)
+        SubsetCore.__init__(self,constants)
         parabam.command.PairTask.__init__(self,task_set=task_set,
                         outqu=outqu,
                         curproc=curproc,
                         parent_bam = parent_bam,
-                        const=const,
+                        constants=constants,
                         parent_class=parent_class)
 
     def __handle_engine_output__(self,engine_output,read):
@@ -94,13 +95,13 @@ class PairTask(SubsetCore,parabam.command.PairTask):
 class Handler(parabam.command.Handler):
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
-                object const,object pause_qu,dict out_qu_dict):
+                object constants,object pause_qu,dict out_qu_dict):
         
         super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
-                                     inqu=inqu,const=const,pause_qu=pause_qu,
+                                     inqu=inqu,constants=constants,pause_qu=pause_qu,
                                      out_qu_dict=out_qu_dict)
 
-        self._user_subsets = const.user_subsets
+        self._user_subsets = constants.user_subsets
         for subset in self._user_subsets:
             self._stage_stores[subset] = []
 
@@ -133,7 +134,7 @@ class Handler(parabam.command.Handler):
         self._out_qu_dict["merge"].put(res)
 
     def __write_counts_csv__(self):
-        if self.const.output_counts:
+        if self._constants.output_counts:
             count_path = "./subset_counts_csv_%d.csv" % (time.time(),)
             self.__standard_output__("[Status] Outputting counts to following file: %s" % (count_path,))
 
@@ -217,16 +218,16 @@ class Interface(parabam.command.Interface):
     def __get_destroy_handler_order__(self):
         return [Handler,parabam.merger.Handler]
 
-    def __get_handler_bundle__(self,object const,task_class,pair_process,**kwargs):
+    def __get_handler_bundle__(self,object constants,task_class,pair_process,**kwargs):
         handler_bundle = {}
 
         #queues transformed by leviathon
         handler_bundle[Handler] = {"inqu":"main",
-                                   "const":const, 
+                                   "constants":constants, 
                                    "out_qu_dict":["merge"]}
 
         handler_bundle[parabam.merger.Handler] = {"inqu":"merge",
-                                                  "const":const,
+                                                  "constants":constants,
                                                   "out_qu_dict":[]}
         return handler_bundle
 
@@ -253,7 +254,7 @@ class Interface(parabam.command.Interface):
         if pair_process:
             return PairTask
         else:
-            return parabam.core.Task
+            return Task
 
     def __get_extra_const_args__(self,**kwargs):
         args = {}

@@ -762,7 +762,7 @@ static PyObject *__pyx_builtin_super;
 static PyObject *__pyx_builtin_open;
 static PyObject *__pyx_builtin_IOError;
 static PyObject *__pyx_pf_7parabam_6merger_12MergePackage___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_results, PyObject *__pyx_v_subset_type); /* proto */
-static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_parent_bam, PyObject *__pyx_v_output_paths, PyObject *__pyx_v_inqu, PyObject *__pyx_v_const, PyObject *__pyx_v_pause_qu, PyObject *__pyx_v_out_qu_dict); /* proto */
+static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_parent_bam, PyObject *__pyx_v_output_paths, PyObject *__pyx_v_inqu, PyObject *__pyx_v_constants, PyObject *__pyx_v_pause_qu, PyObject *__pyx_v_out_qu_dict); /* proto */
 static PyObject *__pyx_pf_7parabam_6merger_7Handler_2__get_out_file_objects__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7parabam_6merger_7Handler_4__get_file_for_merge_type__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_merge, PyObject *__pyx_v_path); /* proto */
 static PyObject *__pyx_pf_7parabam_6merger_7Handler_6__get_subset_merge_type__(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_path); /* proto */
@@ -811,7 +811,6 @@ static char __pyx_k_time[] = "time";
 static char __pyx_k_Empty[] = "Empty";
 static char __pyx_k_Queue[] = "Queue";
 static char __pyx_k_close[] = "close";
-static char __pyx_k_const[] = "const";
 static char __pyx_k_fetch[] = "fetch";
 static char __pyx_k_items[] = "items";
 static char __pyx_k_merge[] = "merge";
@@ -852,6 +851,7 @@ static char __pyx_k_pause_qu[] = "pause_qu";
 static char __pyx_k_qualname[] = "__qualname__";
 static char __pyx_k_splitext[] = "splitext";
 static char __pyx_k_temp_dir[] = "temp_dir";
+static char __pyx_k_constants[] = "constants";
 static char __pyx_k_extension[] = "extension";
 static char __pyx_k_itertools[] = "itertools";
 static char __pyx_k_metaclass[] = "__metaclass__";
@@ -942,7 +942,7 @@ static PyObject *__pyx_n_s_args;
 static PyObject *__pyx_n_s_close;
 static PyObject *__pyx_n_s_close_all_out_files;
 static PyObject *__pyx_n_s_collections;
-static PyObject *__pyx_n_s_const;
+static PyObject *__pyx_n_s_constants;
 static PyObject *__pyx_n_s_core;
 static PyObject *__pyx_n_s_cur_file_obj;
 static PyObject *__pyx_n_s_destroy;
@@ -1257,7 +1257,7 @@ static PyObject *__pyx_pf_7parabam_6merger_12MergePackage___init__(CYTHON_UNUSED
  * class Handler(parabam.core.Handler):
  * 
  *     def __init__(self,object parent_bam, object output_paths,object inqu,             # <<<<<<<<<<<<<<
- *                       object const,object pause_qu,dict out_qu_dict):
+ *                       object constants,object pause_qu,dict out_qu_dict):
  * 
  */
 
@@ -1269,7 +1269,7 @@ static PyObject *__pyx_pw_7parabam_6merger_7Handler_1__init__(PyObject *__pyx_se
   PyObject *__pyx_v_parent_bam = 0;
   PyObject *__pyx_v_output_paths = 0;
   PyObject *__pyx_v_inqu = 0;
-  PyObject *__pyx_v_const = 0;
+  PyObject *__pyx_v_constants = 0;
   PyObject *__pyx_v_pause_qu = 0;
   PyObject *__pyx_v_out_qu_dict = 0;
   int __pyx_lineno = 0;
@@ -1279,7 +1279,7 @@ static PyObject *__pyx_pw_7parabam_6merger_7Handler_1__init__(PyObject *__pyx_se
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_parent_bam,&__pyx_n_s_output_paths,&__pyx_n_s_inqu,&__pyx_n_s_const,&__pyx_n_s_pause_qu,&__pyx_n_s_out_qu_dict,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_parent_bam,&__pyx_n_s_output_paths,&__pyx_n_s_inqu,&__pyx_n_s_constants,&__pyx_n_s_pause_qu,&__pyx_n_s_out_qu_dict,0};
     PyObject* values[7] = {0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -1316,7 +1316,7 @@ static PyObject *__pyx_pw_7parabam_6merger_7Handler_1__init__(PyObject *__pyx_se
           __Pyx_RaiseArgtupleInvalid("__init__", 1, 7, 7, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  4:
-        if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_const)) != 0)) kw_args--;
+        if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_constants)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("__init__", 1, 7, 7, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
@@ -1349,7 +1349,7 @@ static PyObject *__pyx_pw_7parabam_6merger_7Handler_1__init__(PyObject *__pyx_se
     __pyx_v_parent_bam = values[1];
     __pyx_v_output_paths = values[2];
     __pyx_v_inqu = values[3];
-    __pyx_v_const = values[4];
+    __pyx_v_constants = values[4];
     __pyx_v_pause_qu = values[5];
     __pyx_v_out_qu_dict = ((PyObject*)values[6]);
   }
@@ -1362,7 +1362,7 @@ static PyObject *__pyx_pw_7parabam_6merger_7Handler_1__init__(PyObject *__pyx_se
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_out_qu_dict), (&PyDict_Type), 1, "out_qu_dict", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7parabam_6merger_7Handler___init__(__pyx_self, __pyx_v_self, __pyx_v_parent_bam, __pyx_v_output_paths, __pyx_v_inqu, __pyx_v_const, __pyx_v_pause_qu, __pyx_v_out_qu_dict);
+  __pyx_r = __pyx_pf_7parabam_6merger_7Handler___init__(__pyx_self, __pyx_v_self, __pyx_v_parent_bam, __pyx_v_output_paths, __pyx_v_inqu, __pyx_v_constants, __pyx_v_pause_qu, __pyx_v_out_qu_dict);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1373,7 +1373,7 @@ static PyObject *__pyx_pw_7parabam_6merger_7Handler_1__init__(PyObject *__pyx_se
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_parent_bam, PyObject *__pyx_v_output_paths, PyObject *__pyx_v_inqu, PyObject *__pyx_v_const, PyObject *__pyx_v_pause_qu, PyObject *__pyx_v_out_qu_dict) {
+static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_parent_bam, PyObject *__pyx_v_output_paths, PyObject *__pyx_v_inqu, PyObject *__pyx_v_constants, PyObject *__pyx_v_pause_qu, PyObject *__pyx_v_out_qu_dict) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1386,9 +1386,9 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObj
   __Pyx_RefNannySetupContext("__init__", 0);
 
   /* "parabam/merger.pyx":28
- *                       object const,object pause_qu,dict out_qu_dict):
+ *                       object constants,object pause_qu,dict out_qu_dict):
  * 
- *         super(Handler,self).__init__(parent_bam,output_paths,inqu,const,pause_qu,             # <<<<<<<<<<<<<<
+ *         super(Handler,self).__init__(parent_bam,output_paths,inqu,constants,pause_qu,             # <<<<<<<<<<<<<<
  *                                         out_qu_dict,report=False)
  * 
  */
@@ -1411,10 +1411,10 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObj
 
   /* "parabam/merger.pyx":29
  * 
- *         super(Handler,self).__init__(parent_bam,output_paths,inqu,const,pause_qu,
+ *         super(Handler,self).__init__(parent_bam,output_paths,inqu,constants,pause_qu,
  *                                         out_qu_dict,report=False)             # <<<<<<<<<<<<<<
  * 
- *         self._user_subsets = list(const.user_subsets)
+ *         self._user_subsets = list(constants.user_subsets)
  */
   __pyx_t_1 = PyTuple_New(6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -1427,9 +1427,9 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObj
   __Pyx_INCREF(__pyx_v_inqu);
   PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_v_inqu);
   __Pyx_GIVEREF(__pyx_v_inqu);
-  __Pyx_INCREF(__pyx_v_const);
-  PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_v_const);
-  __Pyx_GIVEREF(__pyx_v_const);
+  __Pyx_INCREF(__pyx_v_constants);
+  PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_v_constants);
+  __Pyx_GIVEREF(__pyx_v_constants);
   __Pyx_INCREF(__pyx_v_pause_qu);
   PyTuple_SET_ITEM(__pyx_t_1, 4, __pyx_v_pause_qu);
   __Pyx_GIVEREF(__pyx_v_pause_qu);
@@ -1438,9 +1438,9 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObj
   __Pyx_GIVEREF(__pyx_v_out_qu_dict);
 
   /* "parabam/merger.pyx":28
- *                       object const,object pause_qu,dict out_qu_dict):
+ *                       object constants,object pause_qu,dict out_qu_dict):
  * 
- *         super(Handler,self).__init__(parent_bam,output_paths,inqu,const,pause_qu,             # <<<<<<<<<<<<<<
+ *         super(Handler,self).__init__(parent_bam,output_paths,inqu,constants,pause_qu,             # <<<<<<<<<<<<<<
  *                                         out_qu_dict,report=False)
  * 
  */
@@ -1449,17 +1449,17 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObj
 
   /* "parabam/merger.pyx":29
  * 
- *         super(Handler,self).__init__(parent_bam,output_paths,inqu,const,pause_qu,
+ *         super(Handler,self).__init__(parent_bam,output_paths,inqu,constants,pause_qu,
  *                                         out_qu_dict,report=False)             # <<<<<<<<<<<<<<
  * 
- *         self._user_subsets = list(const.user_subsets)
+ *         self._user_subsets = list(constants.user_subsets)
  */
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_report, Py_False) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "parabam/merger.pyx":28
- *                       object const,object pause_qu,dict out_qu_dict):
+ *                       object constants,object pause_qu,dict out_qu_dict):
  * 
- *         super(Handler,self).__init__(parent_bam,output_paths,inqu,const,pause_qu,             # <<<<<<<<<<<<<<
+ *         super(Handler,self).__init__(parent_bam,output_paths,inqu,constants,pause_qu,             # <<<<<<<<<<<<<<
  *                                         out_qu_dict,report=False)
  * 
  */
@@ -1473,11 +1473,11 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObj
   /* "parabam/merger.pyx":31
  *                                         out_qu_dict,report=False)
  * 
- *         self._user_subsets = list(const.user_subsets)             # <<<<<<<<<<<<<<
+ *         self._user_subsets = list(constants.user_subsets)             # <<<<<<<<<<<<<<
  *         self._out_file_objects = self.__get_out_file_objects__()
  *         self._merged = 0
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_const, __pyx_n_s_user_subsets); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 31; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_constants, __pyx_n_s_user_subsets); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 31; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 31; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
@@ -1492,7 +1492,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObj
 
   /* "parabam/merger.pyx":32
  * 
- *         self._user_subsets = list(const.user_subsets)
+ *         self._user_subsets = list(constants.user_subsets)
  *         self._out_file_objects = self.__get_out_file_objects__()             # <<<<<<<<<<<<<<
  *         self._merged = 0
  * 
@@ -1521,7 +1521,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObj
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "parabam/merger.pyx":33
- *         self._user_subsets = list(const.user_subsets)
+ *         self._user_subsets = list(constants.user_subsets)
  *         self._out_file_objects = self.__get_out_file_objects__()
  *         self._merged = 0             # <<<<<<<<<<<<<<
  * 
@@ -1533,7 +1533,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler___init__(CYTHON_UNUSED PyObj
  * class Handler(parabam.core.Handler):
  * 
  *     def __init__(self,object parent_bam, object output_paths,object inqu,             # <<<<<<<<<<<<<<
- *                       object const,object pause_qu,dict out_qu_dict):
+ *                       object constants,object pause_qu,dict out_qu_dict):
  * 
  */
 
@@ -3100,7 +3100,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_10__new_package_action__(CYT
  *                 print "FAILURE ON THIS PATH %s" % (merge_path,)
  * 
  *                 print "\nTEMP CONTENTS"             # <<<<<<<<<<<<<<
- *                 sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
+ *                 sys.stdout.write("\n".join(os.listdir(self.constants.temp_dir)))
  *                 print "--"
  */
         if (__Pyx_PrintOne(0, __pyx_kp_s_TEMP_CONTENTS) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
@@ -3108,7 +3108,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_10__new_package_action__(CYT
         /* "parabam/merger.pyx":86
  * 
  *                 print "\nTEMP CONTENTS"
- *                 sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))             # <<<<<<<<<<<<<<
+ *                 sys.stdout.write("\n".join(os.listdir(self.constants.temp_dir)))             # <<<<<<<<<<<<<<
  *                 print "--"
  *                 print "Printing newpackage.results"
  */
@@ -3125,7 +3125,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_10__new_package_action__(CYT
         __pyx_t_19 = __Pyx_PyObject_GetAttrStr(__pyx_t_18, __pyx_n_s_listdir); if (unlikely(!__pyx_t_19)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
         __Pyx_GOTREF(__pyx_t_19);
         __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
-        __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_const); if (unlikely(!__pyx_t_18)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+        __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_constants); if (unlikely(!__pyx_t_18)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
         __Pyx_GOTREF(__pyx_t_18);
         __pyx_t_20 = __Pyx_PyObject_GetAttrStr(__pyx_t_18, __pyx_n_s_temp_dir); if (unlikely(!__pyx_t_20)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
         __Pyx_GOTREF(__pyx_t_20);
@@ -3189,7 +3189,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_10__new_package_action__(CYT
 
         /* "parabam/merger.pyx":87
  *                 print "\nTEMP CONTENTS"
- *                 sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
+ *                 sys.stdout.write("\n".join(os.listdir(self.constants.temp_dir)))
  *                 print "--"             # <<<<<<<<<<<<<<
  *                 print "Printing newpackage.results"
  *                 print new_package.results
@@ -3197,7 +3197,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_10__new_package_action__(CYT
         if (__Pyx_PrintOne(0, __pyx_kp_s__4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
 
         /* "parabam/merger.pyx":88
- *                 sys.stdout.write("\n".join(os.listdir(self.const.temp_dir)))
+ *                 sys.stdout.write("\n".join(os.listdir(self.constants.temp_dir)))
  *                 print "--"
  *                 print "Printing newpackage.results"             # <<<<<<<<<<<<<<
  *                 print new_package.results
@@ -4851,7 +4851,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_close, __pyx_k_close, sizeof(__pyx_k_close), 0, 0, 1, 1},
   {&__pyx_n_s_close_all_out_files, __pyx_k_close_all_out_files, sizeof(__pyx_k_close_all_out_files), 0, 0, 1, 1},
   {&__pyx_n_s_collections, __pyx_k_collections, sizeof(__pyx_k_collections), 0, 0, 1, 1},
-  {&__pyx_n_s_const, __pyx_k_const, sizeof(__pyx_k_const), 0, 0, 1, 1},
+  {&__pyx_n_s_constants, __pyx_k_constants, sizeof(__pyx_k_constants), 0, 0, 1, 1},
   {&__pyx_n_s_core, __pyx_k_core, sizeof(__pyx_k_core), 0, 0, 1, 1},
   {&__pyx_n_s_cur_file_obj, __pyx_k_cur_file_obj, sizeof(__pyx_k_cur_file_obj), 0, 0, 1, 1},
   {&__pyx_n_s_destroy, __pyx_k_destroy, sizeof(__pyx_k_destroy), 0, 0, 1, 1},
@@ -5027,10 +5027,10 @@ static int __Pyx_InitCachedConstants(void) {
  * class Handler(parabam.core.Handler):
  * 
  *     def __init__(self,object parent_bam, object output_paths,object inqu,             # <<<<<<<<<<<<<<
- *                       object const,object pause_qu,dict out_qu_dict):
+ *                       object constants,object pause_qu,dict out_qu_dict):
  * 
  */
-  __pyx_tuple__10 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_parent_bam, __pyx_n_s_output_paths, __pyx_n_s_inqu, __pyx_n_s_const, __pyx_n_s_pause_qu, __pyx_n_s_out_qu_dict); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__10 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_parent_bam, __pyx_n_s_output_paths, __pyx_n_s_inqu, __pyx_n_s_constants, __pyx_n_s_pause_qu, __pyx_n_s_out_qu_dict); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
   __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(7, 0, 7, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_mer, __pyx_n_s_init, 25, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -5500,7 +5500,7 @@ PyMODINIT_FUNC PyInit_merger(void)
  * class Handler(parabam.core.Handler):
  * 
  *     def __init__(self,object parent_bam, object output_paths,object inqu,             # <<<<<<<<<<<<<<
- *                       object const,object pause_qu,dict out_qu_dict):
+ *                       object constants,object pause_qu,dict out_qu_dict):
  * 
  */
   __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_6merger_7Handler_1__init__, 0, __pyx_n_s_Handler___init, NULL, __pyx_n_s_parabam_merger, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L1_error;}

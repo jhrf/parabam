@@ -18,74 +18,67 @@ from abc import ABCMeta, abstractmethod
 
 class Task(parabam.core.Task):
     __metaclass__=ABCMeta
-    def __init__(self,object task_set, object outqu,object curproc,
-        object parent_bam,object const,str parent_class):
 
-        super(Task, self).__init__(task_set=task_set,
-            outqu=outqu,
-            curproc=curproc,
-            parent_bam = parent_bam,
-            const=const,
-            parent_class=parent_class)
+    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+        super(Task, self).__init__(parent_bam=parent_bam,
+                                    inqu=inqu,
+                                    outqu=outqu,
+                                    task_size=task_size,
+                                    constants=constants)
+
+        self._engine = constants.user_engine
+        self._user_constants = constants.user_constants
 
     @abstractmethod
-    def __generate_results__(self):
+    def __generate_results__(self,bam_iterator,**kwargs):
         #Must make call to self.__process_task_set__
+        pass
+
+    @abstractmethod
+    def __post_run_routine__(self,**kwargs):
         pass
 
     @abstractmethod
     def __handle_engine_output__(self,engine_output,read):
         pass
 
-    def __process_task_set__(self,task_set):
-        engine = self.__engine__
-        handle_engine = self.__handle_engine_output__
-        user_constants = self.const.user_constants
+    def __process_task_set__(self,bam_iterator):
+        engine = self._engine
+        next_read = bam_iterator.next 
+        parent_bam = self._parent_bam
+        cdef int size = self._task_size
+        handle_output = self.__handle_engine_output__
+        user_constants = self._user_constants
+        counts = self._counts
 
-        for read in task_set:
-            decision = engine(read,user_constants,self._parent_bam)
-            handle_engine(decision,read)
-
-    def __get_temp_object__(self,path,ext):
-        if ext == ".gz" or ext == ".gzip":
-            return gzip.open(path,"wb")
-        elif ext == ".txt":
-            return open(path,"w")
-        else:
-            return pysam.AlignmentFile(path,"wb",header=self._parent_bam.header)
+        #StopIteration caught in parabam.core.Task.run
+        for i in xrange(size):
+            counts["total"] += 1
+            read = next_read()
+            engine_output = engine(read,user_constants,parent_bam)
+            handle_output(engine_output,read)
 
     def __get_extension__(self,path):
         root,extension = os.path.splitext(path)
         return extension
 
-    def __get_temp_path__(self,typ,ext=".bam"):
-        #self.pid ensures that the temp names are unique.
-        return "%s/%s_%s_parabam_temp%s" %\
-            (self._temp_dir,typ,self.pid,ext)
-
-    def __engine__(self,read,user_constants,parent):
-        return self.const.user_engine(read,user_constants,parent)
-
 class PairTask(Task):
     __metaclass__ = ABCMeta
 
-    def __init__(self,object task_set,object outqu,object curproc,
-                 object parent_bam,object const,str parent_class):
-        
-        super(PairTask, self).__init__(task_set=task_set,
-                                       outqu=outqu,
-                                       curproc=curproc,
-                                       parent_bam = parent_bam,
-                                       const=const,
-                                       parent_class=parent_class)
+    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+        super(Task, self).__init__(parent_bam=parent_bam,
+                                    inqu=inqu,
+                                    outqu=outqu,
+                                    task_size=task_size,
+                                    constants=constants)
 
-        if const.include_duplicates:
+        if constants.include_duplicates:
             self.__read_filter__ = self.__filter__
         else:
             self.__read_filter__ = self.__filter_duplicates__
 
     @abstractmethod
-    def __generate_results__(self):
+    def __generate_results__(self,**kwargs):
         #Must make call to self.__process_task_set__
         pass
 
@@ -100,7 +93,7 @@ class PairTask(Task):
             self.__process_list_task_set__(task_set)
 
     def __process_dict_task_set__(self,task_set):
-        user_constants = self.const.user_constants
+        user_constants = self._constants.user_constants
         engine = self.__engine__
 
         for qname,reads in task_set.items():
@@ -109,7 +102,7 @@ class PairTask(Task):
 
     def __process_list_task_set__(self,task_set):
         #speedup
-        user_constants = self.const.user_constants
+        user_constants = self._constants.user_constants
         engine = self.__engine__
         query_loners = self.__query_loners__ 
         read_pair_decision = self.__handle_engine_output__
@@ -159,13 +152,13 @@ class Handler(parabam.core.Handler):
     __metaclass__=ABCMeta
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
-                object const,object pause_qu,dict out_qu_dict,object report=True):
+                object constants,object pause_qu,dict out_qu_dict,object report=True):
         
         super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
-                                     inqu=inqu,const=const,pause_qu=pause_qu,
+                                     inqu=inqu,constants=constants,pause_qu=pause_qu,
                                      out_qu_dict=out_qu_dict)
 
-        self._system_subsets = const.system_subsets
+        self._system_subsets = constants.system_subsets
 
         #Stage stores serve as a staging area
         #for packages to be sent on to subhandlers
@@ -181,7 +174,7 @@ class Handler(parabam.core.Handler):
         results = new_package.results
         handle_dict = dict(results)
         #hack so as not record rescued paired reads twice in total
-        if self.const.pair_process and not new_package.parent_class == "Task":
+        if self._constants.pair_process and not new_package.parent_class == "Task":
             handle_dict["total"] = 0
         self.__auto_handle__(handle_dict,self._stats)
 
@@ -261,7 +254,7 @@ class Interface(parabam.core.Interface):
         return module,user_engine,user_constants
 
     @abstractmethod
-    def __get_handler_bundle__(self,queues,object const,task_class,**kwargs):
+    def __get_handler_bundle__(self,queues,object constants,task_class,**kwargs):
         pass
 
     @abstractmethod
@@ -375,25 +368,25 @@ class Interface(parabam.core.Interface):
 
         const_args = self.__get_const_args__(**kwargs)
         const_args.update(self.__get_extra_const_args__(**kwargs))
-        const = parabam.core.Const(**const_args)
+        constants = parabam.core.Constants(**const_args)
 
         task_class = self.__get_task_class__(**kwargs)
         queue_names = self.__get_queue_names__(**kwargs)
 
         handler_order = self.__get_destroy_handler_order__()
-        handler_bundle = self.__get_handler_bundle__(const=const,
+        handler_bundle = self.__get_handler_bundle__(constants=constants,
                                                      task_class=task_class,
                                                      **kwargs)
 
-        if const.pair_process:
+        if constants.pair_process:
             self.__prepare_for_pair_processing__(handler_bundle,handler_order,
-                                                 queue_names,const)
+                                                 queue_names,constants)
         
-        update_interval = self.__get_update_interval__(const.verbose)
+        update_interval = self.__get_update_interval__(constants.verbose)
 
-        leviathon = parabam.core.Leviathon(const,handler_bundle,
+        leviathon = parabam.core.Leviathon(constants,handler_bundle,
                                            handler_order,queue_names,
-                                           update_interval)
+                                           update_interval,task_class)
 
         final_output_paths = {"global":[]}
 
@@ -402,7 +395,7 @@ class Interface(parabam.core.Interface):
             output_paths = self.__get_output_paths__(input_path=input_path,**kwargs)
             self.__update_final_output_paths__(input_path,output_paths,
                                                final_output_paths)
-            if const.verbose: 
+            if constants.verbose: 
                 self.__report_file_names__(final_output_paths,input_path)
 
             leviathon.run(input_path,output_paths)
@@ -424,9 +417,9 @@ class Interface(parabam.core.Interface):
             if len(child_paths) == 0:
                 del final_output_paths[master_path]
 
-    def __prepare_for_pair_processing__(self,handler_bundle,handler_order,queue_names,object const):        
+    def __prepare_for_pair_processing__(self,handler_bundle,handler_order,queue_names,constants):        
         handler_bundle[parabam.chaser.Handler] = {"inqu":"chaser",
-                                                  "const":const,
+                                                  "constants":constants,
                                                   "out_qu_dict":["main"]}
 
         for handler_class,handler_args in handler_bundle.items():
