@@ -28,32 +28,26 @@ class Task(parabam.core.Task):
 
         self._engine = constants.user_engine
         self._user_constants = constants.user_constants
-        self._system = {}
-
-    @abstractmethod
-    def __generate_results__(self,iterator,**kwargs):
-        #Must make call to self.__process_task_set__
-        pass
-
-    def __post_run_routine__(self,**kwargs):
-        self._system = {}
 
     @abstractmethod
     def __handle_engine_output__(self,engine_output,read):
+        pass
+
+    def __pre_run_routine__(self,iterator,**kwargs):
+        self._system = {}
+
+    def __post_run_routine__(self,**kwargs):
         pass
 
     def __process_task_set__(self,iterator):
         engine = self._engine
         next_read = iterator.next 
         parent_bam = self._parent_bam
-        cdef int size = self._task_size
         handle_output = self.__handle_engine_output__
         user_constants = self._user_constants
-        counts = self._counts
-
+        
         #StopIteration caught in parabam.core.Task.run
-        for i in xrange(size):
-            counts["total"] += 1 #TODO: think about how we record counts
+        for i in xrange(self._task_size):    
             read = next_read()
             engine_output = engine(read,user_constants,parent_bam)
             handle_output(engine_output,read)
@@ -77,31 +71,14 @@ class PairTask(Task):
         else:
             self.__read_filter__ = self.__filter_duplicates__
 
-        self._loner_count = 0
-        self._loner_path = None
-        self._loner_file = None
-
-    @abstractmethod
-    def __generate_results__(self,**kwargs):
-        #Must make call to self.__process_task_set__
-        pass
-
     @abstractmethod
     def __handle_engine_output__(self,engine_output,read):
         pass
 
-
     def __post_run_routine__(self,**kwargs):
         super(PairTask,self).__post_run_routine__()
-        self._loner_count = 0
-        self._loner_path = None
-        self._loner_file = None
 
     def __process_task_set__(self,iterator):
-        self._loner_path = self.__get_temp_path__("chaser")
-        self._loner_file = pysam.AlignmentFile(self._loner_path,"wb",
-                                               header=self._parent_bam.header)
-
         engine = self._engine
         next_read = iterator.next 
         parent_bam = self._parent_bam
@@ -126,9 +103,9 @@ class PairTask(Task):
         del loners
 
     def __stash_loners__(self,loners):
-        loner_count = self._loner_count
-        loner_file = self._loner_file
-        loner_path = self._loner_path
+        loner_count = 0
+        loner_path = self.__get_temp_path__("chaser")
+        loner_file = pysam.AlignmentFile(loner_path,"wb",header=self._parent_bam.header)
 
         for qname,read in loners.items():
             loner_count += 1
@@ -157,10 +134,10 @@ class Handler(parabam.core.Handler):
     __metaclass__=ABCMeta
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
-                object constants,object pause_qu,dict out_qu_dict,object report=True):
+                object constants,object pause_qus,dict out_qu_dict,object report=True):
         
         super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
-                                     inqu=inqu,constants=constants,pause_qu=pause_qu,
+                                     inqu=inqu,constants=constants,pause_qus=pause_qus,
                                      out_qu_dict=out_qu_dict)
 
         self._system_subsets = constants.system_subsets
@@ -255,7 +232,7 @@ class Interface(parabam.core.Interface):
         return module,user_engine,user_constants
 
     @abstractmethod
-    def __get_handler_bundle__(self,queues,object constants,task_class,**kwargs):
+    def __get_handler_bundle__(self,**kwargs):
         pass
 
     @abstractmethod
@@ -311,7 +288,9 @@ class Interface(parabam.core.Interface):
 
     def __update_final_output_paths__(self,input_path,output_paths,final_output_paths):
         if "global" in output_paths.keys():
-            final_output_paths["global"].extend(output_paths["global"])
+            for path in output_paths["global"]:
+                if path not in final_output_paths["global"]:
+                    final_output_paths["global"].append(path)
 
         final_output_paths[input_path] = []
         if input_path in output_paths.keys():
@@ -375,9 +354,7 @@ class Interface(parabam.core.Interface):
         queue_names = self.__get_queue_names__(**kwargs)
 
         handler_order = self.__get_destroy_handler_order__()
-        handler_bundle = self.__get_handler_bundle__(constants=constants,
-                                                     task_class=task_class,
-                                                     **kwargs)
+        handler_bundle = self.__get_handler_bundle__(**kwargs)
 
         if constants.pair_process:
             self.__prepare_for_pair_processing__(handler_bundle,handler_order,
@@ -390,12 +367,14 @@ class Interface(parabam.core.Interface):
                                            update_interval,task_class)
 
         final_output_paths = {"global":[]}
+        global_paths = self.__get_global_output_path__(**kwargs)
 
         for input_path in input_paths:
-
             output_paths = self.__get_output_paths__(input_path=input_path,**kwargs)
+            self.__global_paths_to_output__(output_paths,global_paths,**kwargs)
             self.__update_final_output_paths__(input_path,output_paths,
                                                final_output_paths)
+
             if constants.verbose: 
                 self.__report_file_names__(final_output_paths,input_path)
 
@@ -406,6 +385,16 @@ class Interface(parabam.core.Interface):
         
         self.__remove_empty_entries__(final_output_paths)
         return final_output_paths
+
+    def __get_global_output_path__(self,**kwargs):
+        return {}
+
+    def __global_paths_to_output__(self,output_paths,global_paths,**kwargs):
+        if not global_paths == {}:
+            output_paths["global"] = global_paths["global"]
+
+    def __get_global_output__(self,**kwargs):
+        return {}
 
     def __get_update_interval__(self,verbose):
         if verbose == 1: 
@@ -437,20 +426,23 @@ class Interface(parabam.core.Interface):
             ,help='The instruction file, written in python, that we wish'\
             'to carry out on the input BAM.')
         parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
-            ,help='The file(s) we wish to operate on. Multipe entries should be separated by a single space')
+            ,help='The file(s) we wish to operate on. Multiple entries should be separated by a single space')
         parser.add_argument('--debug',action="store_true",default=False,
             help="Only the first 5million reads will be processed")
         parser.add_argument('--pair',action="store_true",default=False
             ,help="A pair processor is used instead of a conventional processor")
+        parser.add_argument('-f',type=int,metavar="REGION",nargs='?',default=2
+            ,help="The amount of open connections to the file being read. Conventional hard drives\
+            perform best with the default of 2\n")
         parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
             ,help="The subset process will be run only on reads from this region\n"\
-            "Regions should be colon seperated as specified by samtools (eg \'chr1:1000,5000\')")
+            "Regions should be colon separated as specified by samtools (eg \'chr1:1000,5000\')")
         parser.add_argument('-d',action="store_false",default=True,
             help="parabam will not process reads marked duplicate.")
         parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
             help="Indicate the amount of information output by the program:\n"\
             "\t0: No output [Default]\n"\
-            "\t1: Total Reads Processsed\n"\
+            "\t1: Total Reads Processed\n"\
             "\t2: Detailed output")
 
         return parser

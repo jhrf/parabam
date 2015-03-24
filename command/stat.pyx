@@ -1,3 +1,4 @@
+#Once upon a time...
 import pysam
 import parabam
 import shutil
@@ -13,25 +14,26 @@ from abc import ABCMeta, abstractmethod
 
 class StatCore(object):
 
-    def __init__(self,object const,source):
-        self._source = source
+    def __init__(self,object constants):
+        self._constants
         self._counts = {}
         self._local_structures = {}
         self._system = {}
 
-    def __generate_results__(self):
-        for name,structure in self.const.user_structures.items():
+    def __pre_run_routine__(self,iterator,**kwargs):
+        for name,structure in self._constants.user_structures.items():
             self._local_structures[name] = structure.empty_clone()
             self._counts[name] = 0
 
-        self.__process_task_set__(self._task_set)
-
+    def __get_results__(self):
         results = {}
         results["structures"] = self.__unpack_structures__(self._local_structures)
         results["counts"] = self._counts
         results["system"] = self._system
-
         return results
+
+    def __post_run_routine__(self,**kwargs):
+        pass
 
     def __handle_engine_output__(self,engine_output,read):
         local_structures = self._local_structures
@@ -47,68 +49,57 @@ class StatCore(object):
 
 class Task(StatCore,parabam.command.Task):
 
-    def __init__(self, object task_set, object outqu, object curproc,object destroy,
-                 object parent_bam, object const, str parent_class,str source):
+    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
         
-        StatCore.__init__(self,const,source)
-        parabam.command.Task.__init__(self,task_set=task_set,
-                                        outqu=outqu,
-                                        curproc=curproc,
-                                        destroy=destroy,
-                                        const=const,
-                                        parent_class = parent_class,
-                                        parent_bam = parent_bam)
+        parabam.command.Task.__init__(self,parent_bam=parent_bam,
+                                            inqu=inqu,
+                                            outqu=outqu,
+                                            task_size=task_size,
+                                            constants=constants)
+        StatCore.__init__(self,constants)
         
 class PairTask(StatCore,parabam.command.PairTask):
 
-    def __init__(self, object task_set, object outqu, object curproc,object destroy,
-                 object parent_bam,object const, str parent_class,str source):
+    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
         
-        StatCore.__init__(self,const,source)
-        parabam.command.PairTask.__init__(self,task_set=task_set,
-                                        outqu=outqu,
-                                        curproc=curproc,
-                                        destroy=destroy,
-                                        const=const,
-                                        parent_class = parent_class,
-                                        parent_bam = parent_bam)
+        parabam.command.PairTask.__init__(self,parent_bam=parent_bam,
+                                            inqu=inqu,
+                                            outqu=outqu,
+                                            task_size=task_size,
+                                            constants=constants)
+        StatCore.__init__(self,constants)
 
 
 class Handler(parabam.command.Handler):
 
-    def __init__(self,object inqu,object const,int destroy_limit,dict out_qu_dict):
-        super(Handler,self).__init__(inqu,const,destroy_limit=destroy_limit,out_qu_dict=out_qu_dict)
-        self._final_structures = {}
+    def __init__(self,object parent_bam, object output_paths,object inqu,
+                object constants,object pause_qus,dict out_qu_dict,object report=True):
 
-        for source in self._sources:
-            self._final_structures[source] = {}
-            for name,struc in self.const.user_structures.items():
-                self._final_structures[source][struc.name] = struc.empty_clone()
+        super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
+                                     inqu=inqu,constants=constants,pause_qus=pause_qus,
+                                     out_qu_dict=out_qu_dict)
+
+        self._final_structures = {}
+        for name,struc in self._constants.user_structures.items():
+            self._final_structures[struc.name] = struc.empty_clone()
 
     def __new_package_action__(self,new_package,**kwargs):
         super(Handler,self).__new_package_action__(new_package)
         results = new_package.results
-        source = results["source"]
         for name,data in results["structures"]:
-            final_struc = self._final_structures[source][name]
+            final_struc = self._final_structures[name]
             final_struc.merge(data)
 
     def __handler_exit__(self):
         super(Handler,self).__handler_exit__()
-        const = self.const
+        constants = self._constants
 
-        for source in self._sources:
-            source_structures = self._final_structures[source]
-            data_str = self.__get_data_str_from_names__(const.analysis_names,source_structures)
+        data_str = self.__get_data_str_from_names__(constants.analysis_names,self._final_structures)
 
-            with open(const.output_paths["global"][0],"a") as out_object:
-                out_object.write("%s%s\n" % (source,data_str))
+        with open(self._output_paths["global"][0],"a") as out_object:
+            out_object.write("%s%s\n" % (self._parent_bam.filename,data_str))
 
-            #Arrays can't be squished into unified output, so create a unique file path    
-            for name,struc in source_structures.items():
-                if struc.struc_type == np.ndarray:
-                    array_path = "%s_%s.csv" % (source,struc.name)
-                    struc.write_to_csv(array_path,source,const.outmode)
+        #TODO: Handle array output    
 
     def __get_data_str_from_names__(self,names,user_structures):
         data_str = ""
@@ -174,10 +165,6 @@ class UserStructure(object):
     def merge_cumu(self,result):
         pass
 
-    @abstractmethod
-    def write_to_csv(self,source):
-        pass
-
 class NumericStructure(UserStructure):
     def __init__(self,name,struc_type,store_method,data,log_scaling=False):
         super(NumericStructure,self).__init__(name,struc_type,store_method,data)
@@ -206,16 +193,6 @@ class NumericStructure(UserStructure):
     def merge_cumu(self,result):
         self.data += result
         del result
-
-    def write_to_csv(self,out_paths,source,mode):
-        if mode == "a":
-            first_col=source
-        elif mode == "s":
-            first_col=self.name
-        write_line = "%s,%.3f\n" % (first_col,self.data,)
-
-        with open(out_paths[source][self.name],"a") as out_object:
-            out_object.write(write_line)
 
 class ArrayStructure(UserStructure):
     def __init__(self,name,struc_type,store_method,data):
@@ -247,7 +224,7 @@ class ArrayStructure(UserStructure):
         self.data += result
         del result
 
-    def write_to_csv(self,out_path,source,mode):
+    def write_to_csv(self,out_path,mode):
         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
 
 class Interface(parabam.command.Interface):
@@ -263,120 +240,88 @@ class Interface(parabam.command.Interface):
         user_struc_blueprint = {}
         module.set_structures(user_struc_blueprint)
 
-        self.run(
-            input_bams=cmd_args.input,
-            user_specified_outpath=cmd_args.output,
-            proc=cmd_args.p,
-            chunk=cmd_args.c,
+        self.run(input_bams=cmd_args.input,
+            total_procs = cmd_args.p,
+            task_size = cmd_args.s,
             verbose= cmd_args.v,
             user_constants = user_constants,
-            user_engine = user_engine,
             user_struc_blueprint = user_struc_blueprint,
-            fetch_region=cmd_args.region,
-            side_by_side=cmd_args.s,
-            pair_process=cmd_args.pair)
-    
-    def run(self,input_bams,proc,chunk,user_constants,user_engine,
+            user_engine = user_engine,
+            fetch_region = cmd_args.region,
+            pair_process=cmd_args.pair,
+            include_duplicates=cmd_args.d,
+            debug = cmd_args.debug)
+
+
+    def run(self,input_bams,total_procs,task_size,user_constants,user_engine,
             user_struc_blueprint,user_specified_outpath=None,
-            fetch_region=None,side_by_side=2,keep_in_temp=False,
-            engine_is_class=False,verbose=0,pair_process=False,
-            include_duplicates=True,ensure_unique_output=False,
-            debug=False,input_is_sam=False):
+            reader_n = 2,fetch_region=None,side_by_side=2,
+            keep_in_temp=False,verbose=0,pair_process=False,
+            include_duplicates=True,debug=False,input_is_sam=False):
 
         ''' Docstring! '''
         args = dict(locals())
         del args["self"]
         return super(Interface,self).run(**args)
 
-    def __get_processor_bundle__(self,queues,object const,task_class,pair_process,debug,**kwargs):
-        processor_bundle = {}
+    def __get_destroy_handler_order__(self):
+        return [Handler]
 
-        processor_bundle["class"] = parabam.command.Processor
+    def __get_queue_names__(self,**kwargs):
+        return ["main"]
 
-        for i,source in enumerate(const.sources):
-            processor_bundle[source] = {"source":source,
-                                        "outqu":queues["main"],
-                                        "const":const,
-                                        "TaskClass":task_class,
-                                        "task_args":[source],
-                                        "debug":debug}
-        return processor_bundle
+    def __get_extra_const_args__(self,user_struc_blueprint,**kwargs):
+        user_structures = self.__create_structures__(user_struc_blueprint)
+        analysis_names = self.__get_non_array_names__(user_struc_blueprint)
 
+        return {"user_structures":user_structures,
+                "analysis_names":analysis_names}
 
-    def __get_handler_bundle__(self,queues,object const,task_class,**kwargs):
-        handler_bundle = {Handler: {"inqu":queues["main"],
-                                    "const":const,
-                                    "destroy_limit":len(const.sources),
+    def __get_handler_bundle__(self,**kwargs):
+        handler_bundle = { Handler: {"inqu":"main",
                                     "out_qu_dict":{}} }
         return handler_bundle
 
-    def __get_master_file_path__(self,sources,input_paths,**kwargs):
-        master_file_path = {}
-        for path,source in izip(input_paths,sources):
-                master_file_path[source] = path
-        return master_file_path
 
-    def __get_output_paths__(self,sources,input_paths,user_specified_outpath,
-                             user_struc_blueprint,**kwargs):
-        output_paths = {}
+    def __get_global_output_path__(self,user_struc_blueprint,user_specified_outpath,**kwargs):
 
         if not user_specified_outpath:
-            output_paths["global"] = [os.path.join(".",self._temp_dir,
-                                                   "parabam_stat_%d.csv" % (time.time(),))]
+            global_filename = os.path.join(".",self._temp_dir,"parabam_stat_%d_%d.csv"\
+                                     % (time.time(),os.getpid()))
         else:
-            output_paths["global"] = [user_specified_outpath]
-        analysis_names = self.__get_non_array_names__(user_struc_blueprint)
-        self.__create_output_files__(output_paths["global"][0],analysis_names)
+            global_filename = user_specified_outpath
 
+        analysis_names = self.__get_non_array_names__(user_struc_blueprint)
+        self.__create_output_files__(global_filename,analysis_names)
+
+        return {"global": [global_filename]}
+
+    def __get_output_paths__(self,input_path,user_specified_outpath,
+                             user_struc_blueprint,
+                             **kwargs):
+
+        output_paths = {}
         for name,blueprint in user_struc_blueprint.items():
             if blueprint["data"] == np.ndarray:
                 try:
-                    path_list = output_paths[source]
+                    path_list = output_paths[input_path]
                 except KeyError:
-                    output_paths[source] = []
-                    path_list = output_paths[source]
+                    output_paths[input_path] = []
+                    path_list = output_paths[input_path]
 
-                for source in sources:
-                    filename = "%s_%s_array.csv" % (source,name,)
-                    path_list.append(os.path.join(".",self._temp_dir,filename))
+                filename = "%s_%s_array.csv" % \
+                    (os.path.splitext(os.path.split(input_path)),name,)
+                path_list.append(os.path.join(".",self._temp_dir,filename))
 
         return output_paths
 
-    def __get_const_args__(self,**kwargs):
-        args = super(Interface,self).__get_const_args__(**kwargs)
-        user_structures = self.__create_structures__(kwargs["user_struc_blueprint"])
-        analysis_names = self.__get_non_array_names__(kwargs["user_struc_blueprint"])
-        args["user_structures"] = user_structures
-        args["analysis_names"] = analysis_names
-        return args
-
-    def __get_task_class__(self,pair_process,user_engine,engine_is_class,**kwargs):
+    def __get_task_class__(self,pair_process,**kwargs):
         if pair_process:
-            base_class = PairTask
+            return PairTask
         else:
-            base_class = Task
+            return Task
 
-        if engine_is_class:
-            if not pair_process and not issubclass(user_engine,Task):
-                raise_exception = True
-            elif pair_process and not issubclass(user_engine,PairTask):
-                raise_exception = True
-            else:
-                raise_exception = False
-                
-            if raise_exception:
-                #TODO: Untested exception here. Class name might be ABCMeta also
-                raise Exception("[ERROR] User engine class must inherit %s\n" \
-                    % (base_class.__class__,))
-                sys.exit(1)
-            else:
-                task_class = user_engine
-        else:
-            task_class = base_class
-
-        return task_class
-
-    def __get_queues__(self,object const,**kwargs):
+    def __get_queues__(self,object constants,**kwargs):
         queues = {"main":Queue()}
         return queues
 
@@ -394,9 +339,11 @@ class Interface(parabam.command.Interface):
         return names
 
     def __create_structures__(self,user_struc_blueprint):
-        #(data,store_method,)
         user_structures = {}
-        class_to_type_map = {int:NumericStructure,float:NumericStructure,np.ndarray:ArrayStructure}
+        class_to_type_map = {int:NumericStructure,
+                             float:NumericStructure,
+                             np.ndarray:ArrayStructure}
+
         for name,definition in user_struc_blueprint.items():
             definition["name"] = name
             definition["struc_type"] = type(definition["data"])

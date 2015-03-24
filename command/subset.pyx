@@ -12,32 +12,25 @@ from multiprocessing import Queue
 class SubsetCore(object):
 
     def __init__(self,object constants):
-        self._user_subsets = constants.user_subsets
+        self.constants = constants
+
+    def __pre_run_routine__(self,iterator,**kwargs):
+        super(SubsetCore,self).__pre_run_routine__(iterator)
+        self._user_subsets = self.constants.user_subsets
         self._counts = {}
         self._temp_paths = {}
         self._temp_objects = {}
 
-    def __generate_results__(self,iterator,**kwargs):
-        cdef dict temp_paths = self._temp_paths
-        cdef dict temp_objects = self._temp_objects
-        cdef dict counts = self._counts
-        cdef dict system = self._system
-
         for subset in self._user_subsets:
-            temp_paths[subset] = self.__get_temp_path__(subset)
-            temp_objects[subset] = self.__get_temp_object__(temp_paths[subset])
-            counts[subset] = 0
-        counts["total"] = 0
+            self._temp_paths[subset] = self.__get_temp_path__(subset)
+            self._temp_objects[subset] = self.__get_temp_object__(self._temp_paths[subset])
+            self._counts[subset] = 0
 
-        self.__process_task_set__(iterator)
-
-        for subset,file_object in temp_objects.items():
-            file_object.close() #close temp_bams
-
+    def __get_results__(self):
         results = {}
-        results["temp_paths"] = temp_paths
-        results["counts"] = counts
-        results["system"] = system
+        results["temp_paths"] = self._temp_paths
+        results["counts"] = self._counts
+        results["system"] = self._system
 
         return results
 
@@ -47,9 +40,9 @@ class SubsetCore(object):
 
     def __post_run_routine__(self,**kwargs):
         super(SubsetCore,self).__post_run_routine__()
-        self._counts = {}
-        self._temp_paths = {}
-        self._temp_objects = {}
+        for subset,fileobj in self._temp_objects.items():
+            fileobj.close()
+
 
 class Task(SubsetCore,parabam.command.Task):
 
@@ -62,15 +55,13 @@ class Task(SubsetCore,parabam.command.Task):
                                     constants=constants)
         SubsetCore.__init__(self,constants)
 
-    def __handle_engine_output__(self,engine_output,read):
-        subset_write = self.__write_to_subset_bam__
-             
+    def __handle_engine_output__(self,engine_output,read):             
         if type(engine_output) == bool:
             if engine_output:
-                subset_write(self._constants.user_subsets[0],read)          
+                self.__write_to_subset_bam__(self._constants.user_subsets[0],read)          
         elif type(engine_output) == list:
             for subset,cur_read in engine_output:
-                subset_write(subset,cur_read)
+                self.__write_to_subset_bam__(subset,cur_read)
         elif type(engine_output) == None:
             pass
 
@@ -90,10 +81,10 @@ class PairTask(SubsetCore,parabam.command.PairTask):
 class Handler(parabam.command.Handler):
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
-                object constants,object pause_qu,dict out_qu_dict):
+                object constants,object pause_qus,dict out_qu_dict):
         
         super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
-                                     inqu=inqu,constants=constants,pause_qu=pause_qu,
+                                     inqu=inqu,constants=constants,pause_qus=pause_qus,
                                      out_qu_dict=out_qu_dict)
 
         self._user_subsets = constants.user_subsets
@@ -188,14 +179,13 @@ class Interface(parabam.command.Interface):
             fetch_region = cmd_args.region,
             pair_process=cmd_args.pair,
             include_duplicates=cmd_args.d,
-            side_by_side = cmd_args.s,
             debug = cmd_args.debug,
             ensure_unique_output=cmd_args.u,
             output_counts=cmd_args.counts
             )
     
     def run(self,input_bams,total_procs,task_size,user_constants,user_engine,
-            user_subsets,reader_n = 2,fetch_region=None,side_by_side=2,
+            user_subsets,reader_n = 2,fetch_region=None,
             keep_in_temp=False,verbose=0,pair_process=False,
             include_duplicates=True,debug=False,
             ensure_unique_output=False,output_counts=False,
@@ -213,16 +203,14 @@ class Interface(parabam.command.Interface):
     def __get_destroy_handler_order__(self):
         return [Handler,parabam.merger.Handler]
 
-    def __get_handler_bundle__(self,object constants,task_class,pair_process,**kwargs):
+    def __get_handler_bundle__(self,**kwargs):
         handler_bundle = {}
 
         #queues transformed by leviathon
-        handler_bundle[Handler] = {"inqu":"main",
-                                   "constants":constants, 
+        handler_bundle[Handler] = {"inqu":"main", 
                                    "out_qu_dict":["merge"]}
 
         handler_bundle[parabam.merger.Handler] = {"inqu":"merge",
-                                                  "constants":constants,
                                                   "out_qu_dict":[]}
         return handler_bundle
 

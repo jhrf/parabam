@@ -32,11 +32,11 @@ class MatchMakerPackage(ChaserPackage):
 class Handler(parabam.core.Handler):
 
     def __init__(self,object parent_bam, object output_paths,
-                      object inqu,object constants,object pause_qu,
+                      object inqu,object constants,object pause_qus,
                       dict out_qu_dict,object Task):
 
         super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
-                             inqu=inqu,constants=constants,pause_qu=pause_qu,
+                             inqu=inqu,constants=constants,pause_qus=pause_qus,
                              out_qu_dict=out_qu_dict,report = False)
         
         class ChaserTask(Task):
@@ -50,7 +50,7 @@ class Handler(parabam.core.Handler):
             def handle_pair_dict(self,pairs,unique):
                 self.unique = unique
                 results = self.__generate_results__(pairs)
-                self.__post_run_routine__()
+                results["total"] = 0
                 self._dealt += 1
                 time.sleep(.01)
                 return results
@@ -93,7 +93,7 @@ class Handler(parabam.core.Handler):
 
         self._max_reads = 5000000
 
-    #START -- BORROWED FROM PROCESOR
+
     #Need to refactor here to stop code duplication
     def __wait_for_tasks__(self,list active_tasks,int max_tasks):
         update_tasks = self.__update_tasks__ #optimising alias
@@ -105,7 +105,8 @@ class Handler(parabam.core.Handler):
             return
 
         if not self._destroy:
-            self._pause_qu.put(True)
+            for qu in self._pause_qus:
+                qu.put(True)
 
         while(max_tasks <= currently_active and currently_active > 0):
             update_tasks(active_tasks)
@@ -113,9 +114,9 @@ class Handler(parabam.core.Handler):
             time.sleep(1)
 
         if not self._destroy:
-            self._pause_qu.put(False)
-
-        return 
+            for qu in self._pause_qus:
+                qu.put(False)
+        return
 
     def __instalise_primary_store__(self):
         paths = []
@@ -138,7 +139,6 @@ class Handler(parabam.core.Handler):
             gc.collect()
 
         return len(active_tasks)
-    #END -- BORROWED FROM PROCESOR
 
     def __instalise_loner_pyramid__(self):
         loner_pyramid = {}
@@ -161,12 +161,6 @@ class Handler(parabam.core.Handler):
             else:
                 self._total_loners += loner_count
                 self._primary_store.append(path) 
-
-        # Removed logic because of the new way destroy is handeled 
-        # if not new_package.processing:
-        #     self._processing = new_package.processing
-        #     self.__test_primary_tasks__(required_paths=1)
-        #     self.__wait_for_tasks__(self._tasks,0)
 
     def __handle_match_maker__(self,new_package):
         loner_type = new_package.loner_type
@@ -396,10 +390,11 @@ class Handler(parabam.core.Handler):
     def __handler_exit__(self,**kwargs):
         if self._constants.verbose:
             if self._total_loners - self._rescued["total"] == 0:
-                self.__standard_output__("[Status] All reads succesfully paired") 
+                self.__standard_output__("\n[Status] All reads succesfully paired") 
             else:
-                self.__standard_output__("[Status] Couldn't find pairs for %d reads" %\
+                self.__standard_output__("\n[Status] Couldn't find pairs for %d reads" %\
                     (self._total_loners - self._rescued["total"],))
+        
         for qu in self._pause_qus:
             qu.close()
 

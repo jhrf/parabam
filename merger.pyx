@@ -23,9 +23,9 @@ class MergePackage(parabam.core.Package):
 class Handler(parabam.core.Handler):
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
-                      object constants,object pause_qu,dict out_qu_dict):
+                      object constants,object pause_qus,dict out_qu_dict):
 
-        super(Handler,self).__init__(parent_bam,output_paths,inqu,constants,pause_qu,
+        super(Handler,self).__init__(parent_bam,output_paths,inqu,constants,pause_qus,
                                         out_qu_dict,report=False)
         
         self._user_subsets = list(constants.user_subsets)
@@ -71,7 +71,6 @@ class Handler(parabam.core.Handler):
     def __new_package_action__(self,new_package,**kwargs):
         #Handle the result. Result will always be of type parabam.support.MergePackage
         subset_type = new_package.subset_type
-        self._pause_qu.put(True)
         for merge_count,merge_path in new_package.results:
             try:
                 if merge_count > 0:
@@ -92,7 +91,6 @@ class Handler(parabam.core.Handler):
                 raise
             self._merged += 1
         time.sleep(1)
-        self._pause_qu.put(False)
 
     def __get_entries_from_file__(self,path,subset):
         merge_type = self.__get_subset_merge_type__(path)
