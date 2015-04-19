@@ -21,6 +21,7 @@ class StatCore(object):
         self._system = {}
 
     def __pre_run_routine__(self,iterator,**kwargs):
+        super(StatCore,self).__pre_run_routine__(iterator)
         for name,structure in self._constants.user_structures.items():
             self._local_structures[name] = structure.empty_clone()
             self._counts[name] = 0
@@ -33,6 +34,7 @@ class StatCore(object):
         return results
 
     def __post_run_routine__(self,**kwargs):
+        super(StatCore,self).__post_run_routine__()
         pass
 
     def __handle_engine_output__(self,engine_output,read):
@@ -244,6 +246,7 @@ class Interface(parabam.command.Interface):
             total_procs = cmd_args.p,
             task_size = cmd_args.s,
             verbose= cmd_args.v,
+            reader_n = cmd_args.f,
             user_constants = user_constants,
             user_struc_blueprint = user_struc_blueprint,
             user_engine = user_engine,
@@ -257,7 +260,7 @@ class Interface(parabam.command.Interface):
             user_struc_blueprint,user_specified_outpath=None,
             reader_n = 2,fetch_region=None,side_by_side=2,
             keep_in_temp=False,verbose=0,pair_process=False,
-            include_duplicates=True,debug=False,input_is_sam=False):
+            include_duplicates=True,debug=False):
 
         ''' Docstring! '''
         args = dict(locals())
@@ -279,7 +282,7 @@ class Interface(parabam.command.Interface):
 
     def __get_handler_bundle__(self,**kwargs):
         handler_bundle = { Handler: {"inqu":"main",
-                                    "out_qu_dict":{}} }
+                                    "out_qu_dict":[]}}
         return handler_bundle
 
 

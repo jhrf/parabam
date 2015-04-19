@@ -11,7 +11,7 @@ from multiprocessing import Queue
 
 class SubsetCore(object):
 
-    def __init__(self,object constants):
+    def __init__(self,object constants,**kwargs):
         self.constants = constants
 
     def __pre_run_routine__(self,iterator,**kwargs):
@@ -46,7 +46,7 @@ class SubsetCore(object):
 
 class Task(SubsetCore,parabam.command.Task):
 
-    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+    def __init__(self,parent_bam,inqu,outqu,task_size,constants,**kwargs):
         
         parabam.command.Task.__init__(self,parent_bam=parent_bam,
                                     inqu=inqu,
@@ -67,6 +67,7 @@ class Task(SubsetCore,parabam.command.Task):
 
 class PairTask(SubsetCore,parabam.command.PairTask):
     def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+        
         parabam.command.PairTask.__init__(self,parent_bam=parent_bam,
                                                 inqu=inqu,
                                                 outqu=outqu,
@@ -177,6 +178,7 @@ class Interface(parabam.command.Interface):
             user_constants = user_constants,
             user_engine = user_engine,
             fetch_region = cmd_args.region,
+            reader_n = cmd_args.f,
             pair_process=cmd_args.pair,
             include_duplicates=cmd_args.d,
             debug = cmd_args.debug,
@@ -188,8 +190,7 @@ class Interface(parabam.command.Interface):
             user_subsets,reader_n = 2,fetch_region=None,
             keep_in_temp=False,verbose=0,pair_process=False,
             include_duplicates=True,debug=False,
-            ensure_unique_output=False,output_counts=False,
-            input_is_sam=False):
+            ensure_unique_output=False,output_counts=False):
 
         ''' Docstring! '''
         args = dict(locals())

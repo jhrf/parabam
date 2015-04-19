@@ -75,8 +75,14 @@ class PairTask(Task):
     def __handle_engine_output__(self,engine_output,read):
         pass
 
+    def __pre_run_routine__(self,iterator):
+        super(PairTask,self).__pre_run_routine__(iterator)
+        self._loners = {}
+
     def __post_run_routine__(self,**kwargs):
         super(PairTask,self).__post_run_routine__()
+        self.__stash_loners__(self._loners)
+        del self._loners
 
     def __process_task_set__(self,iterator):
         engine = self._engine
@@ -88,7 +94,7 @@ class PairTask(Task):
         user_constants = self._user_constants
         counts = self._counts
 
-        cdef dict loners = {}
+        loners = self._loners
 
         #StopIteration caught in parabam.core.Task.run
         for i in xrange(size):
@@ -98,9 +104,6 @@ class PairTask(Task):
             if read1:
                 engine_output = engine((read1,read2),user_constants,parent_bam)
                 handle_output(engine_output,(read1,read2,))
-
-        self.__stash_loners__(loners)
-        del loners
 
     def __stash_loners__(self,loners):
         loner_count = 0
@@ -189,7 +192,7 @@ class Handler(parabam.core.Handler):
         gc.collect()
 
     def __test_stage_store__(self,subset):
-        if self._destroy:
+        if (not self._processing) or self._destroy:
             return True
         else:
             return len(self._stage_stores[subset]) > 20
@@ -273,7 +276,7 @@ class Interface(parabam.core.Interface):
 
         defaults = ["total_procs","task_size","verbose","user_constants",
                     "reader_n","user_constants", "user_engine", "fetch_region", 
-                    "pair_process", "include_duplicates","input_is_sam","debug"]
+                    "pair_process", "include_duplicates","debug"]
 
         for key,val in kwargs.items():
             if key in defaults:
@@ -398,7 +401,7 @@ class Interface(parabam.core.Interface):
 
     def __get_update_interval__(self,verbose):
         if verbose == 1: 
-            return 60
+            return 200
         else:
             return 1
 
@@ -407,7 +410,8 @@ class Interface(parabam.core.Interface):
             if len(child_paths) == 0:
                 del final_output_paths[master_path]
 
-    def __prepare_for_pair_processing__(self,handler_bundle,handler_order,queue_names,constants,Task):        
+    def __prepare_for_pair_processing__(self,handler_bundle,handler_order,
+                                            queue_names,constants,Task):        
         handler_bundle[parabam.chaser.Handler] = {"inqu":"chaser",
                                                   "constants":constants,
                                                   "out_qu_dict":["main"],
@@ -418,6 +422,7 @@ class Interface(parabam.core.Interface):
                 handler_bundle[handler_class]["out_qu_dict"].append("chaser")
         queue_names.append("chaser")
         handler_order.insert(0,parabam.chaser.Handler)
+        constants.total_procs = constants.total_procs / 2
 
     def default_parser(self):
         parser = super(Interface,self).default_parser()
@@ -431,7 +436,7 @@ class Interface(parabam.core.Interface):
             help="Only the first 5million reads will be processed")
         parser.add_argument('--pair',action="store_true",default=False
             ,help="A pair processor is used instead of a conventional processor")
-        parser.add_argument('-f',type=int,metavar="REGION",nargs='?',default=2
+        parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2
             ,help="The amount of open connections to the file being read. Conventional hard drives\
             perform best with the default of 2\n")
         parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None

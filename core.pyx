@@ -32,6 +32,7 @@ cdef class Handler:
 
         self._periodic_interval = 10
 
+        self._processing = True
         self._destroy = False
         self._finished = False
 
@@ -87,6 +88,8 @@ cdef class Handler:
                 new_package = self._inqu.get(False)
                 if type(new_package) == DestroyPackage:
                     self._destroy = True
+                elif type(new_package) == EndProcPackage:
+                    self._processing = False
 
                 if not new_package.results == {}:#If results are present...
                     self.__new_package_action__(new_package) #Handle the results
@@ -173,6 +176,7 @@ class Task(Process):
         self._dealt = 0
 
     def run(self):
+
         bamfile = pysam.AlignmentFile(self._parent_path,"rb")
         iterator = bamfile.fetch(until_eof=True)
         next_read = iterator.next
@@ -182,7 +186,7 @@ class Task(Process):
         while True:
             try:
                 package = self._inqu.get(False)
-                
+            
                 if type(package) == DestroyPackage:
                     bamfile.close()
                     del iterator
@@ -208,7 +212,6 @@ class Task(Process):
                 time.sleep(0.005) #And here
                 self.__post_run_routine__()
                 self._outqu.put(Package(results=results))
-
         return
 
     def __generate_results__(self,iterator,**kwargs):
@@ -220,6 +223,8 @@ class Task(Process):
         return results
 
     def __handle_stop_iteration__(self,seek,bamfile,iterator):
+        results = self.__get_results__()
+         
         cdef int count = 0 
         bamfile.seek(seek)
         try: #Count the amount of reads until end of file
@@ -228,14 +233,6 @@ class Task(Process):
         except StopIteration:
             pass
 
-        bamfile.seek(seek)
-
-        try:
-            self.__process_task_set__(iterator)
-        except StopIteration:
-            pass
-
-        results = self.__get_results__()
         results["total"] = count
         return results
 
@@ -270,7 +267,6 @@ class FileReader(Process):
                  int task_n,object constants,object Task,
                  object pause_qu):
         
-        #TODO FETCH REGION!
         super(FileReader,self).__init__()
 
         self._input_path = input_path
@@ -291,6 +287,7 @@ class FileReader(Process):
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
     def run(self):
+
         parent_bam_mem_obj = ParentAlignmentFile(self._input_path)
         parent_bam = pysam.AlignmentFile(self._input_path,"rb")
         parent_iter = self.__get_parent_iter__(parent_bam)
@@ -338,7 +335,7 @@ class FileReader(Process):
         cdef int iterations = 0
         cdef int task_size = self._task_size
 
-        while True:            
+        while True:
             try:
                 if iterations % reader_n == proc_id:
                     yield True
@@ -371,9 +368,6 @@ class FileReader(Process):
         return
 
     def __query_pause_qu__(self,bypass,pause_qu):
-        #This fairly obfuscated code is to fix
-        #a race condition when a pause can
-        #be missed due to waiting on a previous pause
         try:
             if bypass:
                 pause = True
@@ -387,11 +381,14 @@ class FileReader(Process):
                         if not pause:
                             break
                     except Queue2.Empty:
-                        time.sleep(1)
+                        time.sleep(.5)
         except Queue2.Empty:
             pass
 
-        last = False  
+        #code is to fix a race condition when a
+        # pause can be missed due to 
+        #waiting on a previous pause
+        last = False 
         while True:
             try:
                 pause = pause_qu.get(False)
@@ -453,6 +450,10 @@ class Leviathon(object):
         for file_reader in file_readers:
             file_reader.join()
 
+        #Inform handlers that processing has finished
+        for handler,queue in izip(handlers,handler_inqus):
+            queue.put(EndProcPackage())
+
         #Destory handlers
         for handler,queue in izip(handlers,handler_inqus):
             queue.put(DestroyPackage())
@@ -468,12 +469,11 @@ class Leviathon(object):
 
         gc.collect()
 
-
     def __create_pause_qus__(self,reader_n):
         return [Queue() for i in xrange(reader_n)]
 
     def __get_task_n__(self,constants,handlers):
-        task_n = (constants.total_procs - len(handlers) - constants.reader_n) / constants.reader_n
+        task_n = (constants.total_procs - constants.reader_n) / constants.reader_n
         if task_n > 0:
             return task_n
         else:
@@ -648,16 +648,17 @@ class DestroyPackage(Package):
         super(DestroyPackage,self).__init__(results={})
         self.destroy = True
 
+class EndProcPackage(Package):
+    def __init__(self):
+        super(EndProcPackage,self).__init__(results={})
+        self.destroy = False
+
 class ParentAlignmentFile(object):
     
-    def __init__(self,path,input_is_sam=False):
+    def __init__(self,path):
         has_index = os.path.exists(os.path.join("%s%s" % (path,".bai")))
 
-        if input_is_sam:
-            mode = "r"
-        else:
-            mode = "rb"
-        parent = pysam.AlignmentFile(path,mode)
+        parent = pysam.AlignmentFile(path,"rb")
         self.filename = parent.filename
         self.references = parent.references
         self.header = parent.header

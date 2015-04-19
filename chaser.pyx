@@ -5,6 +5,7 @@ import sys
 import os
 import gc
 import parabam
+import random
 
 import Queue as Queue2
 import numpy as np
@@ -42,10 +43,10 @@ class Handler(parabam.core.Handler):
         class ChaserTask(Task):
             def __init__(self,parent_bam,constants):
                 super(ChaserTask,self).__init__(parent_bam=parent_bam,
-                                                        inqu=None,
-                                                        outqu=None,
-                                                        task_size=0,
-                                                        constants=constants)
+                                                    inqu=None,
+                                                    outqu=None,
+                                                    task_size=0,
+                                                    constants=constants)
 
             def handle_pair_dict(self,pairs,unique):
                 self.unique = unique
@@ -61,7 +62,6 @@ class Handler(parabam.core.Handler):
                 handle_output = self.__handle_engine_output__
                 user_constants = self._user_constants
 
-                #StopIteration caught in parabam.core.Task.run
                 for read_name,pair in iterator.items():
                     engine_output = engine(pair,user_constants,parent_bam)
                     handle_output(engine_output,pair)
@@ -85,24 +85,25 @@ class Handler(parabam.core.Handler):
                             "queue":out_qu_dict["main"],
                             "chaser_task":ChaserTask(parent_bam,self._constants)}
 
-        self._chaser_task_max = 8 #TODO: work this out properly
+        self._chaser_task_max = self._constants.total_procs #This is half of the user specified procs
+                                                  #as total procs are divided by two when we prepare
+                                                  #for pair processing
         self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
 
-        self._primary_complete = True
+        self._max_reads = 7000000
 
-        self._max_reads = 5000000
-
-
-    #Need to refactor here to stop code duplication
     def __wait_for_tasks__(self,list active_tasks,int max_tasks):
         update_tasks = self.__update_tasks__ #optimising alias
         update_tasks(active_tasks)
         cdef int currently_active = len(active_tasks)
         self._active_count = currently_active
 
+
         if max_tasks > currently_active:
             return
+
+        max_tasks = max_tasks/2
 
         if not self._destroy:
             for qu in self._pause_qus:
@@ -270,9 +271,9 @@ class Handler(parabam.core.Handler):
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count == 200:
+            if (empty and running == 0) or self._stale_count == 400:
                 finished = True
-                if not empty:
+                if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
                     self.__tidy_pyramid__()
                 else: 
@@ -286,17 +287,18 @@ class Handler(parabam.core.Handler):
 
         gc.collect()
 
-#        if iterations % 30 == 0:
-#            sys.stdout.write("\r %d/%d=%.5f | Processing:%d Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
-#                (self._rescued["total"],
-#                self._total_loners,
-#                float(self._rescued["total"]+1)/(self._total_loners+1),
-#                self._processing,
-#                empty,
-#                len(self._loner_purgatory),
-#                self._stale_count,
-#                len(self._tasks)))
-#            sys.stdout.flush()
+        # if iterations % 30 == 0:
+        #     #sys.stdout.write("\r %d/%d=%.5f | Processing:%d Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
+        #     sys.stdout.write("\r %d/%d=%.5f | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
+        #         (self._rescued["total"],
+        #         self._total_loners,
+        #         float(self._rescued["total"]+1)/(self._total_loners+1),
+        #         #self._processing,
+        #         empty,
+        #         len(self._loner_purgatory),
+        #         self._stale_count,
+        #         len(self._tasks)))
+        #     sys.stdout.flush()
 
     def __is_queue_empty__(self):
         try:
@@ -357,12 +359,16 @@ class Handler(parabam.core.Handler):
     def __idle_routine__(self,pyramid,loner_type):
         idle_paths = []
         levels = []
-        task_size = 5
+        if random.randint(0,1):
+            task_size = 3
+        else:
+            task_size = 2
         for i,sub_pyramid in enumerate(pyramid):
             for path in sub_pyramid:
                 idle_paths.append(path)
                 levels.append(i)
                 if len(idle_paths) == task_size:
+                    #maximum task_size reached
                     break 
         success = False
         if len(idle_paths) > 1:
@@ -382,9 +388,9 @@ class Handler(parabam.core.Handler):
             task_size = 15
         else:
             if level % 2 == 0:
-                task_size = 4
+                task_size = 2
             else:
-                task_size = 5
+                task_size = 3
         return task_size
 
     def __handler_exit__(self,**kwargs):
@@ -521,22 +527,29 @@ class PrimaryTask(ChaserClass):
     def __write_loner__(self,loner_objects,loner_file_counts,loner_type,read):
         try:
             loner_path = loner_objects[loner_type][-1].filename
-            if loner_file_counts[loner_path] == (self._max_reads-1): #minus one so we are always one less than max
+            if loner_file_counts[loner_path] == (self._max_reads-50000): #-2500000 to garuntee being less than max
                 new_bam_object = self.__get_loner_object__(loner_type,len(loner_objects[loner_type]))
-                loner_objects[loner_type].append(new_bam_object)
+                loner_objects[loner_type][-1].close() #CHANGE TO STOP CRASH ON BIG TASK_SIZE
+                
+                loner_objects[loner_type].append(new_bam_object) 
+                #open loner references causing crash with large
+                #amounts of overflow files??
         except KeyError:
             new_bam_object = self.__get_loner_object__(loner_type,0)
+            loner_path = new_bam_object.filename
             loner_objects[loner_type] = [new_bam_object]
         
+        loner_file_counts[loner_path] += 1
         loner_objects[loner_type][-1].write(read)
 
-    def __get_paths_and_close__(self,loner_holder):
+    def __get_paths_and_close__(self,loner_holder):   
         paths = {}
         for loner_type,loner_objects in loner_holder.items():
             paths[loner_type] = []
             for loner_object in loner_objects:
                 paths[loner_type].append(loner_object.filename)
-                loner_object.close()
+                #loner_object.close() #CHANGE TO STOP CRASH ON BIG TASK_SIZE
+            loner_object.close() #CHANGE TO STOP CRASH ON BIG TASK_SIZE
         return paths
 
 class MatchMakerTask(ChaserClass):

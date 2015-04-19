@@ -63,7 +63,7 @@ class Handler(parabam.core.Handler):
     def __periodic_action__(self,iterations):
         if self._destroy:
             try:
-                pack = self._inqu.get(False,20)
+                pack = self._inqu.get(False,10)
                 self._inqu.put(pack)
             except Queue2.Empty:
                 self._finished = True
@@ -90,7 +90,7 @@ class Handler(parabam.core.Handler):
 
                 raise
             self._merged += 1
-        time.sleep(1)
+        time.sleep(.5)
 
     def __get_entries_from_file__(self,path,subset):
         merge_type = self.__get_subset_merge_type__(path)
