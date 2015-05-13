@@ -596,13 +596,14 @@ class Interface(object):
                     formatter_class=argparse.RawTextHelpFormatter)
 
         parser.add_argument('-p',type=int,nargs='?',default=4
-            ,help="The maximum amount of processes you wish parabam to use. This should"\
-                  "be less than or equal to the amount of processor cores in your machine.")
+            ,help="The maximum amount of processes you wish parabam to use.\n"\
+                  "This should be less than or equal to the amount of processor\n"\
+                  "cores in your machine.")
         parser.add_argument('-s',type=int,nargs='?',default=250000
             ,help="The amount of reads considered by each distributed task.")
         parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2
-            ,help="The amount of open connections to the file being read. Conventional hard drives\
-            perform best with the default of 2\n")
+            ,help="The amount of open connections to the file being read.\n"\
+            "Conventional hard drives perform best with the default of 2")
         return parser
 
     @abstractmethod

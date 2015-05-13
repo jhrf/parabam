@@ -428,17 +428,19 @@ class Interface(parabam.core.Interface):
         parser = super(Interface,self).default_parser()
 
         parser.add_argument('--instruc','-i',metavar='INSTRUCTION',required=True
-            ,help='The instruction file, written in python, that we wish'\
-            'to carry out on the input BAM.')
+            ,help='The instruction file, written in python,\n'\
+            'that we wish to apply to the input BAM.')
         parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
-            ,help='The file(s) we wish to operate on. Multiple entries should be separated by a single space')
+            ,help='The file(s) we wish to operate on.\n'\
+            ' Multiple entries should be separated by a single space')
         parser.add_argument('--debug',action="store_true",default=False,
             help="Only the first 5million reads will be processed")
         parser.add_argument('--pair',action="store_true",default=False
             ,help="A pair processor is used instead of a conventional processor")
         parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
-            ,help="The subset process will be run only on reads from this region\n"\
-            "Regions should be colon separated as specified by samtools (eg \'chr1:1000,5000\')")
+            ,help="The process will be run only on reads from\n"\
+            "this region. Regions should be colon separated as\n"\
+            "specified by samtools (eg \'chr1:1000,5000\')")
         parser.add_argument('-d',action="store_false",default=True,
             help="parabam will not process reads marked duplicate.")
         parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
