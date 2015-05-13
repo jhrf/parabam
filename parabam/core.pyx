@@ -552,16 +552,19 @@ class Interface(object):
     def __init__(self,temp_dir):
         self._temp_dir = temp_dir
 
-    def __introduce__(self,name):
+    def __introduce__(self,name,verbose=True):
         intro =  "%s has started. Start Time: " % (name,)\
             + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
         underline = "-" * len(intro)
-        print intro
-        print underline
 
-    def __goodbye__(self,name):
-        print "%s has finished. End Time: " % (name,)\
-            + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        if verbose:
+            print intro
+            print underline
+
+    def __goodbye__(self,name,verbose=True):
+        if verbose:
+            print "%s has finished. End Time: " % (name,)\
+                + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
     def __sort_and_index__(self,fnm,verbose=False,tempDir=".",name=False):
         if not os.path.exists(fnm+".bai"):

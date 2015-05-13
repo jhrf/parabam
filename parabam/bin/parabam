@@ -9,9 +9,6 @@ import traceback
 import os
 import shutil
 
-#The following imports are a for pyinstaller. Don't remove
-import numpy 
-
 def keyboard_handler(sig, frame):#Catch keyboard interupt and end processors
 	sys.stdout.write("\r[ERROR] parabam interrupted by user")
 	sys.exit(0)

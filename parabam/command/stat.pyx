@@ -253,19 +253,28 @@ class Interface(parabam.command.Interface):
             fetch_region = cmd_args.region,
             pair_process=cmd_args.pair,
             include_duplicates=cmd_args.d,
-            debug = cmd_args.debug)
+            debug = cmd_args.debug,
+            announce = True)
 
 
     def run(self,input_bams,total_procs,task_size,user_constants,user_engine,
             user_struc_blueprint,user_specified_outpath=None,
             reader_n = 2,fetch_region=None,side_by_side=2,
             keep_in_temp=False,verbose=0,pair_process=False,
-            include_duplicates=True,debug=False):
+            include_duplicates=True,debug=False,announce=False):
 
         ''' Docstring! '''
         args = dict(locals())
         del args["self"]
-        return super(Interface,self).run(**args)
+
+        if not verbose:
+            announce = False
+        self.__introduce__("parabam stat",announce)
+
+        results = super(Interface,self).run(**args)
+
+        self.__goodbye__("parabam stat",announce)
+        return results
 
     def __get_destroy_handler_order__(self):
         return [Handler]

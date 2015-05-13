@@ -183,19 +183,28 @@ class Interface(parabam.command.Interface):
             include_duplicates=cmd_args.d,
             debug = cmd_args.debug,
             ensure_unique_output=cmd_args.u,
-            output_counts=cmd_args.counts
+            output_counts=cmd_args.counts,
+            announce = True
             )
     
     def run(self,input_bams,total_procs,task_size,user_constants,user_engine,
             user_subsets,reader_n = 2,fetch_region=None,
             keep_in_temp=False,verbose=0,pair_process=False,
             include_duplicates=True,debug=False,
-            ensure_unique_output=False,output_counts=False):
-
+            ensure_unique_output=False,output_counts=False,announce=False):
         ''' Docstring! '''
+
         args = dict(locals())
         del args["self"]
-        return super(Interface,self).run(**args)
+
+        if not verbose:
+            announce = False
+        self.__introduce__("parabam subset",announce)
+
+        results = super(Interface,self).run(**args)
+        
+        self.__goodbye__("parabam stat",announce)
+        return results
 
     def __get_queue_names__(self,pair_process,**kwargs):
         queues = ["merge","main"]
