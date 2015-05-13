@@ -436,9 +436,6 @@ class Interface(parabam.core.Interface):
             help="Only the first 5million reads will be processed")
         parser.add_argument('--pair',action="store_true",default=False
             ,help="A pair processor is used instead of a conventional processor")
-        parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2
-            ,help="The amount of open connections to the file being read. Conventional hard drives\
-            perform best with the default of 2\n")
         parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
             ,help="The subset process will be run only on reads from this region\n"\
             "Regions should be colon separated as specified by samtools (eg \'chr1:1000,5000\')")

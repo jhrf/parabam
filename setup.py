@@ -4,18 +4,20 @@ from setuptools.command.sdist import sdist as _sdist
 
 cmdclass = {}
 ext_modules = [
-      Extension("parabam.core", [ "core.c" ]),
-      Extension("parabam.chaser", ["chaser.c"]),
-      Extension("parabam.merger", ["merger.c"]),
-      Extension("parabam.command.subset", ["command/subset.c"]),
-      Extension("parabam.command.stat", ["command/stat.c"]),
-      Extension("parabam.command.core", ["command/core.c"])] 
+      Extension("parabam.core", [ "parabam/core.c" ]),
+      Extension("parabam.chaser", ["parabam/chaser.c"]),
+      Extension("parabam.merger", ["parabam/merger.c"]),
+      Extension("parabam.command.subset", ["parabam/command/subset.c"]),
+      Extension("parabam.command.stat", ["parabam/command/stat.c"]),
+      Extension("parabam.command.core", ["parabam/command/core.c"])] 
 
 class sdist(_sdist):
     def run(self):
         # Make sure the compiled Cython files in the distribution are up-to-date
         from Cython.Build import cythonize
-        cythonize(['chaser.pyx','core.pyx','merger.pyx','command/core.pyx','command/stat.pyx','command/subset.pyx'])
+        cythonize(['parabam/chaser.pyx','parabam/core.pyx','parabam/merger.pyx',
+                   'parabam/command/core.pyx','parabam/command/stat.pyx',
+                   'parabam/command/subset.pyx'])
         _sdist.run(self)
 cmdclass['sdist'] = sdist
 
@@ -26,9 +28,9 @@ setup(name='parabam',
       license='GPL',
       author_email = 'jhrf2@cam.ac.uk',
       packages = ['parabam','parabam.command'],
-      package_dir = {'parabam':'','parabam.command':'command'},
+      package_dir = {'parabam':'parabam','parabam.command':'parabam/command'},
       requires = ['numpy','argparse','pysam'],
-      scripts = ['bin/parabam'],
+      scripts = ['parabam/bin/parabam'],
       cmdclass = cmdclass,
       ext_modules=ext_modules
       )
