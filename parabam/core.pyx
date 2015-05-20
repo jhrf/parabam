@@ -39,22 +39,19 @@ cdef class Handler:
         if constants.verbose == 1:
             self._verbose = True
             self._update_output = self.__level_1_output__
-        elif constants.verbose == 2 or constants.verbose == True:
+        elif constants.verbose == 2:
             #In the case verbose is simply "True" or "level 2"
             self._verbose = True
             self._update_output = self.__level_2_output__
         else:#catching False and -v0
             self._verbose = False
-            self._update_output = self.__level_2_output__
+            self._update_output = self.__level_1_output__
 
     def __standard_output__(self,out_str):
         sys.stdout.write(out_str + "\n")
         sys.stdout.flush()
 
     def __level_1_output__(self,out_str):
-        #BUG! the fact this makes a call to __total_reads__ is ridiculous
-        #this is making calls to a sub class method and just expecting it to be there.
-
         total_procd = self.__total_reads__()
         time = out_str.partition("Time: ")[2]
         sys.stdout.write("[Update] Processed: %d Time: %s\n" % (total_procd,time))
@@ -63,6 +60,9 @@ cdef class Handler:
     def __level_2_output__(self,outstr):
         sys.stdout.write("\r" + outstr)
         sys.stdout.flush()
+
+    def __destroy_output__(self,outstr):
+        pass
 
     #Must be overwritten if stats architecture is modififed
     def __total_reads__(self):
@@ -112,6 +112,9 @@ cdef class Handler:
     def __is_finished__(self):
         if not self._destroy or not self._finished:
             return False
+        if self._destroy and not self._finished and \
+            not self._update_output == self.__destroy_output__():
+            self._update_output = self.__destroy_output__()
         return True
 
     def __format_update__(self,start_time):
@@ -553,11 +556,11 @@ class Interface(object):
         self._temp_dir = temp_dir
 
     def __introduce__(self,name,verbose=True):
-        intro =  "%s has started. Start Time: " % (name,)\
-            + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-        underline = "-" * len(intro)
-
         if verbose:
+            intro =  "%s has started. Start Time: " % (name,)\
+                + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+            underline = ("-" * len(intro)) + "\n"
+
             print intro
             print underline
 

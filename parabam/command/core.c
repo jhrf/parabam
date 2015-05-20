@@ -1094,7 +1094,7 @@ static char __pyx_k_Interface___output_files_to_cwd[] = "Interface.__output_file
 static char __pyx_k_Interface___update_final_output[] = "Interface.__update_final_output_paths__";
 static char __pyx_k_PairTask___handle_engine_output[] = "PairTask.__handle_engine_output__";
 static char __pyx_k_Status_Processing_complete_d_re[] = "\n[Status] Processing complete. %d reads processed";
-static char __pyx_k_Status_This_run_will_output_the[] = "\n[Status] This run will output the following files:\n";
+static char __pyx_k_Status_This_run_will_output_the[] = "[Status] This run will output the following files:\n";
 static char __pyx_k_The_instruction_file_written_in[] = "The instruction file, written in python,\nthat we wish to apply to the input BAM.";
 static char __pyx_k_The_process_will_be_run_only_on[] = "The process will be run only on reads from\nthis region. Regions should be colon separated as\nspecified by samtools (eg 'chr1:1000,5000')";
 static char __pyx_k_Users_farmer01_proj_parabam_par[] = "/Users/farmer01/proj/parabam/parabam/command/core.pyx";
@@ -10170,7 +10170,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_9Interface_22__move_output_fil
  *             return alternate_path
  * 
  *     def __report_file_names__(self,final_output_paths,input_paths):             # <<<<<<<<<<<<<<
- *         sys.stdout.write("\n[Status] This run will output the following files:\n")
+ *         sys.stdout.write("[Status] This run will output the following files:\n")
  *         for master_path,child_paths in final_output_paths.items():
  */
 
@@ -10275,7 +10275,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_9Interface_24__report_file_nam
   /* "parabam/command/core.pyx":340
  * 
  *     def __report_file_names__(self,final_output_paths,input_paths):
- *         sys.stdout.write("\n[Status] This run will output the following files:\n")             # <<<<<<<<<<<<<<
+ *         sys.stdout.write("[Status] This run will output the following files:\n")             # <<<<<<<<<<<<<<
  *         for master_path,child_paths in final_output_paths.items():
  *             if master_path in input_paths:
  */
@@ -10294,7 +10294,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_9Interface_24__report_file_nam
 
   /* "parabam/command/core.pyx":341
  *     def __report_file_names__(self,final_output_paths,input_paths):
- *         sys.stdout.write("\n[Status] This run will output the following files:\n")
+ *         sys.stdout.write("[Status] This run will output the following files:\n")
  *         for master_path,child_paths in final_output_paths.items():             # <<<<<<<<<<<<<<
  *             if master_path in input_paths:
  *                 for path in child_paths:
@@ -10413,7 +10413,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_9Interface_24__report_file_nam
     __pyx_t_6 = 0;
 
     /* "parabam/command/core.pyx":342
- *         sys.stdout.write("\n[Status] This run will output the following files:\n")
+ *         sys.stdout.write("[Status] This run will output the following files:\n")
  *         for master_path,child_paths in final_output_paths.items():
  *             if master_path in input_paths:             # <<<<<<<<<<<<<<
  *                 for path in child_paths:
@@ -10631,7 +10631,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_9Interface_24__report_file_nam
 
     /* "parabam/command/core.pyx":341
  *     def __report_file_names__(self,final_output_paths,input_paths):
- *         sys.stdout.write("\n[Status] This run will output the following files:\n")
+ *         sys.stdout.write("[Status] This run will output the following files:\n")
  *         for master_path,child_paths in final_output_paths.items():             # <<<<<<<<<<<<<<
  *             if master_path in input_paths:
  *                 for path in child_paths:
@@ -10663,7 +10663,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_9Interface_24__report_file_nam
  *             return alternate_path
  * 
  *     def __report_file_names__(self,final_output_paths,input_paths):             # <<<<<<<<<<<<<<
- *         sys.stdout.write("\n[Status] This run will output the following files:\n")
+ *         sys.stdout.write("[Status] This run will output the following files:\n")
  *         for master_path,child_paths in final_output_paths.items():
  */
 
@@ -13527,7 +13527,7 @@ static int __Pyx_InitCachedConstants(void) {
   /* "parabam/command/core.pyx":340
  * 
  *     def __report_file_names__(self,final_output_paths,input_paths):
- *         sys.stdout.write("\n[Status] This run will output the following files:\n")             # <<<<<<<<<<<<<<
+ *         sys.stdout.write("[Status] This run will output the following files:\n")             # <<<<<<<<<<<<<<
  *         for master_path,child_paths in final_output_paths.items():
  *             if master_path in input_paths:
  */
@@ -14062,7 +14062,7 @@ static int __Pyx_InitCachedConstants(void) {
  *             return alternate_path
  * 
  *     def __report_file_names__(self,final_output_paths,input_paths):             # <<<<<<<<<<<<<<
- *         sys.stdout.write("\n[Status] This run will output the following files:\n")
+ *         sys.stdout.write("[Status] This run will output the following files:\n")
  *         for master_path,child_paths in final_output_paths.items():
  */
   __pyx_tuple__94 = PyTuple_Pack(8, __pyx_n_s_self, __pyx_n_s_final_output_paths, __pyx_n_s_input_paths, __pyx_n_s_master_path, __pyx_n_s_child_paths, __pyx_n_s_path, __pyx_n_s_root, __pyx_n_s_name); if (unlikely(!__pyx_tuple__94)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -15382,7 +15382,7 @@ PyMODINIT_FUNC PyInit_core(void)
  *             return alternate_path
  * 
  *     def __report_file_names__(self,final_output_paths,input_paths):             # <<<<<<<<<<<<<<
- *         sys.stdout.write("\n[Status] This run will output the following files:\n")
+ *         sys.stdout.write("[Status] This run will output the following files:\n")
  *         for master_path,child_paths in final_output_paths.items():
  */
   __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4core_9Interface_25__report_file_names__, 0, __pyx_n_s_Interface___report_file_names, NULL, __pyx_n_s_parabam_command_core, __pyx_d, ((PyObject *)__pyx_codeobj__95)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
