@@ -112,9 +112,6 @@ cdef class Handler:
     def __is_finished__(self):
         if not self._destroy or not self._finished:
             return False
-        if self._destroy and not self._finished and \
-            not self._update_output == self.__destroy_output__():
-            self._update_output = self.__destroy_output__()
         return True
 
     def __format_update__(self,start_time):

@@ -169,6 +169,9 @@ class Handler(parabam.core.Handler):
     #Child classes MUST call super
     def __periodic_action__(self,iterations):
         self.__decide_if_finished__()
+        if not self._processing:
+            #This stops useless outputting in level2 mode
+            self._update_output = self.__destroy_output__()
 
         for subset in self._system_subsets:
             if self.__test_stage_store__(subset):
@@ -382,7 +385,7 @@ class Interface(parabam.core.Interface):
                 self.__report_file_names__(final_output_paths,input_path)
 
             leviathon.run(input_path,output_paths)
-            
+
         if not kwargs["keep_in_temp"]:
             final_output_paths = self.__output_files_to_cwd__(final_output_paths)
         

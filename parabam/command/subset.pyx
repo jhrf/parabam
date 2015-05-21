@@ -203,7 +203,7 @@ class Interface(parabam.command.Interface):
 
         results = super(Interface,self).run(**args)
         
-        self.__goodbye__("parabam stat",announce)
+        self.__goodbye__("parabam subset",announce)
         return results
 
     def __get_queue_names__(self,pair_process,**kwargs):
