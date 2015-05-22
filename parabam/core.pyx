@@ -61,9 +61,6 @@ cdef class Handler:
         sys.stdout.write("\r" + outstr)
         sys.stdout.flush()
 
-    def __destroy_output__(self,outstr):
-        pass
-
     #Must be overwritten if stats architecture is modififed
     def __total_reads__(self):
         if self._stats == {}:
@@ -77,7 +74,7 @@ cdef class Handler:
         cdef int start_time = time.time()
         cdef int dealt  = 0
 
-        update_output = self._update_output #speedup alias
+        update_output = self._update_output
         periodic_interval = self._periodic_interval #speedup alias
         finished = self.__is_finished__
 
@@ -102,7 +99,10 @@ cdef class Handler:
             if iterations % periodic_interval == 0: 
                 self.__periodic_action__(iterations)
 
-            if self._verbose and self._report and iterations % update_interval == 0:
+            if self._verbose and self._report \
+                and iterations % update_interval == 0 \
+                and self._processing:
+                #Could move this to functiond decision if speed was an issue
                 outstr = self.__format_update__(start_time)
                 update_output(outstr)
 

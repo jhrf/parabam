@@ -72,23 +72,10 @@ class Handler(parabam.core.Handler):
         #Handle the result. Result will always be of type parabam.support.MergePackage
         subset_type = new_package.subset_type
         for merge_count,merge_path in new_package.results:
-            try:
-                if merge_count > 0:
-                    for item in self.__get_entries_from_file__(merge_path,subset_type):
-                        self._out_file_objects[subset_type].write(item)
-                os.remove(merge_path)
-
-            except IOError:
-                print "FAILURE ON THIS PATH %s" % (merge_path,)
-
-                print "\nTEMP CONTENTS"
-                sys.stdout.write("\n".join(os.listdir(self.constants.temp_dir)))
-                print "--"
-                print "Printing newpackage.results"
-                print new_package.results
-                print "--"
-
-                raise
+            if merge_count > 0:
+                for item in self.__get_entries_from_file__(merge_path,subset_type):
+                    self._out_file_objects[subset_type].write(item)
+            os.remove(merge_path)
             self._merged += 1
         time.sleep(.5)
 

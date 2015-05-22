@@ -1001,7 +1001,6 @@ static char __pyx_k_handler_exit[] = "__handler_exit__";
 static char __pyx_k_keep_in_temp[] = "keep_in_temp";
 static char __pyx_k_output_paths[] = "output_paths";
 static char __pyx_k_pair_process[] = "pair_process";
-static char __pyx_k_parabam_stat[] = "parabam stat";
 static char __pyx_k_stage_stores[] = "_stage_stores";
 static char __pyx_k_temp_objects[] = "_temp_objects";
 static char __pyx_k_temp_paths_2[] = "temp_paths";
@@ -1218,7 +1217,6 @@ static PyObject *__pyx_n_s_pair;
 static PyObject *__pyx_n_s_pair_process;
 static PyObject *__pyx_n_s_parabam;
 static PyObject *__pyx_n_s_parabam_command_subset;
-static PyObject *__pyx_kp_s_parabam_stat;
 static PyObject *__pyx_kp_s_parabam_subset;
 static PyObject *__pyx_n_s_parent_bam;
 static PyObject *__pyx_n_s_parse_args;
@@ -7556,7 +7554,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_4run(CYTHON_UNUSE
  * 
  *         results = super(Interface,self).run(**args)             # <<<<<<<<<<<<<<
  * 
- *         self.__goodbye__("parabam stat",announce)
+ *         self.__goodbye__("parabam subset",announce)
  */
   __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_Interface); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
@@ -7586,7 +7584,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_4run(CYTHON_UNUSE
   /* "parabam/command/subset.pyx":206
  *         results = super(Interface,self).run(**args)
  * 
- *         self.__goodbye__("parabam stat",announce)             # <<<<<<<<<<<<<<
+ *         self.__goodbye__("parabam subset",announce)             # <<<<<<<<<<<<<<
  *         return results
  * 
  */
@@ -7609,9 +7607,9 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_4run(CYTHON_UNUSE
   if (__pyx_t_1) {
     PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1); __Pyx_GIVEREF(__pyx_t_1); __pyx_t_1 = NULL;
   }
-  __Pyx_INCREF(__pyx_kp_s_parabam_stat);
-  PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_6, __pyx_kp_s_parabam_stat);
-  __Pyx_GIVEREF(__pyx_kp_s_parabam_stat);
+  __Pyx_INCREF(__pyx_kp_s_parabam_subset);
+  PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_6, __pyx_kp_s_parabam_subset);
+  __Pyx_GIVEREF(__pyx_kp_s_parabam_subset);
   __Pyx_INCREF(__pyx_v_announce);
   PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_v_announce);
   __Pyx_GIVEREF(__pyx_v_announce);
@@ -7623,7 +7621,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_9Interface_4run(CYTHON_UNUSE
 
   /* "parabam/command/subset.pyx":207
  * 
- *         self.__goodbye__("parabam stat",announce)
+ *         self.__goodbye__("parabam subset",announce)
  *         return results             # <<<<<<<<<<<<<<
  * 
  *     def __get_queue_names__(self,pair_process,**kwargs):
@@ -9592,7 +9590,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pair_process, __pyx_k_pair_process, sizeof(__pyx_k_pair_process), 0, 0, 1, 1},
   {&__pyx_n_s_parabam, __pyx_k_parabam, sizeof(__pyx_k_parabam), 0, 0, 1, 1},
   {&__pyx_n_s_parabam_command_subset, __pyx_k_parabam_command_subset, sizeof(__pyx_k_parabam_command_subset), 0, 0, 1, 1},
-  {&__pyx_kp_s_parabam_stat, __pyx_k_parabam_stat, sizeof(__pyx_k_parabam_stat), 0, 0, 1, 0},
   {&__pyx_kp_s_parabam_subset, __pyx_k_parabam_subset, sizeof(__pyx_k_parabam_subset), 0, 0, 1, 0},
   {&__pyx_n_s_parent_bam, __pyx_k_parent_bam, sizeof(__pyx_k_parent_bam), 0, 0, 1, 1},
   {&__pyx_n_s_parse_args, __pyx_k_parse_args, sizeof(__pyx_k_parse_args), 0, 0, 1, 1},

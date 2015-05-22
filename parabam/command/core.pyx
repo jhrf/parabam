@@ -169,10 +169,6 @@ class Handler(parabam.core.Handler):
     #Child classes MUST call super
     def __periodic_action__(self,iterations):
         self.__decide_if_finished__()
-        if not self._processing:
-            #This stops useless outputting in level2 mode
-            self._update_output = self.__destroy_output__()
-
         for subset in self._system_subsets:
             if self.__test_stage_store__(subset):
                 self.__add_staged_system_task__(results=self._stage_stores[subset],
@@ -222,11 +218,13 @@ class Interface(parabam.core.Interface):
     def __get_module_and_vitals__(self,code_path):
         if os.getcwd not in sys.path:
             sys.path.append(os.getcwd())
+
+        code_path = code_path.replace(".py","")
+
         try:
             module = __import__(code_path, fromlist=[''])
-
         except ImportError:
-            sys.stderr.write("[Error] parabam can't find user specified instructions"\
+            sys.stderr.write("[Error] parabam can't find user specified instructions\n"\
                              "\tEnsure instruction code is in current working directory\n")
             raise SystemExit
 
