@@ -205,7 +205,7 @@ class Handler(parabam.core.Handler):
     #Child classes MUST call super
     def __handler_exit__(self, **kwargs):
         if self._verbose:
-            self.__standard_output__("\n[Status] Processing complete. %d reads processed" \
+            self.__standard_output__("[Status] Processing complete. %d reads processed" \
                                         % (self.__total_reads__(),))
 
 class Interface(parabam.core.Interface):

@@ -1095,7 +1095,7 @@ static char __pyx_k_Interface___get_update_interval[] = "Interface.__get_update_
 static char __pyx_k_Interface___output_files_to_cwd[] = "Interface.__output_files_to_cwd__";
 static char __pyx_k_Interface___update_final_output[] = "Interface.__update_final_output_paths__";
 static char __pyx_k_PairTask___handle_engine_output[] = "PairTask.__handle_engine_output__";
-static char __pyx_k_Status_Processing_complete_d_re[] = "\n[Status] Processing complete. %d reads processed";
+static char __pyx_k_Status_Processing_complete_d_re[] = "[Status] Processing complete. %d reads processed";
 static char __pyx_k_Status_This_run_will_output_the[] = "[Status] This run will output the following files:\n";
 static char __pyx_k_The_instruction_file_written_in[] = "The instruction file, written in python,\nthat we wish to apply to the input BAM.";
 static char __pyx_k_The_process_will_be_run_only_on[] = "The process will be run only on reads from\nthis region. Regions should be colon separated as\nspecified by samtools (eg 'chr1:1000,5000')";
@@ -6917,7 +6917,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_14__add_staged_system
  *     #Child classes MUST call super
  *     def __handler_exit__(self, **kwargs):             # <<<<<<<<<<<<<<
  *         if self._verbose:
- *             self.__standard_output__("\n[Status] Processing complete. %d reads processed" \
+ *             self.__standard_output__("[Status] Processing complete. %d reads processed" \
  */
 
 /* Python wrapper */
@@ -6996,7 +6996,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_16__handler_exit__(CY
  *     #Child classes MUST call super
  *     def __handler_exit__(self, **kwargs):
  *         if self._verbose:             # <<<<<<<<<<<<<<
- *             self.__standard_output__("\n[Status] Processing complete. %d reads processed" \
+ *             self.__standard_output__("[Status] Processing complete. %d reads processed" \
  *                                         % (self.__total_reads__(),))
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 207; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -7008,7 +7008,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_16__handler_exit__(CY
     /* "parabam/command/core.pyx":208
  *     def __handler_exit__(self, **kwargs):
  *         if self._verbose:
- *             self.__standard_output__("\n[Status] Processing complete. %d reads processed" \             # <<<<<<<<<<<<<<
+ *             self.__standard_output__("[Status] Processing complete. %d reads processed" \             # <<<<<<<<<<<<<<
  *                                         % (self.__total_reads__(),))
  * 
  */
@@ -7017,7 +7017,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_16__handler_exit__(CY
 
     /* "parabam/command/core.pyx":209
  *         if self._verbose:
- *             self.__standard_output__("\n[Status] Processing complete. %d reads processed" \
+ *             self.__standard_output__("[Status] Processing complete. %d reads processed" \
  *                                         % (self.__total_reads__(),))             # <<<<<<<<<<<<<<
  * 
  * class Interface(parabam.core.Interface):
@@ -7086,7 +7086,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_16__handler_exit__(CY
  *     #Child classes MUST call super
  *     def __handler_exit__(self, **kwargs):             # <<<<<<<<<<<<<<
  *         if self._verbose:
- *             self.__standard_output__("\n[Status] Processing complete. %d reads processed" \
+ *             self.__standard_output__("[Status] Processing complete. %d reads processed" \
  */
 
   /* function exit code */
@@ -13942,7 +13942,7 @@ static int __Pyx_InitCachedConstants(void) {
  *     #Child classes MUST call super
  *     def __handler_exit__(self, **kwargs):             # <<<<<<<<<<<<<<
  *         if self._verbose:
- *             self.__standard_output__("\n[Status] Processing complete. %d reads processed" \
+ *             self.__standard_output__("[Status] Processing complete. %d reads processed" \
  */
   __pyx_tuple__69 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_kwargs); if (unlikely(!__pyx_tuple__69)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__69);
@@ -14994,7 +14994,7 @@ PyMODINIT_FUNC PyInit_core(void)
  *     #Child classes MUST call super
  *     def __handler_exit__(self, **kwargs):             # <<<<<<<<<<<<<<
  *         if self._verbose:
- *             self.__standard_output__("\n[Status] Processing complete. %d reads processed" \
+ *             self.__standard_output__("[Status] Processing complete. %d reads processed" \
  */
   __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4core_7Handler_17__handler_exit__, 0, __pyx_n_s_Handler___handler_exit, NULL, __pyx_n_s_parabam_command_core, __pyx_d, ((PyObject *)__pyx_codeobj__70)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
