@@ -38,10 +38,11 @@ class StatCore(object):
         pass
 
     def __handle_engine_output__(self,engine_output,read):
-        local_structures = self._local_structures
-        for name,package in engine_output.items():
-            self._counts[name] += 1
-            local_structures[name].add(**package)
+        if engine_output:#Allows return False
+            local_structures = self._local_structures
+            for name,package in engine_output.items():
+                self._counts[name] += 1
+                local_structures[name].add(**package)
 
     def __unpack_structures__(self,structures):
         unpacked = []
@@ -96,16 +97,22 @@ class Handler(parabam.command.Handler):
         super(Handler,self).__handler_exit__()
         constants = self._constants
 
-        data_str = self.__get_data_str_from_names__(constants.analysis_names,self._final_structures)
-
-        with open(self._output_paths["global"][0],"a") as out_object:
-            out_object.write("%s%s\n" % (self._parent_bam.filename,data_str))
-
-        #TODO: Handle array output    
+        #Append to global csv
+        if constants.analysis_names: #Check that there are global analyses
+            data_str = self.__get_data_str_from_names__(constants.analysis_names,self._final_structures)
+            with open(self._output_paths["global"][0],"a") as out_object:
+                out_object.write("%s%s\n" % (self._parent_bam.filename,data_str))
+        
+        #Output numpy arrays
+        for name,structure in self._final_structures.items():
+            if structure.struc_type == np.ndarray:
+                structure.write_to_csv(self._output_paths[self._parent_bam.filename][name])
 
     def __get_data_str_from_names__(self,names,user_structures):
         data_str = ""
         for name in names:
+            if user_structures[name].struc_type == np.ndarray:
+                continue
             cur_data = user_structures[name].data
             data_str += ",%.5f" % (cur_data,)
         return data_str
@@ -211,8 +218,8 @@ class ArrayStructure(UserStructure):
         existing = self.data[coords]
         self.data[coords] = self.min_decision(result,existing)
 
-    def add_cumu(self,result,coords):
-        self.data[coords] += result
+    def add_cumu(self,result):
+        self.data += result
 
     def merge_max(self,result):
         self.data = np.maximum(self.data,result)
@@ -226,7 +233,7 @@ class ArrayStructure(UserStructure):
         self.data += result
         del result
 
-    def write_to_csv(self,out_path,mode):
+    def write_to_csv(self,out_path):
         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
 
 class Interface(parabam.command.Interface):
@@ -296,35 +303,27 @@ class Interface(parabam.command.Interface):
 
 
     def __get_global_output_path__(self,user_struc_blueprint,user_specified_outpath,**kwargs):
-
-        if not user_specified_outpath:
-            global_filename = os.path.join(".",self._temp_dir,"parabam_stat_%d_%d.csv"\
-                                     % (time.time(),os.getpid()))
-        else:
-            global_filename = user_specified_outpath
-
         analysis_names = self.__get_non_array_names__(user_struc_blueprint)
-        self.__create_output_files__(global_filename,analysis_names)
-
-        return {"global": [global_filename]}
+        if analysis_names:
+            if not user_specified_outpath:
+                global_filename = os.path.join(".",self._temp_dir,"parabam_stat_%d_%d.csv"\
+                                         % (time.time(),os.getpid()))
+            else:
+                global_filename = user_specified_outpath
+            self.__create_output_files__(global_filename,analysis_names)
+            return {"global": [global_filename]}
+        else:
+            return {"global": []}
 
     def __get_output_paths__(self,input_path,user_specified_outpath,
                              user_struc_blueprint,
                              **kwargs):
-
-        output_paths = {}
+        output_paths = {input_path:{}}
         for name,blueprint in user_struc_blueprint.items():
-            if blueprint["data"] == np.ndarray:
-                try:
-                    path_list = output_paths[input_path]
-                except KeyError:
-                    output_paths[input_path] = []
-                    path_list = output_paths[input_path]
-
-                filename = "%s_%s_array.csv" % \
-                    (os.path.splitext(os.path.split(input_path)),name,)
-                path_list.append(os.path.join(".",self._temp_dir,filename))
-
+            if type(blueprint["data"]) == np.ndarray:
+                path_id,ext = os.path.splitext(os.path.basename(input_path))
+                csv_path = "%s_%s.csv" % (path_id,name,)
+                output_paths[input_path][name] = os.path.join(".",self._temp_dir,csv_path)
         return output_paths
 
     def __get_task_class__(self,pair_process,**kwargs):
@@ -345,7 +344,7 @@ class Interface(parabam.command.Interface):
     def __get_non_array_names__(self,user_struc_blueprint):
         names = []
         for name,blueprint in user_struc_blueprint.items():
-            if not blueprint["data"] == np.ndarray:
+            if not type(blueprint["data"]) == np.ndarray:
                 names.append(name)
         names.sort()
         return names

@@ -302,13 +302,13 @@ class Interface(parabam.core.Interface):
             if type(output_path) == dict:
                 for subset,path in output_path.items():
                     final_output_paths[input_path].append(path)    
-            elif type(output_paths) == list:
+            elif type(output_path) == list:
                 final_output_paths[input_path] = output_path
-            elif type(output_paths) == str:
+            elif type(output_path) == str:
                 final_output_paths[input_path].append(output_path)
             else:
                 sys.stderr.write("[Error] Unexpected output path type: %s \n" \
-                    % (type(output_paths[input_path])))
+                    % (type(output_path)))
                 raise SystemExit
 
     def __output_files_to_cwd__(self,final_output_paths):

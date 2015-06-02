@@ -271,7 +271,7 @@ class Handler(parabam.core.Handler):
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count == 400:
+            if (empty and running == 0) or self._stale_count == 1000:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
@@ -288,12 +288,10 @@ class Handler(parabam.core.Handler):
         gc.collect()
 
         # if iterations % 30 == 0:
-        #     #sys.stdout.write("\r %d/%d=%.5f | Processing:%d Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
-        #     sys.stdout.write("\r %d/%d=%.5f | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
+        #     sys.stdout.write("\r %d/%d=%.5f | Empty:%d Purgatory:%d Stale:%d Tasks:%d \n"  %\
         #         (self._rescued["total"],
         #         self._total_loners,
         #         float(self._rescued["total"]+1)/(self._total_loners+1),
-        #         #self._processing,
         #         empty,
         #         len(self._loner_purgatory),
         #         self._stale_count,
