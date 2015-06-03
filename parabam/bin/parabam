@@ -8,29 +8,17 @@ import time
 import traceback
 import os
 import shutil
+import tempfile
 
 def keyboard_handler(sig, frame):#Catch keyboard interupt and end processors
 	sys.stdout.write("\r[ERROR] parabam interrupted by user")
 	sys.exit(0)
 
 def get_unique_tempdir():
-	i = 0
-	path = ""
-	while True:
-		path = get_candidate_temp_path(i)
-		if not os.path.exists(path):
-			return path	
-		i += 1
-
-def get_candidate_temp_path(unique):
-	prefix = "parabam-temp-%d" % (int(time.time()),)
-	if unique == 0:
-		return "%s" % (prefix,)
-	else:
-		return "%s-%d" % (prefix,unique,)
+	return tempfile.mkdtemp(prefix="parabam-tmp-",dir=".")
 
 def die_gracefully(temp_dir):
-	if not temp_dir == "." or not temp_dir == "": 
+	if not temp_dir == "." or not temp_dir == "" or not temp_dir == "./": 
 		shutil.rmtree(temp_dir)
 
 if __name__ == "__main__":
@@ -50,7 +38,6 @@ if __name__ == "__main__":
 		command = sys.argv[1]
 
 		temp_dir = get_unique_tempdir()
-		os.makedirs(temp_dir)
 
 		if command in progs:
 			#Load the command using the command line

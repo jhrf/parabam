@@ -343,7 +343,7 @@ class Interface(parabam.core.Interface):
             if master_path in input_paths:
                 for path in child_paths:
                     root,name = os.path.split(path)
-                    sys.stdout.write("\t%s\n" % (name,))            
+                    sys.stdout.write("\t %s\n" % (name,))            
         sys.stdout.write("\n")
 
     def run(self,**kwargs):
@@ -379,7 +379,7 @@ class Interface(parabam.core.Interface):
             self.__update_final_output_paths__(input_path,output_paths,
                                                final_output_paths)
 
-            if constants.verbose: 
+            if constants.verbose and not kwargs["keep_in_temp"]: 
                 self.__report_file_names__(final_output_paths,input_path)
 
             leviathon.run(input_path,output_paths)
