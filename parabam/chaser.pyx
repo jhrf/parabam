@@ -206,6 +206,9 @@ class Handler(parabam.core.Handler):
     def __start_matchmaker_task__(self,paths,loner_type,level):
         self.__wait_for_tasks__(self._tasks,self._chaser_task_max)
 
+        if self._destroy:
+            self._stale_count += 1
+
         new_task = MatchMakerTask(paths,self._inqu,self._constants,
                     loner_type,level,self._max_reads,self._child_pack)
         new_task.start()
@@ -264,14 +267,12 @@ class Handler(parabam.core.Handler):
         self.__test_primary_tasks__(required_paths=required_paths)
 
         if self._destroy:
-            if self._rescued["total"] == self._prev_rescued:
-                self._stale_count += 1
-            else:
+            if not self._rescued["total"] == self._prev_rescued:
                 self._stale_count = 0
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count == 1000:
+            if (empty and running == 0) or self._stale_count == 25:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
