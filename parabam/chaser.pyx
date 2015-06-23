@@ -185,6 +185,9 @@ class Handler(parabam.core.Handler):
             for loner_level,loner_path in new_package.results:
                 pyramid[loner_level].append(loner_path)
 
+        if self._destroy:
+            self._stale_count += 1
+
     def __test_primary_tasks__(self,required_paths=10):
         task_sent = False
         if len(self._primary_store) >= required_paths:
@@ -205,10 +208,6 @@ class Handler(parabam.core.Handler):
 
     def __start_matchmaker_task__(self,paths,loner_type,level):
         self.__wait_for_tasks__(self._tasks,self._chaser_task_max)
-
-        if self._destroy:
-            self._stale_count += 1
-
         new_task = MatchMakerTask(paths,self._inqu,self._constants,
                     loner_type,level,self._max_reads,self._child_pack)
         new_task.start()
@@ -272,7 +271,7 @@ class Handler(parabam.core.Handler):
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count == 300:
+            if (empty and running == 0) or self._stale_count == 250:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
@@ -376,15 +375,10 @@ class Handler(parabam.core.Handler):
         return success,idle_paths,levels
        
     def __get_task_size__(self,level,loner_type):
-        if "XX" in loner_type:
-            if level % 2 == 0:
-                task_size = 2
-            else:
-                task_size = 3
-        elif loner_type == "U-M" and level == 0 and not self._destroy:
-            task_size = 30
-        elif loner_type == "U-M" and level == 1 and self._destroy:
-            task_size = 15
+        if "UM" in loner_type and level == 0 and not self._destroy:
+            task_size = 14
+        elif "UM" in loner_type and level == 1 and self._destroy:
+            task_size = 7
         else:
             if level % 2 == 0:
                 task_size = 2
@@ -498,25 +492,27 @@ class PrimaryTask(ChaserClass):
 
     def __get_reference_id_name__(self,read,bins):
         if read.reference_id == read.next_reference_id:
+            #reads on same chromosome
             return "XX%d-%d" % (read.reference_id,read.next_reference_id,)
         else:
             class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
-            return "%d-%d" % tuple(class_bins)
+            #reads on different chromosome
+            return "BB%d-%d" % tuple(class_bins)
 
     def __get_loner_type__(self,read,bins):
         if not read.is_unmapped and not read.mate_is_unmapped:
             return self.__get_reference_id_name__(read,bins)
         elif read.is_unmapped and read.mate_is_unmapped:
-            return "U-U"
+            #both unmapped
+            return "UU"
         else:
-            if read.reference_id == -1:
-                return "U-M"
-            else:#Some reads are errneously given a ref_id even though the
-                 #flag says they are unmapped. In this case the mate reads
-                 #treats the read as mapped and the reads are in seperate
-                 #chaser pyramids
-                return self.__get_reference_id_name__(read,bins)
-
+            if read.is_unmapped:
+                relevant_reference = read.next_reference_id
+            else:
+                relevant_reference = read.reference_id
+            #one unmapped read, one mapped read
+            return "UM%d" % (bins[relevant_reference],)
+            
     def __order_reference_number__(self,read_ref,mate_ref):
         if min((read_ref,mate_ref)) == read_ref:
             return read_ref,mate_ref
