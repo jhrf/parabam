@@ -223,7 +223,7 @@ class Handler(parabam.core.Handler):
             required_paths = 10
         else:
             idle_threshold = 5
-            required_paths=1
+            required_paths = 1
 
         pyramid_idle_counts = self._pyramid_idle_counts 
 
@@ -272,7 +272,7 @@ class Handler(parabam.core.Handler):
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count == 25:
+            if (empty and running == 0) or self._stale_count == 300:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
@@ -399,7 +399,6 @@ class Handler(parabam.core.Handler):
             else:
                 self.__standard_output__("\n[Status] Couldn't find pairs for %d reads" %\
                     (self._total_loners - self._rescued["total"],))
-        
         for qu in self._pause_qus:
             qu.close()
 
@@ -497,17 +496,26 @@ class PrimaryTask(ChaserClass):
         else:
             return list(np.digitize( range(reference_len) , range(0,reference_len,2)))
 
+    def __get_reference_id_name__(self,read,bins):
+        if read.reference_id == read.next_reference_id:
+            return "XX%d-%d" % (read.reference_id,read.next_reference_id,)
+        else:
+            class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
+            return "%d-%d" % tuple(class_bins)
+
     def __get_loner_type__(self,read,bins):
         if not read.is_unmapped and not read.mate_is_unmapped:
-            if read.reference_id == read.next_reference_id:
-                return "XX%d-%d" % (read.reference_id,read.next_reference_id,)
-            else:
-                class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
-                return "%d-%d" % tuple(class_bins)
+            return self.__get_reference_id_name__(read,bins)
         elif read.is_unmapped and read.mate_is_unmapped:
             return "U-U"
         else:
-            return "U-M"
+            if read.reference_id == -1:
+                return "U-M"
+            else:#Some reads are errneously given a ref_id even though the
+                 #flag says they are unmapped. In this case the mate reads
+                 #treats the read as mapped and the reads are in seperate
+                 #chaser pyramids
+                return self.__get_reference_id_name__(read,bins)
 
     def __order_reference_number__(self,read_ref,mate_ref):
         if min((read_ref,mate_ref)) == read_ref:
@@ -526,13 +534,11 @@ class PrimaryTask(ChaserClass):
     def __write_loner__(self,loner_objects,loner_file_counts,loner_type,read):
         try:
             loner_path = loner_objects[loner_type][-1].filename
-            if loner_file_counts[loner_path] == (self._max_reads-50000): #-2500000 to garuntee being less than max
+            if loner_file_counts[loner_path] == (self._max_reads-50000): #Ensure fewer reads than max
                 new_bam_object = self.__get_loner_object__(loner_type,len(loner_objects[loner_type]))
-                loner_objects[loner_type][-1].close() #CHANGE TO STOP CRASH ON BIG TASK_SIZE
+                loner_objects[loner_type][-1].close()
                 
                 loner_objects[loner_type].append(new_bam_object) 
-                #open loner references causing crash with large
-                #amounts of overflow files??
         except KeyError:
             new_bam_object = self.__get_loner_object__(loner_type,0)
             loner_path = new_bam_object.filename
@@ -547,8 +553,7 @@ class PrimaryTask(ChaserClass):
             paths[loner_type] = []
             for loner_object in loner_objects:
                 paths[loner_type].append(loner_object.filename)
-                #loner_object.close() #CHANGE TO STOP CRASH ON BIG TASK_SIZE
-            loner_object.close() #CHANGE TO STOP CRASH ON BIG TASK_SIZE
+            loner_object.close()#This close prevents too many open files
         return paths
 
 class MatchMakerTask(ChaserClass):
@@ -591,7 +596,7 @@ class MatchMakerTask(ChaserClass):
                     del pairs[read.qname]
                     del read_pairs[read.qname]
 
-                #we are handling pairs so we divide chunk by two.
+                #If over hard limit, send to main stream.
                 if len(send_pairs) >= 100000:
                     rescued += self.__launch_child_task__(send_pairs)
                     send_pairs = {}
