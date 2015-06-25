@@ -406,7 +406,7 @@ class Handler(parabam.core.Handler):
        
     def __get_task_size__(self,level,loner_type):
         if "UM" in loner_type and level == 0 and not self._destroy:
-            task_size = 14
+            task_size = 18
         elif "UM" in loner_type and level == 1 and self._destroy:
             task_size = 7
         else:
@@ -427,25 +427,18 @@ class Handler(parabam.core.Handler):
             qu.close()
 
 class ChaserClass(Process):
-    def __init__(self,object parent_bam,object constants):
+    def __init__(self,object constants):
         super(ChaserClass,self).__init__()
         self._constants = constants
 
-        head,root = os.path.split(parent_bam.filename)
-        name,ext = os.path.splitext(root)
-        self.basename = name
-
-    def __sort_and_index__(self,path):
-        pass
-
     def __get_loner_temp_path__(self,loner_type,level=0,unique=""):
-        return "%s/%s_%s_lvl%d_typ%s%s.bam" %\
-            (self._constants.temp_dir,self.basename,self.pid,level,loner_type,unique)
+        return "%s/%s_%d_%s%s.bam" %\
+            (self._constants.temp_dir,self.pid,level,loner_type,unique)
 
 class PrimaryTask(ChaserClass):
 
     def __init__(self,object unsorted_paths,object outqu,object constants, int max_reads, dict child_pack):
-        super(PrimaryTask,self).__init__(child_pack["parent_bam"],constants)
+        super(PrimaryTask,self).__init__(constants)
         
         self._unsorted_paths = unsorted_paths
         self._outqu = outqu
@@ -494,7 +487,6 @@ class PrimaryTask(ChaserClass):
 
     def __read_generator__(self):
         for path in self._unsorted_paths:
-            self.__sort_and_index__(path)
             loner_object = pysam.AlignmentFile(path,"rb")
             for read in loner_object.fetch(until_eof=True):
                 yield read
@@ -559,7 +551,7 @@ class MatchMakerTask(ChaserClass):
     def __init__(self,object loner_paths,object outqu,object constants,
         str loner_type,int level,int max_reads,object child_pack):
 
-        super(MatchMakerTask,self).__init__(child_pack["parent_bam"],constants)
+        super(MatchMakerTask,self).__init__(constants)
         
         self._max_reads = max_reads
         self._child_pack = child_pack
