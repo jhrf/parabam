@@ -83,6 +83,7 @@ class Handler(parabam.core.Handler):
 
         self._child_pack = {"parent_bam":parent_bam,
                             "queue":out_qu_dict["main"],
+                            "chrom_bins":self.__get_chrom_bins__(parent_bam) ,
                             "chaser_task":ChaserTask(parent_bam,self._constants)}
 
         self._chaser_task_max = self._constants.total_procs #This is half of the user specified procs
@@ -92,6 +93,28 @@ class Handler(parabam.core.Handler):
         self._primary_store = self.__instalise_primary_store__()
 
         self._max_reads = 7000000
+
+    def __get_chrom_bins__(self,parent_bam):
+        chrom_bins = {}
+
+        references = parent_bam.references
+        lengths = parent_bam.lengths
+        unbinned = []
+        binned = []
+        for i,name,length in izip(xrange(references),references,lengths):
+            if i > 1000000:
+                unbinned.append( (i,name,) )
+            else:
+                binned.append( (i,name,) )
+
+        for i,name in unbinned:
+            chrom_bins[i] = "cx%s" % (name,)
+
+        #Divide the short chromosomes into bins of ~12
+        bins = list(np.digitize(range(len(binned)),range(0,len(binned),24)))
+        for (i,name),bin in izip(binned,bins):
+            chrom_bins[i] = "cb%d" % (bin,)
+        return chrom_bins
 
     def __wait_for_tasks__(self,list active_tasks,int max_tasks):
         update_tasks = self.__update_tasks__ #optimising alias
@@ -218,10 +241,10 @@ class Handler(parabam.core.Handler):
         running = len(self._tasks)
 
         if not self._destroy:
-            idle_threshold = 75
+            idle_threshold = 100
             required_paths = 10
         else:
-            idle_threshold = 5
+            idle_threshold = 20
             required_paths = 1
 
         pyramid_idle_counts = self._pyramid_idle_counts 
@@ -229,39 +252,40 @@ class Handler(parabam.core.Handler):
         empty = True
 
         for loner_type,pyramid in self._loner_pyramid.items():
-                for i,sub_pyramid in enumerate(reversed(pyramid)):
-                    level = len(pyramid) - (i+1)
-                    paths = self.__get_paths__(loner_type,sub_pyramid,level)
-                    if len(paths) > 0:
-                        empty = False
-                        self.__start_matchmaker_task__(paths,loner_type,level)
-                        running += 1
-                        pyramid_idle_counts[loner_type] = 0
-                        for path in paths:#remove sent paths
-                            sub_pyramid.remove(path)
-                        break
-                    if len(sub_pyramid) > 0:
-                        empty = False
-                        pyramid_idle_counts[loner_type] += 1
-                    del paths
-                if pyramid_idle_counts[loner_type] >= idle_threshold:
-                    idle_success,idle_paths,idle_levels = self.__idle_routine__(pyramid,loner_type)
+            for i,sub_pyramid in enumerate(reversed(pyramid)):
+                level = len(pyramid) - (i+1)
+                paths = self.__get_paths__(loner_type,sub_pyramid,level)
+                if len(paths) > 0:
+                    empty = False
+                    self.__start_matchmaker_task__(paths,loner_type,level)
+                    running += 1
+                    pyramid_idle_counts[loner_type] = 0
+                    for path in paths:#remove sent paths
+                        sub_pyramid.remove(path)
+                    break
+                if len(sub_pyramid) > 0:
+                    empty = False
+                    pyramid_idle_counts[loner_type] += 1
+                del paths
 
-                    #delete after idle success or when processing has finished and idle fails
-                    if self.__clear_subpyramid__(idle_success, self._destroy ,running):
-                        pyramid_idle_counts[loner_type]=0
-                        for idle_level,idle_path in izip(idle_levels,idle_paths):
-                            if not idle_success:
-                                try:
-                                    self._loner_purgatory[loner_type].append(idle_path)
-                                except KeyError:
-                                    self._loner_purgatory[loner_type] = [idle_path]
-                                pyramid[idle_level].remove(idle_path)
-                            else:
-                                pyramid[idle_level].remove(idle_path)
-                                running += 1
+            if pyramid_idle_counts[loner_type] >= idle_threshold:
+                idle_success,idle_paths,idle_levels = self.__idle_routine__(pyramid,loner_type)
 
-                    del idle_paths,idle_levels
+                #delete after idle success or when processing has finished and idle fails
+                if self.__clear_subpyramid__(idle_success, self._destroy ,running):
+                    pyramid_idle_counts[loner_type]=0
+                    for idle_level,idle_path in izip(idle_levels,idle_paths):
+                        if not idle_success:
+                            try:
+                                self._loner_purgatory[loner_type].append(idle_path)
+                            except KeyError:
+                                self._loner_purgatory[loner_type] = [idle_path]
+                            pyramid[idle_level].remove(idle_path)
+                        else:
+                            pyramid[idle_level].remove(idle_path)
+                            running += 1
+
+                del idle_paths,idle_levels
 
         self.__test_primary_tasks__(required_paths=required_paths)
 
@@ -285,18 +309,19 @@ class Handler(parabam.core.Handler):
                 if finished:
                     self._finished = True
 
-        gc.collect()
+        if iterations % 10 == 0:
+            gc.collect()
 
-        # if iterations % 30 == 0:
-        #     sys.stdout.write("\r %d/%d=%.5f | Empty:%d Purgatory:%d Stale:%d Tasks:%d \n"  %\
-        #         (self._rescued["total"],
-        #         self._total_loners,
-        #         float(self._rescued["total"]+1)/(self._total_loners+1),
-        #         empty,
-        #         len(self._loner_purgatory),
-        #         self._stale_count,
-        #         len(self._tasks)))
-        #     sys.stdout.flush()
+        if iterations % 30 == 0:
+            sys.stdout.write("\r %d/%d=%.5f | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
+                (self._rescued["total"],
+                self._total_loners,
+                float(self._rescued["total"]+1)/(self._total_loners+1),
+                empty,
+                len(self._loner_purgatory),
+                self._stale_count,
+                len(self._tasks)))
+            sys.stdout.flush()
 
     def __is_queue_empty__(self):
         try:
@@ -355,6 +380,11 @@ class Handler(parabam.core.Handler):
             return False
 
     def __idle_routine__(self,pyramid,loner_type):
+        if "UM" in loner_type and not self._destroy:
+            #Don't conduct idle on UMs because we don't expect to see pairs
+            #until after processing has finished
+            return True,[],[]
+
         idle_paths = []
         levels = []
         if random.randint(0,1):
@@ -438,11 +468,11 @@ class PrimaryTask(ChaserClass):
 
         loner_total = 0
 
-        classifier_bins = self.__get_classifier_bins__()
+        chrom_bins = self._child_pack["chrom_bins"]
 
         for read in self.__read_generator__():
             
-            loner_type = self.__get_loner_type__(read,classifier_bins)
+            loner_type = self.__get_loner_type__(read,chrom_bins)
             loner_total += 1
             write_loner(loner_holder,loner_file_counts,loner_type,read)
 
@@ -472,32 +502,10 @@ class PrimaryTask(ChaserClass):
             os.remove(path)
         gc.collect()
 
-    def __get_classifier_bins__(self):
-        crucial_bin_number = 30
-        reference_len = len(self._references)
-
-        if reference_len > crucial_bin_number:
-            bins = []
-            curcial_bins = list(np.digitize( range(crucial_bin_number) , range(0,crucial_bin_number,3)))
-
-            remainder_bins = list(np.digitize(range(crucial_bin_number,reference_len),
-                        range(crucial_bin_number,reference_len,50)) + 10)
-
-            bins.extend(curcial_bins)
-            bins.extend(remainder_bins)
-
-            return bins
-        else:
-            return list(np.digitize( range(reference_len) , range(0,reference_len,2)))
-
     def __get_reference_id_name__(self,read,bins):
-        if read.reference_id == read.next_reference_id:
-            #reads on same chromosome
-            return "XX%d-%d" % (read.reference_id,read.next_reference_id,)
-        else:
-            class_bins = map(lambda x : bins[x],self.__order_reference_number__(read.reference_id,read.next_reference_id))
-            #reads on different chromosome
-            return "BB%d-%d" % tuple(class_bins)
+        class_bins = map(lambda x : bins[x],sorted(read.reference_id,read.next_reference_id))
+        #reads on different chromosome
+        return "MM%s-%s" % tuple(class_bins)
 
     def __get_loner_type__(self,read,bins):
         if not read.is_unmapped and not read.mate_is_unmapped:
@@ -511,14 +519,8 @@ class PrimaryTask(ChaserClass):
             else:
                 relevant_reference = read.reference_id
             #one unmapped read, one mapped read
-            return "UM%d" % (bins[relevant_reference],)
+            return "UM%s" % (bins[relevant_reference],)
             
-    def __order_reference_number__(self,read_ref,mate_ref):
-        if min((read_ref,mate_ref)) == read_ref:
-            return read_ref,mate_ref
-        else:
-            return mate_ref,read_ref
-
     def __get_loner_holder__(self):
         holder = {}
         return holder
