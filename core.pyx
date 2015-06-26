@@ -373,12 +373,14 @@ class FileReader(Process):
                 pause = True
             else:
                 pause = pause_qu.get(False)
+                pause_qu.put(2) #Acknowledge
 
             if pause:
                 while True:
                     try:
                         pause = pause_qu.get(False)
                         if not pause:
+                            pause_qu.put(2) #Acknowledge
                             break
                     except Queue2.Empty:
                         time.sleep(.5)
