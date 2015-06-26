@@ -990,6 +990,7 @@ static PyObject *__pyx_tp_new_7parabam_6chaser___pyx_scope_struct_2___get_refere
 static PyObject *__pyx_tp_new_7parabam_6chaser___pyx_scope_struct_3___read_generator__(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static char __pyx_k_d[] = "-%d";
 static char __pyx_k_i[] = "i";
+static char __pyx_k_s[] = "%s";
 static char __pyx_k_x[] = "x";
 static char __pyx_k_UM[] = "UM";
 static char __pyx_k_UU[] = "UU";
@@ -1001,6 +1002,7 @@ static char __pyx_k_qu[] = "qu";
 static char __pyx_k_rb[] = "rb";
 static char __pyx_k_wb[] = "wb";
 static char __pyx_k__16[] = "";
+static char __pyx_k_b_d[] = "b%d";
 static char __pyx_k_bin[] = "bin";
 static char __pyx_k_doc[] = "__doc__";
 static char __pyx_k_end[] = "end";
@@ -1015,9 +1017,7 @@ static char __pyx_k_sys[] = "sys";
 static char __pyx_k_Task[] = "Task";
 static char __pyx_k_args[] = "args";
 static char __pyx_k_bins[] = "bins";
-static char __pyx_k_cb_d[] = "cb%d";
 static char __pyx_k_core[] = "core";
-static char __pyx_k_cx_s[] = "cx%s";
 static char __pyx_k_file[] = "file";
 static char __pyx_k_init[] = "__init__";
 static char __pyx_k_inqu[] = "inqu";
@@ -1062,7 +1062,6 @@ static char __pyx_k_tasks[] = "_tasks";
 static char __pyx_k_throw[] = "throw";
 static char __pyx_k_total[] = "total";
 static char __pyx_k_write[] = "write";
-static char __pyx_k_MM_s_s[] = "MM%s-%s";
 static char __pyx_k_Queue2[] = "Queue2";
 static char __pyx_k_append[] = "append";
 static char __pyx_k_binned[] = "binned";
@@ -1089,6 +1088,7 @@ static char __pyx_k_unique[] = "unique";
 static char __pyx_k_xrange[] = "xrange";
 static char __pyx_k_Counter[] = "Counter";
 static char __pyx_k_Handler[] = "Handler";
+static char __pyx_k_MM_sv_s[] = "MM%sv%s";
 static char __pyx_k_Package[] = "Package";
 static char __pyx_k_Process[] = "Process";
 static char __pyx_k_collect[] = "collect";
@@ -1367,7 +1367,7 @@ static PyObject *__pyx_n_s_Handler___tidy_pyramid;
 static PyObject *__pyx_n_s_Handler___update_tasks;
 static PyObject *__pyx_n_s_Handler___wait_for_tasks;
 static PyObject *__pyx_n_s_KeyError;
-static PyObject *__pyx_kp_s_MM_s_s;
+static PyObject *__pyx_kp_s_MM_sv_s;
 static PyObject *__pyx_n_s_MatchMakerPackage;
 static PyObject *__pyx_n_s_MatchMakerPackage___init;
 static PyObject *__pyx_n_s_MatchMakerTask;
@@ -1411,12 +1411,12 @@ static PyObject *__pyx_n_s_active_tasks;
 static PyObject *__pyx_n_s_all_paths;
 static PyObject *__pyx_n_s_append;
 static PyObject *__pyx_n_s_args;
+static PyObject *__pyx_kp_s_b_d;
 static PyObject *__pyx_n_s_bam_iterator;
 static PyObject *__pyx_n_s_bam_object;
 static PyObject *__pyx_n_s_bin;
 static PyObject *__pyx_n_s_binned;
 static PyObject *__pyx_n_s_bins;
-static PyObject *__pyx_kp_s_cb_d;
 static PyObject *__pyx_n_s_chaser_task;
 static PyObject *__pyx_n_s_chaser_task_max;
 static PyObject *__pyx_n_s_chaser_type;
@@ -1434,7 +1434,6 @@ static PyObject *__pyx_n_s_core;
 static PyObject *__pyx_n_s_count;
 static PyObject *__pyx_n_s_count_limit;
 static PyObject *__pyx_n_s_currently_active;
-static PyObject *__pyx_kp_s_cx_s;
 static PyObject *__pyx_kp_s_d;
 static PyObject *__pyx_kp_s_d_d_5f_Empty_d_Purgatory_d_Stal;
 static PyObject *__pyx_n_s_dealt;
@@ -1612,6 +1611,7 @@ static PyObject *__pyx_n_s_return_paths;
 static PyObject *__pyx_n_s_reversed;
 static PyObject *__pyx_n_s_run;
 static PyObject *__pyx_n_s_running;
+static PyObject *__pyx_kp_s_s;
 static PyObject *__pyx_kp_s_s__d__d__s;
 static PyObject *__pyx_kp_s_s_s__d__s_s_bam;
 static PyObject *__pyx_n_s_sample;
@@ -4095,7 +4095,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
   PyObject *__pyx_v_binned = NULL;
   PyObject *__pyx_v_i = NULL;
   PyObject *__pyx_v_name = NULL;
-  CYTHON_UNUSED PyObject *__pyx_v_length = NULL;
+  PyObject *__pyx_v_length = NULL;
   PyObject *__pyx_v_bins = NULL;
   PyObject *__pyx_v_bin = NULL;
   PyObject *__pyx_r = NULL;
@@ -4170,7 +4170,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
  *         unbinned = []
  *         binned = []             # <<<<<<<<<<<<<<
  *         for i,name,length in izip(xrange(len(references)),references,lengths):
- *             if i > 1000000:
+ *             if length > 1000000:
  */
   __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 106; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -4181,7 +4181,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
  *         unbinned = []
  *         binned = []
  *         for i,name,length in izip(xrange(len(references)),references,lengths):             # <<<<<<<<<<<<<<
- *             if i > 1000000:
+ *             if length > 1000000:
  *                 unbinned.append( (i,name,) )
  */
   __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_izip); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -4332,18 +4332,18 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
     /* "parabam/chaser.pyx":108
  *         binned = []
  *         for i,name,length in izip(xrange(len(references)),references,lengths):
- *             if i > 1000000:             # <<<<<<<<<<<<<<
+ *             if length > 1000000:             # <<<<<<<<<<<<<<
  *                 unbinned.append( (i,name,) )
  *             else:
  */
-    __pyx_t_1 = PyObject_RichCompare(__pyx_v_i, __pyx_int_1000000, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyObject_RichCompare(__pyx_v_length, __pyx_int_1000000, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_10) {
 
       /* "parabam/chaser.pyx":109
  *         for i,name,length in izip(xrange(len(references)),references,lengths):
- *             if i > 1000000:
+ *             if length > 1000000:
  *                 unbinned.append( (i,name,) )             # <<<<<<<<<<<<<<
  *             else:
  *                 binned.append( (i,name,) )
@@ -4386,7 +4386,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
  *         unbinned = []
  *         binned = []
  *         for i,name,length in izip(xrange(len(references)),references,lengths):             # <<<<<<<<<<<<<<
- *             if i > 1000000:
+ *             if length > 1000000:
  *                 unbinned.append( (i,name,) )
  */
   }
@@ -4396,7 +4396,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
  *                 binned.append( (i,name,) )
  * 
  *         for i,name in unbinned:             # <<<<<<<<<<<<<<
- *             chrom_bins[i] = "cx%s" % (name,)
+ *             chrom_bins[i] = "%s" % (name,)
  * 
  */
   __pyx_t_2 = __pyx_v_unbinned; __Pyx_INCREF(__pyx_t_2); __pyx_t_3 = 0;
@@ -4465,7 +4465,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
     /* "parabam/chaser.pyx":114
  * 
  *         for i,name in unbinned:
- *             chrom_bins[i] = "cx%s" % (name,)             # <<<<<<<<<<<<<<
+ *             chrom_bins[i] = "%s" % (name,)             # <<<<<<<<<<<<<<
  * 
  *         #Divide the short chromosomes into bins of ~12
  */
@@ -4474,7 +4474,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
     __Pyx_INCREF(__pyx_v_name);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_name);
     __Pyx_GIVEREF(__pyx_v_name);
-    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_cx_s, __pyx_t_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_s, __pyx_t_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (unlikely(PyDict_SetItem(__pyx_v_chrom_bins, __pyx_v_i, __pyx_t_4) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -4484,7 +4484,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
  *                 binned.append( (i,name,) )
  * 
  *         for i,name in unbinned:             # <<<<<<<<<<<<<<
- *             chrom_bins[i] = "cx%s" % (name,)
+ *             chrom_bins[i] = "%s" % (name,)
  * 
  */
   }
@@ -4495,7 +4495,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
  *         #Divide the short chromosomes into bins of ~12
  *         bins = list(np.digitize(range(len(binned)),range(0,len(binned),24)))             # <<<<<<<<<<<<<<
  *         for (i,name),bin in izip(binned,bins):
- *             chrom_bins[i] = "cb%d" % (bin,)
+ *             chrom_bins[i] = "b%d" % (bin,)
  */
   __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
@@ -4567,7 +4567,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
  *         #Divide the short chromosomes into bins of ~12
  *         bins = list(np.digitize(range(len(binned)),range(0,len(binned),24)))
  *         for (i,name),bin in izip(binned,bins):             # <<<<<<<<<<<<<<
- *             chrom_bins[i] = "cb%d" % (bin,)
+ *             chrom_bins[i] = "b%d" % (bin,)
  *         return chrom_bins
  */
   __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_izip); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -4747,7 +4747,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
     /* "parabam/chaser.pyx":119
  *         bins = list(np.digitize(range(len(binned)),range(0,len(binned),24)))
  *         for (i,name),bin in izip(binned,bins):
- *             chrom_bins[i] = "cb%d" % (bin,)             # <<<<<<<<<<<<<<
+ *             chrom_bins[i] = "b%d" % (bin,)             # <<<<<<<<<<<<<<
  *         return chrom_bins
  * 
  */
@@ -4756,7 +4756,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
     __Pyx_INCREF(__pyx_v_bin);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_bin);
     __Pyx_GIVEREF(__pyx_v_bin);
-    __pyx_t_8 = __Pyx_PyString_Format(__pyx_kp_s_cb_d, __pyx_t_1); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_8 = __Pyx_PyString_Format(__pyx_kp_s_b_d, __pyx_t_1); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (unlikely(PyDict_SetItem(__pyx_v_chrom_bins, __pyx_v_i, __pyx_t_8) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -4766,7 +4766,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
  *         #Divide the short chromosomes into bins of ~12
  *         bins = list(np.digitize(range(len(binned)),range(0,len(binned),24)))
  *         for (i,name),bin in izip(binned,bins):             # <<<<<<<<<<<<<<
- *             chrom_bins[i] = "cb%d" % (bin,)
+ *             chrom_bins[i] = "b%d" % (bin,)
  *         return chrom_bins
  */
   }
@@ -4774,7 +4774,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_2__get_chrom_bins__(CYTHON_U
 
   /* "parabam/chaser.pyx":120
  *         for (i,name),bin in izip(binned,bins):
- *             chrom_bins[i] = "cb%d" % (bin,)
+ *             chrom_bins[i] = "b%d" % (bin,)
  *         return chrom_bins             # <<<<<<<<<<<<<<
  * 
  *     def __wait_for_tasks__(self,list active_tasks,int max_tasks):
@@ -14414,7 +14414,7 @@ static PyObject *__pyx_pw_7parabam_6chaser_11PrimaryTask_10__get_reference_id_na
  *     def __get_reference_id_name__(self,read,bins):
  *         class_bins = map(lambda x : bins[x],sorted((read.reference_id,read.next_reference_id,)))             # <<<<<<<<<<<<<<
  *         #reads on different chromosome
- *         return "MM%s-%s" % tuple(class_bins)
+ *         return "MM%sv%s" % tuple(class_bins)
  */
 
 /* Python wrapper */
@@ -14500,7 +14500,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_11PrimaryTask_9__get_reference_id_nam
  *     def __get_reference_id_name__(self,read,bins):
  *         class_bins = map(lambda x : bins[x],sorted((read.reference_id,read.next_reference_id,)))             # <<<<<<<<<<<<<<
  *         #reads on different chromosome
- *         return "MM%s-%s" % tuple(class_bins)
+ *         return "MM%sv%s" % tuple(class_bins)
  */
   __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_6chaser_11PrimaryTask_25__get_reference_id_name___lambda1, 0, __pyx_n_s_PrimaryTask___get_reference_id_n, ((PyObject*)__pyx_cur_scope), __pyx_n_s_parabam_chaser, __pyx_d, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 509; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -14536,14 +14536,14 @@ static PyObject *__pyx_pf_7parabam_6chaser_11PrimaryTask_9__get_reference_id_nam
   /* "parabam/chaser.pyx":511
  *         class_bins = map(lambda x : bins[x],sorted((read.reference_id,read.next_reference_id,)))
  *         #reads on different chromosome
- *         return "MM%s-%s" % tuple(class_bins)             # <<<<<<<<<<<<<<
+ *         return "MM%sv%s" % tuple(class_bins)             # <<<<<<<<<<<<<<
  * 
  *     def __get_loner_type__(self,read,bins):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2 = PySequence_Tuple(__pyx_v_class_bins); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyString_Format(__pyx_kp_s_MM_s_s, __pyx_t_2); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyString_Format(__pyx_kp_s_MM_sv_s, __pyx_t_2); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_5;
@@ -14576,7 +14576,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_11PrimaryTask_9__get_reference_id_nam
 }
 
 /* "parabam/chaser.pyx":513
- *         return "MM%s-%s" % tuple(class_bins)
+ *         return "MM%sv%s" % tuple(class_bins)
  * 
  *     def __get_loner_type__(self,read,bins):             # <<<<<<<<<<<<<<
  *         if not read.is_unmapped and not read.mate_is_unmapped:
@@ -14790,7 +14790,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_11PrimaryTask_11__get_loner_type__(CY
   }
 
   /* "parabam/chaser.pyx":513
- *         return "MM%s-%s" % tuple(class_bins)
+ *         return "MM%sv%s" % tuple(class_bins)
  * 
  *     def __get_loner_type__(self,read,bins):             # <<<<<<<<<<<<<<
  *         if not read.is_unmapped and not read.mate_is_unmapped:
@@ -20165,7 +20165,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_Handler___update_tasks, __pyx_k_Handler___update_tasks, sizeof(__pyx_k_Handler___update_tasks), 0, 0, 1, 1},
   {&__pyx_n_s_Handler___wait_for_tasks, __pyx_k_Handler___wait_for_tasks, sizeof(__pyx_k_Handler___wait_for_tasks), 0, 0, 1, 1},
   {&__pyx_n_s_KeyError, __pyx_k_KeyError, sizeof(__pyx_k_KeyError), 0, 0, 1, 1},
-  {&__pyx_kp_s_MM_s_s, __pyx_k_MM_s_s, sizeof(__pyx_k_MM_s_s), 0, 0, 1, 0},
+  {&__pyx_kp_s_MM_sv_s, __pyx_k_MM_sv_s, sizeof(__pyx_k_MM_sv_s), 0, 0, 1, 0},
   {&__pyx_n_s_MatchMakerPackage, __pyx_k_MatchMakerPackage, sizeof(__pyx_k_MatchMakerPackage), 0, 0, 1, 1},
   {&__pyx_n_s_MatchMakerPackage___init, __pyx_k_MatchMakerPackage___init, sizeof(__pyx_k_MatchMakerPackage___init), 0, 0, 1, 1},
   {&__pyx_n_s_MatchMakerTask, __pyx_k_MatchMakerTask, sizeof(__pyx_k_MatchMakerTask), 0, 0, 1, 1},
@@ -20209,12 +20209,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_all_paths, __pyx_k_all_paths, sizeof(__pyx_k_all_paths), 0, 0, 1, 1},
   {&__pyx_n_s_append, __pyx_k_append, sizeof(__pyx_k_append), 0, 0, 1, 1},
   {&__pyx_n_s_args, __pyx_k_args, sizeof(__pyx_k_args), 0, 0, 1, 1},
+  {&__pyx_kp_s_b_d, __pyx_k_b_d, sizeof(__pyx_k_b_d), 0, 0, 1, 0},
   {&__pyx_n_s_bam_iterator, __pyx_k_bam_iterator, sizeof(__pyx_k_bam_iterator), 0, 0, 1, 1},
   {&__pyx_n_s_bam_object, __pyx_k_bam_object, sizeof(__pyx_k_bam_object), 0, 0, 1, 1},
   {&__pyx_n_s_bin, __pyx_k_bin, sizeof(__pyx_k_bin), 0, 0, 1, 1},
   {&__pyx_n_s_binned, __pyx_k_binned, sizeof(__pyx_k_binned), 0, 0, 1, 1},
   {&__pyx_n_s_bins, __pyx_k_bins, sizeof(__pyx_k_bins), 0, 0, 1, 1},
-  {&__pyx_kp_s_cb_d, __pyx_k_cb_d, sizeof(__pyx_k_cb_d), 0, 0, 1, 0},
   {&__pyx_n_s_chaser_task, __pyx_k_chaser_task, sizeof(__pyx_k_chaser_task), 0, 0, 1, 1},
   {&__pyx_n_s_chaser_task_max, __pyx_k_chaser_task_max, sizeof(__pyx_k_chaser_task_max), 0, 0, 1, 1},
   {&__pyx_n_s_chaser_type, __pyx_k_chaser_type, sizeof(__pyx_k_chaser_type), 0, 0, 1, 1},
@@ -20232,7 +20232,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_count, __pyx_k_count, sizeof(__pyx_k_count), 0, 0, 1, 1},
   {&__pyx_n_s_count_limit, __pyx_k_count_limit, sizeof(__pyx_k_count_limit), 0, 0, 1, 1},
   {&__pyx_n_s_currently_active, __pyx_k_currently_active, sizeof(__pyx_k_currently_active), 0, 0, 1, 1},
-  {&__pyx_kp_s_cx_s, __pyx_k_cx_s, sizeof(__pyx_k_cx_s), 0, 0, 1, 0},
   {&__pyx_kp_s_d, __pyx_k_d, sizeof(__pyx_k_d), 0, 0, 1, 0},
   {&__pyx_kp_s_d_d_5f_Empty_d_Purgatory_d_Stal, __pyx_k_d_d_5f_Empty_d_Purgatory_d_Stal, sizeof(__pyx_k_d_d_5f_Empty_d_Purgatory_d_Stal), 0, 0, 1, 0},
   {&__pyx_n_s_dealt, __pyx_k_dealt, sizeof(__pyx_k_dealt), 0, 0, 1, 1},
@@ -20410,6 +20409,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_reversed, __pyx_k_reversed, sizeof(__pyx_k_reversed), 0, 0, 1, 1},
   {&__pyx_n_s_run, __pyx_k_run, sizeof(__pyx_k_run), 0, 0, 1, 1},
   {&__pyx_n_s_running, __pyx_k_running, sizeof(__pyx_k_running), 0, 0, 1, 1},
+  {&__pyx_kp_s_s, __pyx_k_s, sizeof(__pyx_k_s), 0, 0, 1, 0},
   {&__pyx_kp_s_s__d__d__s, __pyx_k_s__d__d__s, sizeof(__pyx_k_s__d__d__s), 0, 0, 1, 0},
   {&__pyx_kp_s_s_s__d__s_s_bam, __pyx_k_s_s__d__s_s_bam, sizeof(__pyx_k_s_s__d__s_s_bam), 0, 0, 1, 0},
   {&__pyx_n_s_sample, __pyx_k_sample, sizeof(__pyx_k_sample), 0, 0, 1, 1},
@@ -21007,7 +21007,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_codeobj__81 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__80, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_par, __pyx_n_s_get_reference_id_name, 508, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__81)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 508; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "parabam/chaser.pyx":513
- *         return "MM%s-%s" % tuple(class_bins)
+ *         return "MM%sv%s" % tuple(class_bins)
  * 
  *     def __get_loner_type__(self,read,bins):             # <<<<<<<<<<<<<<
  *         if not read.is_unmapped and not read.mate_is_unmapped:
@@ -22057,7 +22057,7 @@ PyMODINIT_FUNC PyInit_chaser(void)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "parabam/chaser.pyx":513
- *         return "MM%s-%s" % tuple(class_bins)
+ *         return "MM%sv%s" % tuple(class_bins)
  * 
  *     def __get_loner_type__(self,read,bins):             # <<<<<<<<<<<<<<
  *         if not read.is_unmapped and not read.mate_is_unmapped:

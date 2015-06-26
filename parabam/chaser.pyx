@@ -105,18 +105,18 @@ class Handler(parabam.core.Handler):
         unbinned = []
         binned = []
         for i,name,length in izip(xrange(len(references)),references,lengths):
-            if i > 1000000:
+            if length > 1000000:
                 unbinned.append( (i,name,) )
             else:
                 binned.append( (i,name,) )
 
         for i,name in unbinned:
-            chrom_bins[i] = "cx%s" % (name,)
+            chrom_bins[i] = "%s" % (name,)
 
         #Divide the short chromosomes into bins of ~12
         bins = list(np.digitize(range(len(binned)),range(0,len(binned),24)))
         for (i,name),bin in izip(binned,bins):
-            chrom_bins[i] = "cb%d" % (bin,)
+            chrom_bins[i] = "b%d" % (bin,)
         return chrom_bins
 
     def __wait_for_tasks__(self,list active_tasks,int max_tasks):
@@ -508,7 +508,7 @@ class PrimaryTask(ChaserClass):
     def __get_reference_id_name__(self,read,bins):
         class_bins = map(lambda x : bins[x],sorted((read.reference_id,read.next_reference_id,)))
         #reads on different chromosome
-        return "MM%s-%s" % tuple(class_bins)
+        return "MM%sv%s" % tuple(class_bins)
 
     def __get_loner_type__(self,read,bins):
         if not read.is_unmapped and not read.mate_is_unmapped:
