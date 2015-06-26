@@ -394,13 +394,12 @@ class Handler(parabam.core.Handler):
             return True,[],[]
 
         all_paths = []
-        idle_paths = []
-        levels = []
-
-        for sub_pyramid in pyramid:
-            all_paths.extend(sub_pyramid)
+        for level,sub_pyramid in enumerate(pyramid):
+            all_paths.extend(zip([level]*len(sub_pyramid),sub_pyramid))
 
         success = False
+        idle_paths = []
+        idle_levels = []
         if len(all_paths) > 1:
             path_n = random.randint(0,len(all_paths))
             if path_n < 2:
@@ -408,12 +407,14 @@ class Handler(parabam.core.Handler):
                 #2 paths means a depth heavy search
                 path_n = 2
 
-            idle_paths = random.sample(all_paths,path_n)
-            self.__start_matchmaker_task__(idle_paths,loner_type,levels[-1])
-            success = True
-            del all_paths
+            idle_tuples = random.sample(all_paths,path_n)
+            idle_levels,idle_paths = zip( *idle_tuples )
 
-        return success,idle_paths,levels
+            self.__start_matchmaker_task__(idle_paths,loner_type,max(idle_levels))
+            success = True
+            del all_paths,idle_tuples
+
+        return success,idle_paths,idle_levels
 
     def __get_task_size__(self,level,loner_type):
         if "UM" in loner_type and level == 0 and not self._destroy:
