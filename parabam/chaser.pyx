@@ -244,7 +244,7 @@ class Handler(parabam.core.Handler):
         running = len(self._tasks)
 
         if not self._destroy:
-            idle_threshold = 100
+            idle_threshold = 250
             required_paths = 10
         else:
             idle_threshold = 5
