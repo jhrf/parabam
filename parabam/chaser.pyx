@@ -86,9 +86,12 @@ class Handler(parabam.core.Handler):
                             "chrom_bins":self.__get_chrom_bins__(parent_bam) ,
                             "chaser_task":ChaserTask(parent_bam,self._constants)}
 
-        self._chaser_task_max = self._constants.total_procs #This is half of the user specified procs
-                                                  #as total procs are divided by two when we prepare
-                                                  #for pair processing
+        #This is half of the user specified procs
+        #as total procs are divided by two when we prepare
+        #for pair processing
+        self._chaser_task_max = self._constants.total_procs 
+        self._task_max_altered = False
+
         self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
 
@@ -290,6 +293,11 @@ class Handler(parabam.core.Handler):
         self.__test_primary_tasks__(required_paths=required_paths)
 
         if self._destroy:
+            if not self._task_max_altered:
+                self._chaser_task_max = self._chaser_task_max +\
+                                            (self._chaser_task_max//2)
+                self._task_max_altered = True
+
             if not self._rescued["total"] == self._prev_rescued:
                 self._stale_count = 0
             self._prev_rescued = self._rescued["total"]
@@ -409,7 +417,7 @@ class Handler(parabam.core.Handler):
 
     def __get_task_size__(self,level,loner_type):
         if "UM" in loner_type and level == 0 and not self._destroy:
-            task_size = 18
+            task_size = 30
         elif "UM" in loner_type and level == 1 and self._destroy:
             task_size = 7
         else:
