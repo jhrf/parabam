@@ -125,7 +125,6 @@ class Handler(parabam.core.Handler):
         cdef int currently_active = len(active_tasks)
         self._active_count = currently_active
 
-
         if max_tasks > currently_active:
             return
 
@@ -133,8 +132,9 @@ class Handler(parabam.core.Handler):
 
         if not self._destroy:
             for qu in self._pause_qus:
-                qu.put(True)
-
+                qu.put(1)
+                self.__wait_for_ack__(qu)
+                
         while(max_tasks <= currently_active and currently_active > 0):
             update_tasks(active_tasks)
             currently_active = len(active_tasks)
@@ -142,8 +142,15 @@ class Handler(parabam.core.Handler):
 
         if not self._destroy:
             for qu in self._pause_qus:
-                qu.put(False)
+                qu.put(0)
+                self.__wait_for_ack__(qu)
         return
+
+    def __wait_for_ack__(self,qu):
+        while True:
+            ack = qu.get()
+            if ack == 2:
+                return
 
     def __instalise_primary_store__(self):
         paths = []
@@ -247,7 +254,7 @@ class Handler(parabam.core.Handler):
             idle_threshold = 100
             required_paths = 10
         else:
-            idle_threshold = 5
+            idle_threshold = 25
             required_paths = 1
 
         pyramid_idle_counts = self._pyramid_idle_counts 
