@@ -92,7 +92,7 @@ class Handler(parabam.core.Handler):
         self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
 
-        self._max_reads = 7000000
+        self._max_reads = 5000000
 
     def __get_chrom_bins__(self,parent_bam):
         chrom_bins = {}
@@ -101,7 +101,7 @@ class Handler(parabam.core.Handler):
         lengths = parent_bam.lengths
         unbinned = []
         binned = []
-        for i,name,length in izip(xrange(references),references,lengths):
+        for i,name,length in izip(xrange(len(references)),references,lengths):
             if i > 1000000:
                 unbinned.append( (i,name,) )
             else:
@@ -244,7 +244,7 @@ class Handler(parabam.core.Handler):
             idle_threshold = 100
             required_paths = 10
         else:
-            idle_threshold = 20
+            idle_threshold = 5
             required_paths = 1
 
         pyramid_idle_counts = self._pyramid_idle_counts 
@@ -385,25 +385,28 @@ class Handler(parabam.core.Handler):
             #until after processing has finished
             return True,[],[]
 
+        all_paths = []
         idle_paths = []
         levels = []
-        if random.randint(0,1):
-            task_size = 3
-        else:
-            task_size = 2
-        for i,sub_pyramid in enumerate(pyramid):
-            for path in sub_pyramid:
-                idle_paths.append(path)
-                levels.append(i)
-                if len(idle_paths) == task_size:
-                    #maximum task_size reached
-                    break 
+
+        for sub_pyramid in pyramid:
+            all_paths.extend(sub_pyramid)
+
         success = False
-        if len(idle_paths) > 1:
+        if len(all_paths) > 1:
+            path_n = random.randint(0,len(all_paths))
+            if path_n < 2:
+                #This gives 3 chances to roll a 2
+                #2 paths means a depth heavy search
+                path_n = 2
+
+            idle_paths = random.sample(all_paths,path_n)
             self.__start_matchmaker_task__(idle_paths,loner_type,levels[-1])
             success = True
+            del all_paths
+
         return success,idle_paths,levels
-       
+
     def __get_task_size__(self,level,loner_type):
         if "UM" in loner_type and level == 0 and not self._destroy:
             task_size = 18
@@ -495,7 +498,7 @@ class PrimaryTask(ChaserClass):
         gc.collect()
 
     def __get_reference_id_name__(self,read,bins):
-        class_bins = map(lambda x : bins[x],sorted(read.reference_id,read.next_reference_id))
+        class_bins = map(lambda x : bins[x],sorted((read.reference_id,read.next_reference_id,)))
         #reads on different chromosome
         return "MM%s-%s" % tuple(class_bins)
 
@@ -503,15 +506,11 @@ class PrimaryTask(ChaserClass):
         if not read.is_unmapped and not read.mate_is_unmapped:
             return self.__get_reference_id_name__(read,bins)
         elif read.is_unmapped and read.mate_is_unmapped:
-            #both unmapped
+            #both unmapped 
             return "UU"
         else:
-            if read.is_unmapped:
-                relevant_reference = read.next_reference_id
-            else:
-                relevant_reference = read.reference_id
             #one unmapped read, one mapped read
-            return "UM%s" % (bins[relevant_reference],)
+            return "UM"
             
     def __get_loner_holder__(self):
         holder = {}
@@ -524,7 +523,7 @@ class PrimaryTask(ChaserClass):
     def __write_loner__(self,loner_objects,loner_file_counts,loner_type,read):
         try:
             loner_path = loner_objects[loner_type][-1].filename
-            if loner_file_counts[loner_path] == (self._max_reads-50000): #Ensure fewer reads than max
+            if loner_file_counts[loner_path] == ((self._max_reads / 2) - 1): #Ensure fewer reads than max
                 new_bam_object = self.__get_loner_object__(loner_type,len(loner_objects[loner_type]))
                 loner_objects[loner_type][-1].close()
                 
