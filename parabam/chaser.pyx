@@ -95,28 +95,30 @@ class Handler(parabam.core.Handler):
         self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
 
-        self._max_reads = 5000000
+        self._max_reads = 7000000
 
     def __get_chrom_bins__(self,parent_bam):
-        chrom_bins = {}
-
         references = parent_bam.references
         lengths = parent_bam.lengths
+
+        chrom_bins = {}
         unbinned = []
         binned = []
-        for i,name,length in izip(xrange(len(references)),references,lengths):
-            if length > 1000000:
-                unbinned.append( (i,name,) )
-            else:
-                binned.append( (i,name,) )
+        chrom_info = zip(xrange(len(references)),references,lengths)
+        chrom_info = sorted(chrom_info, key=lambda tup: tup[2])
+        group = []
+        size = 0
+        uid = 0
+        for i,name,length in chrom_info:
+           group.append( (i,name,length,) )
+           size += length
 
-        for i,name in unbinned:
-            chrom_bins[i] = "%s" % (name,)
-
-        #Divide the short chromosomes into bins of 50
-        bins = list(np.digitize(range(len(binned)),range(0,len(binned),50)))
-        for (i,name),bin in izip(binned,bins):
-            chrom_bins[i] = "b%d" % (bin,)
+           if size > 150000000:
+                for i,name,length in group:
+                    chrom_bins[i] = "b%d" % (uid,)
+                group = []
+                size = 0
+                uid += 1
         return chrom_bins
 
     def __wait_for_tasks__(self,list active_tasks,int max_tasks):
@@ -128,7 +130,7 @@ class Handler(parabam.core.Handler):
         if max_tasks > currently_active:
             return
 
-        max_tasks = 1 #wait for most of the task to finish
+        max_tasks = (max_tasks // 2) - 1 
 
         if not self._destroy:
             for qu in self._pause_qus:
@@ -333,11 +335,11 @@ class Handler(parabam.core.Handler):
             gc.collect()
 
         if iterations % 30 == 0:
-            sys.stdout.write("\r %d/%d=%.5f %.3fGB | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
+            sys.stdout.write("\r %d/%d=%.4f %.2fGB | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
                 (self._rescued["total"],
                 self._total_loners,
-                float((self._total_loners,self._rescued["total"]) * 130) / (10**9),
                 float(self._rescued["total"]+1)/(self._total_loners+1),
+                float((self._total_loners-self._rescued["total"]) * 130) / (10**9),
                 empty,
                 len(self._loner_purgatory),
                 self._stale_count,
@@ -434,16 +436,11 @@ class Handler(parabam.core.Handler):
             task_size = 50
         elif "UM" in loner_type and level == 1 and self._destroy:
             task_size = 7
-        elif "XX" in loner_type:
+        else:
             if level % 2 == 0:
                 task_size = 2
             else:
                 task_size = 3
-        else:
-            if level % 2 == 0:
-                task_size = 4
-            else:
-                task_size = 5
         return task_size
 
     def __handler_exit__(self,**kwargs):
@@ -525,12 +522,12 @@ class PrimaryTask(ChaserClass):
         gc.collect()
 
     def __get_reference_id_name__(self,read,bins):
-        loner_type = "MM"
         if read.reference_id == read.next_reference_id:
-            loner_type = "XX"
-        class_bins = map(lambda x : bins[x],sorted((read.reference_id,read.next_reference_id,)))
-        #reads on different chromosome
-        return loner_type + "%sv%s" % tuple(class_bins)
+            return "XX%dv%d" % (read.reference_id,read.next_reference_id)
+        else:
+            class_bins = map(lambda x : bins[x],sorted((read.reference_id,read.next_reference_id,)))
+            #reads on different chromosome
+            return "MM%sv%s" % tuple(class_bins)
 
     def __get_loner_type__(self,read,bins):
         if not read.is_unmapped and not read.mate_is_unmapped:
