@@ -367,20 +367,25 @@ class FileReader(Process):
                 break
         return
 
+    def __send_ack__(self,qu):
+        qu.put(2)
+        print "ACK SENT"
+        time.sleep(1)
+
     def __query_pause_qu__(self,bypass,pause_qu):
         try:
             if bypass:
                 pause = True
             else:
                 pause = pause_qu.get(False)
-                pause_qu.put(2) #Acknowledge
+                self.__send_ack__(pause_qu)
 
             if pause:
                 while True:
                     try:
                         pause = pause_qu.get(False)
                         if not pause:
-                            pause_qu.put(2) #Acknowledge
+                            self.__send_ack__(pause_qu)#Acknowledge
                             break
                     except Queue2.Empty:
                         time.sleep(.5)

@@ -113,8 +113,8 @@ class Handler(parabam.core.Handler):
         for i,name in unbinned:
             chrom_bins[i] = "%s" % (name,)
 
-        #Divide the short chromosomes into bins of ~12
-        bins = list(np.digitize(range(len(binned)),range(0,len(binned),24)))
+        #Divide the short chromosomes into bins of 50
+        bins = list(np.digitize(range(len(binned)),range(0,len(binned),50)))
         for (i,name),bin in izip(binned,bins):
             chrom_bins[i] = "b%d" % (bin,)
         return chrom_bins
@@ -128,7 +128,7 @@ class Handler(parabam.core.Handler):
         if max_tasks > currently_active:
             return
 
-        max_tasks = max_tasks/2
+        max_tasks = 1 #wait for most of the task to finish
 
         if not self._destroy:
             for qu in self._pause_qus:
@@ -148,10 +148,15 @@ class Handler(parabam.core.Handler):
 
     def __wait_for_ack__(self,qu):
         while True:
-            ack = qu.get()
-            if ack == 2:
-                return
-
+            try:
+                ack = qu.get(False)
+                if ack == 2:
+                    return
+                else:
+                    qu.put(ack)
+            except Queue2.Empty:
+                time.sleep(.2)
+           
     def __instalise_primary_store__(self):
         paths = []
         return paths
@@ -251,10 +256,10 @@ class Handler(parabam.core.Handler):
         running = len(self._tasks)
 
         if not self._destroy:
-            idle_threshold = 250
+            idle_threshold = 1000
             required_paths = 10
         else:
-            idle_threshold = 25
+            idle_threshold = 99
             required_paths = 1
 
         pyramid_idle_counts = self._pyramid_idle_counts 
@@ -310,7 +315,7 @@ class Handler(parabam.core.Handler):
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count == 500:
+            if (empty and running == 0) or self._stale_count == 750:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
@@ -328,9 +333,10 @@ class Handler(parabam.core.Handler):
             gc.collect()
 
         if iterations % 30 == 0:
-            sys.stdout.write("\r %d/%d=%.5f | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
+            sys.stdout.write("\r %d/%d=%.5f %.3fGB | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
                 (self._rescued["total"],
                 self._total_loners,
+                float((self._total_loners,self._rescued["total"]) * 130) / (10**9),
                 float(self._rescued["total"]+1)/(self._total_loners+1),
                 empty,
                 len(self._loner_purgatory),
@@ -425,14 +431,19 @@ class Handler(parabam.core.Handler):
 
     def __get_task_size__(self,level,loner_type):
         if "UM" in loner_type and level == 0 and not self._destroy:
-            task_size = 30
+            task_size = 50
         elif "UM" in loner_type and level == 1 and self._destroy:
             task_size = 7
-        else:
+        elif "XX" in loner_type:
             if level % 2 == 0:
                 task_size = 2
             else:
                 task_size = 3
+        else:
+            if level % 2 == 0:
+                task_size = 4
+            else:
+                task_size = 5
         return task_size
 
     def __handler_exit__(self,**kwargs):
@@ -514,9 +525,12 @@ class PrimaryTask(ChaserClass):
         gc.collect()
 
     def __get_reference_id_name__(self,read,bins):
+        loner_type = "MM"
+        if read.reference_id == read.next_reference_id:
+            loner_type = "XX"
         class_bins = map(lambda x : bins[x],sorted((read.reference_id,read.next_reference_id,)))
         #reads on different chromosome
-        return "MM%sv%s" % tuple(class_bins)
+        return loner_type + "%sv%s" % tuple(class_bins)
 
     def __get_loner_type__(self,read,bins):
         if not read.is_unmapped and not read.mate_is_unmapped:

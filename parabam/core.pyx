@@ -367,44 +367,31 @@ class FileReader(Process):
                 break
         return
 
-    def __query_pause_qu__(self,bypass,pause_qu):
-        try:
-            if bypass:
-                pause = True
-            else:
-                pause = pause_qu.get(False)
+    def __send_ack__(self,qu):
+        sys.stdout.flush()
+        qu.put(2)
 
-            if pause:
+    def __query_pause_qu__(self,pause_qu):
+        try:
+            pause = pause_qu.get(False)
+            self.__send_ack__(pause_qu)
+            time.sleep(1)
+
+            if pause == 1: #Pause signal received
                 while True:
                     try:
-                        pause = pause_qu.get(False)
-                        if not pause:
-                            break
+                        pause = pause_qu.get(False) 
+                        if pause == 0: #Unpause signal recieved
+                            self.__send_ack__(pause_qu)
+                            return
                     except Queue2.Empty:
                         time.sleep(.5)
         except Queue2.Empty:
             pass
 
-        #code is to fix a race condition when a
-        # pause can be missed due to 
-        #waiting on a previous pause
-        last = False 
-        while True:
-            try:
-                pause = pause_qu.get(False)
-                last = pause
-            except Queue2.Empty:
-                break
-        return last
-
     def __wait_for_pause__(self):
         pause_qu = self._pause_qu
-        pause = self.__query_pause_qu__(False,pause_qu)
-        if pause:
-            while True:
-                pause = self.__query_pause_qu__(True,pause_qu)
-                if not pause:
-                    break
+        self.__query_pause_qu__(pause_qu)
         
 class Leviathon(object):
     #Leviathon takes objects of file_readers and handlers and
