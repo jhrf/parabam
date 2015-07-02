@@ -148,6 +148,7 @@ class Handler(parabam.core.Handler):
         return
 
     def __wait_for_ack__(self,qu):
+        count = 0
         while True:
             try:
                 ack = qu.get(False)
@@ -156,7 +157,11 @@ class Handler(parabam.core.Handler):
                 else:
                     qu.put(ack)
             except Queue2.Empty:
-                time.sleep(.2)
+                if count > 20:
+                    return
+                else:
+                    count += 1
+                time.sleep(1)
            
     def __instalise_primary_store__(self):
         paths = []
@@ -257,10 +262,10 @@ class Handler(parabam.core.Handler):
         running = len(self._tasks)
 
         if not self._destroy:
-            idle_threshold = 750
+            idle_threshold = 500
             required_paths = 10
         else:
-            idle_threshold = 99
+            idle_threshold = 75
             required_paths = 1
 
         pyramid_idle_counts = self._pyramid_idle_counts 
@@ -312,7 +317,7 @@ class Handler(parabam.core.Handler):
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count == 1000:
+            if (empty and running == 0) or self._stale_count == 500:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
@@ -329,17 +334,17 @@ class Handler(parabam.core.Handler):
         if iterations % 10 == 0:
             gc.collect()
 
-        if iterations % 30 == 0:
-            sys.stdout.write("\r %d/%d=%.4f %.2fGB | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
-                (self._rescued["total"],
-                self._total_loners,
-                float(self._rescued["total"]+1)/(self._total_loners+1),
-                float((self._total_loners-self._rescued["total"]) * 130) / (10**9),
-                empty,
-                len(self._loner_purgatory),
-                self._stale_count,
-                len(self._tasks)))
-            sys.stdout.flush()
+        #if iterations % 30 == 0:
+        #    sys.stdout.write("\r %d/%d=%.4f %.2fGB | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
+        #        (self._rescued["total"],
+        #        self._total_loners,
+        #        float(self._rescued["total"]+1)/(self._total_loners+1),
+        #        float((self._total_loners-self._rescued["total"]) * 130) / (10**9),
+        #        empty,
+        #        len(self._loner_purgatory),
+        #        self._stale_count,
+        #        len(self._tasks)))
+        #    sys.stdout.flush()
 
     def __is_queue_empty__(self):
         try:
