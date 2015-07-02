@@ -90,7 +90,6 @@ class Handler(parabam.core.Handler):
         #as total procs are divided by two when we prepare
         #for pair processing
         self._chaser_task_max = self._constants.total_procs 
-        self._task_max_altered = False
 
         self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
@@ -258,7 +257,7 @@ class Handler(parabam.core.Handler):
         running = len(self._tasks)
 
         if not self._destroy:
-            idle_threshold = 1000
+            idle_threshold = 750
             required_paths = 10
         else:
             idle_threshold = 99
@@ -307,17 +306,13 @@ class Handler(parabam.core.Handler):
         self.__test_primary_tasks__(required_paths=required_paths)
 
         if self._destroy:
-            if not self._task_max_altered:
-                self._chaser_task_max = self._chaser_task_max +\
-                                            (self._chaser_task_max//2)
-                self._task_max_altered = True
 
             if not self._rescued["total"] == self._prev_rescued:
                 self._stale_count = 0
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count == 750:
+            if (empty and running == 0) or self._stale_count == 1000:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
@@ -370,14 +365,15 @@ class Handler(parabam.core.Handler):
         return saved
 
     def __get_paths__(self,loner_type,sub_pyramid,level):
+        if not self._destroy and "UM" in loner_type:
+            return []
         task_size = self.__get_task_size__(level,loner_type)
-        paths = []
         if len(sub_pyramid) >= task_size:
-            for path in sub_pyramid:
-                paths.append(path)
-                if len(paths) == task_size:
-                    break
-        return paths
+            if "XX" in loner_type:
+                return sub_pyramid[:task_size]
+            else:
+                return random.sample(sub_pyramid,task_size)
+        return []
     
     def __tidy_pyramid__(self):
         for loner_type,pyramid in self._loner_pyramid.items():
@@ -432,15 +428,10 @@ class Handler(parabam.core.Handler):
         return success,idle_paths,idle_levels
 
     def __get_task_size__(self,level,loner_type):
-        if "UM" in loner_type and level == 0 and not self._destroy:
-            task_size = 50
-        elif "UM" in loner_type and level == 1 and self._destroy:
-            task_size = 7
+        if level % 2 == 0:
+            task_size = 2
         else:
-            if level % 2 == 0:
-                task_size = 2
-            else:
-                task_size = 3
+            task_size = 3
         return task_size
 
     def __handler_exit__(self,**kwargs):

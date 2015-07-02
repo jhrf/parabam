@@ -1724,6 +1724,7 @@ static PyObject *__pyx_int_2;
 static PyObject *__pyx_int_3;
 static PyObject *__pyx_int_4;
 static PyObject *__pyx_int_5;
+static PyObject *__pyx_int_8;
 static PyObject *__pyx_int_10;
 static PyObject *__pyx_int_250000;
 static PyObject *__pyx_int_neg_1;
@@ -9510,7 +9511,7 @@ static PyObject *__pyx_pf_7parabam_4core_10FileReader_14__query_pause_qu__(CYTHO
  *                         pause = pause_qu.get(False)
  *                         if pause == 0: #Unpause signal recieved             # <<<<<<<<<<<<<<
  *                             self.__send_ack__(pause_qu)
- *                             time.sleep(5)
+ *                             time.sleep(8)
  */
               __pyx_t_4 = PyObject_RichCompare(__pyx_v_pause, __pyx_int_0, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
               __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
@@ -9521,7 +9522,7 @@ static PyObject *__pyx_pf_7parabam_4core_10FileReader_14__query_pause_qu__(CYTHO
  *                         pause = pause_qu.get(False)
  *                         if pause == 0: #Unpause signal recieved
  *                             self.__send_ack__(pause_qu)             # <<<<<<<<<<<<<<
- *                             time.sleep(5)
+ *                             time.sleep(8)
  *                             return
  */
                 __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_send_ack); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
@@ -9556,7 +9557,7 @@ static PyObject *__pyx_pf_7parabam_4core_10FileReader_14__query_pause_qu__(CYTHO
                 /* "parabam/core.pyx":386
  *                         if pause == 0: #Unpause signal recieved
  *                             self.__send_ack__(pause_qu)
- *                             time.sleep(5)             # <<<<<<<<<<<<<<
+ *                             time.sleep(8)             # <<<<<<<<<<<<<<
  *                             return
  *                     except Queue2.Empty:
  */
@@ -9572,7 +9573,7 @@ static PyObject *__pyx_pf_7parabam_4core_10FileReader_14__query_pause_qu__(CYTHO
 
                 /* "parabam/core.pyx":387
  *                             self.__send_ack__(pause_qu)
- *                             time.sleep(5)
+ *                             time.sleep(8)
  *                             return             # <<<<<<<<<<<<<<
  *                     except Queue2.Empty:
  *                         time.sleep(.5)
@@ -9593,7 +9594,7 @@ static PyObject *__pyx_pf_7parabam_4core_10FileReader_14__query_pause_qu__(CYTHO
             __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
             /* "parabam/core.pyx":388
- *                             time.sleep(5)
+ *                             time.sleep(8)
  *                             return
  *                     except Queue2.Empty:             # <<<<<<<<<<<<<<
  *                         time.sleep(.5)
@@ -18763,11 +18764,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "parabam/core.pyx":386
  *                         if pause == 0: #Unpause signal recieved
  *                             self.__send_ack__(pause_qu)
- *                             time.sleep(5)             # <<<<<<<<<<<<<<
+ *                             time.sleep(8)             # <<<<<<<<<<<<<<
  *                             return
  *                     except Queue2.Empty:
  */
-  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_int_5); if (unlikely(!__pyx_tuple__17)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_int_8); if (unlikely(!__pyx_tuple__17)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__17);
   __Pyx_GIVEREF(__pyx_tuple__17);
 
@@ -19465,6 +19466,7 @@ static int __Pyx_InitGlobals(void) {
   __pyx_int_3 = PyInt_FromLong(3); if (unlikely(!__pyx_int_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_4 = PyInt_FromLong(4); if (unlikely(!__pyx_int_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_5 = PyInt_FromLong(5); if (unlikely(!__pyx_int_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_int_8 = PyInt_FromLong(8); if (unlikely(!__pyx_int_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_10 = PyInt_FromLong(10); if (unlikely(!__pyx_int_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_250000 = PyInt_FromLong(250000L); if (unlikely(!__pyx_int_250000)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_neg_1 = PyInt_FromLong(-1); if (unlikely(!__pyx_int_neg_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
