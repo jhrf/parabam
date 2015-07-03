@@ -259,6 +259,7 @@ class Handler(parabam.core.Handler):
 
     def __periodic_action__(self,iterations):
         running = len(self._tasks)
+        chaser_debug = False
 
         if not self._destroy:
             idle_threshold = 500
@@ -332,7 +333,7 @@ class Handler(parabam.core.Handler):
         if iterations % 10 == 0:
             gc.collect()
 
-        if iterations % 30 == 0:
+        if chaser_debug and iterations % 30 == 0:
             sys.stdout.write("\r %d/%d=%.4f %.2fGB | Proc:%d Des:%d Emp:%d Purg:%d Stale:%d Task:%d "  %\
                 (self._rescued["total"],
                 self._total_loners,
