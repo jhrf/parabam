@@ -150,6 +150,8 @@ class Handler(parabam.core.Handler):
     def __wait_for_ack__(self,qu):
         count = 0
         while True:
+            if count > 20:
+                return
             try:
                 ack = qu.get(False)
                 if ack == 2:
@@ -157,11 +159,8 @@ class Handler(parabam.core.Handler):
                 else:
                     qu.put(ack)
             except Queue2.Empty:
-                if count > 20:
-                    return
-                else:
-                    count += 1
                 time.sleep(1)
+            count += 1
            
     def __instalise_primary_store__(self):
         paths = []
@@ -311,13 +310,12 @@ class Handler(parabam.core.Handler):
         self.__test_primary_tasks__(required_paths=required_paths)
 
         if self._destroy:
-
             if not self._rescued["total"] == self._prev_rescued:
                 self._stale_count = 0
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count == 500:
+            if (empty and running == 0) or self._stale_count > 100:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
@@ -334,17 +332,19 @@ class Handler(parabam.core.Handler):
         if iterations % 10 == 0:
             gc.collect()
 
-        #if iterations % 30 == 0:
-        #    sys.stdout.write("\r %d/%d=%.4f %.2fGB | Empty:%d Purgatory:%d Stale:%d Tasks:%d "  %\
-        #        (self._rescued["total"],
-        #        self._total_loners,
-        #        float(self._rescued["total"]+1)/(self._total_loners+1),
-        #        float((self._total_loners-self._rescued["total"]) * 130) / (10**9),
-        #        empty,
-        #        len(self._loner_purgatory),
-        #        self._stale_count,
-        #        len(self._tasks)))
-        #    sys.stdout.flush()
+        if iterations % 30 == 0:
+            sys.stdout.write("\r %d/%d=%.4f %.2fGB | Proc:%d Des:%d Emp:%d Purg:%d Stale:%d Task:%d "  %\
+                (self._rescued["total"],
+                self._total_loners,
+                float(self._rescued["total"]+1)/(self._total_loners+1),
+                float((self._total_loners-self._rescued["total"]) * 130) / (10**9),
+                self._processing,
+                self._destroy,
+                empty,
+                len(self._loner_purgatory),
+                self._stale_count,
+                len(self._tasks)))
+            sys.stdout.flush()
 
     def __is_queue_empty__(self):
         try:
@@ -429,6 +429,8 @@ class Handler(parabam.core.Handler):
             self.__start_matchmaker_task__(idle_paths,loner_type,max(idle_levels))
             success = True
             del all_paths,idle_tuples
+        elif len(all_paths) == 1:
+            idle_levels,idle_paths = zip(*all_paths)
 
         return success,idle_paths,idle_levels
 
