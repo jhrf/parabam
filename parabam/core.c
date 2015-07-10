@@ -1353,13 +1353,13 @@ static char __pyx_k_Leviathon___get_file_readers[] = "Leviathon.__get_file_reade
 static char __pyx_k_ParentAlignmentFile_getrname[] = "ParentAlignmentFile.getrname";
 static char __pyx_k_Task___handle_stop_iteration[] = "Task.__handle_stop_iteration__";
 static char __pyx_k_Leviathon___proc_id_generator[] = "Leviathon.__proc_id_generator__";
-static char __pyx_k_The_maximum_amount_of_processes[] = "The maximum amount of processes you wish parabam to use.\nThis should be less than or equal to the amount of processor\ncores in your machine.";
+static char __pyx_k_The_maximum_amount_of_processes[] = "The maximum amount of processes you wish parabam to use.\nThis should be less than or equal to the amount of processor\ncores in your machine [Default: 4].";
 static char __pyx_k_Users_farmer01_proj_parabam_par[] = "/Users/farmer01/proj/parabam/parabam/core.pyx";
 static char __pyx_k_s_is_not_indexed_Sorting_and_cr[] = "%s is not indexed. Sorting and creating index file.";
 static char __pyx_k_Interface___get_unique_temp_path[] = "Interface.__get_unique_temp_path__";
 static char __pyx_k_Leviathon___get_file_reader_bund[] = "Leviathon.__get_file_reader_bundles__";
-static char __pyx_k_The_amount_of_open_connections_t[] = "The amount of open connections to the file being read.\nConventional hard drives perform best with the default of 2";
-static char __pyx_k_The_amount_of_reads_considered_b[] = "The amount of reads considered by each distributed task.";
+static char __pyx_k_The_amount_of_open_connections_t[] = "The amount of open connections to the file being read.\nConventional hard drives perform best with the default of 2. [Default: 2]";
+static char __pyx_k_The_amount_of_reads_considered_b[] = "The amount of reads considered by each distributed task. [Default: 250000]";
 static PyObject *__pyx_kp_s_;
 static PyObject *__pyx_n_s_ABCMeta;
 static PyObject *__pyx_n_s_AlignmentFile;
@@ -15664,9 +15664,9 @@ static PyObject *__pyx_pf_7parabam_4core_9Interface_15default_parser(CYTHON_UNUS
 
   /* "parabam/core.pyx":593
  *                   "This should be less than or equal to the amount of processor\n"\
- *                   "cores in your machine.")
+ *                   "cores in your machine [Default: 4].")
  *         parser.add_argument('-s',type=int,nargs='?',default=250000             # <<<<<<<<<<<<<<
- *             ,help="The amount of reads considered by each distributed task.")
+ *             ,help="The amount of reads considered by each distributed task. [Default: 250000]")
  *         parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_parser, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -15685,10 +15685,10 @@ static PyObject *__pyx_pf_7parabam_4core_9Interface_15default_parser(CYTHON_UNUS
 
   /* "parabam/core.pyx":595
  *         parser.add_argument('-s',type=int,nargs='?',default=250000
- *             ,help="The amount of reads considered by each distributed task.")
+ *             ,help="The amount of reads considered by each distributed task. [Default: 250000]")
  *         parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2             # <<<<<<<<<<<<<<
  *             ,help="The amount of open connections to the file being read.\n"\
- *             "Conventional hard drives perform best with the default of 2")
+ *             "Conventional hard drives perform best with the default of 2. [Default: 2]")
  */
   __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_parser, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 595; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
@@ -15707,7 +15707,7 @@ static PyObject *__pyx_pf_7parabam_4core_9Interface_15default_parser(CYTHON_UNUS
 
   /* "parabam/core.pyx":598
  *             ,help="The amount of open connections to the file being read.\n"\
- *             "Conventional hard drives perform best with the default of 2")
+ *             "Conventional hard drives perform best with the default of 2. [Default: 2]")
  *         return parser             # <<<<<<<<<<<<<<
  * 
  *     @abstractmethod
@@ -18829,9 +18829,9 @@ static int __Pyx_InitCachedConstants(void) {
 
   /* "parabam/core.pyx":593
  *                   "This should be less than or equal to the amount of processor\n"\
- *                   "cores in your machine.")
+ *                   "cores in your machine [Default: 4].")
  *         parser.add_argument('-s',type=int,nargs='?',default=250000             # <<<<<<<<<<<<<<
- *             ,help="The amount of reads considered by each distributed task.")
+ *             ,help="The amount of reads considered by each distributed task. [Default: 250000]")
  *         parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2
  */
   __pyx_tuple__26 = PyTuple_Pack(1, __pyx_kp_s_s); if (unlikely(!__pyx_tuple__26)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 593; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -18840,10 +18840,10 @@ static int __Pyx_InitCachedConstants(void) {
 
   /* "parabam/core.pyx":595
  *         parser.add_argument('-s',type=int,nargs='?',default=250000
- *             ,help="The amount of reads considered by each distributed task.")
+ *             ,help="The amount of reads considered by each distributed task. [Default: 250000]")
  *         parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2             # <<<<<<<<<<<<<<
  *             ,help="The amount of open connections to the file being read.\n"\
- *             "Conventional hard drives perform best with the default of 2")
+ *             "Conventional hard drives perform best with the default of 2. [Default: 2]")
  */
   __pyx_tuple__27 = PyTuple_Pack(1, __pyx_kp_s_f); if (unlikely(!__pyx_tuple__27)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 595; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__27);
