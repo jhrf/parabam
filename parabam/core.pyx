@@ -368,10 +368,10 @@ class FileReader(Process):
         return
 
     def __send_ack__(self,qu):
-        sys.stdout.flush()
         qu.put(2)
 
-    def __query_pause_qu__(self,pause_qu):
+    def __wait_for_pause__(self):
+        pause_qu = self._pause_qu
         try:
             pause = pause_qu.get(False)
             self.__send_ack__(pause_qu)
@@ -389,10 +389,6 @@ class FileReader(Process):
                         time.sleep(.5)
         except Queue2.Empty:
             pass
-
-    def __wait_for_pause__(self):
-        pause_qu = self._pause_qu
-        self.__query_pause_qu__(pause_qu)
         
 class Leviathon(object):
     #Leviathon takes objects of file_readers and handlers and
