@@ -11,23 +11,28 @@ import Queue as Queue2
 import numpy as np
 
 from itertools import izip
-from collections import Counter
+from collections import Counter,namedtuple
 from multiprocessing import Queue,Process
 
-class ChaserPackage(parabam.core.Package):
+class ChaserResults(parabam.core.Package):
     def __init__(self,results,chaser_type):
-        super(ChaserPackage,self).__init__(results)
+        super(ChaserResults,self).__init__(results)
         self.chaser_type=chaser_type
 
-class OriginPackage(ChaserPackage):
-    def __init__(self,results,chaser_type):
-        super(OriginPackage,self).__init__(results,chaser_type)
+class PrimaryResults(ChaserResults):
+    super(PrimaryResults,self).__init__(results,chaser_type)
 
-class MatchMakerPackage(ChaserPackage):
+class MatchMakerResults(ChaserResults):
     def __init__(self,loner_type,results,chaser_type,rescued,level):
-        super(MatchMakerPackage,self).__init__(results,chaser_type)
+        super(MatchMakerResults,self).__init__(results,chaser_type)
         self.rescued = rescued
         self.loner_type = loner_type
+        self.level = level
+
+class JobPackage(object):
+    def __init__(self,paths,loner_type,level):
+        self.paths = paths
+        self.loner_type = loner_type 
         self.level = level
 
 class Handler(parabam.core.Handler):
@@ -452,32 +457,69 @@ class Handler(parabam.core.Handler):
         for qu in self._pause_qus:
             qu.close()
 
-class ChaserClass(Process):
-    def __init__(self,object constants):
+
+class ChaserProcess(Process):
+    def __init__(self,object constants,object inqu, object outqu, 
+                      int max_reads, dict child_pack,object parent_bam):
         super(ChaserClass,self).__init__()
         self._constants = constants
+        self._inqu = inqu
+        self._outqu = outqu
+        self._child_pack = child_pack
+        self._max_reads = max_reads
+
+    def run(self):
+        primary_handler = PrimaryHandler(constants = self._constants,
+                                         outqu = self._outqu,
+                                         max_reads = self._max_reads,
+                                         child_pack = self._child_pack,
+                                         parent_bam = self._parent_bam)
+
+        match_handler = MatchMakerHandler
+
+        while True:
+            try:
+                package = self._inqu.get(False)
+                if type(package) == JobPackage:
+                    if package.level == -1:
+                        results = primary_handler.run(package.paths)
+                    else:
+                        results = match_handler.run(package.paths,
+                                          package.loner_type,
+                                          package.level)
+                self._outqu.put(results)
+
+                elif type(package) == DestroyPackage:
+                    break
+                
+                self._dealt += 1
+                time.sleep(0.005)
+
+            except Queue2.Empty:
+                time.sleep(5)
+        return
+
+class ChaserHandler(object):
+    __metaclass__ = ABCMeta
+
+    def __init__(self,object constants,int max_reads, dict child_pack,object parent_bam):
+        self._constants = constants
+        self._max_reads = max_reads
+        self._child_pack = child_pack
+        self._header = parent_bam.header
 
     def __get_loner_temp_path__(self,loner_type,level=0,unique=""):
         return "%s/%s_%d_%s%s.bam" %\
             (self._constants.temp_dir,self.pid,level,loner_type,unique)
 
-class PrimaryTask(ChaserClass):
+class PrimaryHandler(ChaserHandler):
 
-    def __init__(self,object unsorted_paths,object outqu,object constants, int max_reads, dict child_pack):
-        super(PrimaryTask,self).__init__(constants)
+    def __init__(self,object constants,int max_reads, dict child_pack,object parent_bam):
+        super(PrimaryHandler,self).__init__(constants,outqu,max_reads,child_pack,parent_bam)
         
-        self._unsorted_paths = unsorted_paths
-        self._outqu = outqu
-        self._child_pack = child_pack
-
-        unsorted_object = pysam.AlignmentFile(unsorted_paths[0],"rb")
-        self._references = unsorted_object.references
-        self._header = unsorted_object.header
-        unsorted_object.close()
-
-        self._max_reads = max_reads
-
-    def run(self):
+        self.match_handler = MatchMakerHandler(constants,outqu,max_reads,child_pack,parent_bam)
+        
+    def run(self,unsorted_paths):
         #speedup
         write_loner = self.__write_loner__
         #speedup
@@ -489,7 +531,7 @@ class PrimaryTask(ChaserClass):
 
         chrom_bins = self._child_pack["chrom_bins"]
 
-        for read in self.__read_generator__():
+        for read in self.__read_generator__(unsorted_paths):
             
             loner_type = self.__get_loner_type__(read,chrom_bins)
             loner_total += 1
@@ -497,22 +539,19 @@ class PrimaryTask(ChaserClass):
 
         loner_paths = self.__get_paths_and_close__(loner_holder)
 
+        match_maker_results = []
         for loner_type,paths in loner_paths.items():
             for path in paths:
-                self.__start_matchmaker_task__([path],loner_type,-1) 
+                match_maker_results.append(self.__start_matchmaker_task__([path],loner_type,-1))
 
         del loner_paths,loner_file_counts,loner_holder
+        return PrimaryResults(match_maker_results,"primary")
 
     def __start_matchmaker_task__(self,paths,loner_type,level):
-        new_task = MatchMakerTask(paths,self._outqu,self._constants,
-                                  loner_type,level,self._max_reads,
-                                  self._child_pack)
-        new_task.start()
-        new_task.join()
-        time.sleep(1)
-
-    def __read_generator__(self):
-        for path in self._unsorted_paths:
+        return self.match_handler(paths,loner_type,level)
+        
+    def __read_generator__(self,unsorted_paths):
+        for path in unsorted_paths:
             loner_object = pysam.AlignmentFile(path,"rb")
             for read in loner_object.fetch(until_eof=True):
                 yield read
@@ -571,34 +610,28 @@ class PrimaryTask(ChaserClass):
             loner_object.close()#This close prevents too many open files
         return paths
 
-class MatchMakerTask(ChaserClass):
+class MatchMakerHandler(ChaserHandler):
 
-    def __init__(self,object loner_paths,object outqu,object constants,
-        str loner_type,int level,int max_reads,object child_pack):
+    def __init__(self,object constants,int max_reads, dict child_pack,object parent_bam):
+        super(MatchMakerHandler,self).__init__(constants,outqu,max_reads,child_pack,parent_bam)
+        self.LonerInfo = namedtuple("LonerInfo","paths level loner_type")
 
-        super(MatchMakerTask,self).__init__(constants)
+    def run(self,loner_paths,loner_type,level):
+
+        loner_info = self.LonerInfo(loner_paths,level,loner_type)
         
-        self._max_reads = max_reads
-        self._child_pack = child_pack
-        self._loner_paths = loner_paths
-        self._outqu = outqu
-        self._loner_type = loner_type
-        self._level = level
-        self._header = self.__get_header__(self._loner_paths[0])
-        self._leftover_paths = []
-
-    def run(self):
-
-        loner_path = self.__get_loner_temp_path__(self._loner_type,self._level+1)
+        loner_path = self.__get_loner_temp_path__(loner_info.loner_type,loner_info.level+1)
         loner_object = self.__get_loner_object__(loner_path)
 
-        cdef dict pairs = self.__first_pass__()
+        cdef dict pairs = self.__first_pass__(loner_info)
         cdef dict read_pairs = {}
         cdef dict send_pairs = {}
         cdef int rescued = 0
         cdef int written = 0
+        cdef list leftover_paths = []
 
-        for read in self.__read_generator__(second_pass=True):
+        for read in self.__read_generator__(loner_info,second_pass=True,
+                                            leftover_paths=leftover_paths):
             try:
                 status = pairs[read.qname]
                 try:
@@ -635,25 +668,20 @@ class MatchMakerTask(ChaserClass):
         if written == 0:
             os.remove(loner_path)
         else:
-            return_paths.append((self._level+1,loner_path))
+            return_paths.append((loner_info.level+1,loner_path))
 
-        if len(self._leftover_paths) > 0:
-            for leftover_path in self._leftover_paths:
-                return_paths.append((self._level,leftover_path))
+        if len(leftover_paths) > 0:
+            for leftover_path in leftover_paths:
+                return_paths.append((loner_info.level,leftover_path))
 
-        loner_pack = MatchMakerPackage(loner_type=self._loner_type,results=return_paths,level=self._level+1,
-                                       chaser_type="match_maker",rescued=rescued)
-        self._outqu.put(loner_pack)
+        loner_pack = MatchMakerResults(loner_type=loner_info.loner_type,results=return_paths,
+                                       level=loner_info.level+1,chaser_type="match_maker",
+                                       rescued=rescued)
+        return loner_pack
 
-    def __get_header__(self,path):
-        bam_object = pysam.AlignmentFile(path,"rb")
-        header = bam_object.header
-        bam_object.close()
-        return header
-
-    def __first_pass__(self):
+    def __first_pass__(self,loner_info):
         cdef dict pairs = {}
-        for read in self.__read_generator__(second_pass=False):
+        for read in self.__read_generator__(loner_info):
             try:
                 status = pairs[read.qname]
                 pairs[read.qname] = True
@@ -664,10 +692,10 @@ class MatchMakerTask(ChaserClass):
     def __prepare_for_second_pass__(self,pairs):
         return dict(filter( lambda tup : tup[1], iter(pairs.items()) ))
 
-    def __read_generator__(self,second_pass=False):
-        count = self._max_reads // len(self._loner_paths)
+    def __read_generator__(self,loner_info,second_pass=False,leftover_paths=None):
+        count = self._max_reads // len(loner_info.paths)
         count_limit = False
-        for path in self._loner_paths:
+        for path in loner_info.paths:
             loner_object = pysam.AlignmentFile(path,"rb")
             bam_iterator = loner_object.fetch(until_eof=True)
            
@@ -681,14 +709,14 @@ class MatchMakerTask(ChaserClass):
                 if count_limit:
                     count_limit = False
                     leftover_count = 0
-                    leftover_object = self.__get_leftover_object__(len(self._leftover_paths))
+                    leftover_object = self.__get_leftover_object__(loner_info,len(leftover_paths))
                     for read in bam_iterator:
                         leftover_count += 1
                         leftover_object.write(read)
                     leftover_object.close()
                     
                     if leftover_count > 0:
-                        self._leftover_paths.append(leftover_object.filename)
+                        leftover_paths.append(leftover_object.filename)
                     else:
                         os.remove(leftover_object.filename)
                 os.remove(path)
@@ -701,8 +729,8 @@ class MatchMakerTask(ChaserClass):
         child_pack["queue"].put(parabam.core.Package(results=results))
         return len(pairs)
 
-    def __get_leftover_object__(self,unique):
-        path = self.__get_loner_temp_path__(self._loner_type,self._level,"-%d" % (unique,))
+    def __get_leftover_object__(self,loner_info,unique):
+        path = self.__get_loner_temp_path__(loner_info.loner_type,loner_info.level,"-%d" % (unique,))
         leftover = pysam.AlignmentFile(path,"wb",header=self._header)
         return leftover
 
