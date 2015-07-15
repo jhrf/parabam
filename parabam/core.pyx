@@ -375,7 +375,7 @@ class FileReader(Process):
         try:
             pause = pause_qu.get(False)
             self.__send_ack__(pause_qu)
-            time.sleep(1)
+            time.sleep(2)
 
             if pause == 1: #Pause signal received
                 while True:
@@ -383,7 +383,6 @@ class FileReader(Process):
                         pause = pause_qu.get(False) 
                         if pause == 0: #Unpause signal recieved
                             self.__send_ack__(pause_qu)
-                            time.sleep(8)
                             return
                     except Queue2.Empty:
                         time.sleep(.5)

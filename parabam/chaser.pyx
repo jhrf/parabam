@@ -10,6 +10,7 @@ import random
 import Queue as Queue2
 import numpy as np
 
+from parabam.core import DestroyPackage
 from itertools import izip
 from collections import Counter,namedtuple
 from multiprocessing import Queue,Process
@@ -20,7 +21,8 @@ class ChaserResults(parabam.core.Package):
         self.chaser_type=chaser_type
 
 class PrimaryResults(ChaserResults):
-    super(PrimaryResults,self).__init__(results,chaser_type)
+    def __init__(self,results,chaser_type):
+        super(PrimaryResults,self).__init__(results,chaser_type)
 
 class MatchMakerResults(ChaserResults):
     def __init__(self,loner_type,results,chaser_type,rescued,level):
@@ -45,9 +47,9 @@ class Handler(parabam.core.Handler):
                              inqu=inqu,constants=constants,pause_qus=pause_qus,
                              out_qu_dict=out_qu_dict,report = False)
         
-        class ChaserTask(Task):
+        class EngineTask(Task):
             def __init__(self,parent_bam,constants):
-                super(ChaserTask,self).__init__(parent_bam=parent_bam,
+                super(EngineTask,self).__init__(parent_bam=parent_bam,
                                                     inqu=None,
                                                     outqu=None,
                                                     task_size=0,
@@ -89,25 +91,32 @@ class Handler(parabam.core.Handler):
         self._child_pack = {"parent_bam":parent_bam,
                             "queue":out_qu_dict["main"],
                             "chrom_bins":self.__get_chrom_bins__(parent_bam) ,
-                            "chaser_task":ChaserTask(parent_bam,self._constants)}
+                            "chaser_task":EngineTask(parent_bam,self._constants)}
 
-        #This is half of the user specified procs
-        #as total procs are divided by two when we prepare
-        #for pair processing
-        self._chaser_task_max = self._constants.total_procs 
+        self._chaser_qu = Queue()
+        self._chaser_tasks = self.__get_chaser_tasks__(self._constants.total_procs,self._child_pack )
+        self._pending_jobs = 0
+        self._file_readers_paused = False
 
-        self._tasks = []
         self._primary_store = self.__instalise_primary_store__()
 
-        self._max_reads = 7000000
+    def __create_chaser_tasks__(self,total_tasks,child_pack):
+        tasks = []
+        for i in xrange(total_tasks):
+            task = ChaserTask(constants=self._constants,
+                              inqu=self._chaser_qu,
+                              outqu=self._inqu,
+                              max_reads=7000000,
+                              child_pack=self._constants)
+            task.start()
+            tasks.append(task)
+        return tasks
 
     def __get_chrom_bins__(self,parent_bam):
         references = parent_bam.references
         lengths = parent_bam.lengths
 
         chrom_bins = {}
-        unbinned = []
-        binned = []
         chrom_info = zip(xrange(len(references)),references,lengths)
         chrom_info = sorted(chrom_info, key=lambda tup: tup[2])
         group = []
@@ -124,52 +133,12 @@ class Handler(parabam.core.Handler):
                 size = 0
                 uid += 1
         return chrom_bins
-
-    def __wait_for_tasks__(self,list active_tasks,int max_tasks):
-        update_tasks = self.__update_tasks__ #optimising alias
-        update_tasks(active_tasks)
-        cdef int currently_active = len(active_tasks)
-        self._active_count = currently_active
-
-        if max_tasks > currently_active:
-            return
-
-        max_tasks = (max_tasks // 2) - 1 
-
-        if not self._destroy:
-            for qu in self._pause_qus:
-                qu.put(1)
-                self.__wait_for_ack__(qu)
-                
-        while(max_tasks <= currently_active and currently_active > 0):
-            update_tasks(active_tasks)
-            currently_active = len(active_tasks)
-            time.sleep(1)
-
-        if not self._destroy:
-            for qu in self._pause_qus:
-                qu.put(0)
-                self.__wait_for_ack__(qu)
-        return
-
-    def __wait_for_ack__(self,qu):
-        count = 0
-        while True:
-            if count > 20:
-                return
-            try:
-                ack = qu.get(False)
-                if ack == 2:
-                    return
-                else:
-                    qu.put(ack)
-            except Queue2.Empty:
-                time.sleep(1)
-            count += 1
            
     def __instalise_primary_store__(self):
-        paths = []
-        return paths
+        return []
+
+    def __instalise_loner_pyramid__(self):
+        return {}
 
     def __update_tasks__(self,active_tasks):
         terminated_procs = []
@@ -189,25 +158,19 @@ class Handler(parabam.core.Handler):
 
         return len(active_tasks)
 
-    def __instalise_loner_pyramid__(self):
-        loner_pyramid = {}
-        return loner_pyramid
-
     def __new_package_action__(self,new_package,**kwargs):        
         chaser_type = new_package.chaser_type
         if chaser_type == "origin":
             self.__handle_origin_task__(new_package)
         elif chaser_type == "match_maker":
             self.__handle_match_maker__(new_package)
+            self._pending_jobs -= 1
         elif chaser_type == "primary":
             self.__handle_primary_task__(new_package)
+            self._pending_jobs -= 1
         else:
             print "Error!"
         self.__update_tasks__(self._tasks)
-
-    def __handle_primary_task__(new_package):
-        for match_package in new_package.results:
-            self.__handle_match_maker__(match_package)
 
     def __handle_origin_task__(self,new_package):
         for loner_count,path in new_package.results:
@@ -242,6 +205,10 @@ class Handler(parabam.core.Handler):
         if self._destroy:
             self._stale_count += 1
 
+    def __handle_primary_task__(self,new_package):
+        for match_package in new_package.results:
+            self.__handle_match_maker__(match_package)
+
     def __test_primary_tasks__(self,required_paths=10):
         task_sent = False
         if len(self._primary_store) >= required_paths:
@@ -254,22 +221,46 @@ class Handler(parabam.core.Handler):
             time.sleep(1)
           
     def __start_primary_task__(self):        
-        self.__wait_for_tasks__(self._tasks,self._chaser_task_max) #wait for existing tasks
-        paths = self._primary_store
-        new_task = PrimaryTask(paths,self._inqu,self._constants,self._max_reads,self._child_pack)
-        new_task.start()
-        self._tasks.append(new_task)
+        self.__start_job__(self._primary_store,"Primary",-1)
 
     def __start_matchmaker_task__(self,paths,loner_type,level):
-        self.__wait_for_tasks__(self._tasks,self._chaser_task_max)
-        new_task = MatchMakerTask(paths,self._inqu,self._constants,
-                    loner_type,level,self._max_reads,self._child_pack)
-        new_task.start()
+        self.__start_job__(self,paths,loner_type,level)
 
-        self._tasks.append(new_task)
+    def __start_job__(self,paths,loner_type,level):
+        job = JobPackage(paths,loner_type,level)
+        self._pending_jobs += 1
+        self._chaser_qu.put(job)
+
+    def __pause_monitor__(self):
+        if not self._destroy:
+            max_jobs = (self._constants.total_procs * 3)
+            if self._pending_jobs >= max_jobs and not self._file_readers_paused:
+                for qu in self._pause_qus:
+                    qu.put(1)
+                    self.__wait_for_ack__(qu)
+            elif self._pending_jobs < max_jobs and self._file_readers_paused:
+                for qu in self._pause_qus:
+                    qu.put(0)
+                    self.__wait_for_ack__(qu)
+
+    def __wait_for_ack__(self,qu):
+        count = 0
+        while True:
+            if count > 20:
+                return
+            try:
+                ack = qu.get(False)
+                if ack == 2:
+                    return
+                else:
+                    qu.put(ack)
+            except Queue2.Empty:
+                time.sleep(1)
+            count += 1
 
     def __periodic_action__(self,iterations):
-        running = len(self._tasks)
+
+        self.__pause_monitor__()
         chaser_debug = False
 
         if not self._destroy:
@@ -280,9 +271,7 @@ class Handler(parabam.core.Handler):
             required_paths = 1
 
         pyramid_idle_counts = self._pyramid_idle_counts 
-
         empty = True
-
         for loner_type,pyramid in self._loner_pyramid.items():
             for i,sub_pyramid in enumerate(reversed(pyramid)):
                 level = len(pyramid) - (i+1)
@@ -290,7 +279,6 @@ class Handler(parabam.core.Handler):
                 if len(paths) > 0:
                     empty = False
                     self.__start_matchmaker_task__(paths,loner_type,level)
-                    running += 1
                     pyramid_idle_counts[loner_type] = 0
                     for path in paths:#remove sent paths
                         sub_pyramid.remove(path)
@@ -304,7 +292,7 @@ class Handler(parabam.core.Handler):
                 idle_success,idle_paths,idle_levels = self.__idle_routine__(pyramid,loner_type)
 
                 #delete after idle success or when processing has finished and idle fails
-                if self.__clear_subpyramid__(idle_success, self._destroy ,running):
+                if self.__clear_subpyramid__(idle_success, self._destroy,self._pending_jobs):
                     pyramid_idle_counts[loner_type]=0
                     for idle_level,idle_path in izip(idle_levels,idle_paths):
                         if not idle_success:
@@ -315,7 +303,6 @@ class Handler(parabam.core.Handler):
                             pyramid[idle_level].remove(idle_path)
                         else:
                             pyramid[idle_level].remove(idle_path)
-                            running += 1
 
                 del idle_paths,idle_levels
 
@@ -327,7 +314,7 @@ class Handler(parabam.core.Handler):
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and running == 0) or self._stale_count > 100:
+            if (empty and self._pending_jobs == 0) or self._stale_count > 100:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__wait_for_tasks__(self._tasks,max_tasks=0)
@@ -341,7 +328,7 @@ class Handler(parabam.core.Handler):
                 if finished:
                     self._finished = True
 
-        if iterations % 10 == 0:
+        if iterations % 20 == 0:
             gc.collect()
 
         if chaser_debug and iterations % 30 == 0:
@@ -464,10 +451,10 @@ class Handler(parabam.core.Handler):
             qu.close()
 
 
-class ChaserProcess(Process):
+class ChaserTask(Process):
     def __init__(self,object constants,object inqu, object outqu, 
-                      int max_reads, dict child_pack,object parent_bam):
-        super(ChaserClass,self).__init__()
+                      int max_reads, dict child_pack):
+        super(ChaserTask,self).__init__()
         self._constants = constants
         self._inqu = inqu
         self._outqu = outqu
@@ -478,10 +465,12 @@ class ChaserProcess(Process):
         primary_handler = PrimaryHandler(constants = self._constants,
                                          outqu = self._outqu,
                                          max_reads = self._max_reads,
-                                         child_pack = self._child_pack,
-                                         parent_bam = self._parent_bam)
+                                         child_pack = self._child_pack)
 
-        match_handler = MatchMakerHandler
+        match_handler = MatchMakerHandler(constants = self._constants,
+                                         outqu = self._outqu,
+                                         max_reads = self._max_reads,
+                                         child_pack = self._child_pack)
 
         while True:
             try:
@@ -493,12 +482,11 @@ class ChaserProcess(Process):
                         results = match_handler.run(package.paths,
                                           package.loner_type,
                                           package.level)
-                self._outqu.put(results)
+                    self._outqu.put(results)
 
                 elif type(package) == DestroyPackage:
                     break
                 
-                self._dealt += 1
                 time.sleep(0.005)
 
             except Queue2.Empty:
@@ -506,13 +494,12 @@ class ChaserProcess(Process):
         return
 
 class ChaserHandler(object):
-    __metaclass__ = ABCMeta
 
-    def __init__(self,object constants,int max_reads, dict child_pack,object parent_bam):
+    def __init__(self,object constants,int max_reads, dict child_pack):
         self._constants = constants
         self._max_reads = max_reads
         self._child_pack = child_pack
-        self._header = parent_bam.header
+        self._parent_bam = self._child_pack["parent_bam"]
 
     def __get_loner_temp_path__(self,loner_type,level=0,unique=""):
         return "%s/%s_%d_%s%s.bam" %\
@@ -520,10 +507,9 @@ class ChaserHandler(object):
 
 class PrimaryHandler(ChaserHandler):
 
-    def __init__(self,object constants,int max_reads, dict child_pack,object parent_bam):
-        super(PrimaryHandler,self).__init__(constants,outqu,max_reads,child_pack,parent_bam)
-        
-        self.match_handler = MatchMakerHandler(constants,outqu,max_reads,child_pack,parent_bam)
+    def __init__(self,object constants, int max_reads, dict child_pack):
+        super(PrimaryHandler,self).__init__(constants,max_reads,child_pack)
+        self.match_handler = MatchMakerHandler(constants,max_reads,child_pack)
         
     def run(self,unsorted_paths):
         #speedup
@@ -554,7 +540,7 @@ class PrimaryHandler(ChaserHandler):
         return PrimaryResults(match_maker_results,"primary")
 
     def __start_matchmaker_task__(self,paths,loner_type,level):
-        return self.match_handler(paths,loner_type,level)
+        return self.match_handler.run(paths,loner_type,level)
         
     def __read_generator__(self,unsorted_paths):
         for path in unsorted_paths:
@@ -618,8 +604,8 @@ class PrimaryHandler(ChaserHandler):
 
 class MatchMakerHandler(ChaserHandler):
 
-    def __init__(self,object constants,int max_reads, dict child_pack,object parent_bam):
-        super(MatchMakerHandler,self).__init__(constants,outqu,max_reads,child_pack,parent_bam)
+    def __init__(self,object constants,int max_reads, dict child_pack):
+        super(MatchMakerHandler,self).__init__(constants,max_reads,child_pack)
         self.LonerInfo = namedtuple("LonerInfo","paths level loner_type")
 
     def run(self,loner_paths,loner_type,level):
