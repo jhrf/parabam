@@ -199,9 +199,15 @@ class Handler(parabam.core.Handler):
             self.__handle_origin_task__(new_package)
         elif chaser_type == "match_maker":
             self.__handle_match_maker__(new_package)
+        elif chaser_type == "primary":
+            self.__handle_primary_task__(new_package)
         else:
             print "Error!"
         self.__update_tasks__(self._tasks)
+
+    def __handle_primary_task__(new_package):
+        for match_package in new_package.results:
+            self.__handle_match_maker__(match_package)
 
     def __handle_origin_task__(self,new_package):
         for loner_count,path in new_package.results:
