@@ -198,7 +198,7 @@ class Handler(parabam.core.Handler):
     
     def __add_staged_system_task__(self,results,subset_type):
         if subset_type == "chaser":
-            res = parabam.chaser.OriginPackage(results=results,
+            res = parabam.chaser.ChaserResults(results=results,
                                 chaser_type="origin")
             self._out_qu_dict["chaser"].put(res)
 
