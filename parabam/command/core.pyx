@@ -402,9 +402,9 @@ class Interface(parabam.core.Interface):
 
     def __get_update_interval__(self,verbose):
         if verbose == 1: 
-            return 200
+            return 7500
         else:
-            return 1
+            return 100
 
     def __remove_empty_entries__(self,final_output_paths):
         for master_path,child_paths in final_output_paths.items():

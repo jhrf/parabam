@@ -82,20 +82,24 @@ cdef class Handler:
             iterations += 1
             #Listen for a process coming in...
             try:
-                new_package = self._inqu.get(False)
-                if type(new_package) == DestroyPackage:
-                    self._destroy = True
-                elif type(new_package) == EndProcPackage:
-                    self._processing = False
-
-                if not new_package.results == {}:#If results are present...
-                    self.__new_package_action__(new_package) #Handle the results
-                    dealt += 1
-
+                packages = []
+                for i in xrange(20):
+                    packages.append(self._inqu.get(False))
             except Queue2.Empty:
                 #Queue empty. Continue with loop
-                time.sleep(.5)
+                #time.sleep(.5)
+                time.sleep(.01)
 
+            for package in packages:
+                if not package.results == {}:#If results are present...
+                    self.__new_package_action__(package) #Handle the results
+                    dealt += 1
+                if type(package) == DestroyPackage:
+                    self._destroy = True
+                elif type(package) == EndProcPackage:
+                    self._processing = False
+            
+            del packages
             if iterations % periodic_interval == 0: 
                 self.__periodic_action__(iterations)
 
@@ -387,13 +391,11 @@ class FileReader(Process):
         
         if pause == 1:
             self.__send_ack__(pause_qu)
-            print "PAUSE"
             while True:
                 try:
                     pause = pause_qu.get(False) 
                     if pause == 0: #Unpause signal recieved
                         self.__send_ack__(pause_qu)
-                        print "UNPAUSE"
                         return
                 except Queue2.Empty:
                     time.sleep(.5)
