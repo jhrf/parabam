@@ -6618,11 +6618,11 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_16__handle_match_maker__(CYT
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L11_try_end;
       __pyx_L4_error:;
-      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
 
       /* "parabam/chaser.pyx":195
  *             try:
@@ -8747,7 +8747,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_32__periodic_action__(CYTHON
  *     def __periodic_action__(self,iterations):
  * 
  *         self.__pause_monitor__()             # <<<<<<<<<<<<<<
- *         chaser_debug = True
+ *         chaser_debug = False
  * 
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_pause_monitor); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -8775,14 +8775,14 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_32__periodic_action__(CYTHON
   /* "parabam/chaser.pyx":268
  * 
  *         self.__pause_monitor__()
- *         chaser_debug = True             # <<<<<<<<<<<<<<
+ *         chaser_debug = False             # <<<<<<<<<<<<<<
  * 
  *         if not self._destroy:
  */
-  __pyx_v_chaser_debug = 1;
+  __pyx_v_chaser_debug = 0;
 
   /* "parabam/chaser.pyx":270
- *         chaser_debug = True
+ *         chaser_debug = False
  * 
  *         if not self._destroy:             # <<<<<<<<<<<<<<
  *             idle_threshold = 500
