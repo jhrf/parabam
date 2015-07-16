@@ -369,6 +369,7 @@ class FileReader(Process):
 
     def __send_ack__(self,qu):
         qu.put(2)
+        time.sleep(1)
 
     def __wait_for_pause__(self):
         try: #pre clause for speed
@@ -379,17 +380,20 @@ class FileReader(Process):
         pause_qu = self._pause_qu
         while True:
             try:#get most recent signal
-                pause = self._qu
+                attempt = pause_qu.get(False)
+                pause = attempt
             except Queue2.Empty:
                 break
         
         if pause == 1:
             self.__send_ack__(pause_qu)
+            print "PAUSE"
             while True:
                 try:
                     pause = pause_qu.get(False) 
                     if pause == 0: #Unpause signal recieved
                         self.__send_ack__(pause_qu)
+                        print "UNPAUSE"
                         return
                 except Queue2.Empty:
                     time.sleep(.5)

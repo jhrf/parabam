@@ -254,6 +254,7 @@ class Handler(parabam.core.Handler):
             try:
                 ack = qu.get(False)
                 if ack == 2:
+                    print "ACK %d" % (self._pending_jobs,)
                     return
                 else:
                     qu.put(ack)
