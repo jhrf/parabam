@@ -308,7 +308,7 @@ class FileReader(Process):
         for task in tasks:
             task.start()
 
-        for i,command in enumerate(parent_generator):
+        for command in parent_generator:
             #This pause adds stability to parabam
             #I think this is because it spaces calls to disk
             time.sleep(.0001) 
@@ -371,23 +371,29 @@ class FileReader(Process):
         qu.put(2)
 
     def __wait_for_pause__(self):
-        pause_qu = self._pause_qu
-        try:
-            pause = pause_qu.get(False)
-            self.__send_ack__(pause_qu)
-            time.sleep(2)
-
-            if pause == 1: #Pause signal received
-                while True:
-                    try:
-                        pause = pause_qu.get(False) 
-                        if pause == 0: #Unpause signal recieved
-                            self.__send_ack__(pause_qu)
-                            return
-                    except Queue2.Empty:
-                        time.sleep(.5)
+        try: #pre clause for speed
+            pause = self._pause_qu.get(False)
         except Queue2.Empty:
-            pass
+            return
+
+        pause_qu = self._pause_qu
+        while True:
+            try:#get most recent signal
+                pause = self._qu
+            except Queue2.Empty:
+                break
+        
+        if pause == 1:
+            self.__send_ack__(pause_qu)
+            while True:
+                try:
+                    pause = pause_qu.get(False) 
+                    if pause == 0: #Unpause signal recieved
+                        self.__send_ack__(pause_qu)
+                        return
+                except Queue2.Empty:
+                    time.sleep(.5)
+
         
 class Leviathon(object):
     #Leviathon takes objects of file_readers and handlers and

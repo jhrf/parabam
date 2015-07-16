@@ -96,6 +96,7 @@ class Handler(parabam.core.Handler):
         self._chaser_qu = Queue()
         self._chaser_tasks = self.__create_chaser_tasks__(self._constants.total_procs)
         self._pending_jobs = 0
+        self._max_jobs = (self._constants.total_procs * 3)
         self._file_readers_paused = False
 
         self._primary_store = self.__instalise_primary_store__()
@@ -232,22 +233,23 @@ class Handler(parabam.core.Handler):
 
     def __pause_monitor__(self):
         if not self._destroy:
-            max_jobs = (self._constants.total_procs * 3)
+            max_jobs = self._max_jobs
             if self._pending_jobs >= max_jobs and not self._file_readers_paused:
                 for qu in self._pause_qus:
-                    qu.put(1)
+                    qu.put(1) #pause
                     self.__wait_for_ack__(qu)
                 self._file_readers_paused = True
+
             elif self._pending_jobs < max_jobs and self._file_readers_paused:
                 for qu in self._pause_qus:
-                    qu.put(0)
+                    qu.put(0) #unpause
                     self.__wait_for_ack__(qu)
                 self._file_readers_paused = False
 
     def __wait_for_ack__(self,qu):
         count = 0
         while True:
-            if count > 20:
+            if count > 30:
                 return
             try:
                 ack = qu.get(False)
@@ -262,7 +264,7 @@ class Handler(parabam.core.Handler):
     def __periodic_action__(self,iterations):
 
         self.__pause_monitor__()
-        chaser_debug =True
+        chaser_debug = False
 
         if not self._destroy:
             idle_threshold = 500
@@ -441,6 +443,13 @@ class Handler(parabam.core.Handler):
         return task_size
 
     def __handler_exit__(self,**kwargs):
+        for i in xrange(len(self._chaser_tasks)+1):
+           self._chaser_qu.put(DestroyPackage())
+        time.sleep(2)
+        self._chaser_qu.close()
+        del self._chaser_qu
+        del self._chaser_tasks
+        
         if self._constants.verbose:
             if self._total_loners - self._rescued["total"] == 0:
                 self.__standard_output__("\n[Status] All reads succesfully paired") 
