@@ -399,8 +399,7 @@ class FileReader(Process):
                         return
                 except Queue2.Empty:
                     time.sleep(.5)
-
-        
+ 
 class Leviathon(object):
     #Leviathon takes objects of file_readers and handlers and
     #chains them together.
