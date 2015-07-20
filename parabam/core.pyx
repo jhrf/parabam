@@ -181,20 +181,13 @@ class Task(Process):
 
     def run(self):
 
-        mode = "rb"
-        if ".sam" == self._parent_path[-4:]:
-            mode = "r"
-
-        bamfile = pysam.AlignmentFile(self._parent_path,mode)
+        bamfile = pysam.AlignmentFile(self._parent_path,"rb")
         iterator = bamfile.fetch(until_eof=True)
-        next_read = iterator.next
-
         generate_results = self.__generate_results__
 
         while True:
             try:
                 package = self._inqu.get(False)
-            
                 if type(package) == DestroyPackage:
                     bamfile.close()
                     del iterator
@@ -296,12 +289,8 @@ class FileReader(Process):
     #and divide pertaining to the chromosome that it is aligned to
     def run(self):
 
-        mode = "rb"
-        if ".sam" == self._input_path[-4:]:
-            mode = "r"
-
         parent_bam_mem_obj = ParentAlignmentFile(self._input_path)
-        parent_bam = pysam.AlignmentFile(self._input_path,mode)
+        parent_bam = pysam.AlignmentFile(self._input_path,"rb")
         parent_iter = self.__get_parent_iter__(parent_bam)
         parent_generator = self.__bam_generator__(parent_iter)
         wait_for_pause = self.__wait_for_pause__
@@ -667,10 +656,7 @@ class ParentAlignmentFile(object):
     def __init__(self,path):
         has_index = os.path.exists(os.path.join("%s%s" % (path,".bai")))
 
-        mode = "rb"
-        if ".sam" == path[-4:]:
-            mode = "r"
-        parent = pysam.AlignmentFile(path,mode)
+        parent = pysam.AlignmentFile(path,"rb")
         self.filename = parent.filename
         self.references = parent.references
         self.header = parent.header
