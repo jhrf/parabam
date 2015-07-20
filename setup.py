@@ -23,7 +23,7 @@ cmdclass['sdist'] = sdist
 
 setup(name='parabam',
       description='Parallel BAM File Analysis',
-      version='1.3.4',
+      version='1.3.5',
       author="JHR Farmery",
       license='GPL',
       author_email = 'jhrf2@cam.ac.uk',
