@@ -19,10 +19,11 @@ from abc import ABCMeta, abstractmethod
 class Task(parabam.core.Task):
     __metaclass__=ABCMeta
 
-    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
         super(Task, self).__init__(parent_bam=parent_bam,
                                     inqu=inqu,
                                     outqu=outqu,
+                                    statusqu=statusqu,
                                     task_size=task_size,
                                     constants=constants)
 
@@ -59,10 +60,11 @@ class Task(parabam.core.Task):
 class PairTask(Task):
     __metaclass__ = ABCMeta
 
-    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
         super(PairTask, self).__init__(parent_bam=parent_bam,
                                     inqu=inqu,
                                     outqu=outqu,
+                                    statusqu=statusqu,
                                     task_size=task_size,
                                     constants=constants)
 

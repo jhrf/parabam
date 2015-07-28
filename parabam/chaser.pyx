@@ -52,6 +52,7 @@ class Handler(parabam.core.Handler):
                 super(EngineTask,self).__init__(parent_bam=parent_bam,
                                                     inqu=None,
                                                     outqu=None,
+                                                    statusqu=None,
                                                     task_size=0,
                                                     constants=constants)
 
@@ -236,14 +237,18 @@ class Handler(parabam.core.Handler):
             max_jobs = self._max_jobs
             if self._pending_jobs >= max_jobs and not self._file_readers_paused:
                 for qu in self._pause_qus:
+                    print "Chaser sending pause - waiting for ack"
                     qu.put(1) #pause
                     self.__wait_for_ack__(qu)
+                    print "ack found"
                 self._file_readers_paused = True
 
             elif self._pending_jobs < max_jobs and self._file_readers_paused:
                 for qu in self._pause_qus:
+                    print "Chaser sending unpause - waiting for ack"
                     qu.put(0) #unpause
                     self.__wait_for_ack__(qu)
+                    print "ack found"
                 self._file_readers_paused = False
 
     def __wait_for_ack__(self,qu):

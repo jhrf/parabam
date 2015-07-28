@@ -164,7 +164,7 @@ cdef class Handler:
 class Task(Process):
     __metaclass__=ABCMeta
 
-    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
         super(Task,self).__init__()
         self._parent_bam = parent_bam
         self._parent_path = self._parent_bam.filename
@@ -172,12 +172,15 @@ class Task(Process):
 
         self._outqu = outqu
         self._inqu = inqu
+        self._statusqu = statusqu
 
         self._task_size = task_size
         self._temp_dir = constants.temp_dir
         self._constants = constants 
         
         self._dealt = 0
+
+        self._idle_sent = False
 
     def run(self):
 
@@ -188,6 +191,7 @@ class Task(Process):
         while True:
             try:
                 package = self._inqu.get(False)
+                self._idle_sent = False
                 if type(package) == DestroyPackage:
                     bamfile.close()
                     del iterator
@@ -206,6 +210,9 @@ class Task(Process):
                 self._outqu.put(Package(results=results))
 
             except Queue2.Empty:
+                if not self._idle_sent:
+                    self._idle_sent = True
+                    self._statusqu.put("Idle")
                 time.sleep(5)
             except StopIteration:
                 results = self.__handle_stop_iteration__(seek,bamfile,iterator)
@@ -266,7 +273,7 @@ class Task(Process):
 class FileReader(Process):
     def __init__(self,str input_path,int proc_id,object outqu,
                  int task_n,object constants,object Task,
-                 object pause_qu):
+                 object pause_qu,object inqu = Queue()):
         
         super(FileReader,self).__init__()
 
@@ -285,6 +292,11 @@ class FileReader(Process):
         self._temp_dir = constants.temp_dir
         self._debug = constants.debug
 
+        self._inqu = inqu
+        self._no_status_received = 0
+
+
+
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
     def run(self):
@@ -294,6 +306,9 @@ class FileReader(Process):
         parent_iter = self.__get_parent_iter__(parent_bam)
         parent_generator = self.__bam_generator__(parent_iter)
         wait_for_pause = self.__wait_for_pause__
+        check_inqu = self.__check_inqu__
+
+
         if self._debug:
             parent_generator = self.__debug_generator__(parent_iter)
 
@@ -302,6 +317,7 @@ class FileReader(Process):
         tasks = [self._Task(parent_bam=parent_bam_mem_obj,
                       inqu=task_qu,
                       outqu=self._outqu,
+                      statusqu = self._inqu,
                       task_size=self._task_size,
                       constants=self._constants) \
                         for i in xrange(self._task_n)]
@@ -312,9 +328,11 @@ class FileReader(Process):
         for command in parent_generator:
             #This pause adds stability to parabam
             #I think this is because it spaces calls to disk
-            time.sleep(.0001) 
+            #time.sleep(.0001) 
             wait_for_pause()
             task_qu.put(parent_bam.tell())
+            check_inqu()
+
 
         for n in xrange(self._task_n+1):
             task_qu.put(DestroyPackage())
@@ -323,6 +341,30 @@ class FileReader(Process):
         parent_bam.close()
         task_qu.close()
         return
+
+    def __check_inqu__(self):
+        status = None
+        while True:
+            try:
+                status = self._inqu.get(False)
+            except Queue2.Empty:
+                if status == None:
+                    self._no_status_received += 1
+                else:
+                    self._no_status_received = 0
+                break
+
+        if self._no_status_received > (self._task_n * 10):
+            print "No idle seen in %d. Waiting for idle signal" % (self._task_n * 10,)
+            while True:
+                try:  #Block until a child becomes free
+                    status = self._inqu.get(False)
+                    self._no_status_received = 0
+                    print "Idle signal found. Continuing"
+                    break
+                except Queue2.Empty:
+                    time.sleep(2)
+                    self.__wait_for_pause__()
 
     def __get_parent_iter__(self,parent_bam):
         if not self._constants.fetch_region:
@@ -383,15 +425,18 @@ class FileReader(Process):
             try:#get most recent signal
                 attempt = pause_qu.get(False)
                 pause = attempt
+                print "Spool"
             except Queue2.Empty:
                 break
         
         if pause == 1:
+            print "FileReader Paused: Sending Ack"
             self.__send_ack__(pause_qu)
             while True:
                 try:
                     pause = pause_qu.get(False) 
                     if pause == 0: #Unpause signal recieved
+                        print "FileReader Unpaused: Sending Ack"
                         self.__send_ack__(pause_qu)
                         return
                 except Queue2.Empty:
@@ -464,7 +509,8 @@ class Leviathon(object):
         return [Queue() for i in xrange(reader_n)]
 
     def __get_task_n__(self,constants,handlers):
-        task_n = (constants.total_procs - constants.reader_n) / constants.reader_n
+        #task_n = (constants.total_procs - constants.reader_n) / constants.reader_n
+        task_n = constants.total_procs / constants.reader_n
         if task_n > 0:
             return task_n
         else:

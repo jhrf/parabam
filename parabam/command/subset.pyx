@@ -46,11 +46,12 @@ class SubsetCore(object):
 
 class Task(SubsetCore,parabam.command.Task):
 
-    def __init__(self,parent_bam,inqu,outqu,task_size,constants,**kwargs):
+    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants,**kwargs):
         
         parabam.command.Task.__init__(self,parent_bam=parent_bam,
                                     inqu=inqu,
                                     outqu=outqu,
+                                    statusqu=statusqu,
                                     task_size=task_size,
                                     constants=constants)
         SubsetCore.__init__(self,constants)
@@ -66,11 +67,12 @@ class Task(SubsetCore,parabam.command.Task):
             pass
 
 class PairTask(SubsetCore,parabam.command.PairTask):
-    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
         
         parabam.command.PairTask.__init__(self,parent_bam=parent_bam,
                                                 inqu=inqu,
                                                 outqu=outqu,
+                                                statusqu=statusqu,
                                                 task_size=task_size,
                                                 constants=constants)
         SubsetCore.__init__(self,constants)

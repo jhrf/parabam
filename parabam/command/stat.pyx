@@ -52,22 +52,24 @@ class StatCore(object):
 
 class Task(StatCore,parabam.command.Task):
 
-    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
         
         parabam.command.Task.__init__(self,parent_bam=parent_bam,
                                             inqu=inqu,
                                             outqu=outqu,
+                                            statusqu=statusqu,
                                             task_size=task_size,
                                             constants=constants)
         StatCore.__init__(self,constants)
         
 class PairTask(StatCore,parabam.command.PairTask):
 
-    def __init__(self,parent_bam,inqu,outqu,task_size,constants):
+    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
         
         parabam.command.PairTask.__init__(self,parent_bam=parent_bam,
                                             inqu=inqu,
                                             outqu=outqu,
+                                            statusqu=statusqu,
                                             task_size=task_size,
                                             constants=constants)
         StatCore.__init__(self,constants)
