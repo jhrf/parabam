@@ -467,13 +467,14 @@ class Handler(parabam.core.Handler):
 
     def __post_destroy_report__(self):
         if self._constants.verbose:
-            if self._post_destroy_count == 0:
-                sys.stdout.write("\n")
-                sys.stdout.flush()
-            if self._post_destroy_count % 5 == 0:
-                sys.stdout.write("\r[Status] Read pairing still in progress: %.3f%% complete  " %\
-                            ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
-                sys.stdout.flush()
+            if self._post_destroy_count >= 10:
+                if self._post_destroy_count == 10:
+                    sys.stdout.write("\n")
+                    sys.stdout.flush()
+                if self._post_destroy_count % 5 == 0:
+                    sys.stdout.write("\r[Status] Read pairing still in progress: %.3f%% complete  " %\
+                                ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
+                    sys.stdout.flush()
             self._post_destroy_count += 1
 
 class ChaserTask(Process):
