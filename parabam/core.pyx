@@ -354,17 +354,15 @@ class FileReader(Process):
                     self._no_status_received = 0
                 break
 
-        if self._no_status_received > (self._task_n * 10):
-            print "No idle seen in %d. Waiting for idle signal" % (self._task_n * 10,)
+        if self._no_status_received > (self._task_n * 25):
             while True:
                 try:  #Block until a child becomes free
                     status = self._inqu.get(False)
                     self._no_status_received = 0
-                    print "Idle signal found. Continuing"
                     break
                 except Queue2.Empty:
-                    time.sleep(2)
                     self.__wait_for_pause__()
+                    time.sleep(1)
 
     def __get_parent_iter__(self,parent_bam):
         if not self._constants.fetch_region:
@@ -425,18 +423,15 @@ class FileReader(Process):
             try:#get most recent signal
                 attempt = pause_qu.get(False)
                 pause = attempt
-                print "Spool"
             except Queue2.Empty:
                 break
         
         if pause == 1:
-            print "FileReader Paused: Sending Ack"
             self.__send_ack__(pause_qu)
             while True:
                 try:
                     pause = pause_qu.get(False) 
                     if pause == 0: #Unpause signal recieved
-                        print "FileReader Unpaused: Sending Ack"
                         self.__send_ack__(pause_qu)
                         return
                 except Queue2.Empty:
