@@ -100,6 +100,8 @@ class Handler(parabam.core.Handler):
         self._max_jobs = (self._constants.total_procs * 3)
         self._file_readers_paused = False
 
+        self._post_destroy_count = 0
+
         self._primary_store = self.__instalise_primary_store__()
 
     def __create_chaser_tasks__(self,total_tasks):
@@ -250,7 +252,7 @@ class Handler(parabam.core.Handler):
     def __wait_for_ack__(self,qu):
         count = 0
         while True:
-            if count > 30:
+            if count > 10:
                 return
             try:
                 ack = qu.get(False)
@@ -258,6 +260,7 @@ class Handler(parabam.core.Handler):
                     return
                 else:
                     qu.put(ack)
+                    time.sleep(1)
             except Queue2.Empty:
                 time.sleep(1)
             count += 1
@@ -276,6 +279,7 @@ class Handler(parabam.core.Handler):
 
         pyramid_idle_counts = self._pyramid_idle_counts 
         empty = True
+
         for loner_type,pyramid in self._loner_pyramid.items():
             for i,sub_pyramid in enumerate(reversed(pyramid)):
                 level = len(pyramid) - (i+1)
@@ -313,6 +317,7 @@ class Handler(parabam.core.Handler):
         self.__test_primary_tasks__(required_paths=required_paths)
 
         if self._destroy:
+            self.__post_destroy_report__()
             if not self._rescued["total"] == self._prev_rescued:
                 self._stale_count = 0
             self._prev_rescued = self._rescued["total"]
@@ -460,6 +465,16 @@ class Handler(parabam.core.Handler):
         for qu in self._pause_qus:
             qu.close()
 
+    def __post_destroy_report__(self):
+        if self._constants.verbose:
+            if self._post_destroy_count == 0:
+                sys.stdout.write("\n")
+                sys.stdout.flush()
+            if self._post_destroy_count % 5 == 0:
+                sys.stdout.write("\r[Status] Read pairing still in progress: %.3f%% complete  " %\
+                            ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
+                sys.stdout.flush()
+            self._post_destroy_count += 1
 
 class ChaserTask(Process):
     def __init__(self,object constants,object inqu, object outqu, 

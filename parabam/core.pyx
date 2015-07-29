@@ -180,8 +180,6 @@ class Task(Process):
         
         self._dealt = 0
 
-        self._idle_sent = False
-
     def run(self):
 
         bamfile = pysam.AlignmentFile(self._parent_path,"rb")
@@ -208,11 +206,10 @@ class Task(Process):
                 time.sleep(0.005)
 
                 self._outqu.put(Package(results=results))
+                    #tell filereader a batch of five jobs
+                self._statusqu.put(1) 
 
             except Queue2.Empty:
-                if not self._idle_sent:
-                    self._idle_sent = True
-                    self._statusqu.put("Idle")
                 time.sleep(5)
             except StopIteration:
                 results = self.__handle_stop_iteration__(seek,bamfile,iterator)
@@ -293,9 +290,7 @@ class FileReader(Process):
         self._debug = constants.debug
 
         self._inqu = inqu
-        self._no_status_received = 0
-
-
+        self._active_jobs = 0
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
@@ -325,14 +320,12 @@ class FileReader(Process):
         for task in tasks:
             task.start()
 
-        for command in parent_generator:
-            #This pause adds stability to parabam
-            #I think this is because it spaces calls to disk
-            #time.sleep(.0001) 
+        for i,command in enumerate(parent_generator):
             wait_for_pause()
             task_qu.put(parent_bam.tell())
-            check_inqu()
-
+            self._active_jobs += 1
+            if i % 10 == 0:
+                check_inqu()
 
         for n in xrange(self._task_n+1):
             task_qu.put(DestroyPackage())
@@ -343,26 +336,19 @@ class FileReader(Process):
         return
 
     def __check_inqu__(self):
-        status = None
+
         while True:
             try:
-                status = self._inqu.get(False)
+                self._active_jobs -= self._inqu.get(False)
             except Queue2.Empty:
-                if status == None:
-                    self._no_status_received += 1
-                else:
-                    self._no_status_received = 0
                 break
 
-        if self._no_status_received > (self._task_n * 25):
-            while True:
-                try:  #Block until a child becomes free
-                    status = self._inqu.get(False)
-                    self._no_status_received = 0
-                    break
-                except Queue2.Empty:
-                    self.__wait_for_pause__()
-                    time.sleep(1)
+        while self._active_jobs > ((self._task_n * 10) * ((10000/self._task_size)+1)):
+            try: #Block until active jobs is less than limit
+                self._active_jobs -= self._inqu.get(False)
+            except Queue2.Empty:
+                self.__wait_for_pause__()
+                time.sleep(1)
 
     def __get_parent_iter__(self,parent_bam):
         if not self._constants.fetch_region:
@@ -471,7 +457,6 @@ class Leviathon(object):
         #Start file_readers
         for file_reader in file_readers:
             file_reader.start()
-            #time.sleep(2)
 
         #Start handlers:
         for handler in handlers:
