@@ -1766,6 +1766,7 @@ static PyObject *__pyx_int_3;
 static PyObject *__pyx_int_5;
 static PyObject *__pyx_int_10;
 static PyObject *__pyx_int_20;
+static PyObject *__pyx_int_25;
 static PyObject *__pyx_int_30;
 static PyObject *__pyx_int_60;
 static PyObject *__pyx_int_100;
@@ -13487,7 +13488,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_48__handler_exit__(CYTHON_UN
  * 
  *     def __post_destroy_report__(self):             # <<<<<<<<<<<<<<
  *         if self._constants.verbose:
- *             if self._post_destroy_count >= 10:
+ *             if self._post_destroy_count >= 25:
  */
 
 /* Python wrapper */
@@ -13523,8 +13524,8 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_50__post_destroy_report__(CY
  * 
  *     def __post_destroy_report__(self):
  *         if self._constants.verbose:             # <<<<<<<<<<<<<<
- *             if self._post_destroy_count >= 10:
- *                 if self._post_destroy_count == 10:
+ *             if self._post_destroy_count >= 25:
+ *                 if self._post_destroy_count == 25:
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_constants_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 469; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -13538,13 +13539,13 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_50__post_destroy_report__(CY
     /* "parabam/chaser.pyx":470
  *     def __post_destroy_report__(self):
  *         if self._constants.verbose:
- *             if self._post_destroy_count >= 10:             # <<<<<<<<<<<<<<
- *                 if self._post_destroy_count == 10:
+ *             if self._post_destroy_count >= 25:             # <<<<<<<<<<<<<<
+ *                 if self._post_destroy_count == 25:
  *                     sys.stdout.write("\n")
  */
     __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_post_destroy_count); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 470; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = PyObject_RichCompare(__pyx_t_2, __pyx_int_10, Py_GE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 470; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyObject_RichCompare(__pyx_t_2, __pyx_int_25, Py_GE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 470; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 470; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -13552,22 +13553,22 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_50__post_destroy_report__(CY
 
       /* "parabam/chaser.pyx":471
  *         if self._constants.verbose:
- *             if self._post_destroy_count >= 10:
- *                 if self._post_destroy_count == 10:             # <<<<<<<<<<<<<<
+ *             if self._post_destroy_count >= 25:
+ *                 if self._post_destroy_count == 25:             # <<<<<<<<<<<<<<
  *                     sys.stdout.write("\n")
  *                     sys.stdout.flush()
  */
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_post_destroy_count); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 471; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_int_10, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 471; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_int_25, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 471; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 471; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       if (__pyx_t_3) {
 
         /* "parabam/chaser.pyx":472
- *             if self._post_destroy_count >= 10:
- *                 if self._post_destroy_count == 10:
+ *             if self._post_destroy_count >= 25:
+ *                 if self._post_destroy_count == 25:
  *                     sys.stdout.write("\n")             # <<<<<<<<<<<<<<
  *                     sys.stdout.flush()
  *                 if self._post_destroy_count % 5 == 0:
@@ -13586,7 +13587,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_50__post_destroy_report__(CY
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
         /* "parabam/chaser.pyx":473
- *                 if self._post_destroy_count == 10:
+ *                 if self._post_destroy_count == 25:
  *                     sys.stdout.write("\n")
  *                     sys.stdout.flush()             # <<<<<<<<<<<<<<
  *                 if self._post_destroy_count % 5 == 0:
@@ -13796,7 +13797,7 @@ static PyObject *__pyx_pf_7parabam_6chaser_7Handler_50__post_destroy_report__(CY
  * 
  *     def __post_destroy_report__(self):             # <<<<<<<<<<<<<<
  *         if self._constants.verbose:
- *             if self._post_destroy_count >= 10:
+ *             if self._post_destroy_count >= 25:
  */
 
   /* function exit code */
@@ -23013,8 +23014,8 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__18);
 
   /* "parabam/chaser.pyx":472
- *             if self._post_destroy_count >= 10:
- *                 if self._post_destroy_count == 10:
+ *             if self._post_destroy_count >= 25:
+ *                 if self._post_destroy_count == 25:
  *                     sys.stdout.write("\n")             # <<<<<<<<<<<<<<
  *                     sys.stdout.flush()
  *                 if self._post_destroy_count % 5 == 0:
@@ -23423,7 +23424,7 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *     def __post_destroy_report__(self):             # <<<<<<<<<<<<<<
  *         if self._constants.verbose:
- *             if self._post_destroy_count >= 10:
+ *             if self._post_destroy_count >= 25:
  */
   __pyx_tuple__85 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__85)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__85);
@@ -23717,6 +23718,7 @@ static int __Pyx_InitGlobals(void) {
   __pyx_int_5 = PyInt_FromLong(5); if (unlikely(!__pyx_int_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_10 = PyInt_FromLong(10); if (unlikely(!__pyx_int_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_20 = PyInt_FromLong(20); if (unlikely(!__pyx_int_20)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_int_25 = PyInt_FromLong(25); if (unlikely(!__pyx_int_25)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_30 = PyInt_FromLong(30); if (unlikely(!__pyx_int_30)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_60 = PyInt_FromLong(60); if (unlikely(!__pyx_int_60)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_100 = PyInt_FromLong(100); if (unlikely(!__pyx_int_100)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -24553,7 +24555,7 @@ PyMODINIT_FUNC PyInit_chaser(void)
  * 
  *     def __post_destroy_report__(self):             # <<<<<<<<<<<<<<
  *         if self._constants.verbose:
- *             if self._post_destroy_count >= 10:
+ *             if self._post_destroy_count >= 25:
  */
   __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_6chaser_7Handler_51__post_destroy_report__, 0, __pyx_n_s_Handler___post_destroy_report, NULL, __pyx_n_s_parabam_chaser, __pyx_d, ((PyObject *)__pyx_codeobj__86)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);

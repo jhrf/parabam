@@ -343,12 +343,15 @@ class FileReader(Process):
             except Queue2.Empty:
                 break
 
-        while self._active_jobs > ((self._task_n * 10) * ((10000/self._task_size)+1)):
-            try: #Block until active jobs is less than limit
-                self._active_jobs -= self._inqu.get(False)
-            except Queue2.Empty:
-                self.__wait_for_pause__()
-                time.sleep(1)
+        if self._active_jobs > ((self._task_n * 50) * ((1000/self._task_size)+1)):
+            while True:
+                try: #Block until active jobs is less than limit
+                    self._active_jobs -= self._inqu.get(False)
+                    if self._active_jobs <= (self._task_n+1):
+                        break
+                except Queue2.Empty:
+                    self.__wait_for_pause__()
+                    time.sleep(1)
 
     def __get_parent_iter__(self,parent_bam):
         if not self._constants.fetch_region:

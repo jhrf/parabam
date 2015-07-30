@@ -467,8 +467,8 @@ class Handler(parabam.core.Handler):
 
     def __post_destroy_report__(self):
         if self._constants.verbose:
-            if self._post_destroy_count >= 10:
-                if self._post_destroy_count == 10:
+            if self._post_destroy_count >= 25:
+                if self._post_destroy_count == 25:
                     sys.stdout.write("\n")
                     sys.stdout.flush()
                 if self._post_destroy_count % 5 == 0:
