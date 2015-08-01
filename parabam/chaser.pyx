@@ -101,6 +101,7 @@ class Handler(parabam.core.Handler):
         self._file_readers_paused = False
 
         self._post_destroy_count = 0
+        self._post_destroy_thresh = 50
 
         self._primary_store = self.__instalise_primary_store__()
 
@@ -458,6 +459,9 @@ class Handler(parabam.core.Handler):
         
         if self._constants.verbose:
             if self._total_loners - self._rescued["total"] == 0:
+                if self._post_destroy_count >= self._post_destroy_thresh:
+                    sys.stdout.write("\r[Status] Read pairing still in progress: 100.000%% complete")
+                    sys.stdout.flush()
                 self.__standard_output__("\n[Status] All reads succesfully paired") 
             else:
                 self.__standard_output__("\n[Status] Couldn't find pairs for %d reads" %\
@@ -467,8 +471,8 @@ class Handler(parabam.core.Handler):
 
     def __post_destroy_report__(self):
         if self._constants.verbose:
-            if self._post_destroy_count >= 25:
-                if self._post_destroy_count == 25:
+            if self._post_destroy_count >= self._post_destroy_thresh:
+                if self._post_destroy_count == self._post_destroy_thresh:
                     sys.stdout.write("\n")
                     sys.stdout.flush()
                 if self._post_destroy_count % 5 == 0:

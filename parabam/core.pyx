@@ -270,7 +270,7 @@ class Task(Process):
 class FileReader(Process):
     def __init__(self,str input_path,int proc_id,object outqu,
                  int task_n,object constants,object Task,
-                 object pause_qu,object inqu = Queue()):
+                 object pause_qu,object inqu = None):
         
         super(FileReader,self).__init__()
 
@@ -289,8 +289,13 @@ class FileReader(Process):
         self._temp_dir = constants.temp_dir
         self._debug = constants.debug
 
-        self._inqu = inqu
+        if not inqu:
+            self._inqu = Queue()
+        else:
+            self._inqu = inqu
         self._active_jobs = 0
+        self._active_jobs_thresh = ((self._task_n * 50) *\
+                                        ((1000/self._task_size)+1))
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
@@ -343,11 +348,11 @@ class FileReader(Process):
             except Queue2.Empty:
                 break
 
-        if self._active_jobs > ((self._task_n * 50) * ((1000/self._task_size)+1)):
+        if self._active_jobs > self._active_jobs_thresh:
             while True:
                 try: #Block until active jobs is less than limit
                     self._active_jobs -= self._inqu.get(False)
-                    if self._active_jobs <= (self._task_n+1):
+                    if self._active_jobs <= self._task_n*2:
                         break
                 except Queue2.Empty:
                     self.__wait_for_pause__()
