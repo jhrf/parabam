@@ -10,6 +10,9 @@ import os
 import shutil
 import tempfile
 
+#pyinstaller - don't remove
+from pysam import TabProxies as TabProxies
+
 def keyboard_handler(sig, frame):#Catch keyboard interupt and end processors
 	sys.stdout.write("\r[ERROR] parabam interrupted by user")
 	sys.exit(0)
