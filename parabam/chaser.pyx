@@ -206,7 +206,7 @@ class Handler(parabam.core.Handler):
             for loner_level,loner_path in new_package.results:
                 pyramid[loner_level].append(loner_path)
 
-        if self._destroy:
+        if self._destroy: #TODO:should this move to new_package_action?
             self._stale_count += 1
 
     def __handle_primary_task__(self,new_package):
@@ -324,7 +324,7 @@ class Handler(parabam.core.Handler):
             self._prev_rescued = self._rescued["total"]
             saved = self.__save_purgatory_loners__()
 
-            if (empty and self._pending_jobs == 0) or self._stale_count > 100:
+            if (empty and self._pending_jobs == 0) or self._stale_count > 500:
                 finished = True
                 if not empty: #essentialy `if stale count`
                     self.__tidy_pyramid__()
