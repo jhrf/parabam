@@ -223,11 +223,14 @@ class Interface(parabam.core.Interface):
 
         code_path = code_path.replace(".py","")
 
+        # TODO: I've seen an error where a bug in the imported package
+        #       causes parabam to throw this message. Needs further
+        #       exploration
         try:
             module = __import__(code_path, fromlist=[''])
-        except ImportError:
+        except ImportError: 
             sys.stderr.write("[Error] parabam can't find user specified instructions\n"\
-                             "\tEnsure instruction code is in current working directory\n")
+                              "\tEnsure instruction code is in current working directory\n")
             raise SystemExit
 
         user_engine = module.engine

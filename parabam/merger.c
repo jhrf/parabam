@@ -2428,7 +2428,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_8__periodic_action__(CYTHON_
  *     def __periodic_action__(self,iterations):
  *         if self._destroy:             # <<<<<<<<<<<<<<
  *             try:
- *                 pack = self._inqu.get(False,10)
+ *                 pack = self._inqu.get(True,10)
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_destroy); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 64; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -2440,7 +2440,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_8__periodic_action__(CYTHON_
  *     def __periodic_action__(self,iterations):
  *         if self._destroy:
  *             try:             # <<<<<<<<<<<<<<
- *                 pack = self._inqu.get(False,10)
+ *                 pack = self._inqu.get(True,10)
  *                 self._inqu.put(pack)
  */
     {
@@ -2453,7 +2453,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_8__periodic_action__(CYTHON_
         /* "parabam/merger.pyx":66
  *         if self._destroy:
  *             try:
- *                 pack = self._inqu.get(False,10)             # <<<<<<<<<<<<<<
+ *                 pack = self._inqu.get(True,10)             # <<<<<<<<<<<<<<
  *                 self._inqu.put(pack)
  *             except Queue2.Empty:
  */
@@ -2470,7 +2470,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_8__periodic_action__(CYTHON_
 
         /* "parabam/merger.pyx":67
  *             try:
- *                 pack = self._inqu.get(False,10)
+ *                 pack = self._inqu.get(True,10)
  *                 self._inqu.put(pack)             # <<<<<<<<<<<<<<
  *             except Queue2.Empty:
  *                 self._finished = True
@@ -2518,7 +2518,7 @@ static PyObject *__pyx_pf_7parabam_6merger_7Handler_8__periodic_action__(CYTHON_
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
 
       /* "parabam/merger.pyx":68
- *                 pack = self._inqu.get(False,10)
+ *                 pack = self._inqu.get(True,10)
  *                 self._inqu.put(pack)
  *             except Queue2.Empty:             # <<<<<<<<<<<<<<
  *                 self._finished = True
@@ -4679,11 +4679,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "parabam/merger.pyx":66
  *         if self._destroy:
  *             try:
- *                 pack = self._inqu.get(False,10)             # <<<<<<<<<<<<<<
+ *                 pack = self._inqu.get(True,10)             # <<<<<<<<<<<<<<
  *                 self._inqu.put(pack)
  *             except Queue2.Empty:
  */
-  __pyx_tuple_ = PyTuple_Pack(2, Py_False, __pyx_int_10); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple_ = PyTuple_Pack(2, Py_True, __pyx_int_10); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 

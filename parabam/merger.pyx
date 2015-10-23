@@ -63,7 +63,7 @@ class Handler(parabam.core.Handler):
     def __periodic_action__(self,iterations):
         if self._destroy:
             try:
-                pack = self._inqu.get(False,10)
+                pack = self._inqu.get(True,10)
                 self._inqu.put(pack)
             except Queue2.Empty:
                 self._finished = True
