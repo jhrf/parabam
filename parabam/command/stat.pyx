@@ -221,7 +221,7 @@ class ArrayStructure(UserStructure):
         self.data[coords] = self.min_decision(result,existing)
 
     def add_cumu(self,result):
-        self.data += result
+        self.data = np.add(self.data,result)
 
     def merge_max(self,result):
         self.data = np.maximum(self.data,result)
@@ -232,7 +232,7 @@ class ArrayStructure(UserStructure):
         del result
 
     def merge_cumu(self,result):
-        self.data += result
+        self.data = np.add(self.data,result)
         del result
 
     def write_to_csv(self,out_path):
