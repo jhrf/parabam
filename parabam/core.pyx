@@ -579,17 +579,23 @@ class Interface(object):
 
     def __introduce__(self,name,verbose=True):
         if verbose:
-            intro =  "%s has started. Start Time: " % (name,)\
-                + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-            underline = ("-" * len(intro)) + "\n"
+            intro =  "%s has started. Start Time: %s" % (name,self.__get_date_time__())
+            underline = ("-" * len(intro))
 
-            print intro
-            print underline
+            sys.stdout.write(intro+"\n")
+            sys.stdout.write(underline+"\n\n")
+            sys.stdout.flush()
+    
+    def __get_date_time__(self):
+        return datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
     def __goodbye__(self,name,verbose=True):
         if verbose:
-            print "%s has finished. End Time: " % (name,)\
-                + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+            outro = "%s has finished.  End Time: %s" % (name,self.__get_date_time__())
+
+            sys.stdout.write(("-" * len(outro)) + "\n")
+            sys.stdout.write(outro + "\n")
+            sys.stdout.flush()
 
     def __sort_and_index__(self,fnm,verbose=False,tempDir=".",name=False):
         if not os.path.exists(fnm+".bai"):
