@@ -356,7 +356,7 @@ class Handler(parabam.core.Handler):
 
     def __is_queue_empty__(self):
         try:
-            pack = self._inqu.get(False,60)
+            pack = self._inqu.get(True,10)
             self._inqu.put(pack)
             return False
         except Queue2.Empty:
@@ -475,10 +475,15 @@ class Handler(parabam.core.Handler):
                 if self._post_destroy_count == self._post_destroy_thresh:
                     sys.stdout.write("\n")
                     sys.stdout.flush()
-                if self._post_destroy_count % 5 == 0:
+                if self._post_destroy_count % 25 == 0 and self._constants.verbose == 2:
                     sys.stdout.write("\r[Status] Read pairing still in progress: %.3f%% complete  " %\
                                 ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
                     sys.stdout.flush()
+                elif self._post_destroy_count % 100 == 0 and self._constants.verbose ==1:
+                    sys.stdout.write("[Status] Read pairing still in progress: %.3f%% complete\n" %\
+                                ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
+                    sys.stdout.flush()
+
             self._post_destroy_count += 1
 
 class ChaserTask(Process):

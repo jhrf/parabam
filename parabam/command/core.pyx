@@ -194,7 +194,7 @@ class Handler(parabam.core.Handler):
 
     def __test_stage_store__(self,subset):
         if (not self._processing) or self._destroy:
-            return True
+            return len(self._stage_stores[subset]) > 0
         else:
             return len(self._stage_stores[subset]) > 20
     
