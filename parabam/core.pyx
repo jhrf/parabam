@@ -54,7 +54,7 @@ cdef class Handler:
     def __level_1_output__(self,out_str):
         total_procd = self.__total_reads__()
         time = out_str.partition("Time: ")[2]
-        sys.stdout.write("[Update] Processed: %d Time: %s\n" % (total_procd,time))
+        sys.stdout.write("\t- Reads processed: %d Time: %s\n" % (total_procd,time))
         sys.stdout.flush()
 
     def __level_2_output__(self,outstr):
@@ -65,7 +65,7 @@ cdef class Handler:
     def __total_reads__(self):
         if self._stats == {}:
             return 0
-        return self._stats["total"]
+        return self._stats["Total"]
 
     def listen(self,update_interval):
         destroy = self._destroy
@@ -107,7 +107,7 @@ cdef class Handler:
                 and iterations % update_interval == 0 \
                 and self._processing:
                 #Could move this to functiond decision if speed was an issue
-                outstr = self.__format_update__(start_time)
+                outstr = self.__format_update__(start_time,iterations,update_interval)
                 update_output(outstr)
 
         self._inqu.close()
@@ -118,12 +118,17 @@ cdef class Handler:
             return False
         return True
 
-    def __format_update__(self,start_time):
-        stats = "[Update] "
+    def __format_update__(self,start_time,iterations,update_interval):
+        first_char = self.__get_first_char__(iterations,update_interval)
+        stats = "\t%s " % (first_char,)
         for name,value in self._stats.items():
             stats += "%s:%d " % (name,value)
         return "\r%s| Time: %d " %\
                 (stats,self.__secs_since__(start_time),)
+
+    def __get_first_char__(self,iterations,update_interval):
+        first_chars = ["-","+","*","+"]
+        return first_chars[(iterations/update_interval) % len(first_chars)]
 
     #This code is a little ugly. Essentially, given a results
     #dictionary, it will go through and create a sensible output
@@ -223,7 +228,7 @@ class Task(Process):
         self.__pre_run_routine__(iterator)
         self.__process_task_set__(iterator)
         results = self.__get_results__()
-        results["total"] = self._task_size
+        results["Total"] = self._task_size
         self.__post_run_routine__()
         return results
 
@@ -238,7 +243,7 @@ class Task(Process):
         except StopIteration:
             pass
 
-        results["total"] = count
+        results["Total"] = count
         return results
 
     def __get_temp_object__(self,path):

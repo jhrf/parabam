@@ -207,7 +207,7 @@ class Handler(parabam.core.Handler):
     #Child classes MUST call super
     def __handler_exit__(self, **kwargs):
         if self._verbose:
-            self.__standard_output__("[Status] Processing complete. %d reads processed" \
+            self.__standard_output__("\t- Total reads processed: %d" \
                                         % (self.__total_reads__(),))
 
 class Interface(parabam.core.Interface):
@@ -335,21 +335,20 @@ class Interface(parabam.core.Interface):
             root,ext = os.path.splitext( new_path )
             alternate_path = root + "_%d" % time.time() + ext
 
-            sys.stderr.write("[Warning] Something went wrong when copying output to working directory.\n")
-            sys.stdout.write("[Update]Trying to create output using unique filename:\n")
+            sys.stderr.write("WARNING: Something went wrong when copying output to working directory.\n")
+            sys.stdout.write("... Trying to create output using unique filename:\n")
             sys.stdout.write("\t\t%s\n" % alternate_path)
 
             shutil.move(current_path,alternate_path)
             return alternate_path
 
     def __report_file_names__(self,final_output_paths,input_paths):
-        sys.stdout.write("[Status] This run will output the following files:\n")
+        sys.stdout.write("\t- This run will output the following files:\n")
         for master_path,child_paths in final_output_paths.items():
             if master_path in input_paths:
                 for path in child_paths:
                     root,name = os.path.split(path)
-                    sys.stdout.write("\t %s\n" % (name,))            
-        sys.stdout.write("\n")
+                    sys.stdout.write("\t\t+ %s\n" % (name,))            
 
     def run(self,**kwargs):
 
@@ -407,9 +406,9 @@ class Interface(parabam.core.Interface):
 
     def __get_update_interval__(self,verbose):
         if verbose == 1: 
-            return 7500
+            return 8000
         else:
-            return 100
+            return 200
 
     def __remove_empty_entries__(self,final_output_paths):
         for master_path,child_paths in final_output_paths.items():

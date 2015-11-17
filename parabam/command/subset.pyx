@@ -126,7 +126,7 @@ class Handler(parabam.command.Handler):
     def __write_counts_csv__(self):
         if self._constants.output_counts:
             count_path = "./subset_counts_csv_%d.csv" % (time.time(),)
-            self.__standard_output__("[Status] Outputting counts to following file: %s" % (count_path,))
+            self.__standard_output__("- Outputting counts to following file: %s" % (count_path,))
 
             with open(count_path, "w") as count_file:
                 key_order,header = self.__get_count_header__()

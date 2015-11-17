@@ -1065,9 +1065,9 @@ static char __pyx_k_SubsetCore___pre_run_routine[] = "SubsetCore.__pre_run_routi
 static char __pyx_k_Handler___generate_count_line[] = "Handler.__generate_count_line__";
 static char __pyx_k_SubsetCore___post_run_routine[] = "SubsetCore.__post_run_routine__";
 static char __pyx_k_Interface___get_handler_bundle[] = "Interface.__get_handler_bundle__";
+static char __pyx_k_Outputting_counts_to_following[] = "- Outputting counts to following file: %s";
 static char __pyx_k_Interface___get_destroy_handler[] = "Interface.__get_destroy_handler_order__";
 static char __pyx_k_PairTask___handle_engine_output[] = "PairTask.__handle_engine_output__";
-static char __pyx_k_Status_Outputting_counts_to_fol[] = "[Status] Outputting counts to following file: %s";
 static char __pyx_k_The_files_will_be_appended_with[] = "The files will be appended with a unique identifier. In the format <input_name>_<unique_id>_<subset_type>.bam";
 static char __pyx_k_The_interface_to_parabam_subset[] = "The interface to parabam subset.\n    Users will primarily make use of the ``run`` function.";
 static char __pyx_k_Users_farmer01_proj_parabam_par[] = "/Users/farmer01/proj/parabam/parabam/command/subset.pyx";
@@ -1096,12 +1096,12 @@ static PyObject *__pyx_n_s_Interface_get_parser;
 static PyObject *__pyx_n_s_Interface_run;
 static PyObject *__pyx_n_s_Interface_run_cmd;
 static PyObject *__pyx_n_s_MergePackage;
+static PyObject *__pyx_kp_s_Outputting_counts_to_following;
 static PyObject *__pyx_n_s_PairTask;
 static PyObject *__pyx_n_s_PairTask___handle_engine_output;
 static PyObject *__pyx_n_s_PairTask___init;
 static PyObject *__pyx_n_s_Queue;
 static PyObject *__pyx_n_s_Sample;
-static PyObject *__pyx_kp_s_Status_Outputting_counts_to_fol;
 static PyObject *__pyx_n_s_SubsetCore;
 static PyObject *__pyx_n_s_SubsetCore___get_results;
 static PyObject *__pyx_n_s_SubsetCore___init;
@@ -5126,7 +5126,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_7Handler_10__write_counts_cs
  *     def __write_counts_csv__(self):
  *         if self._constants.output_counts:             # <<<<<<<<<<<<<<
  *             count_path = "./subset_counts_csv_%d.csv" % (time.time(),)
- *             self.__standard_output__("[Status] Outputting counts to following file: %s" % (count_path,))
+ *             self.__standard_output__("- Outputting counts to following file: %s" % (count_path,))
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_constants_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -5141,7 +5141,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_7Handler_10__write_counts_cs
  *     def __write_counts_csv__(self):
  *         if self._constants.output_counts:
  *             count_path = "./subset_counts_csv_%d.csv" % (time.time(),)             # <<<<<<<<<<<<<<
- *             self.__standard_output__("[Status] Outputting counts to following file: %s" % (count_path,))
+ *             self.__standard_output__("- Outputting counts to following file: %s" % (count_path,))
  * 
  */
     __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_time); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 128; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -5181,7 +5181,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_7Handler_10__write_counts_cs
     /* "parabam/command/subset.pyx":129
  *         if self._constants.output_counts:
  *             count_path = "./subset_counts_csv_%d.csv" % (time.time(),)
- *             self.__standard_output__("[Status] Outputting counts to following file: %s" % (count_path,))             # <<<<<<<<<<<<<<
+ *             self.__standard_output__("- Outputting counts to following file: %s" % (count_path,))             # <<<<<<<<<<<<<<
  * 
  *             with open(count_path, "w") as count_file:
  */
@@ -5192,7 +5192,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_7Handler_10__write_counts_cs
     __Pyx_INCREF(__pyx_v_count_path);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_count_path);
     __Pyx_GIVEREF(__pyx_v_count_path);
-    __pyx_t_5 = __Pyx_PyString_Format(__pyx_kp_s_Status_Outputting_counts_to_fol, __pyx_t_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 129; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyString_Format(__pyx_kp_s_Outputting_counts_to_following, __pyx_t_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 129; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -5224,7 +5224,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_7Handler_10__write_counts_cs
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
     /* "parabam/command/subset.pyx":131
- *             self.__standard_output__("[Status] Outputting counts to following file: %s" % (count_path,))
+ *             self.__standard_output__("- Outputting counts to following file: %s" % (count_path,))
  * 
  *             with open(count_path, "w") as count_file:             # <<<<<<<<<<<<<<
  *                 key_order,header = self.__get_count_header__()
@@ -5528,7 +5528,7 @@ static PyObject *__pyx_pf_7parabam_7command_6subset_7Handler_10__write_counts_cs
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
 
           /* "parabam/command/subset.pyx":131
- *             self.__standard_output__("[Status] Outputting counts to following file: %s" % (count_path,))
+ *             self.__standard_output__("- Outputting counts to following file: %s" % (count_path,))
  * 
  *             with open(count_path, "w") as count_file:             # <<<<<<<<<<<<<<
  *                 key_order,header = self.__get_count_header__()
@@ -9528,12 +9528,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_Interface_run, __pyx_k_Interface_run, sizeof(__pyx_k_Interface_run), 0, 0, 1, 1},
   {&__pyx_n_s_Interface_run_cmd, __pyx_k_Interface_run_cmd, sizeof(__pyx_k_Interface_run_cmd), 0, 0, 1, 1},
   {&__pyx_n_s_MergePackage, __pyx_k_MergePackage, sizeof(__pyx_k_MergePackage), 0, 0, 1, 1},
+  {&__pyx_kp_s_Outputting_counts_to_following, __pyx_k_Outputting_counts_to_following, sizeof(__pyx_k_Outputting_counts_to_following), 0, 0, 1, 0},
   {&__pyx_n_s_PairTask, __pyx_k_PairTask, sizeof(__pyx_k_PairTask), 0, 0, 1, 1},
   {&__pyx_n_s_PairTask___handle_engine_output, __pyx_k_PairTask___handle_engine_output, sizeof(__pyx_k_PairTask___handle_engine_output), 0, 0, 1, 1},
   {&__pyx_n_s_PairTask___init, __pyx_k_PairTask___init, sizeof(__pyx_k_PairTask___init), 0, 0, 1, 1},
   {&__pyx_n_s_Queue, __pyx_k_Queue, sizeof(__pyx_k_Queue), 0, 0, 1, 1},
   {&__pyx_n_s_Sample, __pyx_k_Sample, sizeof(__pyx_k_Sample), 0, 0, 1, 1},
-  {&__pyx_kp_s_Status_Outputting_counts_to_fol, __pyx_k_Status_Outputting_counts_to_fol, sizeof(__pyx_k_Status_Outputting_counts_to_fol), 0, 0, 1, 0},
   {&__pyx_n_s_SubsetCore, __pyx_k_SubsetCore, sizeof(__pyx_k_SubsetCore), 0, 0, 1, 1},
   {&__pyx_n_s_SubsetCore___get_results, __pyx_k_SubsetCore___get_results, sizeof(__pyx_k_SubsetCore___get_results), 0, 0, 1, 1},
   {&__pyx_n_s_SubsetCore___init, __pyx_k_SubsetCore___init, sizeof(__pyx_k_SubsetCore___init), 0, 0, 1, 1},
@@ -9739,7 +9739,7 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
   /* "parabam/command/subset.pyx":131
- *             self.__standard_output__("[Status] Outputting counts to following file: %s" % (count_path,))
+ *             self.__standard_output__("- Outputting counts to following file: %s" % (count_path,))
  * 
  *             with open(count_path, "w") as count_file:             # <<<<<<<<<<<<<<
  *                 key_order,header = self.__get_count_header__()
