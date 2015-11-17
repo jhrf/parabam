@@ -935,7 +935,7 @@ static char __pyx_k_system_2[] = "system";
 static char __pyx_k_temp_dir[] = "temp_dir";
 static char __pyx_k_Constants[] = "Constants";
 static char __pyx_k_Interface[] = "Interface";
-static char __pyx_k_Leviathon[] = "Leviathon";
+static char __pyx_k_Leviathan[] = "Leviathan";
 static char __pyx_k_code_path[] = "code_path";
 static char __pyx_k_constants[] = "constants";
 static char __pyx_k_extension[] = "extension";
@@ -1160,7 +1160,7 @@ static PyObject *__pyx_n_s_Interface_default_parser;
 static PyObject *__pyx_n_s_Interface_get_parser;
 static PyObject *__pyx_n_s_Interface_run;
 static PyObject *__pyx_n_s_KeyError;
-static PyObject *__pyx_n_s_Leviathon;
+static PyObject *__pyx_n_s_Leviathan;
 static PyObject *__pyx_kp_s_Only_the_first_5million_reads_wi;
 static PyObject *__pyx_n_s_PairTask;
 static PyObject *__pyx_n_s_PairTask___filter;
@@ -11124,7 +11124,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_9Interface_26run(CYTHON_UNUSED
  * 
  *         update_interval = self.__get_update_interval__(constants.verbose)             # <<<<<<<<<<<<<<
  * 
- *         leviathon = parabam.core.Leviathon(constants,handler_bundle,
+ *         leviathon = parabam.core.Leviathan(constants,handler_bundle,
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_get_update_interval); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
@@ -11162,7 +11162,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_9Interface_26run(CYTHON_UNUSED
   /* "parabam/command/core.pyx":374
  *         update_interval = self.__get_update_interval__(constants.verbose)
  * 
- *         leviathon = parabam.core.Leviathon(constants,handler_bundle,             # <<<<<<<<<<<<<<
+ *         leviathon = parabam.core.Leviathan(constants,handler_bundle,             # <<<<<<<<<<<<<<
  *                                            handler_order,queue_names,
  *                                            update_interval,task_class)
  */
@@ -11171,12 +11171,12 @@ static PyObject *__pyx_pf_7parabam_7command_4core_9Interface_26run(CYTHON_UNUSED
   __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_core); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_Leviathon); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_Leviathan); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "parabam/command/core.pyx":376
- *         leviathon = parabam.core.Leviathon(constants,handler_bundle,
+ *         leviathon = parabam.core.Leviathan(constants,handler_bundle,
  *                                            handler_order,queue_names,
  *                                            update_interval,task_class)             # <<<<<<<<<<<<<<
  * 
@@ -13247,7 +13247,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_Interface_get_parser, __pyx_k_Interface_get_parser, sizeof(__pyx_k_Interface_get_parser), 0, 0, 1, 1},
   {&__pyx_n_s_Interface_run, __pyx_k_Interface_run, sizeof(__pyx_k_Interface_run), 0, 0, 1, 1},
   {&__pyx_n_s_KeyError, __pyx_k_KeyError, sizeof(__pyx_k_KeyError), 0, 0, 1, 1},
-  {&__pyx_n_s_Leviathon, __pyx_k_Leviathon, sizeof(__pyx_k_Leviathon), 0, 0, 1, 1},
+  {&__pyx_n_s_Leviathan, __pyx_k_Leviathan, sizeof(__pyx_k_Leviathan), 0, 0, 1, 1},
   {&__pyx_kp_s_Only_the_first_5million_reads_wi, __pyx_k_Only_the_first_5million_reads_wi, sizeof(__pyx_k_Only_the_first_5million_reads_wi), 0, 0, 1, 0},
   {&__pyx_n_s_PairTask, __pyx_k_PairTask, sizeof(__pyx_k_PairTask), 0, 0, 1, 1},
   {&__pyx_n_s_PairTask___filter, __pyx_k_PairTask___filter, sizeof(__pyx_k_PairTask___filter), 0, 0, 1, 1},
