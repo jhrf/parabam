@@ -431,7 +431,7 @@ class FileReader(Process):
                 except Queue2.Empty:
                     time.sleep(.5)
  
-class Leviathon(object):
+class Leviathan(object):
     #Leviathon takes objects of file_readers and handlers and
     #chains them together.
     def __init__(self,object constants,dict handler_bundle,

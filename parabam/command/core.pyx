@@ -371,7 +371,7 @@ class Interface(parabam.core.Interface):
         
         update_interval = self.__get_update_interval__(constants.verbose)
 
-        leviathon = parabam.core.Leviathon(constants,handler_bundle,
+        leviathon = parabam.core.Leviathan(constants,handler_bundle,
                                            handler_order,queue_names,
                                            update_interval,task_class)
 
