@@ -101,9 +101,12 @@ class Handler(parabam.command.Handler):
 
         #Append to global csv
         if constants.analysis_names: #Check that there are global analyses
-            data_str = self.__get_data_str_from_names__(constants.analysis_names,self._final_structures)
+            data_str = self.__get_data_str_from_names__(constants.analysis_names
+                                                        ,self._final_structures)
+            
             with open(self._output_paths["global"][0],"a") as out_object:
-                out_object.write("%s%s\n" % (self._parent_bam.filename,data_str))
+                out_object.write("%s%s\n" % \
+                    (self._parent_bam.filename,data_str))
         
         #Output numpy arrays
         for name,structure in self._final_structures.items():
