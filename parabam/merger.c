@@ -1090,6 +1090,7 @@ static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_10;
 static PyObject *__pyx_int_20;
 static PyObject *__pyx_int_1024;
+static PyObject *__pyx_int_500000;
 static PyObject *__pyx_int_neg_1;
 static PyObject *__pyx_tuple__5;
 static PyObject *__pyx_tuple__6;
@@ -3604,7 +3605,7 @@ static PyObject *__pyx_gb_7parabam_6merger_7Handler_12generator(__pyx_GeneratorO
  *         i = 0
  * 
  *         while True:             # <<<<<<<<<<<<<<
- *             binary_data = open_file.read(1024)
+ *             binary_data = open_file.read(500000)
  *             if not i == 0:
  */
   while (1) {
@@ -3612,7 +3613,7 @@ static PyObject *__pyx_gb_7parabam_6merger_7Handler_12generator(__pyx_GeneratorO
     /* "parabam/merger.pyx":116
  * 
  *         while True:
- *             binary_data = open_file.read(1024)             # <<<<<<<<<<<<<<
+ *             binary_data = open_file.read(500000)             # <<<<<<<<<<<<<<
  *             if not i == 0:
  *                 combined = prev_data+binary_data
  */
@@ -3628,7 +3629,7 @@ static PyObject *__pyx_gb_7parabam_6merger_7Handler_12generator(__pyx_GeneratorO
 
     /* "parabam/merger.pyx":117
  *         while True:
- *             binary_data = open_file.read(1024)
+ *             binary_data = open_file.read(500000)
  *             if not i == 0:             # <<<<<<<<<<<<<<
  *                 combined = prev_data+binary_data
  *                 if combined[len(combined)-28:] == self._eof_signature:
@@ -3640,7 +3641,7 @@ static PyObject *__pyx_gb_7parabam_6merger_7Handler_12generator(__pyx_GeneratorO
     if (__pyx_t_4) {
 
       /* "parabam/merger.pyx":118
- *             binary_data = open_file.read(1024)
+ *             binary_data = open_file.read(500000)
  *             if not i == 0:
  *                 combined = prev_data+binary_data             # <<<<<<<<<<<<<<
  *                 if combined[len(combined)-28:] == self._eof_signature:
@@ -4578,11 +4579,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "parabam/merger.pyx":116
  * 
  *         while True:
- *             binary_data = open_file.read(1024)             # <<<<<<<<<<<<<<
+ *             binary_data = open_file.read(500000)             # <<<<<<<<<<<<<<
  *             if not i == 0:
  *                 combined = prev_data+binary_data
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_int_1024); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 116; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_int_500000); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 116; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
 
@@ -4708,6 +4709,7 @@ static int __Pyx_InitGlobals(void) {
   __pyx_int_10 = PyInt_FromLong(10); if (unlikely(!__pyx_int_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_20 = PyInt_FromLong(20); if (unlikely(!__pyx_int_20)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_1024 = PyInt_FromLong(1024); if (unlikely(!__pyx_int_1024)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_int_500000 = PyInt_FromLong(500000L); if (unlikely(!__pyx_int_500000)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_int_neg_1 = PyInt_FromLong(-1); if (unlikely(!__pyx_int_neg_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;

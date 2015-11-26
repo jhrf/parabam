@@ -113,7 +113,7 @@ class Handler(parabam.core.Handler):
         i = 0
 
         while True:
-            binary_data = open_file.read(1024)
+            binary_data = open_file.read(500000)
             if not i == 0:
                 combined = prev_data+binary_data
                 if combined[len(combined)-28:] == self._eof_signature:
