@@ -7,6 +7,8 @@ import time
 import parabam
 import gzip
 
+import re
+
 import time
 
 import Queue as Queue2
@@ -25,40 +27,59 @@ class Handler(parabam.core.Handler):
     def __init__(self,object parent_bam, object output_paths,object inqu,
                       object constants,object pause_qus,dict out_qu_dict):
 
-        super(Handler,self).__init__(parent_bam,output_paths,inqu,constants,pause_qus,
+        super(Handler,self).__init__(parent_bam,output_paths,inqu,
+                                        constants,pause_qus,
                                         out_qu_dict,report=False)
         
         self._user_subsets = list(constants.user_subsets)
-        self._out_file_objects = self.__get_out_file_objects__()
+
+        self._eof_signature = "\x1F\x8B\x08\x04\x00\x00\x00\x00\x00\xFF"+\
+                              "\x06\x00\x42\x43\x02\x00\x1B\x00\x03\x00"+\
+                              "\x00\x00\x00\x00\x00\x00\x00\x00"
+        self._header_signature = "\x1F\x8B\x08\x04\x00\x00\x00\x00\x00\xFF"
+
+        self._out_file_objects,self._header_size =\
+                    self.__get_out_file_objects__()
         self._merged = 0
 
     def __get_out_file_objects__(self):
         file_objects = {}
         output_paths = self._output_paths
+        header_size = -1
 
         file_objects = {}
         for subset in self._user_subsets:
             output_path = output_paths[self._parent_bam.filename][subset]
-            merge_type = self.__get_subset_merge_type__(output_path)
-            cur_file_obj = self.__get_file_for_merge_type__(merge_type,output_path)
+            cur_file_obj = open(output_path,"wb")
+            header_size = self.__write_header_to_file__(cur_file_obj)
             file_objects[subset] = cur_file_obj
 
-        return file_objects
+        return file_objects,header_size
 
-    def __get_file_for_merge_type__(self,merge,path):
-        if merge == "gzip":
-            return gzip.open(path,"wb")
-        elif merge == "txt":
-            return open(path,"w")
-        return pysam.AlignmentFile(path,"wb",header=self._parent_bam.header)
+    def __write_header_to_file__(self,cur_file_obj):
+        header_source = open(self._parent_bam.filename,"rb")
+        header_signature = self._header_signature
 
-    def __get_subset_merge_type__(self,path):
-        root,extension = os.path.splitext(path)
-        if extension == ".gzip" or extension == ".gz":
-            return "gzip"
-        elif extension == ".txt":
-            return "txt"
-        return "pysam"
+        i = 0
+        read_bytes = ""
+
+        while True:
+            read_bytes += header_source.read(1024)
+            header_count = read_bytes.count(header_signature)
+
+            if header_count > 1:
+                second_header = [i.start() for i in \
+                                    re.finditer(header_signature,read_bytes)][1]
+
+                cur_file_obj.write(read_bytes[:second_header])
+                cur_file_obj.flush()
+                return second_header #Marks the size of the header
+
+            if i > 20:
+                # TODO: Handle this error better
+                print "Header not found."
+                print "Probably not a BAM file"
+                sys.exit(0)
 
     def __periodic_action__(self,iterations):
         if self._destroy:
@@ -69,44 +90,45 @@ class Handler(parabam.core.Handler):
                 self._finished = True
 
     def __new_package_action__(self,new_package,**kwargs):
-        #Handle the result. Result will always be of type parabam.support.MergePackage
+        #NewPackge is of type parabam.merger.MergePackage
         subset_type = new_package.subset_type
+        
         for merge_count,merge_path in new_package.results:
             if merge_count > 0:
-                for item in self.__get_entries_from_file__(merge_path,subset_type):
-                    self._out_file_objects[subset_type].write(item)
+                with open(merge_path,"rb") as merge_file:
+                    merge_file.seek(self._header_size)
+
+                    for binary_data in \
+                            self.__get_binary_from_file__(merge_file):
+
+                        self._out_file_objects[subset_type].write(binary_data)
+                        self._out_file_objects[subset_type].flush()
+
             os.remove(merge_path)
             self._merged += 1
         time.sleep(.5)
 
-    def __get_entries_from_file__(self,path,subset):
-        merge_type = self.__get_subset_merge_type__(path)
-        if merge_type == "pysam":
-            try:
-                file_object = pysam.AlignmentFile(path,"rb")
-            except IOError:
-                print "fail on path %s" % (path,)
-                return
-            for read in file_object.fetch(until_eof=True):
-                yield read
-        elif merge_type == "gzip":
-            file_object = gzip.open(path,"rb")
-            for item in file_object:
-                yield item
-        elif merge_type == "txt":
-            file_object = open(path,"r")
-            for item in file_object:
-                yield item
-        else:
-            print "[Error] Unrecognised merge type"
-            return
-        file_object.close()
+    def __get_binary_from_file__(self,open_file):
+        prev_data = ""
+        i = 0
 
-    def __get_unique_temp_path__(self,temp_type,temp_dir="."):
-        return "%s/%sTEMP%d.bam" % (temp_dir,temp_type,int(time.time()),)
+        while True:
+            binary_data = open_file.read(1024)
+            if not i == 0:
+                combined = prev_data+binary_data
+                if combined[len(combined)-28:] == self._eof_signature:
+                    yield combined[:len(combined)-28]
+                    return
+                else:
+                    yield prev_data
+
+            prev_data = binary_data
+            i += 1
 
     def __close_all_out_files__(self):
         for subset,file_obj in self._out_file_objects.items():
+            file_obj.write(self._eof_signature)
+            file_obj.flush()
             file_obj.close()
         del self._out_file_objects
 
