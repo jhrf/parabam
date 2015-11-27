@@ -35,6 +35,7 @@ cdef class Handler:
         self._processing = True
         self._destroy = False
         self._finished = False
+        self._last_update = False
 
         if constants.verbose == 1:
             self._verbose = True
@@ -74,9 +75,12 @@ cdef class Handler:
         cdef int start_time = time.time()
         cdef int dealt  = 0
 
-        update_output = self._update_output
         periodic_interval = self._periodic_interval #speedup alias
         finished = self.__is_finished__
+
+        output_logic = self.__silence__
+        if self._constants.verbose and self._report:
+            output_logic = self.__verbose_output_logic__
 
         while not finished():
             iterations += 1
@@ -103,15 +107,31 @@ cdef class Handler:
             if iterations % periodic_interval == 0: 
                 self.__periodic_action__(iterations)
 
-            if self._verbose and self._report \
-                and iterations % update_interval == 0 \
-                and self._processing:
-                #Could move this to functiond decision if speed was an issue
-                outstr = self.__format_update__(start_time,iterations,update_interval)
-                update_output(outstr)
+            output_logic(start_time,iterations,update_interval)
 
         self._inqu.close()
         self.__handler_exit__()
+
+    def __verbose_output_logic__(self,start_time,iterations,update_interval):
+
+        if iterations % update_interval == 0 and self._processing:
+            outstr = self.__format_update__(start_time,
+                                            iterations,
+                                            update_interval)
+            self._update_output(outstr)
+        elif not self._processing and not self._last_update:
+            if self._constants.verbose == 2:
+                outstr = self.__format_update__(start_time,
+                                                iterations,
+                                                update_interval)
+                self._update_output(outstr)
+                sys.stdout.write("\n")
+                sys.stdout.flush()
+
+            self._last_update = True
+
+    def __silence__(self,*args):
+        pass
 
     def __is_finished__(self):
         if not self._destroy or not self._finished:
