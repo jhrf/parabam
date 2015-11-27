@@ -1,21 +1,14 @@
 #!/usr/bin/env python
 #Once upon a time...
 
-import pdb,sys,os,argparse
-import pysam
+import pdb,sys,os
+import time
+import re
 import time
 import parabam
-import gzip
-
-import re
-
-import time
 
 import Queue as Queue2
 
-from collections import Counter
-from multiprocessing import Queue,Process
-from itertools import izip
 
 class MergePackage(parabam.core.Package):
     def __init__(self,object results,str subset_type):
@@ -94,7 +87,7 @@ class Handler(parabam.core.Handler):
                 self._finished = True
 
     def __new_package_action__(self,new_package,**kwargs):
-        #NewPackge is of type parabam.merger.MergePackage
+        #new_package is of type parabam.merger.MergePackage
         subset_type = new_package.subset_type
         
         for merge_count,merge_path in new_package.results:
@@ -108,7 +101,6 @@ class Handler(parabam.core.Handler):
                         self._out_file_objects[subset_type].write(binary_data)
                         self._out_file_objects[subset_type].flush()
 
-            #time.sleep(20)
             os.remove(merge_path)
             self._merged += 1
         time.sleep(.5)
@@ -122,14 +114,9 @@ class Handler(parabam.core.Handler):
             if not i == 0:
                 combined = prev_data+binary_data
                 if combined[len(combined)-28:] == self._eof_signature:
-                    # print "Last"
-                    # print combined[len(combined)-1024:].encode("hex")
                     yield combined[:len(combined)-28]
                     return
                 else:
-                    #if i == 1:
-                        # print "First"
-                        # print prev_data[:1024].encode("hex")
                     yield prev_data
 
             prev_data = binary_data
