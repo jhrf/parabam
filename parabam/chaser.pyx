@@ -459,9 +459,9 @@ class Handler(parabam.core.Handler):
         
         if self._constants.verbose:
             if self._total_loners - self._rescued["total"] == 0:
-                sys.stdout.write("\r\t- Read pairing in progress: 100.000% complete")
+                sys.stdout.write("\r\t- Read pairing in progress: 100.00% complete\n")
                 sys.stdout.flush()
-            self.__standard_output__("\n\t- Unpaired reads: %d" %\
+            self.__standard_output__("\t- Unpaired reads: %d" %\
                 (self._total_loners - self._rescued["total"],))
         for qu in self._pause_qus:
             qu.close()
@@ -470,14 +470,11 @@ class Handler(parabam.core.Handler):
         if self._constants.verbose:
             if self._post_destroy_count >= self._post_destroy_thresh:
                 if self._post_destroy_count % 25 == 0 and self._constants.verbose == 2:
-                    if self._post_destroy_count == self._post_destroy_thresh:
-                        sys.stdout.write("\n")
-                        sys.stdout.flush()
-                    sys.stdout.write("\r\t- Read pairing in progress: %.3f%% complete  " %\
+                    sys.stdout.write("\r\t- Read pairing in progress: %.2f%% complete  " %\
                                 ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
                     sys.stdout.flush()
-                elif self._post_destroy_count % 250 == 0 and self._constants.verbose ==1:
-                    sys.stdout.write("\n\t- Read pairing in progress: %.3f%% complete" %\
+                elif self._post_destroy_count % 500 == 0 and self._constants.verbose ==1:
+                    sys.stdout.write("\n\t- Read pairing in progress: %.2f%% complete" %\
                                 ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
                     sys.stdout.flush()
 
