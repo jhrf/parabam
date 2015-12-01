@@ -32,6 +32,8 @@ class Handler(parabam.core.Handler):
         self._header_signature = '\x1F\x8B\x08\x04\x00\x00\x00\x00\x00\xFF'
 
         self._out_file_objects = self.__get_out_file_objects__()
+        self._subset_has_header = \
+                self.__get_subset_dict__(payload=(lambda:False))
         self._merged = 0
 
         self._preserve_order = not self._constants.pair_process
@@ -51,19 +53,12 @@ class Handler(parabam.core.Handler):
         file_objects = {}
         for subset in self._user_subsets:
             output_path = output_paths[self._parent_bam.filename][subset]
-            cur_file_obj = open(output_path,"wb")
-            self.__write_header_to_file__(cur_file_obj)
-            file_objects[subset] = cur_file_obj
+            file_objects[subset] = self.__get_bam_file_obj__(output_path)
 
         return file_objects
 
-    def __write_header_to_file__(self,cur_file_obj):
-        header_location = self.__get_header_location__\
-                                    (self._parent_bam.filename)
-
-        with open(self._parent_bam.filename,"rb") as header_file:
-            cur_file_obj.write(header_file.read(header_location))
-            cur_file_obj.flush()
+    def __get_bam_file_obj__(self,output_path):
+        return open(output_path,"wb")
 
     def __get_header_location__(self,header_path):
         header_signature = self._header_signature
@@ -211,7 +206,10 @@ class Handler(parabam.core.Handler):
 
     def __dump_to_BAM_file__(self,merge_path,subset):
         with open(merge_path,"rb") as merge_file:
-            merge_file.seek(self.__get_header_location__(merge_path))
+            if self._subset_has_header[subset]:
+                merge_file.seek(self.__get_header_location__(merge_path))
+            else:
+                self._subset_has_header[subset] = True
 
             for binary_data in \
                 self.__get_binary_from_file__(merge_file):
