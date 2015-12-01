@@ -16,7 +16,8 @@ from abc import ABCMeta, abstractmethod
 cdef class Handler:
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
-                object constants,object pause_qus,dict out_qu_dict,object report=True):
+                object constants,object pause_qus,
+                dict out_qu_dict,object report=True):
 
         self._parent_bam = parent_bam
         self._inqu = inqu
@@ -213,7 +214,7 @@ class Task(Process):
 
         while True:
             try:
-                package = self._inqu.get(False)
+                package,order = self._inqu.get(False)
                 self._idle_sent = False
                 if type(package) == DestroyPackage:
                     bamfile.close()
@@ -230,8 +231,8 @@ class Task(Process):
                 self._dealt += 1
                 time.sleep(0.005)
 
-                self._outqu.put(Package(results=results))
-                    #tell filereader a batch of five jobs
+                self._outqu.put(Package(results=results,order=order))
+                #tell filereader a batch of five jobs
                 self._statusqu.put(1) 
 
             except Queue2.Empty:
@@ -352,15 +353,15 @@ class FileReader(Process):
 
         for i,command in enumerate(parent_generator):
             wait_for_pause()
-            task_qu.put(parent_bam.tell())
+            task_qu.put( (parent_bam.tell(),command) )
             self._active_jobs += 1
             if i % 10 == 0:
                 check_inqu()
 
         for n in xrange(self._task_n+1):
-            task_qu.put(DestroyPackage())
+            task_qu.put( (DestroyPackage(),-1) )
 
-        time.sleep(3)
+        time.sleep(2)
         parent_bam.close()
         task_qu.close()
         return
@@ -398,7 +399,7 @@ class FileReader(Process):
         while True:
             try:
                 if iterations % reader_n == proc_id:
-                    yield True
+                    yield iterations
                 for x in xrange(task_size):
                     parent_iter.next()
                 iterations += 1
@@ -415,7 +416,7 @@ class FileReader(Process):
         while True:            
             try:
                 if iterations % reader_n == proc_id:
-                    yield True
+                    yield iterations
                 for x in xrange(task_size):
                     parent_iter.next()
                 iterations += 1
@@ -703,8 +704,9 @@ class Constants(object):
         setattr(self,key,val)
 
 class Package(object):
-    def __init__(self,results):
+    def __init__(self,results,order=-1):
         self.results = results
+        self.order = order
 
 class DestroyPackage(Package):
     def __init__(self):

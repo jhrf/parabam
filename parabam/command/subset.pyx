@@ -100,7 +100,8 @@ class Handler(parabam.command.Handler):
         for subset in self._user_subsets:
             if results["counts"][subset] > 0:
                 self._stage_stores[subset].append((results["counts"][subset],
-                                               results["temp_paths"][subset],))
+                                                   results["temp_paths"][subset],
+                                                   new_package.order,))
 
     def __periodic_action__(self,iterations):
         super(Handler,self).__periodic_action__(iterations)
@@ -120,7 +121,8 @@ class Handler(parabam.command.Handler):
         self.__write_counts_csv__()
     
     def __add_merge_task__(self,results,subset_type):
-        res = parabam.merger.MergePackage(results=results,subset_type=subset_type)
+        res = parabam.merger.MergePackage(results=results,
+                                          subset_type=subset_type,)
         self._out_qu_dict["merge"].put(res)
 
     def __write_counts_csv__(self):

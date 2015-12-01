@@ -4,8 +4,8 @@
 import pdb,sys,os
 import time
 import re
-import time
 import parabam
+import pysam
 
 import Queue as Queue2
 
@@ -33,6 +33,16 @@ class Handler(parabam.core.Handler):
 
         self._out_file_objects = self.__get_out_file_objects__()
         self._merged = 0
+
+        self._preserve_order = not self._constants.pair_process
+        self._waiting_files = self.__get_subset_dict__(payload=dict)
+        self._merge_stage = self.__get_subset_dict__()
+        self._previous_merge = -1
+
+        self._total_clumps = 0
+
+    def __get_subset_dict__(self,payload=list):
+        return dict( ( (subset,payload(),) for subset in self._user_subsets) )
 
     def __get_out_file_objects__(self):
         file_objects = {}
@@ -88,22 +98,127 @@ class Handler(parabam.core.Handler):
 
     def __new_package_action__(self,new_package,**kwargs):
         #new_package is of type parabam.merger.MergePackage
-        subset_type = new_package.subset_type
-        
-        for merge_count,merge_path in new_package.results:
-            if merge_count > 0:
-                with open(merge_path,"rb") as merge_file:
-                    merge_file.seek(self.__get_header_location__(merge_path))
+        subset = new_package.subset_type
+        self.__add_to_waiting_files__(subset,new_package.results)
+        self.__process_waiting_files__(subset)
 
-                    for binary_data in \
-                            self.__get_binary_from_file__(merge_file):
+    def __add_to_waiting_files__(self,subset,results):
+        for merge_count,merge_path,order in results:
+            self._merge_stage[subset].append(order)
+            self._waiting_files[subset][order] = (merge_count,merge_path)
+        self._merge_stage[subset].sort()
 
-                        self._out_file_objects[subset_type].write(binary_data)
-                        self._out_file_objects[subset_type].flush()
+    def __process_waiting_files__(self,subset,force=False):
+        order_check = self.__order_check__(subset) #TODO: Better name for order_check
+        if len(order_check) > 0:
+            merge_tuples = [ self._waiting_files[subset][order] for order in order_check ]
 
-            os.remove(merge_path)
-            self._merged += 1
-        time.sleep(.5)
+            solve_clumps = self.__clump_merge_files__(merge_tuples,force)
+            
+            if len(solve_clumps) > 0:
+                for merge_count,merge_path in solve_clumps:
+                    self.__dump_to_BAM_file__(merge_path,subset)
+               
+                for order in order_check:
+                    del self._waiting_files[subset][order]
+                    self._merge_stage[subset].remove(order)
+
+            del solve_clumps
+            del order_check
+
+    def __clump_merge_files__(self,merge_tuples,force=False):
+        all_above_thresh = True
+        any_above_thresh = False
+        total_reads = 0
+
+        merge_paths = []
+
+        for merge_count,merge_path in merge_tuples:
+            total_reads += merge_count
+
+            if merge_count >= 512:
+                any_above_thresh = True
+            else:
+                all_above_thresh = False
+
+        if all_above_thresh:
+            #no clump required
+            return merge_tuples
+        elif total_reads < 2000 and not force:
+            #clump not possible
+            return []
+        elif not any_above_thresh:
+            #one large clump
+            return [ (total_reads,self.__get_clump__(merge_tuples),) ]
+        else:
+            #several clumps
+            return self.__clump_merge_files__(self.__pair_small_files__(merge_tuples),force)
+    
+    def __pair_small_files__(self,merge_tuples):
+        new_tuples = []
+        for t1 in xrange(0,len(merge_tuples),2):
+            if t1+1 < len(merge_tuples):
+                pair1 = merge_tuples[t1]
+                pair2 = merge_tuples[t1+1]
+
+                if pair1[0] < 512 or pair2[0] < 512:
+                    new_tuples.append( self.__get_clump__([pair1,pair2]) )
+                else:
+                    new_tuples.extend((pair1,pair2,))
+            else:
+                new_tuples.append(merge_tuples[t1])
+        return new_tuples
+
+    def __get_clump__(self,merge_tuples):
+        clump_path = os.path.join(self._constants.temp_dir,"merge_temp_%d-%d.bam" \
+                                                    % (self._total_clumps,time.time(),))
+        clump_file = pysam.AlignmentFile(clump_path,"wb",header=self._parent_bam.header)
+        clump_count = 0
+                
+        for count,path in merge_tuples:
+            clump_count += count
+
+            if count > 0:
+                small_bam = pysam.AlignmentFile(path,"rb")
+                for read in small_bam.fetch(until_eof=True):
+                    clump_file.write(read)
+                small_bam.close()
+            os.remove(path)
+
+        clump_file.close()
+        self._total_clumps += 1
+        return clump_count,clump_path
+
+    def __order_check__(self,subset):
+        if not self._preserve_order:
+            return self._merge_stage[subset]
+        else:
+            ready_to_merge = []
+            prev = self._previous_merge
+
+            self._merge_stage[subset].sort()
+            for order in self._merge_stage[subset]:
+                
+                if order-prev > 1:
+                    break
+                else:
+                    ready_to_merge.append(order)
+                    prev = order
+
+            if len(ready_to_merge) > 0:
+                self._previous_merge = ready_to_merge[-1]
+            return ready_to_merge
+
+    def __dump_to_BAM_file__(self,merge_path,subset):
+        with open(merge_path,"rb") as merge_file:
+            merge_file.seek(self.__get_header_location__(merge_path))
+
+            for binary_data in \
+                self.__get_binary_from_file__(merge_file):
+
+                self._out_file_objects[subset].write(binary_data)
+                self._out_file_objects[subset].flush()
+        os.remove(merge_path)
 
     def __get_binary_from_file__(self,open_file):
         prev_data = ""
@@ -130,6 +245,8 @@ class Handler(parabam.core.Handler):
         del self._out_file_objects
 
     def __handler_exit__(self,**kwargs):
+        for subset in self._user_subsets:
+            self.__process_waiting_files__(subset,force=True)
         self.__close_all_out_files__()
         
 #...happily ever after

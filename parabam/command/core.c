@@ -6698,7 +6698,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_12__test_stage_store_
  *         if (not self._processing) or self._destroy:
  *             return len(self._stage_stores[subset]) > 0             # <<<<<<<<<<<<<<
  *         else:
- *             return len(self._stage_stores[subset]) > 20
+ *             return len(self._stage_stores[subset]) > 10
  */
     __Pyx_XDECREF(__pyx_r);
     __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_stage_stores); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 197; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -6719,7 +6719,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_12__test_stage_store_
     /* "parabam/command/core.pyx":199
  *             return len(self._stage_stores[subset]) > 0
  *         else:
- *             return len(self._stage_stores[subset]) > 20             # <<<<<<<<<<<<<<
+ *             return len(self._stage_stores[subset]) > 10             # <<<<<<<<<<<<<<
  * 
  *     def __add_staged_system_task__(self,results,subset_type):
  */
@@ -6731,7 +6731,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_12__test_stage_store_
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_6 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 199; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyBool_FromLong((__pyx_t_6 > 20)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 199; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyBool_FromLong((__pyx_t_6 > 10)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 199; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
@@ -6759,7 +6759,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_12__test_stage_store_
 }
 
 /* "parabam/command/core.pyx":201
- *             return len(self._stage_stores[subset]) > 20
+ *             return len(self._stage_stores[subset]) > 10
  * 
  *     def __add_staged_system_task__(self,results,subset_type):             # <<<<<<<<<<<<<<
  *         if subset_type == "chaser":
@@ -6933,7 +6933,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_7Handler_14__add_staged_system
   __pyx_L3:;
 
   /* "parabam/command/core.pyx":201
- *             return len(self._stage_stores[subset]) > 20
+ *             return len(self._stage_stores[subset]) > 10
  * 
  *     def __add_staged_system_task__(self,results,subset_type):             # <<<<<<<<<<<<<<
  *         if subset_type == "chaser":
@@ -13950,7 +13950,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_codeobj__64 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__63, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_par, __pyx_n_s_test_stage_store, 195, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__64)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 195; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "parabam/command/core.pyx":201
- *             return len(self._stage_stores[subset]) > 20
+ *             return len(self._stage_stores[subset]) > 10
  * 
  *     def __add_staged_system_task__(self,results,subset_type):             # <<<<<<<<<<<<<<
  *         if subset_type == "chaser":
@@ -15003,7 +15003,7 @@ PyMODINIT_FUNC PyInit_core(void)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "parabam/command/core.pyx":201
- *             return len(self._stage_stores[subset]) > 20
+ *             return len(self._stage_stores[subset]) > 10
  * 
  *     def __add_staged_system_task__(self,results,subset_type):             # <<<<<<<<<<<<<<
  *         if subset_type == "chaser":

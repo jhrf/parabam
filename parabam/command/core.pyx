@@ -196,7 +196,7 @@ class Handler(parabam.core.Handler):
         if (not self._processing) or self._destroy:
             return len(self._stage_stores[subset]) > 0
         else:
-            return len(self._stage_stores[subset]) > 20
+            return len(self._stage_stores[subset]) > 10
     
     def __add_staged_system_task__(self,results,subset_type):
         if subset_type == "chaser":
