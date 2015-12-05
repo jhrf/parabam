@@ -214,7 +214,7 @@ class Task(Process):
 
         while True:
             try:
-                package,order = self._inqu.get(False)
+                package,sequence_id = self._inqu.get(False)
                 self._idle_sent = False
                 if type(package) == DestroyPackage:
                     bamfile.close()
@@ -231,7 +231,7 @@ class Task(Process):
                 self._dealt += 1
                 time.sleep(0.005)
 
-                self._outqu.put(Package(results=results,order=order))
+                self._outqu.put(Package(results=results,sequence_id=sequence_id))
                 #tell filereader a batch of five jobs
                 self._statusqu.put(1) 
 
@@ -461,12 +461,12 @@ class Leviathan(object):
     #Leviathon takes objects of file_readers and handlers and
     #chains them together.
     def __init__(self,object constants,dict handler_bundle,
-                 list handler_order,list queue_names,
+                 list sequence_id,list queue_names,
                  int update,object Task):
 
         self._constants = constants
         self._handler_bundle  = handler_bundle
-        self._handler_order = handler_order
+        self.sequence_id = sequence_id
         self._update = update
         self._queue_names = queue_names
         self._Task = Task
@@ -478,7 +478,7 @@ class Leviathan(object):
         pause_qus = self.__create_pause_qus__(self._constants.reader_n)
 
 
-        handlers_objects,handler_inqus = self.__create_handlers__(self._handler_order,
+        handlers_objects,handler_inqus = self.__create_handlers__(self.sequence_id,
                                                           self._handler_bundle,self._constants,
                                                           default_qus,parent,output_paths,pause_qus)
         handlers = self.__get_handlers__(handlers_objects)
@@ -563,12 +563,12 @@ class Leviathan(object):
             queues[name] = Queue()
         return queues
 
-    def __create_handlers__(self,handler_order,handler_bundle,constants,
+    def __create_handlers__(self,sequence_id,handler_bundle,constants,
                             queues,parent_bam,output_paths,pause_qus):
         handlers = []
         handler_inqus = []
 
-        for handler_class in handler_order:
+        for handler_class in sequence_id:
             handler_args = dict(handler_bundle[handler_class])
 
             handler_args["parent_bam"] = parent_bam
@@ -704,9 +704,9 @@ class Constants(object):
         setattr(self,key,val)
 
 class Package(object):
-    def __init__(self,results,order=-1):
+    def __init__(self,results,sequence_id=-1):
         self.results = results
-        self.order = order
+        self.sequence_id = sequence_id
 
 class DestroyPackage(Package):
     def __init__(self):

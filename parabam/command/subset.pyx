@@ -98,10 +98,10 @@ class Handler(parabam.command.Handler):
         super(Handler,self).__new_package_action__(new_package)
         results = new_package.results
         for subset in self._user_subsets:
-            if results["counts"][subset] > 0:
-                self._stage_stores[subset].append((results["counts"][subset],
-                                                   results["temp_paths"][subset],
-                                                   new_package.order,))
+            self._stage_stores[subset].append(\
+                                (results["counts"][subset],
+                                 results["temp_paths"][subset],
+                                 new_package.sequence_id,))
 
     def __periodic_action__(self,iterations):
         super(Handler,self).__periodic_action__(iterations)

@@ -9,6 +9,11 @@ import pysam
 
 import Queue as Queue2
 
+from collections import namedtuple
+from itertools import izip
+
+from pprint import pprint as ppr
+
 
 class MergePackage(parabam.core.Package):
     def __init__(self,object results,str subset_type):
@@ -36,12 +41,27 @@ class Handler(parabam.core.Handler):
                 self.__get_subset_dict__(payload=(lambda:False))
         self._merged = 0
 
-        self._preserve_order = not self._constants.pair_process
+        self._preserve_sequence = not self._constants.pair_process
         self._waiting_files = self.__get_subset_dict__(payload=dict)
         self._merge_stage = self.__get_subset_dict__()
         self._previous_merge = -1
+        self._out_of_sequence_package = -2
 
         self._total_clumps = 0
+
+        self._Clump = namedtuple("Clump","sequence_ids merge_tuples")
+
+        self._header_path = self.__get_header_sam_path__()
+
+    def __get_header_sam_path__(self):
+        header = pysam.view(*["-H",self._parent_bam.filename])
+        time_of_creation = int(time.time())
+        header_path = os.path.join(self._constants.temp_dir,
+                                   "header_%d.bam" % (time_of_creation,))
+        with open(header_path,"w") as header_sam_file:
+            header_sam_file.write("".join(header))
+            header_sam_file.flush()
+        return header_path
 
     def __get_subset_dict__(self,payload=list):
         return dict( ( (subset,payload(),) for subset in self._user_subsets) )
@@ -98,107 +118,168 @@ class Handler(parabam.core.Handler):
         self.__process_waiting_files__(subset)
 
     def __add_to_waiting_files__(self,subset,results):
-        for merge_count,merge_path,order in results:
-            self._merge_stage[subset].append(order)
-            self._waiting_files[subset][order] = (merge_count,merge_path)
+        for merge_count,merge_path,sequence_id in results:
+            merge_id = sequence_id
+            if merge_id == -1:
+                merge_id = self._out_of_sequence_package
+                self._out_of_sequence_package += (-1)
+
+            self._merge_stage[subset].append(merge_id)
+            self._waiting_files[subset][merge_id] = (merge_count,merge_path)
         self._merge_stage[subset].sort()
 
     def __process_waiting_files__(self,subset,force=False):
-        order_check = self.__order_check__(subset) #TODO: Better name for order_check
-        if len(order_check) > 0:
-            merge_tuples = [ self._waiting_files[subset][order] for order in order_check ]
+        #TODO: Better name for valid_sequence_ids
+        valid_sequence_ids = self.__get_valid_sequence_ids__(subset) 
+        if len(valid_sequence_ids) > 0:
 
-            solve_clumps = self.__clump_merge_files__(merge_tuples,force)
-            
-            if len(solve_clumps) > 0:
-                for merge_count,merge_path in solve_clumps:
+            merge_tuples = [ self._waiting_files[subset][sequence_id]\
+                             for sequence_id in valid_sequence_ids ]
+
+            clumps,clumped_sequence_ids = \
+                    self.__clump_merge_files__(merge_tuples,
+                                               valid_sequence_ids,
+                                               force)
+
+            if len(clumps) > 0:
+                for merge_count,merge_path in clumps:
                     self.__dump_to_BAM_file__(merge_path,subset)
-               
-                for order in order_check:
-                    del self._waiting_files[subset][order]
-                    self._merge_stage[subset].remove(order)
+            
+                for sequence_id in clumped_sequence_ids:
+                    del self._waiting_files[subset][sequence_id]
+                    self._merge_stage[subset].remove(sequence_id)
 
-            del solve_clumps
-            del order_check
+            del clumps
+            del valid_sequence_ids
+            del clumped_sequence_ids
 
-    def __clump_merge_files__(self,merge_tuples,force=False):
+    def __clump_merge_files__(self,merge_tuples,sequence_ids,force=False):
         all_above_thresh = True
         any_above_thresh = False
         total_reads = 0
 
-        merge_paths = []
-
         for merge_count,merge_path in merge_tuples:
             total_reads += merge_count
 
-            if merge_count >= 512:
+            if merge_count >= 1000:
                 any_above_thresh = True
             else:
                 all_above_thresh = False
 
         if all_above_thresh:
             #no clump required
-            return merge_tuples
-        elif total_reads < 2000 and not force:
+            return merge_tuples,list(sequence_ids)
+        elif total_reads < 1000:
             #clump not possible
-            return []
-        elif not any_above_thresh:
+            return [],[]
+        elif not any_above_thresh or force:
             #one large clump
-            return [ (total_reads,self.__get_clump__(merge_tuples),) ]
+            return [ self.__get_clump__(merge_tuples) ],list(sequence_ids)
         else:
             #several clumps
-            return self.__clump_merge_files__(self.__pair_small_files__(merge_tuples),force)
+            return self.__create_clumps__(merge_tuples,list(sequence_ids))
     
-    def __pair_small_files__(self,merge_tuples):
-        new_tuples = []
-        for t1 in xrange(0,len(merge_tuples),2):
-            if t1+1 < len(merge_tuples):
-                pair1 = merge_tuples[t1]
-                pair2 = merge_tuples[t1+1]
+    def __create_clumps__(self,merge_tuples,sequence_ids):
+        clumped_sequence_ids = []
+        new_merge_tuple = []
 
-                if pair1[0] < 512 or pair2[0] < 512:
-                    new_tuples.append( self.__get_clump__([pair1,pair2]) )
-                else:
-                    new_tuples.extend((pair1,pair2,))
-            else:
-                new_tuples.append(merge_tuples[t1])
-        return new_tuples
+        current_clump = self.__new_clump__()
+        count = 0
+
+        for (merge_count,merge_path),sequence_id in izip(merge_tuples,sequence_ids):
+            if count > 1000:
+                new_merge_tuple.append(self.__get_clump__(\
+                                            current_clump.merge_tuples))
+                clumped_sequence_ids.extend(current_clump.sequence_ids)
+                current_clump = self.__new_clump__()
+                count = 0
+
+            current_clump.merge_tuples.append((merge_count,merge_path))
+            current_clump.sequence_ids.append(sequence_id)
+            count += merge_count
+
+        return new_merge_tuple,clumped_sequence_ids
+
+    def __new_clump__(self):
+        return self._Clump(sequence_ids=[],merge_tuples=[])
 
     def __get_clump__(self,merge_tuples):
-        clump_path = os.path.join(self._constants.temp_dir,"merge_temp_%d-%d.bam" \
-                                                    % (self._total_clumps,time.time(),))
-        clump_file = pysam.AlignmentFile(clump_path,"wb",header=self._parent_bam.header)
-        clump_count = 0
+
+        # This function may seem overly complicated but it is 
+        # neccessary to handles input to pysam.cat in this way.
+        #
+        # The function protects pysam.cat from catting too many
+        # files at once and from catting only a single file
+        if len(merge_tuples) == 1:
+            return merge_tuples[0]
+        else:
+            
+            def get_tuple_generator(merge_tuples):
+                for count,path in merge_tuples:
+                    yield count,path
+                return
+
+            new_tuples = []
+            total_clumped = 0
+            merge_tuples_generator = get_tuple_generator(merge_tuples)
+
+            while total_clumped < len(merge_tuples):
+
+                clump_path = self.__get_clump_path__()
+                clump_count = 0
                 
-        for count,path in merge_tuples:
-            clump_count += count
+                remove_paths = []
+                cat_paths = []
 
-            if count > 0:
-                small_bam = pysam.AlignmentFile(path,"rb")
-                for read in small_bam.fetch(until_eof=True):
-                    clump_file.write(read)
-                small_bam.close()
-            os.remove(path)
+                for count,path in merge_tuples_generator:
+                    if len(cat_paths) > 250:
+                        break
 
-        clump_file.close()
+                    total_clumped += 1
+                    remove_paths.append(path)
+                    if count > 0:
+                        cat_paths.append(path)
+                        clump_count += count
+                
+                if len(cat_paths) == 1:
+                    # Rare case where a sub-clump was comprised of empty BAM 
+                    # files apart from one BAM file with reads
+
+                    new_tuples.append((clump_count,cat_paths[0]),)
+                    remove_paths.remove(cat_paths[0])
+                else:
+                    cat_paths.insert(0,"-o%s" % (clump_path,))
+                    cat_paths.insert(0,"-h%s" % (self._header_path,))
+                    pysam.cat(*cat_paths)
+                    new_tuples.append((clump_count,clump_path,))
+
+                for path in remove_paths:
+                    os.remove(path)
+
+            return self.__get_clump__(new_tuples)
+
+    def __get_clump_path__(self):
+        clump_path = os.path.join(self._constants.temp_dir,
+                              "merge_temp_%d-%d.bam" % (self._total_clumps,
+                                                         time.time(),))
         self._total_clumps += 1
-        return clump_count,clump_path
+        return clump_path
 
-    def __order_check__(self,subset):
-        if not self._preserve_order:
+    def __get_valid_sequence_ids__(self,subset):
+        if not self._preserve_sequence:
             return self._merge_stage[subset]
         else:
             ready_to_merge = []
             prev = self._previous_merge
 
             self._merge_stage[subset].sort()
-            for order in self._merge_stage[subset]:
+            for sequence_id in self._merge_stage[subset]:
                 
-                if order-prev > 1:
+                if sequence_id-prev > 1:
                     break
                 else:
-                    ready_to_merge.append(order)
-                    prev = order
+                    ready_to_merge.append(sequence_id)
+                    prev = sequence_id
 
             if len(ready_to_merge) > 0:
                 self._previous_merge = ready_to_merge[-1]
