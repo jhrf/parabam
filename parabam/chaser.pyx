@@ -114,6 +114,29 @@ class Handler(parabam.core.Handler):
 
         self._primary_store = self.__instalise_primary_store__()
 
+        #self._print_chaser_debug = (lambda iterations: pass)
+        self._print_chaser_debug = self.__print_debug__
+
+    def __print_debug__(self,iterations):
+        if iterations % 50 == 0:
+            sys.stdout.write(("\r %d/%d=%.4f %.2fGB | Proc:%d Des:%d Emp:%d "
+                         "Purg:%d Stale(Thresh):%d(%d) Jobs:%d Files:%d  ") %\
+                (self._rescued["total"],
+                self._total_loners,
+                float(self._rescued["total"]+1)/(self._total_loners+1),
+                float((self._total_loners\
+                            - self._rescued["total"]) * 130) / (10**9),
+                self._processing,
+                self._destroy,
+                empty,
+                len(self._loner_purgatory),
+                self._stale_count,
+                self._stale_thresh,
+                self._pending_jobs,
+                self._files_in_pyramid))
+            sys.stdout.flush()
+
+
     def __create_chaser_tasks__(self,total_tasks):
         tasks = []
         for i in xrange(total_tasks):
@@ -249,7 +272,8 @@ class Handler(parabam.core.Handler):
 
     def __request_fragment_output__(self,paths):
         if self._destroy and self._stale_count > 10:
-            has_large_file = any([ (os.path.getsize(path) / 100) > 1000000 for path in paths ])
+            has_large_file = any([ (os.path.getsize(path) / 100) \
+                                             > 1000000 for path in paths ])
             if has_large_file:
                 self._stale_thresh = 250
                 return True
@@ -289,7 +313,7 @@ class Handler(parabam.core.Handler):
     def __periodic_action__(self,iterations):
 
         self.__pause_monitor__()
-        chaser_debug = True
+        self._print_chaser_debug(iterations)
 
         if not self._destroy:
             idle_threshold = 500
@@ -344,7 +368,12 @@ class Handler(parabam.core.Handler):
                 del idle_paths,idle_levels
 
         self.__test_primary_tasks__(required_paths=required_paths)
+        self.__finish_test__(empty)
 
+        if iterations % 100 == 0:
+            gc.collect()
+
+    def __finish_test__(self,empty):
         if self._destroy:
             self.__post_destroy_report__()
             if not self._rescued["total"] == self._prev_rescued:
@@ -358,6 +387,8 @@ class Handler(parabam.core.Handler):
                                                         > self._stale_thresh:
                 finished = True
                 if not empty: #essentialy `if stale count`
+                    #TODO: This is causing error. Deleting files in use
+                    #by still active processes causes chrashes
                     self.__tidy_pyramid__()
                 else: 
                     if saved > 0:
@@ -367,27 +398,6 @@ class Handler(parabam.core.Handler):
                                        
                 if finished:
                     self._finished = True
-
-        if iterations % 20 == 0:
-            gc.collect()
-
-        if chaser_debug and iterations % 30 == 0:
-            sys.stdout.write(("\r %d/%d=%.4f %.2fGB | Proc:%d Des:%d Emp:%d "
-                             "Purg:%d Stale(Thresh):%d(%d) Jobs:%d Files:%d  ") %\
-                (self._rescued["total"],
-                self._total_loners,
-                float(self._rescued["total"]+1)/(self._total_loners+1),
-                float((self._total_loners\
-                            -self._rescued["total"]) * 130) / (10**9),
-                self._processing,
-                self._destroy,
-                empty,
-                len(self._loner_purgatory),
-                self._stale_count,
-                self._stale_thresh,
-                self._pending_jobs,
-                self._files_in_pyramid))
-            sys.stdout.flush()
 
     def __set_new_stale_thresh__(self):
         self._stale_thresh = (10 + (self._files_in_pyramid * 5) \
@@ -428,12 +438,38 @@ class Handler(parabam.core.Handler):
         return []
     
     def __tidy_pyramid__(self):
+        def tidy_update(found,total):
+            sys.stdout.write(("\r- Unpaired reads identified."
+                              " Waiting for tasks to finish: %d/%d ") % \
+                                                            (found,total) )
+            sys.stdout.flush()
+        
+        found = 0
+        if self._constants.verbose:
+            sys.stdout.write("\n")
+            sys.stdout.flush()
+
+        while self._pending_jobs > 0:
+            if self._constants.verbose:
+                tidy_update(found,self._pending_jobs)
+            try:
+                pack = self._inqu.get(True,10)
+                self.__new_package_action__(pack)
+                found += 1
+            except Queue2.Empty:
+                time.sleep(1)
+
         for loner_type,pyramid in self._loner_pyramid.items():
             for sub_pyramid in pyramid:
                 for x in xrange(len(sub_pyramid)):
                     os.remove(sub_pyramid.pop())
                     self._files_in_pyramid -= 1
         gc.collect()
+
+        if self._constants.verbose:
+            tidy_update(found,self._pending_jobs)
+            sys.stdout.write("\n")
+            sys.stdout.flush()
             
     def __clear_subpyramid__(self,success,destroy,running):
         if success:
@@ -509,11 +545,11 @@ class Handler(parabam.core.Handler):
     def __post_destroy_report__(self):
         if self._constants.verbose:
             if self._post_destroy_count >= self._post_destroy_thresh:
-                if self._post_destroy_count % 25 == 0 and self._constants.verbose == 2:
+                if self._post_destroy_count % 100 == 0 and self._constants.verbose == 2:
                     sys.stdout.write("\r\t- Read pairing in progress: %.2f%% complete  " %\
                                 ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
                     sys.stdout.flush()
-                elif self._post_destroy_count % 500 == 0 and self._constants.verbose ==1:
+                elif self._post_destroy_count % 1000 == 0 and self._constants.verbose ==1:
                     sys.stdout.write("\n\t- Read pairing in progress: %.2f%% complete" %\
                                 ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
                     sys.stdout.flush()
@@ -539,7 +575,7 @@ class ChaserTask(Process):
         match_handler = MatchMakerHandler(constants = self._constants,
                                          max_reads = self._max_reads,
                                          child_pack = self._child_pack,
-                                         pid = self.pid) #TODO:Add frament leftovers command here
+                                         pid = self.pid)
 
         while True:
             try:
