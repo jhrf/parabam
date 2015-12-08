@@ -32,10 +32,11 @@ class MatchMakerResults(ChaserResults):
         self.level = level
 
 class JobPackage(object):
-    def __init__(self,paths,loner_type,level):
+    def __init__(self,paths,loner_type,level,fragment_leftovers=False):
         self.paths = paths
         self.loner_type = loner_type 
         self.level = level
+        self.fragment_leftovers = fragment_leftovers
 
 class Handler(parabam.core.Handler):
 
@@ -119,7 +120,7 @@ class Handler(parabam.core.Handler):
             task = ChaserTask(constants=self._constants,
                               inqu=self._chaser_qu,
                               outqu=self._inqu,
-                              max_reads=5000000,
+                              max_reads=4000000,
                               child_pack=self._child_pack)
             task.start()
             tasks.append(task)
@@ -240,9 +241,19 @@ class Handler(parabam.core.Handler):
         self.__start_job__(paths,loner_type,level)
 
     def __start_job__(self,paths,loner_type,level):
-        job = JobPackage(paths,loner_type,level)
+        fragment_leftovers = self.__request_fragment_output__(paths)
+
+        job = JobPackage(paths,loner_type,level,fragment_leftovers)
         self._pending_jobs += 1
         self._chaser_qu.put(job)
+
+    def __request_fragment_output__(self,paths):
+        if self._destroy and self._stale_count > 10:
+            has_large_file = any([ (os.path.getsize(path) / 100) > 1000000 for path in paths ])
+            if has_large_file:
+                self._stale_thresh = 250
+                return True
+        return False
 
     def __pause_monitor__(self):
         if not self._destroy:
@@ -284,7 +295,7 @@ class Handler(parabam.core.Handler):
             idle_threshold = 500
             required_paths = 10
         else:
-            idle_threshold = 75
+            idle_threshold = 200
             required_paths = 1
 
         pyramid_idle_counts = self._pyramid_idle_counts 
@@ -361,7 +372,8 @@ class Handler(parabam.core.Handler):
             gc.collect()
 
         if chaser_debug and iterations % 30 == 0:
-            sys.stdout.write("\r %d/%d=%.4f %.2fGB | Proc:%d Des:%d Emp:%d Purg:%d Stale:%d Jobs:%d Files:%d" %\
+            sys.stdout.write(("\r %d/%d=%.4f %.2fGB | Proc:%d Des:%d Emp:%d "
+                             "Purg:%d Stale(Thresh):%d(%d) Jobs:%d Files:%d  ") %\
                 (self._rescued["total"],
                 self._total_loners,
                 float(self._rescued["total"]+1)/(self._total_loners+1),
@@ -372,14 +384,14 @@ class Handler(parabam.core.Handler):
                 empty,
                 len(self._loner_purgatory),
                 self._stale_count,
+                self._stale_thresh,
                 self._pending_jobs,
                 self._files_in_pyramid))
             sys.stdout.flush()
 
     def __set_new_stale_thresh__(self):
         self._stale_thresh = (10 + (self._files_in_pyramid * 5) \
-                                + (self._pending_jobs * 15))
-        print self._stale_thresh
+                                 + (self._pending_jobs * 10))
 
     def __is_queue_empty__(self):
         try:
@@ -409,8 +421,8 @@ class Handler(parabam.core.Handler):
             return []
         task_size = self.__get_task_size__(level,loner_type)
         if len(sub_pyramid) >= task_size:
-            if "XX" in loner_type:
-                return sub_pyramid[:task_size]
+            if "XX" in loner_type and not self._destroy:
+                return sub_pyramid[:task_size] 
             else:
                 return random.sample(sub_pyramid,task_size)
         return []
@@ -461,7 +473,6 @@ class Handler(parabam.core.Handler):
 
             idle_tuples = random.sample(all_paths,path_n)
             idle_levels,idle_paths = zip( *idle_tuples )
-
             self.__start_matchmaker_task__(idle_paths,loner_type,max(idle_levels))
             success = True
             del all_paths,idle_tuples
@@ -528,7 +539,7 @@ class ChaserTask(Process):
         match_handler = MatchMakerHandler(constants = self._constants,
                                          max_reads = self._max_reads,
                                          child_pack = self._child_pack,
-                                         pid = self.pid)
+                                         pid = self.pid) #TODO:Add frament leftovers command here
 
         while True:
             try:
@@ -539,7 +550,8 @@ class ChaserTask(Process):
                     else:
                         results = match_handler.run(package.paths,
                                           package.loner_type,
-                                          package.level)
+                                          package.level,
+                                          package.fragment_leftovers)
                     self._outqu.put(results)
 
                 elif type(package) == DestroyPackage:
@@ -606,7 +618,8 @@ class PrimaryHandler(ChaserHandler):
         return PrimaryResults(match_maker_results,"primary")
 
     def __start_matchmaker_task__(self,paths,loner_type,level):
-        return self.match_handler.run(paths,loner_type,level)
+        return self.match_handler.run(paths,loner_type,
+                                      level,fragment_leftovers=False)
         
     def __read_generator__(self,unsorted_paths):
         for path in unsorted_paths:
@@ -679,7 +692,7 @@ class MatchMakerHandler(ChaserHandler):
                                                 child_pack, pid)
         self.LonerInfo = namedtuple("LonerInfo","paths level loner_type")
 
-    def run(self,loner_paths,loner_type,level):
+    def run(self,loner_paths,loner_type,level,fragment_leftovers):
 
         loner_info = self.LonerInfo(loner_paths,level,loner_type)
         
@@ -695,7 +708,8 @@ class MatchMakerHandler(ChaserHandler):
         cdef list leftover_paths = []
 
         for read in self.__read_generator__(loner_info,second_pass=True,
-                                            leftover_paths=leftover_paths):
+                                            leftover_paths=leftover_paths,
+                                            fragment_leftovers=fragment_leftovers):
             try:
                 status = pairs[read.qname]
                 try:
@@ -759,10 +773,13 @@ class MatchMakerHandler(ChaserHandler):
         return dict(filter( lambda tup : tup[1], iter(pairs.items()) ))
 
     def __read_generator__(self,loner_info,
-                            second_pass=False,
-                            leftover_paths=None):
+                            second_pass=False,leftover_paths=None,
+                            fragment_leftovers=False):
 
-        count = self._max_reads // len(loner_info.paths)
+        if not fragment_leftovers:
+            count = self._max_reads // len(loner_info.paths)
+        else:
+            count = 50000
         count_limit = False
         for path in loner_info.paths:
             loner_object = pysam.AlignmentFile(path,"rb")
@@ -777,22 +794,42 @@ class MatchMakerHandler(ChaserHandler):
             if second_pass:
                 if count_limit:
                     count_limit = False
-                    leftover_count = 0
-                    leftover_object = self.__get_leftover_object__(\
-                                                loner_info,len(leftover_paths))
-                    for read in bam_iterator:
-                        leftover_count += 1
-                        leftover_object.write(read)
-                    leftover_object.close()
-                    
-                    if leftover_count > 0:
-                        leftover_paths.append(leftover_object.filename)
-                    else:
-                        os.remove(leftover_object.filename)
+                    leftover_count,new_leftover_paths = \
+                                self.__write_leftovers__(bam_iterator,
+                                                           fragment_leftovers,
+                                                           loner_info)
+                    for left_path in new_leftover_paths:
+                        if leftover_count > 0:
+                            leftover_paths.append(left_path)
+                        else:
+                            os.remove(left_path)
                 os.remove(path)
             loner_object.close()
         gc.collect()
 
+    def __write_leftovers__(self,bam_iterator,fragment_leftovers,loner_info):
+        leftover_count = 0
+        new_leftover_paths = []
+
+        current_leftover_object = self.__get_leftover_object__(\
+                                                loner_info,len(new_leftover_paths))
+        for read in bam_iterator:
+            if fragment_leftovers and leftover_count > 0 and\
+                    leftover_count % 25000 == 0:
+                new_leftover_paths.append(current_leftover_object.filename)
+                current_leftover_object.close()
+
+                current_leftover_object = self.__get_leftover_object__(\
+                                                loner_info,len(new_leftover_paths))
+ 
+            leftover_count += 1
+            current_leftover_object.write(read)
+        
+        new_leftover_paths.append(current_leftover_object.filename)
+        current_leftover_object.close()
+
+        return leftover_count,new_leftover_paths 
+        
     def __launch_child_task__(self,pairs):
         child_pack = self._child_pack
         results = child_pack["chaser_task"].handle_pair_dict(pairs,\
