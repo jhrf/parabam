@@ -212,6 +212,11 @@ class ArrayStructure(UserStructure):
     def __init__(self,name,struc_type,store_method,data):
         super(ArrayStructure,self).__init__(name,struc_type,store_method,data)
 
+        if self.store_method == "vstack":
+            self.seen = 0
+            self.add = self.add_vstack
+            self.merge = self.merge_vstack
+
     def empty_clone(self):
         return ArrayStructure(self.name,self.struc_type,self.store_method,self.org_data)
 
@@ -226,6 +231,13 @@ class ArrayStructure(UserStructure):
     def add_cumu(self,result):
         self.data = np.add(self.data,result)
 
+    def add_vstack(self,result):
+        if self.seen == 0:
+            self.data = result
+            self.seen += 1
+        else:
+            self.data = np.vstack((self.data,result))
+
     def merge_max(self,result):
         self.data = np.maximum(self.data,result)
         del result
@@ -238,8 +250,12 @@ class ArrayStructure(UserStructure):
         self.data = np.add(self.data,result)
         del result
 
+    def merge_vstack(self,result):
+        self.add_vstack(result)
+        del result
+
     def write_to_csv(self,out_path):
-        np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
+        np.savetxt(out_path,self.data,delimiter=",")
 
 class Interface(parabam.command.Interface):
 

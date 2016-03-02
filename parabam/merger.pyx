@@ -81,27 +81,9 @@ class Handler(parabam.core.Handler):
         return open(output_path,"wb")
 
     def __get_header_location__(self,header_path):
-        header_signature = self._header_signature
-        i = 0
-
-        with open(header_path,"rb") as header_file:
-            read_bytes = ""
-
-            while True:
-                read_bytes += header_file.read(2048)
-                header_count = read_bytes.count(header_signature)
-
-                if header_count > 1:
-                    second_header = [i.start() for i in \
-                                re.finditer(header_signature,read_bytes)][1]
-                    return second_header
-
-                i +=1
-                if i > 50:
-                     # TODO: Handle this error better
-                    print "Header not found."
-                    print "Probably not a BAM file"
-                    sys.exit(0)
+        header_bytes = pysam.view(*["-Hb",header_path])
+        header_str = "".join(header_bytes).encode("hex")
+        return (len(header_str) / 2) - len(self._eof_signature)
 
     def __periodic_action__(self,iterations):
         if self._destroy:
@@ -186,7 +168,8 @@ class Handler(parabam.core.Handler):
         current_clump = self.__new_clump__()
         count = 0
 
-        for (merge_count,merge_path),sequence_id in izip(merge_tuples,sequence_ids):
+        for (merge_count,merge_path),sequence_id in \
+                                            izip(merge_tuples,sequence_ids):
             if count > 1000:
                 new_merge_tuple.append(self.__get_clump__(\
                                             current_clump.merge_tuples))
