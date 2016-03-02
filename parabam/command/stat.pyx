@@ -255,7 +255,16 @@ class ArrayStructure(UserStructure):
         del result
 
     def write_to_csv(self,out_path):
-        np.savetxt(out_path,self.data,delimiter=",")
+
+        format = []
+        for x in self.data[0,:]:
+            type_of_x = type(x) 
+            if type_of_x == str or type_of_x == np.string_:
+                format.append("%s")
+            else:
+                format.append("%.5f")
+
+        np.savetxt(out_path,self.data,fmt=",".join(format),delimiter=",")
 
 class Interface(parabam.command.Interface):
 
