@@ -871,7 +871,6 @@ static char __pyx_k_p[] = "p";
 static char __pyx_k_s[] = "s";
 static char __pyx_k_v[] = "v";
 static char __pyx_k_w[] = "w";
-static char __pyx_k_3f[] = "%.3f";
 static char __pyx_k_5f[] = ",%.5f";
 static char __pyx_k__2[] = "";
 static char __pyx_k__3[] = ",";
@@ -883,7 +882,6 @@ static char __pyx_k_abc[] = "abc";
 static char __pyx_k_add[] = "add";
 static char __pyx_k_doc[] = "__doc__";
 static char __pyx_k_ext[] = "ext";
-static char __pyx_k_fmt[] = "fmt";
 static char __pyx_k_inf[] = "inf";
 static char __pyx_k_max[] = "max";
 static char __pyx_k_min[] = "min";
@@ -1138,7 +1136,6 @@ static char __pyx_k_Handler___get_data_str_from_name[] = "Handler.__get_data_str
 static char __pyx_k_Interface___get_extra_const_args[] = "Interface.__get_extra_const_args__";
 static char __pyx_k_Interface___get_global_output_pa[] = "Interface.__get_global_output_path__";
 static char __pyx_k_Specify_a_name_for_the_output_CS[] = "Specify a name for the output CSV file. Only used with default `outmode`.\nIf this argument is not supplied, the output will take the following form:\nparabam_stat_[UNIX_TIME].csv";
-static PyObject *__pyx_kp_s_3f;
 static PyObject *__pyx_kp_s_5f;
 static PyObject *__pyx_n_s_ABCMeta;
 static PyObject *__pyx_n_s_ArrayStructure;
@@ -1261,7 +1258,6 @@ static PyObject *__pyx_n_s_fetch_region;
 static PyObject *__pyx_n_s_filename;
 static PyObject *__pyx_n_s_final_struc;
 static PyObject *__pyx_n_s_final_structures;
-static PyObject *__pyx_n_s_fmt;
 static PyObject *__pyx_n_s_get_data_str_from_names;
 static PyObject *__pyx_n_s_get_destroy_handler_order;
 static PyObject *__pyx_n_s_get_extra_const_args;
@@ -9295,7 +9291,7 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_18merge_vstac
  *         del result
  * 
  *     def write_to_csv(self,out_path):             # <<<<<<<<<<<<<<
- *         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
+ *         np.savetxt(out_path,self.data,delimiter=",")
  * 
  */
 
@@ -9376,7 +9372,7 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_20write_to_cs
   /* "parabam/command/stat.pyx":258
  * 
  *     def write_to_csv(self,out_path):
- *         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")             # <<<<<<<<<<<<<<
+ *         np.savetxt(out_path,self.data,delimiter=",")             # <<<<<<<<<<<<<<
  * 
  * class Interface(parabam.command.Interface):
  */
@@ -9397,7 +9393,6 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_20write_to_cs
   __pyx_t_1 = 0;
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_fmt, __pyx_kp_s_3f) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_delimiter, __pyx_kp_s__3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
@@ -9410,7 +9405,7 @@ static PyObject *__pyx_pf_7parabam_7command_4stat_14ArrayStructure_20write_to_cs
  *         del result
  * 
  *     def write_to_csv(self,out_path):             # <<<<<<<<<<<<<<
- *         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
+ *         np.savetxt(out_path,self.data,delimiter=",")
  * 
  */
 
@@ -13488,7 +13483,6 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
-  {&__pyx_kp_s_3f, __pyx_k_3f, sizeof(__pyx_k_3f), 0, 0, 1, 0},
   {&__pyx_kp_s_5f, __pyx_k_5f, sizeof(__pyx_k_5f), 0, 0, 1, 0},
   {&__pyx_n_s_ABCMeta, __pyx_k_ABCMeta, sizeof(__pyx_k_ABCMeta), 0, 0, 1, 1},
   {&__pyx_n_s_ArrayStructure, __pyx_k_ArrayStructure, sizeof(__pyx_k_ArrayStructure), 0, 0, 1, 1},
@@ -13611,7 +13605,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_filename, __pyx_k_filename, sizeof(__pyx_k_filename), 0, 0, 1, 1},
   {&__pyx_n_s_final_struc, __pyx_k_final_struc, sizeof(__pyx_k_final_struc), 0, 0, 1, 1},
   {&__pyx_n_s_final_structures, __pyx_k_final_structures, sizeof(__pyx_k_final_structures), 0, 0, 1, 1},
-  {&__pyx_n_s_fmt, __pyx_k_fmt, sizeof(__pyx_k_fmt), 0, 0, 1, 1},
   {&__pyx_n_s_get_data_str_from_names, __pyx_k_get_data_str_from_names, sizeof(__pyx_k_get_data_str_from_names), 0, 0, 1, 1},
   {&__pyx_n_s_get_destroy_handler_order, __pyx_k_get_destroy_handler_order, sizeof(__pyx_k_get_destroy_handler_order), 0, 0, 1, 1},
   {&__pyx_n_s_get_extra_const_args, __pyx_k_get_extra_const_args, sizeof(__pyx_k_get_extra_const_args), 0, 0, 1, 1},
@@ -14301,7 +14294,7 @@ static int __Pyx_InitCachedConstants(void) {
  *         del result
  * 
  *     def write_to_csv(self,out_path):             # <<<<<<<<<<<<<<
- *         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
+ *         np.savetxt(out_path,self.data,delimiter=",")
  * 
  */
   __pyx_tuple__90 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_out_path); if (unlikely(!__pyx_tuple__90)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -15762,7 +15755,7 @@ PyMODINIT_FUNC PyInit_stat(void)
  *         del result
  * 
  *     def write_to_csv(self,out_path):             # <<<<<<<<<<<<<<
- *         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
+ *         np.savetxt(out_path,self.data,delimiter=",")
  * 
  */
   __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7parabam_7command_4stat_14ArrayStructure_21write_to_csv, 0, __pyx_n_s_ArrayStructure_write_to_csv, NULL, __pyx_n_s_parabam_command_stat, __pyx_d, ((PyObject *)__pyx_codeobj__91)); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -15786,7 +15779,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "parabam/command/stat.pyx":260
- *         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
+ *         np.savetxt(out_path,self.data,delimiter=",")
  * 
  * class Interface(parabam.command.Interface):             # <<<<<<<<<<<<<<
  * 
@@ -15992,7 +15985,7 @@ PyMODINIT_FUNC PyInit_stat(void)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "parabam/command/stat.pyx":260
- *         np.savetxt(out_path,self.data,fmt="%.3f",delimiter=",")
+ *         np.savetxt(out_path,self.data,delimiter=",")
  * 
  * class Interface(parabam.command.Interface):             # <<<<<<<<<<<<<<
  * 
