@@ -110,7 +110,8 @@ class Handler(parabam.command.Handler):
         
         #Output numpy arrays
         for name,structure in self._final_structures.items():
-            if structure.struc_type == np.ndarray:
+            if structure.struc_type == np.ndarray or \
+                structure.struc_type == dict:
                 structure.write_to_csv(self._output_paths[self._parent_bam.filename][name])
 
     def __get_data_str_from_names__(self,names,user_structures):
@@ -207,6 +208,53 @@ class NumericStructure(UserStructure):
     def merge_cumu(self,result):
         self.data += result
         del result
+
+class CounterStructure(UserStructure):
+    def __init__(self,name,struc_type,store_method,data):
+        super(CounterStructure,self).__init__(name,struc_type,store_method,data)
+
+    def empty_clone(self):
+        return CounterStructure(self.name,self.struc_type,self.store_method,self.org_data)
+
+    def add_cumu(self,result):
+        for key,value in result.items():
+            try:
+                self.data[key] += value
+            except KeyError:
+                self.data[key] = value
+
+    def add_max(self,result):
+        for key,value in result.items():
+            try:
+                self.data[key] = max([self.data[result],value])
+            except KeyError:
+                self.data[key] = value
+
+    def add_min(self,result):
+        for key,value in result.items():
+            try:
+                self.data[key] = min([self.data[result],value])
+            except KeyError:
+                self.data[key] = value
+
+    def merge_cumu(self,result):
+        self.add_cumu(result)
+        del result
+
+    def merge_max(self,result):
+        self.add_max(result)
+        del result
+
+    def merge_min(self,result):
+        self.add_min(result)
+        del result
+
+    def write_to_csv(self,out_path):
+
+        with open(out_path,"w") as out_file:
+            for key,value in self.data.items():
+                out_str = "%s,%.5f\n" % (key,value,)
+                out_file.write(out_str)
 
 class ArrayStructure(UserStructure):
     def __init__(self,name,struc_type,store_method,data):
@@ -349,8 +397,11 @@ class Interface(parabam.command.Interface):
                              user_struc_blueprint,
                              **kwargs):
         output_paths = {input_path:{}}
+
+        # TODO: See note on line 428. Related problem here
         for name,blueprint in user_struc_blueprint.items():
-            if type(blueprint["data"]) == np.ndarray:
+            if type(blueprint["data"]) == np.ndarray or \
+                     type(blueprint["data"]) == dict:
                 path_id,ext = os.path.splitext(os.path.basename(input_path))
                 csv_path = "%s_%s.csv" % (path_id,name,)
                 output_paths[input_path][name] = os.path.join(".",self._temp_dir,csv_path)
@@ -373,8 +424,16 @@ class Interface(parabam.command.Interface):
 
     def __get_non_array_names__(self,user_struc_blueprint):
         names = []
+
+        # TODO: dict type has been squeezed in here and as a result
+        #       this function name no longer makes sense
+        #
+        #       consider refactoring so that numeric types are the
+        #       exception rather than having not(numeric_types) as
+        #       the exceptional case
         for name,blueprint in user_struc_blueprint.items():
-            if not type(blueprint["data"]) == np.ndarray:
+            if not type(blueprint["data"]) == np.ndarray and \
+                not type(blueprint["data"]) == dict:
                 names.append(name)
         names.sort()
         return names
@@ -383,7 +442,8 @@ class Interface(parabam.command.Interface):
         user_structures = {}
         class_to_type_map = {int:NumericStructure,
                              float:NumericStructure,
-                             np.ndarray:ArrayStructure}
+                             np.ndarray:ArrayStructure,
+                             dict:CounterStructure}
 
         for name,definition in user_struc_blueprint.items():
             definition["name"] = name
