@@ -140,8 +140,6 @@ class UserStructure(object):
         elif store_method == "min":
             self.add = self.add_min
             self.merge = self.merge_min
-            self.data = float('inf')
-            self.org_data = copy.copy(float('inf'))
         else:
             self.add = self.add_cumu
             self.merge = self.merge_cumu
@@ -185,6 +183,10 @@ class NumericStructure(UserStructure):
         super(NumericStructure,self).__init__(name,struc_type,store_method,data)
         self.log_scaling = log_scaling
 
+        if store_method == "min":
+            self.data = float('inf')
+            self.org_data = copy.copy(float('inf'))
+
     def empty_clone(self):
         return NumericStructure(self.name,self.struc_type,self.store_method,self.org_data)
 
@@ -226,14 +228,14 @@ class CounterStructure(UserStructure):
     def add_max(self,result):
         for key,value in result.items():
             try:
-                self.data[key] = max([self.data[result],value])
+                self.data[key] = max([self.data[key],value])
             except KeyError:
                 self.data[key] = value
 
     def add_min(self,result):
         for key,value in result.items():
             try:
-                self.data[key] = min([self.data[result],value])
+                self.data[key] = min([self.data[key],value])
             except KeyError:
                 self.data[key] = value
 
