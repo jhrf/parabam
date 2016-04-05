@@ -81,6 +81,23 @@ class PairTask(SubsetCore,parabam.command.PairTask):
         for subset,cur_read in engine_output:
             self.__write_to_subset_bam__(subset,cur_read)
 
+class ByCoordTask(SubsetCore,parabam.command.ByCoordTask):
+
+    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants,**kwargs):
+        
+        parabam.command.Task.__init__(self,parent_bam=parent_bam,
+                                    inqu=inqu,
+                                    outqu=outqu,
+                                    statusqu=statusqu,
+                                    task_size=task_size,
+                                    constants=constants)
+        SubsetCore.__init__(self,constants)
+
+    def __handle_engine_output__(self,engine_output,read):     
+        write_to_subset = __write_to_subset_bam__        
+        for read in engine_output:
+            write_to_subset(self._constants.user_subsets[0],read)
+
 class Handler(parabam.command.Handler):
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
