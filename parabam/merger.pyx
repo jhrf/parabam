@@ -153,12 +153,13 @@ class Handler(parabam.core.Handler):
         if all_above_thresh:
             #no clump required
             return merge_tuples,list(sequence_ids)
+        elif (total_reads < self._CLUMP_THRESH and not force) \
+            or (force and total_reads == 0):
+            #clump not possible
+            return [],[]
         elif not any_above_thresh or force:
             #one large clump
             return [ self.__get_clump__(merge_tuples) ],list(sequence_ids)
-        elif total_reads < self._CLUMP_THRESH:
-            #clump not possible
-            return [],[]
         else:
             #several clumps
             return self.__create_clumps__(merge_tuples,list(sequence_ids))
