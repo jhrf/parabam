@@ -139,7 +139,7 @@ class ByCoordTask(Task):
     __metaclass__ = ABCMeta
 
     def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
-        super(PairTask, self).__init__(parent_bam=parent_bam,
+        super(ByCoordTask, self).__init__(parent_bam=parent_bam,
                                     inqu=inqu,
                                     outqu=outqu,
                                     statusqu=statusqu,
@@ -157,15 +157,20 @@ class ByCoordTask(Task):
         engine = self._engine
         next_read = iterator.next 
         parent_bam = self._parent_bam
-        cdef int size = self._task_size
+
         handle_output = self.__handle_engine_output__
         user_constants = self._user_constants
+
+        position_max = 5000
 
         task_pos = None
         reads = []
 
+        self._task_size = 0
+        current_positions = 0
+
         #StopIteration caught in parabam.core.Task.run
-        for i in xrange(size):
+        while current_positions <= position_max:
             read = next_read()
             if task_pos is None:
                 task_pos = read.pos
@@ -173,10 +178,15 @@ class ByCoordTask(Task):
             if task_pos == read.pos:
                 reads.append(read)
             else:
-                break
+                engine_output = engine(reads,user_constants,parent_bam)        
+                handle_output(engine_output,reads)
+                
+                del reads
+                reads = [read]
+                task_pos = None
+                current_positions += 1
 
-        engine_output = engine(read,user_constants,parent_bam)        
-        handle_output(engine_output,reads)
+            self._task_size += 1
 
     def __filter__(self,read):
         return read.is_secondary or (read.flag & 2048 == 2048)
@@ -256,15 +266,6 @@ class Handler(parabam.core.Handler):
             self.__standard_output__("\t- Total reads processed: %d" \
                                         % (self.__total_reads__(),))
 
-
-
-class FileReader(Process):
-    def __init__(self,str input_path,int proc_id,object outqu,
-                 int task_n,object constants,object Task,
-                 object pause_qu,object inqu = None):
-        
-        super(FileReader,self).__init__()
-
 class ByCoordFileReader(parabam.core.FileReader):
 
     def __init__(self,str input_path,int proc_id,object outqu,
@@ -279,27 +280,39 @@ class ByCoordFileReader(parabam.core.FileReader):
                                                 Task=Task,
                                                 pause_qu=pause_qu,
                                                 inqu=inqu,)
-    def __bam_generator__(self,parent_iter):
+    def __bam_generator__(self,bam_file):
         cdef int proc_id = self._proc_id
         cdef int reader_n = self._reader_n
         cdef int iterations = 0
         cdef int task_size = self._task_size
 
-        cdef int prev_pos = -1
-        cdef int prev_file_index = -1
+        cdef int position_max = 5000
+        
+        parent_iter = bam_file.fetch(until_eof = True)
+
+        one_ahead_bam = pysam.AlignmentFile(bam_file.filename,"rb")
+        one_ahead_iter = one_ahead_bam.fetch(until_eof = True)
+        one_ahead_iter.next()
 
         while True:
             try:
                 if iterations % reader_n == proc_id:
                     yield iterations
                 
+                observed_positions = 0
                 while True:
-                    prev_file_index = 
-                    parent_iter.next()
-                    if prev_pos == -1:
-                        prev_pos =  
 
-                                        
+                    current_read_pos = parent_iter.next().pos
+                    try:
+                        one_ahead_pos = one_ahead_iter.next().pos                        
+                    except StopIteration:
+                        one_ahead_pos = -1
+
+                    if not current_read_pos == one_ahead_pos:
+                        observed_positions += 1
+                        if observed_positions == position_max:
+                            break
+
                 iterations += 1
 
             except StopIteration:
@@ -308,23 +321,6 @@ class ByCoordFileReader(parabam.core.FileReader):
 
     def __get_parent_iter__(self,parent_bam):
         return parent_bam
-
-    def __bam_generator__(self,parent_iter):
-        cdef int proc_id = self._proc_id
-        cdef int reader_n = self._reader_n
-        cdef int iterations = 0
-        cdef int task_size = self._task_size
-
-        while True:
-            try:
-                if iterations % reader_n == proc_id:
-                    yield iterations
-                for x in xrange(task_size):
-                    parent_iter.next()
-                iterations += 1
-            except StopIteration:
-                break
-        return
 
 class Interface(parabam.core.Interface):
 
@@ -394,7 +390,6 @@ class Interface(parabam.core.Interface):
 
         args = {}
         args["temp_dir"] = self._temp_dir
-
 
         defaults = ["total_procs","task_size","verbose","user_constants",
                     "reader_n","user_constants", "user_engine", "fetch_region", 
@@ -490,7 +485,8 @@ class Interface(parabam.core.Interface):
 
         leviathon = parabam.core.Leviathan(constants,handler_bundle,
                                            handler_order,queue_names,
-                                           update_interval,task_class)
+                                           update_interval,task_class,
+                                           filereader_class)
 
         final_output_paths = {"global":[]}
         global_paths = self.__get_global_output_path__(**kwargs)
@@ -529,7 +525,7 @@ class Interface(parabam.core.Interface):
             return 200
 
     def __get_filereader_class__(self,**kwargs):
-        if kwargs["coord"]:
+        if kwargs["coord_process"]:
             return ByCoordFileReader
         else:
             return parabam.core.FileReader

@@ -85,7 +85,7 @@ class ByCoordTask(SubsetCore,parabam.command.ByCoordTask):
 
     def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants,**kwargs):
         
-        parabam.command.Task.__init__(self,parent_bam=parent_bam,
+        parabam.command.ByCoordTask.__init__(self,parent_bam=parent_bam,
                                     inqu=inqu,
                                     outqu=outqu,
                                     statusqu=statusqu,
@@ -94,7 +94,7 @@ class ByCoordTask(SubsetCore,parabam.command.ByCoordTask):
         SubsetCore.__init__(self,constants)
 
     def __handle_engine_output__(self,engine_output,read):     
-        write_to_subset = __write_to_subset_bam__        
+        write_to_subset = self.__write_to_subset_bam__        
         for read in engine_output:
             write_to_subset(self._constants.user_subsets[0],read)
 
@@ -202,6 +202,7 @@ class Interface(parabam.command.Interface):
             fetch_region = cmd_args.region,
             reader_n = cmd_args.f,
             pair_process=cmd_args.pair,
+            coord_process=cmd_args.coord,
             include_duplicates=cmd_args.d,
             debug = cmd_args.debug,
             ensure_unique_output=cmd_args.u,
@@ -211,7 +212,7 @@ class Interface(parabam.command.Interface):
     
     def run(self,input_bams,total_procs,task_size,user_constants,user_engine,
             user_subsets,reader_n = 2,fetch_region=None,
-            keep_in_temp=False,verbose=0,pair_process=False,
+            keep_in_temp=False,verbose=0,pair_process=False,coord_process=False,
             include_duplicates=True,debug=False,
             ensure_unique_output=False,output_counts=False,announce=False):
         ''' Docstring! '''
@@ -265,9 +266,11 @@ class Interface(parabam.command.Interface):
 
         return os.path.join(".",self._temp_dir, "%s_%s%s%s" % (tail,subset,unique,ext))
             
-    def __get_task_class__(self,pair_process,**kwargs):
+    def __get_task_class__(self,pair_process,coord_process,**kwargs):
         if pair_process:
             return PairTask
+        elif coord_process:
+            return ByCoordTask
         else:
             return Task
 

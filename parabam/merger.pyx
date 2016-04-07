@@ -31,10 +31,14 @@ class Handler(parabam.core.Handler):
         
         self._user_subsets = list(constants.user_subsets)
 
-        self._eof_signature = '\x1F\x8B\x08\x04\x00\x00\x00\x00\x00\xFF'+\
+        #CONSTANTS
+        self._CLUMP_THRESH = 1000
+        self._EOF_SIGNATURE = '\x1F\x8B\x08\x04\x00\x00\x00\x00\x00\xFF'+\
                               '\x06\x00\x42\x43\x02\x00\x1B\x00\x03\x00'+\
                               '\x00\x00\x00\x00\x00\x00\x00\x00'
-        self._header_signature = '\x1F\x8B\x08\x04\x00\x00\x00\x00\x00\xFF'
+        self._Clump = namedtuple("Clump","sequence_ids merge_tuples")                              
+
+        #VARIABLES
 
         self._out_file_objects = self.__get_out_file_objects__()
         self._subset_has_header = \
@@ -48,8 +52,6 @@ class Handler(parabam.core.Handler):
         self._out_of_sequence_package = -2
 
         self._total_clumps = 0
-
-        self._Clump = namedtuple("Clump","sequence_ids merge_tuples")
 
         self._header_path = self.__get_header_sam_path__()
 
@@ -83,7 +85,7 @@ class Handler(parabam.core.Handler):
     def __get_header_location__(self,header_path):
         header_bytes = pysam.view(*["-Hb",header_path])
         header_str = "".join(header_bytes).encode("hex")
-        return (len(header_str) / 2) - len(self._eof_signature)
+        return (len(header_str) / 2) - len(self._EOF_SIGNATURE)
 
     def __periodic_action__(self,iterations):
         if self._destroy:
@@ -143,7 +145,7 @@ class Handler(parabam.core.Handler):
         for merge_count,merge_path in merge_tuples:
             total_reads += merge_count
 
-            if merge_count >= 1000:
+            if merge_count >= self._CLUMP_THRESH:
                 any_above_thresh = True
             else:
                 all_above_thresh = False
@@ -151,12 +153,12 @@ class Handler(parabam.core.Handler):
         if all_above_thresh:
             #no clump required
             return merge_tuples,list(sequence_ids)
-        elif total_reads < 1000:
-            #clump not possible
-            return [],[]
         elif not any_above_thresh or force:
             #one large clump
             return [ self.__get_clump__(merge_tuples) ],list(sequence_ids)
+        elif total_reads < self._CLUMP_THRESH:
+            #clump not possible
+            return [],[]
         else:
             #several clumps
             return self.__create_clumps__(merge_tuples,list(sequence_ids))
@@ -170,7 +172,7 @@ class Handler(parabam.core.Handler):
 
         for (merge_count,merge_path),sequence_id in \
                                             izip(merge_tuples,sequence_ids):
-            if count > 1000:
+            if count > self._CLUMP_THRESH:
                 new_merge_tuple.append(self.__get_clump__(\
                                             current_clump.merge_tuples))
                 clumped_sequence_ids.extend(current_clump.sequence_ids)
@@ -189,7 +191,7 @@ class Handler(parabam.core.Handler):
     def __get_clump__(self,merge_tuples):
 
         # This function may seem overly complicated but it is 
-        # neccessary to handles input to pysam.cat in this way.
+        # neccessary to handle input to pysam.cat in this way.
         #
         # The function protects pysam.cat from catting too many
         # files at once and from catting only a single file
@@ -266,6 +268,7 @@ class Handler(parabam.core.Handler):
 
             if len(ready_to_merge) > 0:
                 self._previous_merge = ready_to_merge[-1]
+
             return ready_to_merge
 
     def __dump_to_BAM_file__(self,merge_path,subset):
@@ -290,7 +293,7 @@ class Handler(parabam.core.Handler):
             binary_data = open_file.read(2**19)
             if not i == 0:
                 combined = prev_data+binary_data
-                if combined[len(combined)-28:] == self._eof_signature:
+                if combined[len(combined)-28:] == self._EOF_SIGNATURE:
                     yield combined[:len(combined)-28]
                     return
                 else:
@@ -301,7 +304,7 @@ class Handler(parabam.core.Handler):
 
     def __close_all_out_files__(self):
         for subset,file_obj in self._out_file_objects.items():
-            file_obj.write(self._eof_signature)
+            file_obj.write(self._EOF_SIGNATURE)
             file_obj.flush()
             file_obj.close()
         del self._out_file_objects

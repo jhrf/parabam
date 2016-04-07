@@ -339,6 +339,7 @@ class Interface(parabam.command.Interface):
             user_engine = user_engine,
             fetch_region = cmd_args.region,
             pair_process=cmd_args.pair,
+            coord_process=cmd_args.coord,
             include_duplicates=cmd_args.d,
             debug = cmd_args.debug,
             announce = True)
@@ -347,8 +348,9 @@ class Interface(parabam.command.Interface):
     def run(self,input_bams,total_procs,task_size,user_constants,user_engine,
             user_struc_blueprint,user_specified_outpath=None,
             reader_n = 2,fetch_region=None,side_by_side=2,
-            keep_in_temp=False,verbose=0,pair_process=False,
-            include_duplicates=True,debug=False,announce=False):
+            keep_in_temp=False,verbose=0,coord_process=False,
+            pair_process=False,include_duplicates=True,
+            debug=False,announce=False):
 
         ''' Docstring! '''
         args = dict(locals())

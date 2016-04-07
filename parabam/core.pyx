@@ -462,7 +462,7 @@ class Leviathan(object):
     #chains them together.
     def __init__(self,object constants,dict handler_bundle,
                  list sequence_id,list queue_names,
-                 int update,object Task):
+                 int update,object Task,object FileReaderClass):
 
         self._constants = constants
         self._handler_bundle  = handler_bundle
@@ -470,6 +470,7 @@ class Leviathan(object):
         self._update = update
         self._queue_names = queue_names
         self._Task = Task
+        self._FileReaderClass = FileReaderClass
     
     def run(self,input_path,output_paths):
         parent = ParentAlignmentFile(input_path)
@@ -533,7 +534,7 @@ class Leviathan(object):
     def __get_file_readers__(self,file_reader_bundles):
         file_readers = []
         for bundle in file_reader_bundles: 
-            file_reader = FileReader(**bundle)
+            file_reader = self._FileReaderClass(**bundle)
             file_readers.append(file_reader)
         return file_readers
 
