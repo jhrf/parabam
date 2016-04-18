@@ -5548,7 +5548,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_4__process_task_
  *         handle_output = self.__handle_engine_output__
  *         user_constants = self._user_constants             # <<<<<<<<<<<<<<
  * 
- *         position_max = 5000
+ *         position_max = 10000
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_user_constants_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 162; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -5558,14 +5558,14 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_4__process_task_
   /* "parabam/command/core.pyx":164
  *         user_constants = self._user_constants
  * 
- *         position_max = 5000             # <<<<<<<<<<<<<<
+ *         position_max = 10000             # <<<<<<<<<<<<<<
  * 
  *         task_pos = None
  */
-  __pyx_v_position_max = 5000;
+  __pyx_v_position_max = 10000;
 
   /* "parabam/command/core.pyx":166
- *         position_max = 5000
+ *         position_max = 10000
  * 
  *         task_pos = None             # <<<<<<<<<<<<<<
  *         reads = []
@@ -5681,7 +5681,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_4__process_task_
  * 
  *             if task_pos == read.pos:             # <<<<<<<<<<<<<<
  *                 reads.append(read)
- *             else:
+ * 
  */
     __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_read, __pyx_n_s_pos); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
@@ -5695,20 +5695,20 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_4__process_task_
  * 
  *             if task_pos == read.pos:
  *                 reads.append(read)             # <<<<<<<<<<<<<<
+ * 
  *             else:
- *                 engine_output = engine(reads,user_constants,parent_bam)
  */
       __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_reads, __pyx_v_read); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       goto __pyx_L6;
     }
     /*else*/ {
 
-      /* "parabam/command/core.pyx":181
- *                 reads.append(read)
+      /* "parabam/command/core.pyx":182
+ * 
  *             else:
  *                 engine_output = engine(reads,user_constants,parent_bam)             # <<<<<<<<<<<<<<
  *                 handle_output(engine_output,reads)
- * 
+ *                 self._task_size += len(reads)
  */
       __Pyx_INCREF(__pyx_v_engine);
       __pyx_t_2 = __pyx_v_engine; __pyx_t_4 = NULL;
@@ -5723,7 +5723,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_4__process_task_
           __pyx_t_7 = 1;
         }
       }
-      __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_8);
       if (__pyx_t_4) {
         PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_4); __Pyx_GIVEREF(__pyx_t_4); __pyx_t_4 = NULL;
@@ -5737,19 +5737,19 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_4__process_task_
       __Pyx_INCREF(__pyx_v_parent_bam);
       PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_7, __pyx_v_parent_bam);
       __Pyx_GIVEREF(__pyx_v_parent_bam);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_XDECREF_SET(__pyx_v_engine_output, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "parabam/command/core.pyx":182
+      /* "parabam/command/core.pyx":183
  *             else:
  *                 engine_output = engine(reads,user_constants,parent_bam)
  *                 handle_output(engine_output,reads)             # <<<<<<<<<<<<<<
+ *                 self._task_size += len(reads)
  * 
- *                 del reads
  */
       __Pyx_INCREF(__pyx_v_handle_output);
       __pyx_t_2 = __pyx_v_handle_output; __pyx_t_8 = NULL;
@@ -5764,7 +5764,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_4__process_task_
           __pyx_t_7 = 1;
         }
       }
-      __pyx_t_4 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       if (__pyx_t_8) {
         PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_8); __Pyx_GIVEREF(__pyx_t_8); __pyx_t_8 = NULL;
@@ -5775,75 +5775,81 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_4__process_task_
       __Pyx_INCREF(__pyx_v_reads);
       PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_7, __pyx_v_reads);
       __Pyx_GIVEREF(__pyx_v_reads);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
       /* "parabam/command/core.pyx":184
+ *                 engine_output = engine(reads,user_constants,parent_bam)
  *                 handle_output(engine_output,reads)
+ *                 self._task_size += len(reads)             # <<<<<<<<<<<<<<
+ * 
+ *                 del reads
+ */
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_task_size_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_7 = PyList_GET_SIZE(__pyx_v_reads); if (unlikely(__pyx_t_7 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_7); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_4 = PyNumber_InPlaceAdd(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_task_size_2, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+      /* "parabam/command/core.pyx":186
+ *                 self._task_size += len(reads)
  * 
  *                 del reads             # <<<<<<<<<<<<<<
  *                 reads = [read]
- *                 task_pos = None
+ *                 task_pos = read.pos
  */
       __Pyx_DECREF(__pyx_v_reads);
       __pyx_v_reads = NULL;
 
-      /* "parabam/command/core.pyx":185
+      /* "parabam/command/core.pyx":187
  * 
  *                 del reads
  *                 reads = [read]             # <<<<<<<<<<<<<<
- *                 task_pos = None
+ *                 task_pos = read.pos
  *                 current_positions += 1
  */
-      __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 185; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_v_read);
-      PyList_SET_ITEM(__pyx_t_1, 0, __pyx_v_read);
+      PyList_SET_ITEM(__pyx_t_4, 0, __pyx_v_read);
       __Pyx_GIVEREF(__pyx_v_read);
-      __pyx_v_reads = ((PyObject*)__pyx_t_1);
-      __pyx_t_1 = 0;
+      __pyx_v_reads = ((PyObject*)__pyx_t_4);
+      __pyx_t_4 = 0;
 
-      /* "parabam/command/core.pyx":186
+      /* "parabam/command/core.pyx":188
  *                 del reads
  *                 reads = [read]
- *                 task_pos = None             # <<<<<<<<<<<<<<
+ *                 task_pos = read.pos             # <<<<<<<<<<<<<<
  *                 current_positions += 1
  * 
  */
-      __Pyx_INCREF(Py_None);
-      __Pyx_DECREF_SET(__pyx_v_task_pos, Py_None);
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_read, __pyx_n_s_pos); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 188; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF_SET(__pyx_v_task_pos, __pyx_t_4);
+      __pyx_t_4 = 0;
 
-      /* "parabam/command/core.pyx":187
+      /* "parabam/command/core.pyx":189
  *                 reads = [read]
- *                 task_pos = None
+ *                 task_pos = read.pos
  *                 current_positions += 1             # <<<<<<<<<<<<<<
- * 
- *             self._task_size += 1
- */
-      __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_v_current_positions, __pyx_int_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF_SET(__pyx_v_current_positions, __pyx_t_1);
-      __pyx_t_1 = 0;
-    }
-    __pyx_L6:;
-
-    /* "parabam/command/core.pyx":189
- *                 current_positions += 1
- * 
- *             self._task_size += 1             # <<<<<<<<<<<<<<
  * 
  *     def __filter__(self,read):
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_task_size_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyNumber_InPlaceAdd(__pyx_t_1, __pyx_int_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_task_size_2, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_4 = PyNumber_InPlaceAdd(__pyx_v_current_positions, __pyx_int_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF_SET(__pyx_v_current_positions, __pyx_t_4);
+      __pyx_t_4 = 0;
+    }
+    __pyx_L6:;
   }
 
   /* "parabam/command/core.pyx":156
@@ -5881,7 +5887,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_4__process_task_
 }
 
 /* "parabam/command/core.pyx":191
- *             self._task_size += 1
+ *                 current_positions += 1
  * 
  *     def __filter__(self,read):             # <<<<<<<<<<<<<<
  *         return read.is_secondary or (read.flag & 2048 == 2048)
@@ -5997,7 +6003,7 @@ static PyObject *__pyx_pf_7parabam_7command_4core_11ByCoordTask_6__filter__(CYTH
   goto __pyx_L0;
 
   /* "parabam/command/core.pyx":191
- *             self._task_size += 1
+ *                 current_positions += 1
  * 
  *     def __filter__(self,read):             # <<<<<<<<<<<<<<
  *         return read.is_secondary or (read.flag & 2048 == 2048)
@@ -8769,7 +8775,7 @@ static PyObject *__pyx_gb_7parabam_7command_4core_17ByCoordFileReader_4generator
  *         cdef int iterations = 0
  *         cdef int task_size = self._task_size             # <<<<<<<<<<<<<<
  * 
- *         cdef int position_max = 5000
+ *         cdef int position_max = 10000
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_self, __pyx_n_s_task_size_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 287; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
@@ -8780,14 +8786,14 @@ static PyObject *__pyx_gb_7parabam_7command_4core_17ByCoordFileReader_4generator
   /* "parabam/command/core.pyx":289
  *         cdef int task_size = self._task_size
  * 
- *         cdef int position_max = 5000             # <<<<<<<<<<<<<<
+ *         cdef int position_max = 10000             # <<<<<<<<<<<<<<
  * 
  *         parent_iter = bam_file.fetch(until_eof = True)
  */
-  __pyx_cur_scope->__pyx_v_position_max = 5000;
+  __pyx_cur_scope->__pyx_v_position_max = 10000;
 
   /* "parabam/command/core.pyx":291
- *         cdef int position_max = 5000
+ *         cdef int position_max = 10000
  * 
  *         parent_iter = bam_file.fetch(until_eof = True)             # <<<<<<<<<<<<<<
  * 
@@ -16568,7 +16574,7 @@ static int __Pyx_InitCachedConstants(void) {
   __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(2, 0, 13, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_farmer01_proj_parabam_par, __pyx_n_s_process_task_set, 156, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 156; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
   /* "parabam/command/core.pyx":191
- *             self._task_size += 1
+ *                 current_positions += 1
  * 
  *     def __filter__(self,read):             # <<<<<<<<<<<<<<
  *         return read.is_secondary or (read.flag & 2048 == 2048)
@@ -17756,7 +17762,7 @@ PyMODINIT_FUNC PyInit_core(void)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "parabam/command/core.pyx":191
- *             self._task_size += 1
+ *                 current_positions += 1
  * 
  *     def __filter__(self,read):             # <<<<<<<<<<<<<<
  *         return read.is_secondary or (read.flag & 2048 == 2048)

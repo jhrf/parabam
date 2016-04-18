@@ -242,7 +242,7 @@ class Task(Process):
                 self._dealt += 1 #Copy paste code here.
                 time.sleep(0.005) #And here
                 self.__post_run_routine__()
-                self._outqu.put(Package(results=results))
+                self._outqu.put(Package(results=results,sequence_id=sequence_id))
         return
 
     def __generate_results__(self,iterator,**kwargs):

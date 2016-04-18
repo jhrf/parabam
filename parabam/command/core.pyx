@@ -161,7 +161,7 @@ class ByCoordTask(Task):
         handle_output = self.__handle_engine_output__
         user_constants = self._user_constants
 
-        position_max = 5000
+        position_max = 10000
 
         task_pos = None
         reads = []
@@ -177,16 +177,16 @@ class ByCoordTask(Task):
 
             if task_pos == read.pos:
                 reads.append(read)
+                
             else:
                 engine_output = engine(reads,user_constants,parent_bam)        
                 handle_output(engine_output,reads)
+                self._task_size += len(reads)
                 
                 del reads
                 reads = [read]
-                task_pos = None
+                task_pos = read.pos
                 current_positions += 1
-
-            self._task_size += 1
 
     def __filter__(self,read):
         return read.is_secondary or (read.flag & 2048 == 2048)
@@ -286,7 +286,7 @@ class ByCoordFileReader(parabam.core.FileReader):
         cdef int iterations = 0
         cdef int task_size = self._task_size
 
-        cdef int position_max = 5000
+        cdef int position_max = 10000
         
         parent_iter = bam_file.fetch(until_eof = True)
 
