@@ -308,6 +308,7 @@ class FileReader(Process):
 
         self._Task = Task
         self._task_n = task_n
+        print proc_id,task_n
 
         self._constants = constants
         self._task_size = constants.task_size
@@ -478,15 +479,22 @@ class Leviathan(object):
         default_qus = self.__create_queues__(self._queue_names) 
         pause_qus = self.__create_pause_qus__(self._constants.reader_n)
 
-
-        handlers_objects,handler_inqus = self.__create_handlers__(self.sequence_id,
-                                                          self._handler_bundle,self._constants,
-                                                          default_qus,parent,output_paths,pause_qus)
+        handlers_objects,handler_inqus = \
+                        self.__create_handlers__(self.sequence_id,
+                                                self._handler_bundle,
+                                                self._constants,
+                                                default_qus,
+                                                parent,
+                                                output_paths,
+                                                pause_qus)                        
         handlers = self.__get_handlers__(handlers_objects)
 
-        task_n = self.__get_task_n__(self._constants,handlers)
-        file_reader_bundles = self.__get_file_reader_bundles__(default_qus,parent,
-                                                               task_n,self._constants,pause_qus)
+        task_n_list = self.__get_task_n__(self._constants,handlers)
+        file_reader_bundles = self.__get_file_reader_bundles__(default_qus,
+                                                                parent,
+                                                                task_n_list,
+                                                                self._constants,
+                                                                pause_qus)
         file_readers = self.__get_file_readers__(file_reader_bundles)
 
         #Start file_readers
@@ -524,12 +532,19 @@ class Leviathan(object):
         return [Queue() for i in xrange(reader_n)]
 
     def __get_task_n__(self,constants,handlers):
-        #task_n = (constants.total_procs - constants.reader_n) / constants.reader_n
-        task_n = constants.total_procs / constants.reader_n
-        if task_n > 0:
-            return task_n
-        else:
-            return 1
+        total_procs = constants.total_procs
+        reader_n = constants.reader_n
+        task_n_list = [total_procs / reader_n] * reader_n
+
+        if not total_procs % reader_n == 0:
+            for i,overflow in zip(xrange(len(task_n_list)),
+                                  [1] * (total_procs % reader_n)):
+                task_n_list[i] += overflow
+
+        if any([ n == 0 for n in task_n_list]):
+            task_n_list = [1] * reader_n
+
+        return task_n_list 
 
     def __get_file_readers__(self,file_reader_bundles):
         file_readers = []
@@ -542,10 +557,12 @@ class Leviathan(object):
         for i in reversed(xrange(reader_n)):
             yield i
 
-    def __get_file_reader_bundles__(self,default_qus,parent,task_n,constants,pause_qus):
+    def __get_file_reader_bundles__(self,default_qus,parent,task_n_list,constants,pause_qus):
         bundles = []
 
-        for proc_id,pause in izip(self.__proc_id_generator__(constants.reader_n),pause_qus):
+        for proc_id,pause,task_n in izip(self.__proc_id_generator__(constants.reader_n),
+                                    pause_qus,
+                                    task_n_list):
             current_bundle = {"input_path" :parent.filename,
                               "proc_id" :proc_id,
                               "task_n" :task_n,
