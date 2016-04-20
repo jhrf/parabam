@@ -308,7 +308,6 @@ class FileReader(Process):
 
         self._Task = Task
         self._task_n = task_n
-        print proc_id,task_n
 
         self._constants = constants
         self._task_size = constants.task_size
