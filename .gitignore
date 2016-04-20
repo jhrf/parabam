@@ -1,3 +1,7 @@
 #Files:
 dist
 parabam.egg-info
+
+#File Types:
+*.so
+*.c
