@@ -211,6 +211,9 @@ class NumericStructure(UserStructure):
         self.data += result
         del result
 
+
+#TODO: This mode doesn't work at all. Probably something to do with 
+#      creating an empty clone. Counts are inflated.
 class CounterStructure(UserStructure):
     def __init__(self,name,struc_type,store_method,data):
         super(CounterStructure,self).__init__(name,struc_type,store_method,data)
