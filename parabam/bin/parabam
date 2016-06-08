@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#main
+
 import sys
 import argparse
 import textwrap
@@ -9,6 +9,8 @@ import traceback
 import os
 import shutil
 import tempfile
+
+import parabam
 
 def keyboard_handler(sig, frame):#Catch keyboard interupt and end processors
 	sys.stdout.write("\r[ERROR] parabam interrupted by user")
@@ -63,13 +65,16 @@ if __name__ == "__main__":
 		printInfo = True
 	
 	if printInfo:
-		print textwrap.dedent('''\
+		print (textwrap.dedent('''\
 		
 		parabam
 		----------------------------------------------------------------
 
 		About: 
 			Parabam - analyse bam file in parallel
+
+		Version:
+			%s
 
 		Usage:
 			parabam <command> [options] instruction:{Python} input:{BAM} output:{BAM/CSV}
@@ -78,4 +83,4 @@ if __name__ == "__main__":
 			stat\t Genereate stats regarding the BAM file
 			subset\t Create a subsetted BAM file
 
-    	'''.expandtabs())
+    	'''.expandtabs()) % (parabam.__version__))
