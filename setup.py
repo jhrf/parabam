@@ -1,6 +1,11 @@
+import os
+
 from setuptools import setup
 from setuptools.extension import Extension
 from setuptools.command.sdist import sdist as _sdist
+
+#Instalise the __version__ variable
+execfile(os.path.join('parabam','_version.py'))
 
 cmdclass = {}
 ext_modules = [
@@ -19,11 +24,12 @@ class sdist(_sdist):
                    'parabam/command/core.pyx','parabam/command/stat.pyx',
                    'parabam/command/subset.pyx'])
         _sdist.run(self)
+        
 cmdclass['sdist'] = sdist
 
 setup(name='parabam',
       description='Parallel BAM File Analysis',
-      version='1.6',
+      version=__version__,
       author="JHR Farmery",
       license='GPL',
       author_email = 'jhrf2@cam.ac.uk',

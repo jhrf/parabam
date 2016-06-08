@@ -1,9 +1,13 @@
+import os
+
 from distutils.core import setup
 from Cython.Build import cythonize
 
+execfile(os.path.join('parabam','_version.py'))
+
 setup(name='parabam',
       description='Parallel BAM File Analysis',
-      version='0.1.7dev',
+      version=__version__,
       author="JHR Farmery",
       license='BSD',
       author_email='jhrf2@cam.ac.uk',
