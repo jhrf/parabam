@@ -114,8 +114,8 @@ class Handler(parabam.core.Handler):
 
         self._primary_store = self.__instalise_primary_store__()
 
-        self._print_chaser_debug = (lambda iterations: False)
-        #self._print_chaser_debug = self.__print_debug__
+        #self._print_chaser_debug = (lambda iterations: False)
+        self._print_chaser_debug = self.__print_debug__
 
     def __print_debug__(self,iterations):
         if iterations % 50 == 0 or iterations == -1:
@@ -155,6 +155,8 @@ class Handler(parabam.core.Handler):
         return tasks
 
     def __get_chrom_bins__(self,parent_bam):
+        # Create chromosome `bins` by grouping together smaller chromosomes
+
         references = parent_bam.references
         lengths = parent_bam.lengths
 
@@ -241,8 +243,7 @@ class Handler(parabam.core.Handler):
                 pyramid.append([])
 
             for loner_level,loner_path in new_package.results:
-                pyramid[loner_level].append(loner_path)
-                self._files_in_pyramid += 1
+                self.__add_to_pyramid__(loner_type,loner_level,loner_path)
 
         if self._destroy: #TODO:should this move to new_package_action?
             self._stale_count += 1
@@ -337,38 +338,16 @@ class Handler(parabam.core.Handler):
                     self.__start_matchmaker_task__(paths,loner_type,level)
                     pyramid_idle_counts[loner_type] = 0
                     for path in paths:#remove sent paths
-                        sub_pyramid.remove(path)
-                        self._files_in_pyramid -= 1
+                        self.__remove_from_pyramid__(loner_type,level,path)
                     break
                 if len(sub_pyramid) > 0:
                     pyramid_idle_counts[loner_type] += 1
                 del paths
 
             if pyramid_idle_counts[loner_type] >= idle_threshold:
-                idle_success,idle_paths,idle_levels = \
-                                    self.__idle_routine__(pyramid,loner_type)
-
-                # Delete after idle success or when 
-                # processing has finished and idle fails
-                if self.__clear_subpyramid__(idle_success, 
-                                             self._destroy,self._pending_jobs):
-                    
-                    pyramid_idle_counts[loner_type]=0
-                    for idle_level,idle_path in izip(idle_levels,idle_paths):
-                        if idle_success:
-                            pyramid[idle_level].remove(idle_path)
-                            self._files_in_pyramid -= 1
-                        else:
-                            try:
-                                self._loner_purgatory[loner_type].\
-                                                        append(idle_path)
-                            except KeyError:
-                                self._loner_purgatory[loner_type] = [idle_path]
-                            pyramid[idle_level].remove(idle_path)
-                            self._files_in_pyramid -= 1
-                            
-
-                del idle_paths,idle_levels
+                self.__test_pyramid_idle_count__(pyramid,
+                                                  loner_type,
+                                                  pyramid_idle_counts)
 
         self.__test_primary_tasks__(required_paths=required_paths)
         self._print_chaser_debug(iterations)
@@ -376,6 +355,33 @@ class Handler(parabam.core.Handler):
 
         if iterations % 100 == 0:
             gc.collect()
+
+    def __test_pyramid_idle_count__(self,pyramid,loner_type,pyramid_idle_counts):
+        #Idle counting is the mechanism whereby loners that have no
+        #match can be entered into `purgatory` thus clearing the pyramid.
+        #This mechanism catches the case where there are genuinley lonerred
+        #reads in the BAM file.
+
+        idle_success,idle_paths,idle_levels = \
+                            self.__idle_routine__(pyramid,loner_type)
+
+        # Delete after idle success or when 
+        # processing has finished and idle fails
+        if self.__clear_subpyramid__(idle_success, 
+                                     self._destroy,
+                                     self._pending_jobs):
+            
+            pyramid_idle_counts[loner_type]=0
+            for idle_level,idle_path in izip(idle_levels,idle_paths):
+                if not idle_success:
+                    try:
+                        self._loner_purgatory[loner_type].\
+                                                append(idle_path)
+                    except KeyError:
+                        self._loner_purgatory[loner_type] = [idle_path]
+                self.__remove_from_pyramid__(loner_type,idle_level,idle_path)
+                    
+        del idle_paths,idle_levels
 
     def __finish_test__(self):
         if self._destroy:
@@ -388,17 +394,16 @@ class Handler(parabam.core.Handler):
             saved = self.__save_purgatory_loners__()
 
             finished = False
-            if self.__pyramid_is_empty___(saved):
+            if self.__pyramid_is_empty__(saved):
                 finished = True
             elif self._stale_count > self._stale_thresh:
-                self.__tidy_pyramid__()
-                finished = True
+                finished = self.__tidy_pyramid__()
 
             if finished:
                 self._print_chaser_debug(-1)
                 self._finished = True
 
-    def __pyramid_is_empty___(self,saved):
+    def __pyramid_is_empty__(self,saved):
         return (self._files_in_pyramid == 0 and \
                 self._pending_jobs == 0 and \
                 saved == 0 and \
@@ -425,11 +430,19 @@ class Handler(parabam.core.Handler):
                 saved_keys.append(loner_type)
                 self._pyramid_idle_counts[loner_type] = 100
                 for path in paths:
-                    self._loner_pyramid[loner_type][0].append(path)
+                    self.__add_to_pyramid__(loner_type,0,path)
         for key in saved_keys:
             del self._loner_purgatory[key]
         gc.collect()
         return saved
+
+    def __add_to_pyramid__(self,loner_type,level,path):
+        self._loner_pyramid[loner_type][level].append(path)
+        self._files_in_pyramid += 1
+
+    def __remove_from_pyramid__(self,loner_type,level,path):
+        self._loner_pyramid[loner_type][level].remove(path)
+        self._files_in_pyramid -= 1
 
     def __get_paths__(self,loner_type,sub_pyramid,level):
         if not self._destroy and "UM" in loner_type:
@@ -443,14 +456,18 @@ class Handler(parabam.core.Handler):
         return []
     
     def __tidy_pyramid__(self):
-        self.__wait_for_remaining_jobs__()
-        for loner_type,pyramid in self._loner_pyramid.items():
-            for sub_pyramid in pyramid:
-                for x in xrange(len(sub_pyramid)):
-                    os.remove(sub_pyramid.pop())
-                    self._files_in_pyramid -= 1
-        gc.collect()
-            
+        reads_found = self.__wait_for_remaining_jobs__()
+
+        if reads_found == 0:
+            for loner_type,pyramid in self._loner_pyramid.items():
+                for level,sub_pyramid in enumerate(pyramid):
+                    for path in sub_pyramid:
+                        self.__remove_from_pyramid__(loner_type,level,path)
+            gc.collect()
+            return True
+        else:
+            return False
+
     def __wait_for_remaining_jobs__(self):
         def waiting_update(found,total):
             sys.stdout.write(("\r\t- Unpaired reads identified."
@@ -462,12 +479,14 @@ class Handler(parabam.core.Handler):
             sys.stdout.write("\n")
             sys.stdout.flush()
 
+        prev_found = self._rescued["total"]
         jobs_at_start = self._pending_jobs
         jobs_found = 0
 
         i = 0
         while self._pending_jobs > 0:
-            if self._constants.verbose and i % 25 == 0:
+            if self._constants.verbose and i % 50 == 0:
+                jobs_at_start = self._pending_jobs
                 waiting_update(jobs_found,jobs_at_start)
             try:
                 pack = self._inqu.get(True,10)
@@ -481,6 +500,8 @@ class Handler(parabam.core.Handler):
             waiting_update(jobs_found,jobs_at_start)
             sys.stdout.write("\n")
             sys.stdout.flush()
+
+        return prev_found == self._rescued["total"]
 
     def __clear_subpyramid__(self,success,destroy,running):
         if success:
