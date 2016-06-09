@@ -114,8 +114,8 @@ class Handler(parabam.core.Handler):
 
         self._primary_store = self.__instalise_primary_store__()
 
-        #self._print_chaser_debug = (lambda iterations: False)
-        self._print_chaser_debug = self.__print_debug__
+        self._print_chaser_debug = (lambda iterations: False)
+        #self._print_chaser_debug = self.__print_debug__
 
     def __print_debug__(self,iterations):
         if iterations % 50 == 0 or iterations == -1:
@@ -141,6 +141,9 @@ class Handler(parabam.core.Handler):
             if iterations == -1:
                 sys.stdout.write("\nFINISHED\n")
             sys.stdout.flush()
+
+        if iterations % 2500 == 0:
+            print ""
 
     def __create_chaser_tasks__(self,total_tasks):
         tasks = []
@@ -458,7 +461,7 @@ class Handler(parabam.core.Handler):
     def __tidy_pyramid__(self):
         reads_found = self.__wait_for_remaining_jobs__()
 
-        if reads_found == 0:
+        if not reads_found:
             for loner_type,pyramid in self._loner_pyramid.items():
                 for level,sub_pyramid in enumerate(pyramid):
                     for path in sub_pyramid:
@@ -470,9 +473,8 @@ class Handler(parabam.core.Handler):
 
     def __wait_for_remaining_jobs__(self):
         def waiting_update(found,total):
-            sys.stdout.write(("\r\t- Unpaired reads identified."
-                              " Waiting for tasks to finish: %d/%d ") % \
-                                                            (found,total) )
+            sys.stdout.write(("\r\t- Waiting for tasks to finish: %d/%d ") % \
+                                                            (found,total))
             sys.stdout.flush()
 
         if self._constants.verbose:
@@ -501,7 +503,8 @@ class Handler(parabam.core.Handler):
             sys.stdout.write("\n")
             sys.stdout.flush()
 
-        return prev_found == self._rescued["total"]
+        print "Saved from wait %d" % (self._rescued["total"] - prev_found)
+        return prev_found < self._rescued["total"]
 
     def __clear_subpyramid__(self,success,destroy,running):
         if success:
