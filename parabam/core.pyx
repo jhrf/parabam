@@ -6,6 +6,7 @@ import Queue as Queue2
 import gc
 import shutil
 import argparse
+import tempfile
 
 import pysam
 
@@ -15,9 +16,14 @@ from abc import ABCMeta, abstractmethod
 
 cdef class Handler:
 
-    def __init__(self,object parent_bam, object output_paths,object inqu,
-                object constants,object pause_qus,
-                dict out_qu_dict,object report=True):
+    def __init__(self,
+                  object parent_bam, 
+                  object output_paths,
+                  object inqu,
+                  object constants,
+                  object pause_qus,
+                  dict out_qu_dict,
+                  object report=True):
 
         self._parent_bam = parent_bam
         self._inqu = inqu
@@ -56,7 +62,8 @@ cdef class Handler:
     def __level_1_output__(self,out_str):
         total_procd = self.__total_reads__()
         time = out_str.partition("Time: ")[2]
-        sys.stdout.write("\t- Reads processed: %d Time: %s\n" % (total_procd,time))
+        sys.stdout.write("\t- Reads processed: %d Time: %s\n" \
+                                                % (total_procd,time))
         sys.stdout.flush()
 
     def __level_2_output__(self,outstr):
@@ -190,7 +197,7 @@ cdef class Handler:
 class Task(Process):
     __metaclass__=ABCMeta
 
-    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
+    def __init__(self, parent_bam, inqu, outqu, statusqu, task_size, constants):
         super(Task,self).__init__()
         self._parent_bam = parent_bam
         self._parent_path = self._parent_bam.filename
@@ -272,7 +279,9 @@ class Task(Process):
 
     def __get_temp_path__(self,identity):
         file_name = "%s_%d_%d_%s" %\
-            (identity,self.pid,self._dealt, os.path.split(self._parent_bam.filename)[1])
+            (identity,self.pid,self._dealt, 
+             os.path.split(self._parent_bam.filename)[1])
+
         return os.path.join(self._temp_dir,file_name)
 
     @abstractmethod
@@ -556,12 +565,19 @@ class Leviathan(object):
         for i in reversed(xrange(reader_n)):
             yield i
 
-    def __get_file_reader_bundles__(self,default_qus,parent,task_n_list,constants,pause_qus):
+    def __get_file_reader_bundles__(self, 
+                                     default_qus, 
+                                     parent, 
+                                     task_n_list, 
+                                     constants, 
+                                     pause_qus):
         bundles = []
 
-        for proc_id,pause,task_n in izip(self.__proc_id_generator__(constants.reader_n),
-                                    pause_qus,
-                                    task_n_list):
+        for proc_id,pause,task_n in izip(
+                                self.__proc_id_generator__(constants.reader_n),
+                                pause_qus,
+                                task_n_list):
+
             current_bundle = {"input_path" :parent.filename,
                               "proc_id" :proc_id,
                               "task_n" :task_n,
@@ -617,12 +633,46 @@ class Interface(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self,temp_dir):
-        self._temp_dir = temp_dir
+    def __init__(self,
+                  task_size = 250000,
+                  total_procs = 8,
+                  reader_n = 2,
+                  verbose = False,
+                  cmd_run = False):
+
+        self.temp_dir = self.__get_unique_tempdir__()
+        self.cmd_run = cmd_run
+
+        if cmd_run:
+            self.__setup_cmd_line_run__()
+
+        else:
+            self.task_size = task_size
+            self.total_procs = total_procs
+            self.reader_n = reader_n
+            self.verbose = verbose
+
+    def get_temp_dir_path(self):
+        return self.temp_dir
+
+    def __get_unique_tempdir__(self):
+        return tempfile.mkdtemp(prefix="parabam-tmp-",dir=".")
+
+    def __setup_cmd_line_run__(self):
+        parser = self.get_parser()
+        cmd_args = parser.parse_args()
+
+        self.task_size = cmd_args.s
+        self.total_procs = cmd_args.p
+        self.verbose = cmd_args.v
+        self.reader_n = cmd_args.f
+
+        self.cmd_args = cmd_args
 
     def __introduce__(self,name,verbose=True):
         if verbose:
-            intro =  "%s has started. Start Time: %s" % (name,self.__get_date_time__())
+            intro =  "%s has started. Start Time: %s" \
+                                % (name,self.__get_date_time__())
             underline = ("-" * len(intro))
 
             sys.stdout.write(intro+"\n")
@@ -630,42 +680,17 @@ class Interface(object):
             sys.stdout.flush()
     
     def __get_date_time__(self):
-        return datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        return datetime.datetime.fromtimestamp(
+                                    time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
     def __goodbye__(self,name,verbose=True):
         if verbose:
-            outro = "%s has finished.  End Time: %s" % (name,self.__get_date_time__())
+            outro = "%s has finished.  End Time: %s" \
+                                 % (name,self.__get_date_time__())
 
             sys.stdout.write(("-" * len(outro)) + "\n")
             sys.stdout.write(outro + "\n")
             sys.stdout.flush()
-
-    def __sort_and_index__(self,fnm,verbose=False,tempDir=".",name=False):
-        if not os.path.exists(fnm+".bai"):
-            if verbose: print "%s is not indexed. Sorting and creating index file." % (fnm,)
-            tempsort_path = self.__get_unique_temp_path__("SORT",temp_dir=self._temp_dir)
-            optStr = "-nf" if name else "-f"
-            pysam.sort(optStr,fnm,tempsort_path)
-            os.remove(fnm)
-            os.rename(tempsort_path,fnm)
-            if not name: pysam.index(fnm)
-
-    def __get_unique_temp_path__(self,temp_type,temp_dir="."):
-        #TODO: Duplicated from parabam.interface.merger. Find a way to reformat code
-        #to remove this duplication
-        return "%s/%sTEMP%d.bam" % (temp_dir,temp_type,int(time.time()),)
-
-    def __get_group__(self,bams,names=[],multi=1):
-        if multi == 0:
-            multi = 1
-        if names == []:
-            names = [self.__get_basename__(path) for path in bams]
-        for i in xrange(0,len(bams),multi):
-            yield (bams[i:i+multi],names[i:i+multi])
-
-    def __get_basename__(self,path):
-        base,ext = os.path.splitext(os.path.basename(path))
-        return base
 
     def default_parser(self):
 
@@ -677,10 +702,13 @@ class Interface(object):
                   "This should be less than or equal to the amount of processor\n"\
                   "cores in your machine [Default: 4].")
         parser.add_argument('-s',type=int,nargs='?',default=250000
-            ,help="The amount of reads considered by each distributed task. [Default: 250000]")
-        parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2
-            ,help="The amount of open connections to the file being read.\n"\
-            "Conventional hard drives perform best with the default of 2. [Default: 2]")
+            ,help="The amount of reads considered by each"\
+                    "distributed task. [Default: 250000]")
+        parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2,
+            help="The amount of open connections to the file being read.\n"\
+                    "Conventional hard drives perform best with \n"\
+                    "the default of 2. [Default: 2]")
+
         return parser
 
     @abstractmethod
@@ -706,13 +734,7 @@ class ParabamParser(argparse.ArgumentParser):
 
 class Constants(object):
     
-    def __init__(self,temp_dir,verbose,task_size,total_procs,fetch_region,**kwargs):
-        #TODO: Update with real required constants values
-        self.temp_dir = temp_dir
-        self.verbose = verbose
-        self.task_size = task_size
-        self.total_procs = total_procs
-        self.fetch_region = fetch_region
+    def __init__(self, **kwargs):
 
         for key, val in kwargs.items():
             setattr(self,key,val)
@@ -766,6 +788,5 @@ class ParentAlignmentFile(object):
             if reference == ref:
                 return i
         return -1
-
 
 #And they all lived happily ever after...

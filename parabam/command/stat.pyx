@@ -37,10 +37,10 @@ class StatCore(object):
         super(StatCore,self).__post_run_routine__()
         pass
 
-    def __handle_engine_output__(self,engine_output,read):
-        if engine_output:#Allows return False
+    def __handle_rule_output__(self,rule_output,read):
+        if rule_output:#Allows return False
             local_structures = self._local_structures
-            for name,package in engine_output.items():
+            for name,package in rule_output.items():
                 self._counts[name] += 1
                 local_structures[name].add(**package)
 
@@ -319,27 +319,27 @@ class ArrayStructure(UserStructure):
 
         np.savetxt(out_path,self.data,fmt=",".join(format),delimiter=",")
 
-class Interface(parabam.command.Interface):
+class Stat(parabam.command.Interface):
 
     def __init__(self,temp_dir):
-        super(Interface,self).__init__(temp_dir)
+        super(Stat,self).__init__(temp_dir)
     
     def run_cmd(self,parser):
 
         cmd_args = parser.parse_args()
 
-        module,user_engine,user_constants = self.__get_module_and_vitals__(cmd_args.instruc)
+        module,user_rule,user_constants = self.__get_module_and_vitals__(cmd_args.instruc)
         user_struc_blueprint = {}
         module.set_structures(user_struc_blueprint)
 
-        self.run(input_bams=cmd_args.input,
+        self.run(input_paths=cmd_args.input,
             total_procs = cmd_args.p,
             task_size = cmd_args.s,
             verbose= cmd_args.v,
             reader_n = cmd_args.f,
             user_constants = user_constants,
             user_struc_blueprint = user_struc_blueprint,
-            user_engine = user_engine,
+            user_rule = user_rule,
             fetch_region = cmd_args.region,
             pair_process=cmd_args.pair,
             coord_process=cmd_args.coord,
@@ -348,7 +348,7 @@ class Interface(parabam.command.Interface):
             announce = True)
 
 
-    def run(self,input_bams,total_procs,task_size,user_constants,user_engine,
+    def run(self,input_paths,total_procs,task_size,user_constants,user_rule,
             user_struc_blueprint,user_specified_outpath=None,
             reader_n = 2,fetch_region=None,side_by_side=2,
             keep_in_temp=False,verbose=0,coord_process=False,
@@ -363,7 +363,7 @@ class Interface(parabam.command.Interface):
             announce = False
         self.__introduce__("parabam stat",announce)
 
-        results = super(Interface,self).run(**args)
+        results = super(Stat,self).run(**args)
 
         self.__goodbye__("parabam stat",announce)
         return results

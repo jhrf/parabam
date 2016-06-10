@@ -14,7 +14,7 @@ from itertools import izip
 from multiprocessing import Queue,Process
 from abc import ABCMeta, abstractmethod
 
-#TODO: error handle incorrect return from user engine
+#TODO: error handle incorrect return from user rule
 
 class Task(parabam.core.Task):
     __metaclass__=ABCMeta
@@ -27,11 +27,11 @@ class Task(parabam.core.Task):
                                     task_size=task_size,
                                     constants=constants)
 
-        self._engine = constants.user_engine
+        self._rule = constants.user_rule
         self._user_constants = constants.user_constants
 
     @abstractmethod
-    def __handle_engine_output__(self,engine_output,read):
+    def __handle_rule_output__(self,rule_output,read):
         pass
 
     def __pre_run_routine__(self,iterator,**kwargs):
@@ -41,17 +41,17 @@ class Task(parabam.core.Task):
         pass
 
     def __process_task_set__(self,iterator):
-        engine = self._engine
+        rule = self._rule
         next_read = iterator.next 
         parent_bam = self._parent_bam
-        handle_output = self.__handle_engine_output__
+        handle_output = self.__handle_rule_output__
         user_constants = self._user_constants
         
         #StopIteration caught in parabam.core.Task.run
         for i in xrange(self._task_size):    
             read = next_read()
-            engine_output = engine(read,user_constants,parent_bam)
-            handle_output(engine_output,read)
+            rule_output = rule(read,user_constants,parent_bam)
+            handle_output(rule_output,read)
 
     def __get_extension__(self,path):
         root,extension = os.path.splitext(path)
@@ -74,7 +74,7 @@ class PairTask(Task):
             self.__read_filter__ = self.__filter_duplicates__
 
     @abstractmethod
-    def __handle_engine_output__(self,engine_output,read):
+    def __handle_rule_output__(self,rule_output,read):
         pass
 
     def __pre_run_routine__(self,iterator):
@@ -87,12 +87,12 @@ class PairTask(Task):
         del self._loners
 
     def __process_task_set__(self,iterator):
-        engine = self._engine
+        rule = self._rule
         next_read = iterator.next 
         parent_bam = self._parent_bam
         query_loners = self.__query_loners__ 
         cdef int size = self._task_size
-        handle_output = self.__handle_engine_output__
+        handle_output = self.__handle_rule_output__
         user_constants = self._user_constants
         counts = self._counts
 
@@ -104,8 +104,8 @@ class PairTask(Task):
             read1,read2 = query_loners(read,loners)
 
             if read1:
-                engine_output = engine((read1,read2),user_constants,parent_bam)
-                handle_output(engine_output,(read1,read2,))
+                rule_output = rule((read1,read2),user_constants,parent_bam)
+                handle_output(rule_output,(read1,read2,))
 
     def __stash_loners__(self,loners):
         loner_count = 0
@@ -150,15 +150,15 @@ class ByCoordTask(Task):
         self.__read_filter__ = self.__filter__
 
     @abstractmethod
-    def __handle_engine_output__(self,engine_output,read):
+    def __handle_rule_output__(self,rule_output,read):
         pass
 
     def __process_task_set__(self,iterator):
-        engine = self._engine
+        rule = self._rule
         next_read = iterator.next 
         parent_bam = self._parent_bam
 
-        handle_output = self.__handle_engine_output__
+        handle_output = self.__handle_rule_output__
         user_constants = self._user_constants
 
         position_max = 10000
@@ -179,8 +179,8 @@ class ByCoordTask(Task):
                 reads.append(read)
                 
             else:
-                engine_output = engine(reads,user_constants,parent_bam)        
-                handle_output(engine_output,reads)
+                rule_output = rule(reads,user_constants,parent_bam)        
+                handle_output(rule_output,reads)
                 self._task_size += len(reads)
                 
                 del reads
@@ -326,8 +326,22 @@ class Interface(parabam.core.Interface):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self,temp_dir):
-        super(Interface,self).__init__(temp_dir)
+    def __init__(self,keep_in_temp = False,
+                      pair_process = False,
+                      coord_process = False,
+                      include_duplicates = True,
+                      debug = False,
+                      ensure_unique_output=False,
+                      **kwargs):
+
+        super(Interface,self).__init__(**kwargs)
+
+        self.keep_in_temp = keep_in_temp
+        self.pair_process = pair_process
+        self.coord_process = coord_process
+        self.include_duplicates = include_duplicates
+        self.debug = debug
+        self.ensure_unique_output = ensure_unique_output
 
     def __get_module_and_vitals__(self,code_path):
         if os.getcwd not in sys.path:
@@ -345,12 +359,12 @@ class Interface(parabam.core.Interface):
                               "\tEnsure instruction code is in current working directory\n")
             raise SystemExit
 
-        user_engine = module.engine
+        user_rule = module.rule
         user_constants = {}
         if hasattr(module,"set_constants"):
             module.set_constants(user_constants)
 
-        return module,user_engine,user_constants
+        return module,user_rule,user_constants
 
     @abstractmethod
     def __get_handler_bundle__(self,**kwargs):
@@ -379,40 +393,42 @@ class Interface(parabam.core.Interface):
         bundles'''
         pass
 
-    @abstractmethod
-    def __get_extra_const_args__(self,**kwargs):
-        '''return empty dict if not needed'''
-        pass
-
     def __get_const_args__(self,**kwargs):
-        '''Any function overwriting this one MUST make a super call to this function.
-        i.e args = super(<class_name>,self).__get_const_args__(**kwargs)'''
+        '''Any function overwriting this one MUST make a 
+            super call to this function.
+
+            i.e args = super(<class_name>,self).__get_const_args__(**kwargs)'''
 
         args = {}
-        args["temp_dir"] = self._temp_dir
-
-        defaults = ["total_procs","task_size","verbose","user_constants",
-                    "reader_n","user_constants", "user_engine", "fetch_region", 
-                    "pair_process", "include_duplicates","debug"]
+        
+        #Dump all non function variables from this interface into constants
+        for attribute in dir(self):
+            is_function = hasattr(getattr(self,attribute),"__call__")
+            if not is_function and not attribute.startswith("_"):
+                args[attribute] = getattr(self,attribute)
 
         for key,val in kwargs.items():
-            if key in defaults:
-                args[key] = val
+            args[key] = val
 
-        if args["pair_process"]:
+        if self.pair_process:
             args["system_subsets"] = ["chaser"]
         else:
             args["system_subsets"] = []
 
         return args
 
-    def __update_final_output_paths__(self,input_path,output_paths,final_output_paths):
+    def __update_final_output_paths__(self,
+                                       input_path,
+                                       output_paths,
+                                       final_output_paths):
+
         if "global" in output_paths.keys():
             for path in output_paths["global"]:
                 if path not in final_output_paths["global"]:
                     final_output_paths["global"].append(path)
 
         final_output_paths[input_path] = []
+        
         if input_path in output_paths.keys():
             output_path = output_paths[input_path]
             if type(output_path) == dict:
@@ -461,12 +477,9 @@ class Interface(parabam.core.Interface):
                     root,name = os.path.split(path)
                     sys.stdout.write("\t\t+ %s\n" % (name,))            
 
-    def run(self,**kwargs):
-
-        input_paths = kwargs["input_bams"]
+    def run(self,input_paths,**kwargs):
 
         const_args = self.__get_const_args__(**kwargs)
-        const_args.update(self.__get_extra_const_args__(**kwargs))
         constants = parabam.core.Constants(**const_args)
 
         task_class = self.__get_task_class__(**kwargs)
@@ -497,12 +510,12 @@ class Interface(parabam.core.Interface):
             self.__update_final_output_paths__(input_path,output_paths,
                                                final_output_paths)
 
-            if constants.verbose and not kwargs["keep_in_temp"]: 
+            if constants.verbose and not self.keep_in_temp: 
                 self.__report_file_names__(final_output_paths,input_path)
 
             leviathon.run(input_path,output_paths)
 
-        if not kwargs["keep_in_temp"]:
+        if not self.keep_in_temp:
             final_output_paths = self.__output_files_to_cwd__(final_output_paths)
         
         self.__remove_empty_entries__(final_output_paths)
@@ -525,7 +538,7 @@ class Interface(parabam.core.Interface):
             return 200
 
     def __get_filereader_class__(self,**kwargs):
-        if kwargs["coord_process"]:
+        if self.coord_process:
             return ByCoordFileReader
         else:
             return parabam.core.FileReader
@@ -552,10 +565,11 @@ class Interface(parabam.core.Interface):
     def default_parser(self):
         parser = super(Interface,self).default_parser()
 
-        parser.add_argument('--instruc','-i',metavar='INSTRUCTION',required=True
-            ,help='The instruction file, written in python,\n'\
+        parser.add_argument('--rule','-i',metavar='RULE',required=True
+            ,help='The file containing the rule, written in python,\n'\
             'that we wish to apply to the input BAM.')
-        parser.add_argument('--input','-b',metavar='INPUT', nargs='+',required=True
+        parser.add_argument('--input','-b',metavar='INPUT', 
+                            nargs='+',required=True
             ,help='The file(s) we wish to operate on.\n'\
             ' Multiple entries should be separated by a single space')
         parser.add_argument('--debug',action="store_true",default=False,
@@ -563,9 +577,13 @@ class Interface(parabam.core.Interface):
         parser.add_argument('--pair',action="store_true",default=False
             ,help="A pair processor is used instead of a conventional processor")
         parser.add_argument('--coord',action="store_true",default=False
-            ,help="Engines recieve a list of reads which all map to the same starting position.\n"\
-                  "This mode is not compatible with the `--pair` option")
-        parser.add_argument('-r','--region',type=str,metavar="REGION",nargs='?',default=None
+            ,help="Engines recieve a list of reads which all map to"\
+                  " the same starting position.\n This mode is not"\
+                  " compatible with the `--pair` option")
+        parser.add_argument('-r','--region',type=str,
+                                            metavar="REGION",
+                                            nargs='?',
+                                            default=None
             ,help="The process will be run only on reads from\n"\
             "this region. Regions should be colon separated as\n"\
             "specified by samtools (eg \'chr1:1000,5000\')")

@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 
 import sys
-import argparse
 import textwrap
 import signal
-import time
 import traceback
-import os
 import shutil
-import tempfile
 
 import parabam
 
@@ -16,38 +12,35 @@ def keyboard_handler(sig, frame):#Catch keyboard interupt and end processors
 	sys.stdout.write("\r[ERROR] parabam interrupted by user")
 	sys.exit(0)
 
-def get_unique_tempdir():
-	return tempfile.mkdtemp(prefix="parabam-tmp-",dir=".")
-
-def die_gracefully(temp_dir):
-	if not temp_dir == "." or not temp_dir == "" or not temp_dir == "./": 
-		shutil.rmtree(temp_dir)
+def die_gracefully(interface):
+	if interface is not None:
+		temp_dir = interface.get_temp_dir_path()
+		if not temp_dir == "." or not temp_dir == "" or not temp_dir == "./": 
+			shutil.rmtree(temp_dir)
 
 if __name__ == "__main__":
-
-	signal.signal(signal.SIGINT, keyboard_handler) #Handle KeyboardInterrupt gracefully
+	#Handle KeyboardInterrupt gracefully
+	signal.signal(signal.SIGINT, keyboard_handler) 
 
 	argument_len = len(sys.argv) >= 2
 
-	progs = {"stat":"command.stat",
-			"subset":"command.subset"}
+	progs = {"stat":parabam.Stat,
+			"subset":parabam.Subset}
 
 	printInfo = False
 
 	if argument_len:
-
-		file_path = sys.argv[0]
 		command = sys.argv[1]
 
-		temp_dir = get_unique_tempdir()
-
 		if command in progs:
-			#Load the command using the command line
-			module = __import__("parabam.%s" % (progs[command],), fromlist=[''])
-			sys.argv = sys.argv[1:] #Remove command from arguments.
+			#Remove command from arguments.
+			sys.argv = sys.argv[1:] 
+
 			try:
-				interface = module.Interface(temp_dir)
-				interface.run_cmd(interface.get_parser())
+				#Load the command using the command line
+				interface = progs[command](cmd_run=True)
+				interface.run_cmd()
+				
 			except SystemExit:
 				print " "
 				print "[Status] parabam is quitting gracefully\n"
@@ -55,12 +48,13 @@ if __name__ == "__main__":
 				print " "
 				print "[Error] parabam stopped unexpecedtly, sorry!"
 				traceback.print_exception(*sys.exc_info())
-				die_gracefully(temp_dir)
+				die_gracefully(interface)
 				raise
+
 		else:
 			print "\nCommand not recognised. Refer to manual below:\n"
 			printInfo = True
-		die_gracefully(temp_dir)
+		die_gracefully(interface)
 	else:
 		printInfo = True
 	
@@ -77,7 +71,7 @@ if __name__ == "__main__":
 			%s
 
 		Usage:
-			parabam <command> [options] instruction:{Python} input:{BAM} output:{BAM/CSV}
+			parabam <command> [options] --rule:{Python} --input:{BAM} output:{BAM/CSV}
 
 		Command:
 			stat\t Genereate stats regarding the BAM file
