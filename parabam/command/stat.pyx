@@ -40,9 +40,9 @@ class StatCore(object):
     def __handle_rule_output__(self,rule_output,read):
         if rule_output:#Allows return False
             local_structures = self._local_structures
-            for name,package in rule_output.items():
+            for name,result in rule_output.items():
                 self._counts[name] += 1
-                local_structures[name].add(*package)
+                local_structures[name].add(result)
 
     def __unpack_structures__(self,structures):
         unpacked = []
@@ -335,7 +335,8 @@ class Stat(parabam.command.Interface):
             user_rule = user_rule,
             user_struc_blueprint = user_struc_blueprint,
             fetch_region = self.cmd_args.region,
-            announce = True)
+            announce = True,
+            sick_rythms = True)
 
     def run(self,input_paths,
                   user_constants,
@@ -343,25 +344,29 @@ class Stat(parabam.command.Interface):
                   user_struc_blueprint,
                   user_specified_outpath=None,
                   fetch_region=None,
-                  announce=False,**kwargs):
+                  announce=False,
+                  **kwargs):
+                  
 
         ''' Docstring! '''
+
+        args = dict(locals())
+        del args["self"]
 
         if not self.verbose:
             announce = False
         self.__introduce__("parabam stat",announce)
 
-        #Prepare state structures and insert to kwargs
+        #Prepare state structures and insert to args
         #kwargs are later used to construct the Constant file
         #passed to all the fileprocessors and handlers
         user_structures = self.__create_structures__(user_struc_blueprint)
         analysis_names = self.__get_non_array_names__(user_struc_blueprint)
 
-        kwargs["user_structures"] = user_structures
-        kwargs["analysis_names"] = analysis_names
+        args["user_structures"] = user_structures
+        args["analysis_names"] = analysis_names
 
-        del kwargs["self"]
-        results = super(Stat,self).run(**kwargs)
+        results = super(Stat,self).run(**args)
 
         self.__goodbye__("parabam stat",announce)
         return results
@@ -377,11 +382,10 @@ class Stat(parabam.command.Interface):
                                     "out_qu_dict":[]}}
         return handler_bundle
 
-    def __get_global_output_path__(self,user_struc_blueprint,user_specified_outpath,**kwargs):
-        analysis_names = self.__get_non_array_names__(user_struc_blueprint)
+    def __get_global_output_path__(self,analysis_names,user_specified_outpath,**kwargs):
         if analysis_names:
             if not user_specified_outpath:
-                global_filename = os.path.join(".",self._temp_dir,"parabam_stat_%d_%d.csv"\
+                global_filename = os.path.join(".",self.temp_dir,"parabam_stat_%d_%d.csv"\
                                          % (time.time(),os.getpid()))
             else:
                 global_filename = user_specified_outpath
@@ -401,7 +405,7 @@ class Stat(parabam.command.Interface):
                      type(blueprint["data"]) == dict:
                 path_id,ext = os.path.splitext(os.path.basename(input_path))
                 csv_path = "%s_%s.csv" % (path_id,name,)
-                output_paths[input_path][name] = os.path.join(".",self._temp_dir,csv_path)
+                output_paths[input_path][name] = os.path.join(".",self.temp_dir,csv_path)
         return output_paths
 
     def __get_task_class__(self,**kwargs):
