@@ -36,6 +36,7 @@ if __name__ == "__main__":
 			#Remove command from arguments.
 			sys.argv = sys.argv[1:] 
 
+			interface = None
 			try:
 				#Load the command using the command line
 				interface = progs[command](cmd_run=True)

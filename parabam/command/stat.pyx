@@ -42,7 +42,7 @@ class StatCore(object):
             local_structures = self._local_structures
             for name,package in rule_output.items():
                 self._counts[name] += 1
-                local_structures[name].add(**package)
+                local_structures[name].add(*package)
 
     def __unpack_structures__(self,structures):
         unpacked = []
@@ -211,7 +211,6 @@ class NumericStructure(UserStructure):
         self.data += result
         del result
 
-
 #TODO: This mode doesn't work at all. Probably something to do with 
 #      creating an empty clone. Counts are inflated.
 class CounterStructure(UserStructure):
@@ -321,49 +320,48 @@ class ArrayStructure(UserStructure):
 
 class Stat(parabam.command.Interface):
 
-    def __init__(self,temp_dir):
-        super(Stat,self).__init__(temp_dir)
+    def __init__(self,**kwargs):
+        super(Stat,self).__init__(**kwargs)
     
-    def run_cmd(self,parser):
+    def run_cmd(self):
+        module,user_rule,user_constants = \
+                self.__get_module_and_vitals__(self.cmd_args.rule)
 
-        cmd_args = parser.parse_args()
-
-        module,user_rule,user_constants = self.__get_module_and_vitals__(cmd_args.instruc)
         user_struc_blueprint = {}
-        module.set_structures(user_struc_blueprint)
+        module.get_blueprints(user_struc_blueprint)
 
-        self.run(input_paths=cmd_args.input,
-            total_procs = cmd_args.p,
-            task_size = cmd_args.s,
-            verbose= cmd_args.v,
-            reader_n = cmd_args.f,
+        self.run(input_paths=self.cmd_args.input,
             user_constants = user_constants,
-            user_struc_blueprint = user_struc_blueprint,
             user_rule = user_rule,
-            fetch_region = cmd_args.region,
-            pair_process=cmd_args.pair,
-            coord_process=cmd_args.coord,
-            include_duplicates=cmd_args.d,
-            debug = cmd_args.debug,
+            user_struc_blueprint = user_struc_blueprint,
+            fetch_region = self.cmd_args.region,
             announce = True)
 
-
-    def run(self,input_paths,total_procs,task_size,user_constants,user_rule,
-            user_struc_blueprint,user_specified_outpath=None,
-            reader_n = 2,fetch_region=None,side_by_side=2,
-            keep_in_temp=False,verbose=0,coord_process=False,
-            pair_process=False,include_duplicates=True,
-            debug=False,announce=False):
+    def run(self,input_paths,
+                  user_constants,
+                  user_rule,
+                  user_struc_blueprint,
+                  user_specified_outpath=None,
+                  fetch_region=None,
+                  announce=False,**kwargs):
 
         ''' Docstring! '''
-        args = dict(locals())
-        del args["self"]
 
-        if not verbose:
+        if not self.verbose:
             announce = False
         self.__introduce__("parabam stat",announce)
 
-        results = super(Stat,self).run(**args)
+        #Prepare state structures and insert to kwargs
+        #kwargs are later used to construct the Constant file
+        #passed to all the fileprocessors and handlers
+        user_structures = self.__create_structures__(user_struc_blueprint)
+        analysis_names = self.__get_non_array_names__(user_struc_blueprint)
+
+        kwargs["user_structures"] = user_structures
+        kwargs["analysis_names"] = analysis_names
+
+        del kwargs["self"]
+        results = super(Stat,self).run(**kwargs)
 
         self.__goodbye__("parabam stat",announce)
         return results
@@ -374,18 +372,10 @@ class Stat(parabam.command.Interface):
     def __get_queue_names__(self,**kwargs):
         return ["main"]
 
-    def __get_extra_const_args__(self,user_struc_blueprint,**kwargs):
-        user_structures = self.__create_structures__(user_struc_blueprint)
-        analysis_names = self.__get_non_array_names__(user_struc_blueprint)
-
-        return {"user_structures":user_structures,
-                "analysis_names":analysis_names}
-
     def __get_handler_bundle__(self,**kwargs):
         handler_bundle = { Handler: {"inqu":"main",
                                     "out_qu_dict":[]}}
         return handler_bundle
-
 
     def __get_global_output_path__(self,user_struc_blueprint,user_specified_outpath,**kwargs):
         analysis_names = self.__get_non_array_names__(user_struc_blueprint)
@@ -414,8 +404,8 @@ class Stat(parabam.command.Interface):
                 output_paths[input_path][name] = os.path.join(".",self._temp_dir,csv_path)
         return output_paths
 
-    def __get_task_class__(self,pair_process,**kwargs):
-        if pair_process:
+    def __get_task_class__(self,**kwargs):
+        if self.pair_process:
             return PairTask
         else:
             return Task
@@ -463,8 +453,8 @@ class Stat(parabam.command.Interface):
         parser = self.default_parser()
 
         parser.add_argument('--output','-o',metavar='OUTPUT', nargs='?',required=False
-        ,help="Specify a name for the output CSV file. Only used with default `outmode`.\n"\
-            "If this argument is not supplied, the output will take the following form:\n"\
+        ,help="Specify a name for the output CSV file. If this argument is \n"\
+            "not supplied, the output will take the following form:\n"\
             "parabam_stat_[UNIX_TIME].csv")
 
         return parser
