@@ -213,19 +213,19 @@ class Handler(parabam.core.Handler):
         self._stagecount = 0
 
     #Child classes MUST call super
-    def __new_package_action__(self,new_package,**kwargs):
+    def __new_package_action__(self, new_package, **kwargs):
         results = new_package.results
         self.__auto_handle__(results,self._stats)
 
         if "system" in results.keys():
             self.__add_system_to_stage__(results["system"])
         
-    def __add_system_to_stage__(self,system_results):
+    def __add_system_to_stage__(self, system_results):
         for subset,(count,path) in system_results.items():
              self._stage_stores[subset].append((count,path))
 
     #Child classes MUST call super
-    def __periodic_action__(self,iterations):
+    def __periodic_action__(self, iterations):
         self.__decide_if_finished__()
         for subset in self._system_subsets:
             if self.__test_stage_store__(subset):
@@ -243,18 +243,18 @@ class Handler(parabam.core.Handler):
             if not has_stage_tasks:
                 self._finished = True
                     
-    def __update_stage_store__(self,subset):
+    def __update_stage_store__(self, subset):
         self._stagecount += 1
         self._stage_stores[subset] = []
         gc.collect()
 
-    def __test_stage_store__(self,subset):
+    def __test_stage_store__(self, subset):
         if (not self._processing) or self._destroy:
             return len(self._stage_stores[subset]) > 0
         else:
             return len(self._stage_stores[subset]) > 10
     
-    def __add_staged_system_task__(self,results,subset_type):
+    def __add_staged_system_task__(self, results, subset_type):
         if subset_type == "chaser":
             res = parabam.chaser.ChaserResults(results=results,
                                 chaser_type="origin")
@@ -378,7 +378,7 @@ class Interface(parabam.core.Interface):
         pass 
 
     @abstractmethod
-    def __get_output_paths__(self,input_paths,**kwargs):
+    def __get_output_paths__(self,input_path,final_output_paths,**kwargs):
         pass
 
     @abstractmethod
@@ -391,6 +391,14 @@ class Interface(parabam.core.Interface):
         these names are converted to queue objects by the leviathon
         use these names when reference queus in processor and handler
         bundles'''
+        pass
+
+    @abstractmethod
+    def __instalise_final_output__(self,**kwargs):
+        '''Allow sub-classes to instalise the dictionary
+        of output paths that are returned to the caller
+        of the run function.
+        '''
         pass
 
     def __get_const_args__(self,**kwargs):
@@ -421,37 +429,18 @@ class Interface(parabam.core.Interface):
                                        input_path,
                                        output_paths,
                                        final_output_paths):
-
-        if "global" in output_paths.keys():
-            for path in output_paths["global"]:
-                if path not in final_output_paths["global"]:
-                    final_output_paths["global"].append(path)
-
-        final_output_paths[input_path] = []
-        
-        if input_path in output_paths.keys():
-            output_path = output_paths[input_path]
-            if type(output_path) == dict:
-                for subset,path in output_path.items():
-                    final_output_paths[input_path].append(path)    
-            elif type(output_path) == list:
-                final_output_paths[input_path] = output_path
-            elif type(output_path) == str:
-                final_output_paths[input_path].append(output_path)
-            else:
-                sys.stderr.write("[Error] Unexpected output path type: %s \n" \
-                    % (type(output_path)))
-                raise SystemExit
-
+        final_output_paths.update(output_paths)
+    
     def __output_files_to_cwd__(self,final_output_paths):
         revised_output_paths = {}
-        for master_path,out_paths in final_output_paths.items():
-            revised_output_paths[ master_path ] = []
-            for path in out_paths:
+        for input_path, analyses in final_output_paths.items():
+            revised_output_paths[input_path] = []
+            for name,path in analyses.items():
                 head,tail = os.path.split(path)
                 new_path = os.path.abspath(os.path.join(".",tail))
                 real_path = self.__move_output_file__(path,new_path)
-                revised_output_paths[master_path].append(real_path)
+                revised_output_paths[input_path].append(real_path)
+                
         return revised_output_paths
 
     def __move_output_file__(self,current_path,new_path):
@@ -501,12 +490,10 @@ class Interface(parabam.core.Interface):
                                            update_interval,task_class,
                                            filereader_class)
 
-        final_output_paths = {"global":[]}
-        global_paths = self.__get_global_output_path__(**kwargs)
+        final_output_paths = self.__instalise_final_output__(**kwargs)
 
         for input_path in input_paths:
-            output_paths = self.__get_output_paths__(input_path=input_path,**kwargs)
-            self.__global_paths_to_output__(output_paths,global_paths,**kwargs)
+            output_paths = self.__get_output_paths__(input_path,final_output_paths,**kwargs)
             self.__update_final_output_paths__(input_path,output_paths,
                                                final_output_paths)
 
@@ -520,16 +507,6 @@ class Interface(parabam.core.Interface):
         
         self.__remove_empty_entries__(final_output_paths)
         return final_output_paths
-
-    def __get_global_output_path__(self,**kwargs):
-        return {}
-
-    def __global_paths_to_output__(self,output_paths,global_paths,**kwargs):
-        if not global_paths == {}:
-            output_paths["global"] = global_paths["global"]
-
-    def __get_global_output__(self,**kwargs):
-        return {}
 
     def __get_update_interval__(self,verbose):
         if verbose == 1: 

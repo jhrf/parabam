@@ -245,6 +245,9 @@ class Subset(parabam.command.Interface):
                                                   "out_qu_dict":[]}
         return handler_bundle
 
+    def __instalise_final_output__(self,**kwargs):
+        return {}
+
     def __get_output_paths__(self,
                              input_path,
                              user_subsets,
