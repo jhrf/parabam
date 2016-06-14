@@ -436,8 +436,10 @@ class Interface(parabam.core.Interface):
             for name,path in analyses.items():
                 head,tail = os.path.split(path)
                 new_path = os.path.abspath(os.path.join(".",tail))
+
                 real_path = self.__move_output_file__(path,new_path)
-                revised_output_paths[input_path].append(real_path)
+
+                revised_output_paths[input_path] = {name:real_path}
                 
         return revised_output_paths
 
@@ -505,7 +507,6 @@ class Interface(parabam.core.Interface):
             final_output_paths = self.__output_files_to_cwd__(final_output_paths)
         
         self.__remove_empty_entries__(final_output_paths)
-
 
         self.__goodbye__()
         self.interface_exit()
