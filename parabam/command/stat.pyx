@@ -106,7 +106,6 @@ class Handler(parabam.command.Handler):
                 self.__get_data_str_from_names__(constants.numeric_names,
                                                   self._final_structures)
             
-            print self._output_paths
             with open(self._output_paths["global"]["stats"],"a") as out_object:
                 out_object.write("%s%s\n" % \
                     (self._parent_bam.filename,data_str))
