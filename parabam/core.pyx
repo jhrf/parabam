@@ -7,12 +7,70 @@ import gc
 import shutil
 import argparse
 import tempfile
+import signal
+import traceback
 
 import pysam
 
 from itertools import izip
-from multiprocessing import Process,Queue
+from multiprocessing import Process,Queue,freeze_support
 from abc import ABCMeta, abstractmethod
+
+class CmdLineInterface(object):
+    def __init__(self,program_name = "parabam"):
+        self.program_name = program_name
+
+    def keyboard_handler(self,sig, frame):#Catch keyboard interupt and end processors
+        sys.stdout.write("\r[ERROR] %s interrupted by user" \
+                                         % (self.program_name))
+        sys.exit(0)
+
+    def die_gracefully(self, interface):
+        if interface is not None:
+            temp_dir = interface.get_temp_dir_path()
+            if not temp_dir == "." or not temp_dir == "" or not temp_dir == "./": 
+                interface.interface_exit()
+
+    def handle(self,command_map,help_text):
+        freeze_support()
+
+        signal.signal(signal.SIGINT, self.keyboard_handler)     
+        print_help_text = False
+        argument_len = len(sys.argv) >= 2
+
+        if argument_len:
+            command = sys.argv[1]
+
+            if command in command_map:
+                #Remove command from arguments.
+                sys.argv = sys.argv[1:] 
+                interface = None
+                try:
+                    #Load the command using the command line
+                    interface = command_map[command](cmd_run=True)
+                    interface.run_cmd()
+                    
+                except SystemExit:
+                    print " "
+                    print "[Status] %s is quitting gracefully\n" \
+                                                    % (self.program_name,)
+                except BaseException as exception:
+                    print " "
+                    print "[Error] %s stopped unexpecedtly, sorry!" \
+                                                    % (self.program_name,)
+
+                    traceback.print_exception(*sys.exc_info())
+                    self.die_gracefully(interface)
+                    raise
+            else:
+                print "\nCommand not recognised. Refer to manual below:\n"
+                print_help_text = True
+            self.die_gracefully(interface)
+        else:
+            print_help_text = True
+
+        if print_help_text:
+            print help_text
 
 cdef class Handler:
 
@@ -626,23 +684,34 @@ class Leviathan(object):
             handler_processes.append(hpr)
         return handler_processes
 
-#Provides a conveinant way for providing an Interface to parabam
-#programs. Includes default command_args and framework for
-#command-line and programatic invocation. 
 class Interface(object):
+    '''Provides a conveinant way for providing an Interface to parabam
+    programs. Includes default command_args and framework for
+    command-line and programatic invocation.'''
 
     __metaclass__ = ABCMeta
 
     def __init__(self,
+                  instance_name = "parabam",
+                  temp_dir = None,
+                  keep_in_temp = False,
                   task_size = 250000,
                   total_procs = 8,
                   reader_n = 2,
                   verbose = False,
+                  announce = False,
                   cmd_run = False):
 
-        self.temp_dir = self.__get_unique_tempdir__()
-        self.cmd_run = cmd_run
+        self.instance_name = instance_name
 
+        if temp_dir is None:
+            self.temp_dir = self.__get_unique_tempdir__()
+            self.control_temp_dir = True
+        else:
+            self.temp_dir = temp_dir
+            self.control_temp_dir = False
+
+        self.cmd_run = cmd_run
         if cmd_run:
             self.__setup_cmd_line_run__()
 
@@ -651,12 +720,19 @@ class Interface(object):
             self.total_procs = total_procs
             self.reader_n = reader_n
             self.verbose = verbose
+            self.keep_in_temp = keep_in_temp
+            if not verbose:
+                self.announce = False
+            else:
+                self.announce = announce
 
     def get_temp_dir_path(self):
         return self.temp_dir
 
     def __get_unique_tempdir__(self):
-        return tempfile.mkdtemp(prefix="parabam-tmp-",dir=".")
+        sanitised_name = self.instance_name.replace(" ","_")
+        prefix = "%s-" % (sanitised_name,)
+        return tempfile.mkdtemp(prefix=prefix,dir=".")
 
     def __setup_cmd_line_run__(self):
         parser = self.get_parser()
@@ -666,13 +742,16 @@ class Interface(object):
         self.total_procs = cmd_args.p
         self.verbose = cmd_args.v
         self.reader_n = cmd_args.f
+    
+        self.keep_in_temp = False
+        self.announce = int(self.verbose) > 0
 
         self.cmd_args = cmd_args
 
-    def __introduce__(self,name,verbose=True):
-        if verbose:
+    def __introduce__(self):
+        if self.verbose and self.announce:
             intro =  "%s has started. Start Time: %s" \
-                                % (name,self.__get_date_time__())
+                             % (self.instance_name,self.__get_date_time__())
             underline = ("-" * len(intro))
 
             sys.stdout.write(intro+"\n")
@@ -683,14 +762,25 @@ class Interface(object):
         return datetime.datetime.fromtimestamp(
                                     time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
-    def __goodbye__(self,name,verbose=True):
-        if verbose:
+    def __goodbye__(self):
+        if self.verbose and self.announce:
             outro = "%s has finished.  End Time: %s" \
-                                 % (name,self.__get_date_time__())
+                            % (self.instance_name,self.__get_date_time__())
 
             sys.stdout.write(("-" * len(outro)) + "\n")
             sys.stdout.write(outro + "\n")
             sys.stdout.flush()
+
+    def interface_exit(self):
+        if self.control_temp_dir and \
+                not self.keep_in_temp and\
+                not self.temp_dir is None:
+
+            for path in os.listdir(self.temp_dir):
+                remove_path = os.path.join(self.temp_dir,path)
+                os.remove(remove_path)
+            shutil.rmtree(self.temp_dir)
+            self.temp_dir = None
 
     def default_parser(self):
 
@@ -708,7 +798,6 @@ class Interface(object):
             help="The amount of open connections to the file being read.\n"\
                     "Conventional hard drives perform best with \n"\
                     "the default of 2. [Default: 2]")
-
         return parser
 
     @abstractmethod
@@ -720,6 +809,7 @@ class Interface(object):
 
     @abstractmethod
     def run(self):
+        #The main run method. Should make a call to `interface_exit`
         pass
 
     @abstractmethod

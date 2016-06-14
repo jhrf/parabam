@@ -51,9 +51,9 @@ class Handler(parabam.core.Handler):
                                      pause_qus=pause_qus,
                                      out_qu_dict=out_qu_dict,report = False)
         
-        class EngineTask(Task):
+        class RuleTask(Task):
             def __init__(self,parent_bam,constants):
-                super(EngineTask,self).__init__(parent_bam=parent_bam,
+                super(RuleTask,self).__init__(parent_bam=parent_bam,
                                                     inqu=None,
                                                     outqu=None,
                                                     statusqu=None,
@@ -69,9 +69,9 @@ class Handler(parabam.core.Handler):
                 return results
 
             def __process_task_set__(self,iterator):
-                engine = self._engine
+                engine = self.rule
                 parent_bam = self._parent_bam
-                handle_output = self.__handle_engine_output__
+                handle_output = self.__handlerule_output__
                 user_constants = self._user_constants
 
                 for read_name,pair in iterator.items():
@@ -99,7 +99,7 @@ class Handler(parabam.core.Handler):
         self._child_pack = {"parent_bam":parent_bam,
                             "queue":out_qu_dict["main"],
                             "chrom_bins":self.__get_chrom_bins__(parent_bam),
-                            "chaser_task":EngineTask(parent_bam,
+                            "chaser_task":RuleTask(parent_bam,
                                                      self._constants)}
 
         self._chaser_qu = Queue()

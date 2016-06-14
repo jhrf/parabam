@@ -184,7 +184,7 @@ class Subset(parabam.command.Interface):
     Users will primarily make use of the ``run`` function."""
 
     def __init__(self, **kwargs):
-        super(Subset,self).__init__(**kwargs)
+        super(Subset,self).__init__(instance_name = "parabam subset", **kwargs)
 
     def run_cmd(self):
         module,user_rule,user_constants =\
@@ -201,8 +201,7 @@ class Subset(parabam.command.Interface):
             user_rule = user_rule,
             user_subsets= user_subsets,
             fetch_region = self.cmd_args.region,
-            output_counts= self.cmd_args.counts,
-            announce = True)
+            output_counts= self.cmd_args.counts)
     
     def run(self,input_paths,
             user_constants,
@@ -210,21 +209,12 @@ class Subset(parabam.command.Interface):
             user_subsets,
             fetch_region=None,
             output_counts=False,
-            announce=False,
             **kwargs):
 
         ''' Docstring! '''
-
         args = dict(locals())
         del args["self"]
-
-        if not self.verbose:
-            announce = False
-        self.__introduce__("parabam subset",announce)
-
         results = super(Subset,self).run(**args)
-        
-        self.__goodbye__("parabam subset",announce)
         return results
 
     def __get_queue_names__(self,**kwargs):
@@ -250,6 +240,7 @@ class Subset(parabam.command.Interface):
 
     def __get_output_paths__(self,
                              input_path,
+                             final_output_paths,
                              user_subsets,
                              **kwargs):
         

@@ -4,63 +4,15 @@ import sys
 import textwrap
 import signal
 import traceback
-import shutil
 
 import parabam
 
-def keyboard_handler(sig, frame):#Catch keyboard interupt and end processors
-	sys.stdout.write("\r[ERROR] parabam interrupted by user")
-	sys.exit(0)
+def handle_input():
 
-def die_gracefully(interface):
-	if interface is not None:
-		temp_dir = interface.get_temp_dir_path()
-		if not temp_dir == "." or not temp_dir == "" or not temp_dir == "./": 
-			shutil.rmtree(temp_dir)
+	command_map = {"stat":parabam.Stat,
+				   "subset":parabam.Subset}
 
-if __name__ == "__main__":
-	#Handle KeyboardInterrupt gracefully
-	signal.signal(signal.SIGINT, keyboard_handler) 
-
-	argument_len = len(sys.argv) >= 2
-
-	progs = {"stat":parabam.Stat,
-			"subset":parabam.Subset}
-
-	printInfo = False
-
-	if argument_len:
-		command = sys.argv[1]
-
-		if command in progs:
-			#Remove command from arguments.
-			sys.argv = sys.argv[1:] 
-
-			interface = None
-			try:
-				#Load the command using the command line
-				interface = progs[command](cmd_run=True)
-				interface.run_cmd()
-				
-			except SystemExit:
-				print " "
-				print "[Status] parabam is quitting gracefully\n"
-			except BaseException as exception:
-				print " "
-				print "[Error] parabam stopped unexpecedtly, sorry!"
-				traceback.print_exception(*sys.exc_info())
-				die_gracefully(interface)
-				raise
-
-		else:
-			print "\nCommand not recognised. Refer to manual below:\n"
-			printInfo = True
-		die_gracefully(interface)
-	else:
-		printInfo = True
-	
-	if printInfo:
-		print (textwrap.dedent('''\
+	help_text = (textwrap.dedent('''\
 		
 		parabam
 		----------------------------------------------------------------
@@ -79,3 +31,9 @@ if __name__ == "__main__":
 			subset\t Create a subsetted BAM file
 
     	'''.expandtabs()) % (parabam.__version__))
+
+	cmd_interface = parabam.core.CmdLineInterface()
+	cmd_interface.handle(command_map,help_text)
+
+if __name__ == "__main__":
+	handle_input()

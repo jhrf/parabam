@@ -326,8 +326,7 @@ class Interface(parabam.core.Interface):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self,keep_in_temp = False,
-                      pair_process = False,
+    def __init__(self,pair_process = False,
                       coord_process = False,
                       include_duplicates = True,
                       debug = False,
@@ -336,7 +335,6 @@ class Interface(parabam.core.Interface):
 
         super(Interface,self).__init__(**kwargs)
 
-        self.keep_in_temp = keep_in_temp
         self.pair_process = pair_process
         self.coord_process = coord_process
         self.include_duplicates = include_duplicates
@@ -460,13 +458,14 @@ class Interface(parabam.core.Interface):
 
     def __report_file_names__(self,final_output_paths,input_paths):
         sys.stdout.write("\t- This run will output the following files:\n")
-        for master_path,child_paths in final_output_paths.items():
-            if master_path in input_paths:
-                for path in child_paths:
-                    root,name = os.path.split(path)
-                    sys.stdout.write("\t\t+ %s\n" % (name,))            
+        for master_path,analyses in final_output_paths.items():
+            for name,path in analyses.items():
+                root,name = os.path.split(path)
+                sys.stdout.write("\t\t+ %s\n" % (name,))            
 
     def run(self,input_paths,**kwargs):
+
+        self.__introduce__()
 
         const_args = self.__get_const_args__(**kwargs)
         constants = parabam.core.Constants(**const_args)
@@ -506,6 +505,10 @@ class Interface(parabam.core.Interface):
             final_output_paths = self.__output_files_to_cwd__(final_output_paths)
         
         self.__remove_empty_entries__(final_output_paths)
+
+
+        self.__goodbye__()
+        self.interface_exit()
         return final_output_paths
 
     def __get_update_interval__(self,verbose):

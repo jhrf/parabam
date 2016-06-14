@@ -28,7 +28,8 @@ class StatCore(object):
 
     def __get_results__(self):
         results = {}
-        results["structures"] = self.__unpack_structures__(self._local_structures)
+        results["structures"] = \
+                    self.__unpack_structures__(self._local_structures)
         results["counts"] = self._counts
         results["system"] = self._system
         return results
@@ -327,7 +328,7 @@ class ArrayStructure(UserStructure):
 class Stat(parabam.command.Interface):
 
     def __init__(self,**kwargs):
-        super(Stat,self).__init__(**kwargs)
+        super(Stat,self).__init__(instance_name = "parabam stat", **kwargs)
     
     def run_cmd(self):
         module,user_rule,user_constants = \
@@ -340,9 +341,7 @@ class Stat(parabam.command.Interface):
                   user_constants = user_constants,
                   user_rule = user_rule,
                   user_struc_blueprint = user_struc_blueprint,
-                  fetch_region = self.cmd_args.region,
-                  announce = True,
-                  sick_rythms = True)
+                  fetch_region = self.cmd_args.region)
 
     def run(self,input_paths,
                   user_constants,
@@ -350,17 +349,11 @@ class Stat(parabam.command.Interface):
                   user_struc_blueprint,
                   user_specified_outpath=None,
                   fetch_region=None,
-                  announce=False,
                   **kwargs):
                   
         ''' Docstring! '''
-
         args = dict(locals())
         del args["self"]
-
-        if not self.verbose:
-            announce = False
-        self.__introduce__("parabam stat",announce)
 
         #Prepare state structures and insert to args
         #kwargs are later used to construct the Constant file
@@ -372,8 +365,6 @@ class Stat(parabam.command.Interface):
         args["numeric_names"] = numeric_names
 
         results = super(Stat,self).run(**args)
-
-        self.__goodbye__("parabam stat",announce)
         return results
 
     def __get_destroy_handler_order__(self):
