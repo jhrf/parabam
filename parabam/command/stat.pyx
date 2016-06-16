@@ -15,14 +15,14 @@ from abc import ABCMeta, abstractmethod
 class StatCore(object):
 
     def __init__(self,object constants):
-        self._constants
+        self.constants = constants
         self._counts = {}
         self._local_structures = {}
         self._system = {}
 
     def __pre_run_routine__(self,iterator,**kwargs):
         super(StatCore,self).__pre_run_routine__(iterator)
-        for name,structure in self._constants.structures.items():
+        for name,structure in self.constants.structures.items():
             self._local_structures[name] = structure.empty_clone()
             self._counts[name] = 0
 
