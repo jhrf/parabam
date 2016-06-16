@@ -22,7 +22,7 @@ class StatCore(object):
 
     def __pre_run_routine__(self,iterator,**kwargs):
         super(StatCore,self).__pre_run_routine__(iterator)
-        for name,structure in self._constants.user_structures.items():
+        for name,structure in self._constants.structures.items():
             self._local_structures[name] = structure.empty_clone()
             self._counts[name] = 0
 
@@ -86,7 +86,7 @@ class Handler(parabam.command.Handler):
                                      out_qu_dict=out_qu_dict)
 
         self._final_structures = {}
-        for name,struc in self._constants.user_structures.items():
+        for name,struc in self._constants.structures.items():
             self._final_structures[struc.name] = struc.empty_clone()
 
     def __new_package_action__(self,new_package,**kwargs):
@@ -117,12 +117,12 @@ class Handler(parabam.command.Handler):
                 structure.write_to_csv(\
                     self._output_paths[self._parent_bam.filename][name])
 
-    def __get_data_str_from_names__(self,names,user_structures):
+    def __get_data_str_from_names__(self,names,structures):
         data_str = ""
         for name in names:
-            if user_structures[name].struc_type == np.ndarray:
+            if structures[name].struc_type == np.ndarray:
                 continue
-            cur_data = user_structures[name].data
+            cur_data = structures[name].data
             data_str += ",%.5f" % (cur_data,)
         return data_str
 
@@ -330,23 +330,23 @@ class Stat(parabam.command.Interface):
         super(Stat,self).__init__(instance_name = "parabam stat", **kwargs)
     
     def run_cmd(self):
-        module,user_rule,user_constants = \
+        module,rule,constants = \
                 self.__get_module_and_vitals__(self.cmd_args.rule)
 
-        user_struc_blueprint = {}
-        module.get_blueprints(user_struc_blueprint)
+        struc_blueprint = {}
+        module.get_blueprints(struc_blueprint)
 
         self.run(input_paths=self.cmd_args.input,
-                  user_constants = user_constants,
-                  user_rule = user_rule,
-                  user_struc_blueprint = user_struc_blueprint,
+                  constants = constants,
+                  rule = rule,
+                  struc_blueprint = struc_blueprint,
                   fetch_region = self.cmd_args.region)
 
     def run(self,input_paths,
-                  user_constants,
-                  user_rule,
-                  user_struc_blueprint,
-                  user_specified_outpath=None,
+                  constants,
+                  rule,
+                  struc_blueprint,
+                  specified_outpath=None,
                   fetch_region=None,
                   **kwargs):
                   
@@ -357,10 +357,10 @@ class Stat(parabam.command.Interface):
         #Prepare state structures and insert to args
         #kwargs are later used to construct the Constant file
         #passed to all the fileprocessors and handlers
-        user_structures = self.__create_structures__(user_struc_blueprint)
-        numeric_names = self.__get_numeric_names__(user_structures)
+        structures = self.__create_structures__(struc_blueprint)
+        numeric_names = self.__get_numeric_names__(structures)
 
-        args["user_structures"] = user_structures
+        args["structures"] = structures
         args["numeric_names"] = numeric_names
 
         results = super(Stat,self).run(**args)
@@ -377,37 +377,37 @@ class Stat(parabam.command.Interface):
         return handler_bundle
 
     def __instalise_final_output__(self,numeric_names,
-                                        user_specified_outpath,
+                                        specified_outpath,
                                         **kwargs):
         final_output = {}
 
         if len(numeric_names) > 0:
             global_filename = \
-                        self.__get_global_output_path__(user_specified_outpath)            
+                        self.__get_global_output_path__(specified_outpath)            
             self.__create_global_output_file__(global_filename,numeric_names)
 
             final_output["global"] = {"stats": global_filename}
 
         return final_output
 
-    def __get_global_output_path__(self,user_specified_outpath):
+    def __get_global_output_path__(self,specified_outpath):
         
-        if user_specified_outpath is None:
+        if specified_outpath is None:
             global_filename = \
                     os.path.join(self.temp_dir,"parabam_stat_%d_%d.csv"\
                                     % (time.time(),os.getpid()))
         else:
-            global_filename = user_specified_outpath
+            global_filename = specified_outpath
 
         return global_filename
 
     def __get_output_paths__(self,input_path,
                              final_output_paths,
-                             user_structures,
+                             structures,
                              **kwargs):
         output_paths = {input_path:{}}
 
-        for name,structure in user_structures.items():
+        for name,structure in structures.items():
             if not issubclass(structure.__class__,NumericStructure):
                 path_id,ext = os.path.splitext(os.path.basename(input_path))
                 csv_path = "%s_%s.csv" % (path_id,name,)
@@ -433,26 +433,26 @@ class Stat(parabam.command.Interface):
         with open(output_path,"w") as out_obj:
             out_obj.write(header)
 
-    def __get_numeric_names__(self,user_structures):
+    def __get_numeric_names__(self,structures):
         numeric_analysis = []
-        for name,structure in user_structures.items():
+        for name,structure in structures.items():
             if issubclass(structure.__class__,NumericStructure):
                 numeric_analysis.append(name)
         return sorted(numeric_analysis)
 
-    def __create_structures__(self,user_struc_blueprint):
-        user_structures = {}
+    def __create_structures__(self,struc_blueprint):
+        structures = {}
         class_to_type_map = {int:NumericStructure,
                              float:NumericStructure,
                              np.ndarray:ArrayStructure,
                              dict:CounterStructure}
 
-        for name,definition in user_struc_blueprint.items():
+        for name,definition in struc_blueprint.items():
             definition["name"] = name
             definition["struc_type"] = type(definition["data"])
-            user_structures[name] = \
+            structures[name] = \
                     class_to_type_map[definition["struc_type"]](**definition)
-        return user_structures
+        return structures
 
     def get_parser(self):
         #argparse imported in ./interface/parabam 
