@@ -72,10 +72,10 @@ class Handler(parabam.core.Handler):
                 rule = self._rule
                 parent_bam = self._parent_bam
                 handle_output = self.__handle_rule_output__
-                user_constants = self._user_constants
+                constants = self._constants
 
                 for read_name,pair in iterator.items():
-                    rule_output = rule(pair,user_constants,parent_bam)
+                    rule_output = rule(pair,constants,parent_bam)
                     handle_output(rule_output,pair)
 
             def __get_temp_path__(self,identity):

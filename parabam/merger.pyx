@@ -29,7 +29,7 @@ class Handler(parabam.core.Handler):
                                         constants,pause_qus,
                                         out_qu_dict,report=False)
         
-        self._user_subsets = list(constants.user_subsets)
+        self._subsets = list(constants.subsets)
 
         #CONSTANTS
         self._CLUMP_THRESH = 1000
@@ -66,14 +66,14 @@ class Handler(parabam.core.Handler):
         return header_path
 
     def __get_subset_dict__(self,payload=list):
-        return dict( ( (subset,payload(),) for subset in self._user_subsets) )
+        return dict( ( (subset,payload(),) for subset in self._subsets) )
 
     def __get_out_file_objects__(self):
         file_objects = {}
         output_paths = self._output_paths
 
         file_objects = {}
-        for subset in self._user_subsets:
+        for subset in self._subsets:
             output_path = output_paths[self._parent_bam.filename][subset]
             file_objects[subset] = self.__get_bam_file_obj__(output_path)
 
@@ -311,7 +311,7 @@ class Handler(parabam.core.Handler):
         del self._out_file_objects
 
     def __handler_exit__(self,**kwargs):
-        for subset in self._user_subsets:
+        for subset in self._subsets:
             self.__process_waiting_files__(subset,force=True)
         self.__close_all_out_files__()
         

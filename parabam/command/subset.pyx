@@ -16,12 +16,12 @@ class SubsetCore(object):
 
     def __pre_run_routine__(self,iterator,**kwargs):
         super(SubsetCore,self).__pre_run_routine__(iterator)
-        self._user_subsets = self.constants.user_subsets
+        self._subsets = self.constants.subsets
         self._counts = {}
         self._temp_paths = {}
         self._temp_objects = {}
 
-        for subset in self._user_subsets:
+        for subset in self._subsets:
             self._temp_paths[subset] = self.__get_temp_path__(subset)
             self._temp_objects[subset] = \
                     self.__get_temp_object__(self._temp_paths[subset])
@@ -60,7 +60,7 @@ class Task(SubsetCore,parabam.command.Task):
     def __handle_rule_output__(self,rule_output,read):             
         if type(rule_output) == bool:
             if rule_output:
-                self.__write_to_subset_bam__(self._constants.user_subsets[0],read)          
+                self.__write_to_subset_bam__(self._constants.subsets[0],read)          
         elif type(rule_output) == list:
             for subset,cur_read in rule_output:
                 self.__write_to_subset_bam__(subset,cur_read)
@@ -97,7 +97,7 @@ class ByCoordTask(SubsetCore,parabam.command.ByCoordTask):
     def __handle_rule_output__(self,rule_output,read):     
         write_to_subset = self.__write_to_subset_bam__        
         for read in rule_output:
-            write_to_subset(self._constants.user_subsets[0],read)
+            write_to_subset(self._constants.subsets[0],read)
 
 class Handler(parabam.command.Handler):
 
@@ -111,14 +111,14 @@ class Handler(parabam.command.Handler):
                                         pause_qus=pause_qus,
                                         out_qu_dict=out_qu_dict)
 
-        self._user_subsets = constants.user_subsets
-        for subset in self._user_subsets:
+        self._subsets = constants.subsets
+        for subset in self._subsets:
             self._stage_stores[subset] = []
 
     def __new_package_action__(self,new_package):
         super(Handler,self).__new_package_action__(new_package)
         results = new_package.results
-        for subset in self._user_subsets:
+        for subset in self._subsets:
             self._stage_stores[subset].append(\
                                 (results["counts"][subset],
                                  results["temp_paths"][subset],
@@ -127,7 +127,7 @@ class Handler(parabam.command.Handler):
     def __periodic_action__(self,iterations):
         super(Handler,self).__periodic_action__(iterations)
 
-        for subset in self._user_subsets:
+        for subset in self._subsets:
             if self.__test_stage_store__(subset):
                 self.__add_merge_task__(results=self._stage_stores[subset],subset_type=subset)
                 self.__update_stage_store__(subset)
@@ -136,7 +136,7 @@ class Handler(parabam.command.Handler):
         super(Handler,self).__handler_exit__()
         #Kill the handlers handler
 
-        for subset in self._user_subsets:
+        for subset in self._subsets:
             #merge task 
             self.__add_merge_task__(self._stage_stores[subset],subset)
         self.__write_counts_csv__()
@@ -187,26 +187,26 @@ class Subset(parabam.command.Interface):
         super(Subset,self).__init__(instance_name = "parabam subset", **kwargs)
 
     def run_cmd(self):
-        module,user_rule,user_constants =\
+        module,rule,constants =\
                       self.__get_module_and_vitals__(self.cmd_args.rule)
 
         if hasattr(module,"get_subset_types"):
-            user_subsets = module.get_subset_types()
+            subsets = module.get_subset_types()
         else:
-            user_subsets = ["subset"]
+            subsets = ["subset"]
 
         self.run(
             input_paths= self.cmd_args.input,
-            user_constants = user_constants,
-            user_rule = user_rule,
-            user_subsets= user_subsets,
+            constants = constants,
+            rule = rule,
+            subsets= subsets,
             fetch_region = self.cmd_args.region,
             output_counts= self.cmd_args.counts)
     
     def run(self,input_paths,
-            user_constants,
-            user_rule,
-            user_subsets,
+            constants,
+            rule,
+            subsets,
             fetch_region=None,
             output_counts=False,
             **kwargs):
@@ -216,6 +216,11 @@ class Subset(parabam.command.Interface):
         del args["self"]
         results = super(Subset,self).run(**args)
         return results
+
+    def __setup_cmd_line_run__(self):
+
+        super(Subset,self).__setup_cmd_line_run__()
+        self.ensure_unique_output = self.cmd_args.u
 
     def __get_queue_names__(self,**kwargs):
         queues = ["merge","main"]
@@ -241,11 +246,11 @@ class Subset(parabam.command.Interface):
     def __get_output_paths__(self,
                              input_path,
                              final_output_paths,
-                             user_subsets,
+                             subsets,
                              **kwargs):
         
         output_paths = {input_path:{}}
-        for salt,subset in enumerate(user_subsets):
+        for salt,subset in enumerate(subsets):
             output_paths[input_path][subset] =\
                                      self.__get_path__(input_path,
                                                          subset,

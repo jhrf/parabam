@@ -27,8 +27,8 @@ class Task(parabam.core.Task):
                                     task_size=task_size,
                                     constants=constants)
 
-        self._rule = constants.user_rule
-        self._user_constants = constants.user_constants
+        self._rule = constants.rule
+        self._constants = constants.constants
 
     @abstractmethod
     def __handle_rule_output__(self,rule_output,read):
@@ -45,12 +45,12 @@ class Task(parabam.core.Task):
         next_read = iterator.next 
         parent_bam = self._parent_bam
         handle_output = self.__handle_rule_output__
-        user_constants = self._user_constants
+        constants = self._constants
         
         #StopIteration caught in parabam.core.Task.run
         for i in xrange(self._task_size):    
             read = next_read()
-            rule_output = rule(read,user_constants,parent_bam)
+            rule_output = rule(read,constants,parent_bam)
             handle_output(rule_output,read)
 
     def __get_extension__(self,path):
@@ -93,7 +93,7 @@ class PairTask(Task):
         query_loners = self.__query_loners__ 
         cdef int size = self._task_size
         handle_output = self.__handle_rule_output__
-        user_constants = self._user_constants
+        constants = self._constants
         counts = self._counts
 
         loners = self._loners
@@ -104,7 +104,7 @@ class PairTask(Task):
             read1,read2 = query_loners(read,loners)
 
             if read1:
-                rule_output = rule((read1,read2),user_constants,parent_bam)
+                rule_output = rule((read1,read2),constants,parent_bam)
                 handle_output(rule_output,(read1,read2,))
 
     def __stash_loners__(self,loners):
@@ -159,7 +159,7 @@ class ByCoordTask(Task):
         parent_bam = self._parent_bam
 
         handle_output = self.__handle_rule_output__
-        user_constants = self._user_constants
+        constants = self._constants
 
         position_max = 10000
 
@@ -179,7 +179,7 @@ class ByCoordTask(Task):
                 reads.append(read)
                 
             else:
-                rule_output = rule(reads,user_constants,parent_bam)        
+                rule_output = rule(reads,constants,parent_bam)        
                 handle_output(rule_output,reads)
                 self._task_size += len(reads)
                 
@@ -335,11 +335,16 @@ class Interface(parabam.core.Interface):
 
         super(Interface,self).__init__(**kwargs)
 
-        self.pair_process = pair_process
-        self.coord_process = coord_process
-        self.include_duplicates = include_duplicates
-        self.debug = debug
-        self.ensure_unique_output = ensure_unique_output
+        if self.cmd_run == False:
+            self.pair_process = pair_process
+
+            self.coord_process = False
+            if not self.pair_process:
+                self.coord_process = coord_process
+
+            self.include_duplicates = include_duplicates
+            self.debug = debug
+            self.ensure_unique_output = ensure_unique_output
 
     def __get_module_and_vitals__(self,code_path):
         if os.getcwd not in sys.path:
@@ -357,12 +362,25 @@ class Interface(parabam.core.Interface):
                               "\tEnsure instruction code is in current working directory\n")
             raise SystemExit
 
-        user_rule = module.rule
-        user_constants = {}
+        rule = module.rule
+        constants = {}
         if hasattr(module,"set_constants"):
-            module.set_constants(user_constants)
+            module.set_constants(constants)
 
-        return module,user_rule,user_constants
+        return module,rule,constants
+
+    def __setup_cmd_line_run__(self):
+
+        super(Interface,self).__setup_cmd_line_run__()
+        
+        self.pair_process = self.cmd_args.pair
+        self.coord_process = False
+
+        if not self.pair_process:
+            self.coord_process = self.cmd_args.coord
+
+        self.include_duplicates = self.cmd_args.d
+        self.debug = self.cmd_args.debug
 
     @abstractmethod
     def __get_handler_bundle__(self,**kwargs):
