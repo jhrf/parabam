@@ -28,7 +28,6 @@ class Task(parabam.core.Task):
                                     constants=constants)
 
         self._rule = constants.rule
-        self._constants = constants.constants
 
     @abstractmethod
     def __handle_rule_output__(self,rule_output,read):
@@ -45,12 +44,12 @@ class Task(parabam.core.Task):
         next_read = iterator.next 
         parent_bam = self._parent_bam
         handle_output = self.__handle_rule_output__
-        constants = self._constants
+        rule_constants = self._constants.rule_constants
         
         #StopIteration caught in parabam.core.Task.run
         for i in xrange(self._task_size):    
             read = next_read()
-            rule_output = rule(read,constants,parent_bam)
+            rule_output = rule(read,rule_constants,parent_bam)
             handle_output(rule_output,read)
 
     def __get_extension__(self,path):
@@ -93,7 +92,7 @@ class PairTask(Task):
         query_loners = self.__query_loners__ 
         cdef int size = self._task_size
         handle_output = self.__handle_rule_output__
-        constants = self._constants
+        rule_constants = self._constants.rule_constants
         counts = self._counts
 
         loners = self._loners
@@ -104,7 +103,7 @@ class PairTask(Task):
             read1,read2 = query_loners(read,loners)
 
             if read1:
-                rule_output = rule((read1,read2),constants,parent_bam)
+                rule_output = rule((read1,read2),rule_constants,parent_bam)
                 handle_output(rule_output,(read1,read2,))
 
     def __stash_loners__(self,loners):

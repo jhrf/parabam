@@ -187,7 +187,7 @@ class Subset(parabam.command.Interface):
         super(Subset,self).__init__(instance_name = "parabam subset", **kwargs)
 
     def run_cmd(self):
-        module,rule,constants =\
+        module,rule,rule_constants =\
                       self.__get_module_and_vitals__(self.cmd_args.rule)
 
         if hasattr(module,"get_subset_types"):
@@ -197,14 +197,14 @@ class Subset(parabam.command.Interface):
 
         self.run(
             input_paths= self.cmd_args.input,
-            constants = constants,
+            rule_constants = rule_constants,
             rule = rule,
             subsets= subsets,
             fetch_region = self.cmd_args.region,
             output_counts= self.cmd_args.counts)
     
     def run(self,input_paths,
-            constants,
+            rule_constants,
             rule,
             subsets,
             fetch_region=None,
