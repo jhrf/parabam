@@ -450,15 +450,14 @@ class Interface(parabam.core.Interface):
     def __output_files_to_cwd__(self,final_output_paths):
         revised_output_paths = {}
         for input_path, analyses in final_output_paths.items():
-            revised_output_paths[input_path] = []
-            for name,path in analyses.items():
-                head,tail = os.path.split(path)
+            revised_output_paths[input_path] = {}
+            for analysis_name, analysis_path in analyses.items():
+                head,tail = os.path.split(analysis_path)
                 new_path = os.path.abspath(os.path.join(".",tail))
 
-                real_path = self.__move_output_file__(path,new_path)
+                real_path = self.__move_output_file__(analysis_path,new_path)
+                revised_output_paths[input_path][analysis_name] = real_path
 
-                revised_output_paths[input_path] = {name:real_path}
-                
         return revised_output_paths
 
     def __move_output_file__(self,current_path,new_path):
@@ -528,6 +527,8 @@ class Interface(parabam.core.Interface):
 
         self.__goodbye__()
         self.interface_exit()
+
+    
         return final_output_paths
 
     def __get_update_interval__(self,verbose):

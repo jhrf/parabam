@@ -447,7 +447,6 @@ class Stat(parabam.command.Interface):
                              float:NumericStructure,
                              np.ndarray:ArrayStructure,
                              dict:CounterStructure}
-
         for name,definition in struc_blueprint.items():
             definition["name"] = name
             definition["struc_type"] = type(definition["data"])
