@@ -13,6 +13,7 @@ import Queue as Queue2
 from itertools import izip
 from multiprocessing import Queue,Process
 from abc import ABCMeta, abstractmethod
+from collections import Counter
 
 #TODO: error handle incorrect return from user rule
 
@@ -112,9 +113,18 @@ class PairTask(Task):
         loner_path = self.__get_temp_path__("chaser")
         loner_file = pysam.AlignmentFile(loner_path,"wb",header=self._parent_bam.header)
 
+        counter = Counter()
+
         for qname,read in loners.items():
             loner_count += 1
             loner_file.write(read)
+
+            counter["%dv%d" % (read.reference_id,read.next_reference_id,)] += 1
+
+        from pprint import pprint as pp
+
+        pp(counter)
+
         self._system["chaser"] = (loner_count,loner_path,)
         loner_file.close()
 
