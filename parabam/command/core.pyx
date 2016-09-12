@@ -74,6 +74,8 @@ class PairTask(Task):
         else:
             self.__read_filter__ = self.__filter_duplicates__
 
+        self._chrom_bins = self.__get_chrom_bins__()
+
     @abstractmethod
     def __handle_rule_output__(self,rule_output,read):
         pass
@@ -109,24 +111,67 @@ class PairTask(Task):
                 handle_output(rule_output,(read1,read2,))
 
     def __stash_loners__(self,loners):
+        sorted_loners = self.__sort_loners__(loners) #sort by loner type
+        loner_paths, loner_files = \
+                            self.__get_loner_files__(sorted_loners.keys())
+
         loner_count = 0
-        loner_path = self.__get_temp_path__("chaser")
-        loner_file = pysam.AlignmentFile(loner_path,"wb",header=self._parent_bam.header)
+        for loner_type, reads in loners.items():
+            for read in reads:
+                loner_files[loner_type].write(read)
+                loner_count += 1
+            loner_files[loner_type].close()
 
-        counter = Counter()
+        self._system["chaser"] = (loner_count,loner_paths,)
 
-        for qname,read in loners.items():
-            loner_count += 1
-            loner_file.write(read)
+    def __get_loner_files__(self, loner_types):
+        files = {}
+        paths = {}
 
-            counter["%dv%d" % (read.reference_id,read.next_reference_id,)] += 1
+        for loner_type in loner_types:
+            path, file_object = self.__get_loner_object__(path, loner_type)
+            files[loner_type] = file_object
+            paths[loner_type] = path
 
-        from pprint import pprint as pp
+        return paths, files
 
-        pp(counter)
+    def __get_loner_object__(self,loner_type,unique):
+        path = self.__get_loner_temp_path__(loner_type,0,unique=\
+                                                        "-%d" % (unique,) )
+        return path, pysam.AlignmentFile(path,"wb",header=self._header)
 
-        self._system["chaser"] = (loner_count,loner_path,)
-        loner_file.close()
+    def __sort_loners__(self, loners):
+        sorted_loners = {}
+        chrm_bins = self._chrom_bins
+
+        for qname, read in loners:
+            loner_type = self.__get_loner_type__(read, chrm_bins)
+            if loner_type in sorted_loners:
+                sorted_loners[loner_type].append(read)
+            else:
+                sorted_loners[loner_type] = [read]
+
+        return sorted_loners
+
+    def __get_reference_id_name__(self, read, bins):
+        if read.reference_id == read.next_reference_id:
+            return "XX%dv%d" % (read.reference_id,read.next_reference_id)
+        else:
+            sorted_chrms = sorted((read.reference_id, read.next_reference_id,))
+            class_bins = [bins[ch] for ch in sorted_chrms]
+
+            #reads on different chromosome
+            return "MM%sv%s" % tuple(class_bins)
+
+    def __get_loner_type__(self, read, bins):
+        if not read.is_unmapped and not read.mate_is_unmapped:
+            return self.__get_reference_id_name__(read,bins)
+        elif read.is_unmapped and read.mate_is_unmapped:
+            #both unmapped 
+            return "UU"
+        else:
+            #one unmapped read, one mapped read
+            return "UM"
 
     def __query_loners__(self,read,loners):
         if self.__read_filter__(read):#Pair processing only handles primary pairs
@@ -139,11 +184,38 @@ class PairTask(Task):
             loners[read.qname] = read
             return None,None
 
+    def __get_chrom_bins__(self):
+        # Create chromosome `bins` by grouping together smaller chromosomes
+        parent_bam = self._parent_bam
+        references = parent_bam.references
+        lengths = parent_bam.lengths
+
+        chrom_bins = {}
+        chrom_info = zip(xrange(len(references)),references,lengths)
+        chrom_info = sorted(chrom_info, key=lambda tup: tup[2])
+        group = []
+        size = 0
+        uid = 0
+        for i,name,length in chrom_info:
+           group.append( (i,name,length,) )
+           size += length
+
+           if size > 150000000:
+                for i,name,length in group:
+                    chrom_bins[i] = "b%d" % (uid,)
+                group = []
+                size = 0
+                uid += 1
+
+        return chrom_bins
+
     def __filter__(self,read):
         return read.is_secondary or (read.flag & 2048 == 2048)
 
     def __filter_duplicates__(self,read):
-        return read.is_secondary or (read.flag & 2048 == 2048) or read.is_duplicate
+        return read.is_secondary or \
+                (read.flag & 2048 == 2048) or \
+                    read.is_duplicate
 
 class ByCoordTask(Task):
     __metaclass__ = ABCMeta
@@ -205,10 +277,13 @@ class Handler(parabam.core.Handler):
     __metaclass__=ABCMeta
 
     def __init__(self,object parent_bam, object output_paths,object inqu,
-                object constants,object pause_qus,dict out_qu_dict,object report=True):
+                     object constants,object pause_qus,
+                     dict out_qu_dict,object report=True):
         
-        super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
-                                     inqu=inqu,constants=constants,pause_qus=pause_qus,
+        super(Handler,self).__init__(parent_bam = parent_bam,
+                                     output_paths = output_paths,
+                                     inqu=inqu,constants=constants,
+                                     pause_qus=pause_qus,
                                      out_qu_dict=out_qu_dict)
 
         self._system_subsets = constants.system_subsets
@@ -231,8 +306,8 @@ class Handler(parabam.core.Handler):
             self.__add_system_to_stage__(results["system"])
         
     def __add_system_to_stage__(self, system_results):
-        for subset,(count,path) in system_results.items():
-             self._stage_stores[subset].append((count,path))
+        for subset,(count,path_dict) in system_results.items():
+             self._stage_stores[subset].append((count,path_dict))
 
     #Child classes MUST call super
     def __periodic_action__(self, iterations):
