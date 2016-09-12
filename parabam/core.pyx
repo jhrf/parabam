@@ -401,7 +401,6 @@ class FileReader(Process):
         wait_for_pause = self.__wait_for_pause__
         check_inqu = self.__check_inqu__
 
-
         if self._debug:
             parent_generator = self.__debug_generator__(parent_iter)
 

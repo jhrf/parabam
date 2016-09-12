@@ -29,7 +29,7 @@ class Task(parabam.core.Task):
                                     constants=constants)
 
         self._rule = constants.rule
-        self._constants = constants.constants
+        self._user_constants = constants.constants
 
     @abstractmethod
     def __handle_rule_output__(self,rule_output,read):
@@ -46,12 +46,12 @@ class Task(parabam.core.Task):
         next_read = iterator.next 
         parent_bam = self._parent_bam
         handle_output = self.__handle_rule_output__
-        constants = self._constants
+        user_constants = self._user_constants
         
         #StopIteration caught in parabam.core.Task.run
         for i in xrange(self._task_size):    
             read = next_read()
-            rule_output = rule(read,constants,parent_bam)
+            rule_output = rule(read,user_constants,parent_bam)
             handle_output(rule_output,read)
 
     def __get_extension__(self,path):
@@ -96,7 +96,7 @@ class PairTask(Task):
         query_loners = self.__query_loners__ 
         cdef int size = self._task_size
         handle_output = self.__handle_rule_output__
-        constants = self._constants
+        user_constants = self._user_constants
         counts = self._counts
 
         loners = self._loners
@@ -107,7 +107,7 @@ class PairTask(Task):
             read1,read2 = query_loners(read,loners)
 
             if read1:
-                rule_output = rule((read1,read2),constants,parent_bam)
+                rule_output = rule((read1,read2),user_constants,parent_bam)
                 handle_output(rule_output,(read1,read2,))
 
     def __stash_loners__(self,loners):
@@ -116,7 +116,7 @@ class PairTask(Task):
                             self.__get_loner_files__(sorted_loners.keys())
 
         loner_count = 0
-        for loner_type, reads in loners.items():
+        for loner_type, reads in sorted_loners.items():
             for read in reads:
                 loner_files[loner_type].write(read)
                 loner_count += 1
@@ -248,7 +248,7 @@ class ByCoordTask(Task):
         parent_bam = self._parent_bam
 
         handle_output = self.__handle_rule_output__
-        constants = self._constants
+        user_constants = self._user_constants
 
         position_max = 10000
 
@@ -268,7 +268,7 @@ class ByCoordTask(Task):
                 reads.append(read)
                 
             else:
-                rule_output = rule(reads,constants,parent_bam)        
+                rule_output = rule(reads,user_constants,parent_bam)        
                 handle_output(rule_output,reads)
                 self._task_size += len(reads)
                 
@@ -455,11 +455,11 @@ class Interface(parabam.core.Interface):
             raise SystemExit
 
         rule = module.rule
-        constants = {}
+        user_constants = {}
         if hasattr(module,"set_constants"):
-            module.set_constants(constants)
+            module.set_constants(user_constants)
 
-        return module,rule,constants
+        return module,rule,user_constants
 
     def __setup_cmd_line_run__(self):
 

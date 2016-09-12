@@ -330,14 +330,14 @@ class Stat(parabam.command.Interface):
         super(Stat,self).__init__(instance_name = "parabam stat", **kwargs)
     
     def run_cmd(self):
-        module,rule,constants = \
+        module,rule,user_constants = \
                 self.__get_module_and_vitals__(self.cmd_args.rule)
 
         struc_blueprint = {}
         module.get_blueprints(struc_blueprint)
 
         self.run(input_paths=self.cmd_args.input,
-                  constants = constants,
+                  constants = user_constants,
                   rule = rule,
                   struc_blueprint = struc_blueprint,
                   fetch_region = self.cmd_args.region,

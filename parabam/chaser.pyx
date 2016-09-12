@@ -72,10 +72,10 @@ class Handler(parabam.core.Handler):
                 rule = self._rule
                 parent_bam = self._parent_bam
                 handle_output = self.__handle_rule_output__
-                constants = self._constants
+                user_constants = self._constants.constants
 
                 for read_name,pair in iterator.items():
-                    rule_output = rule(pair,constants,parent_bam)
+                    rule_output = rule(pair,user_constants,parent_bam)
                     handle_output(rule_output,pair)
 
             def __get_temp_path__(self,identity):
@@ -214,18 +214,18 @@ class Handler(parabam.core.Handler):
             self._stale_count += 1
 
     def __handle_origin_task__(self,new_package):
-        loner_count, primary_paths = new_package.results
-        if loner_count > 0:
-            self._total_loners += loner_count
-            for loner_type,loner_path in primary_paths.items():
+        for loner_count, primary_paths  in new_package.results:
+            if loner_count > 0:
+                self._total_loners += loner_count
+                for loner_type,loner_path in primary_paths.items():
 
-                match_package = MatchMakerResults(
-                                      loner_type=loner_type,
-                                      results=((0,loner_path),),
-                                      chaser_type="match_maker",
-                                      rescued=0,
-                                      level=0)
-                self.__handle_match_maker__(match_package)
+                    match_package = MatchMakerResults(
+                                          loner_type=loner_type,
+                                          results=((0,loner_path),),
+                                          chaser_type="match_maker",
+                                          rescued=0,
+                                          level=0)
+                    self.__handle_match_maker__(match_package)
 
     def __start_matchmaker_task__(self,paths,loner_type,level):
         self.__start_job__(paths,loner_type,level)
