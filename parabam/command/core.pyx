@@ -129,22 +129,29 @@ class PairTask(Task):
         paths = {}
 
         for loner_type in loner_types:
-            path, file_object = self.__get_loner_object__(path, loner_type)
+            path, file_object = self.__get_loner_object__(loner_type)
             files[loner_type] = file_object
             paths[loner_type] = path
 
         return paths, files
 
-    def __get_loner_object__(self,loner_type,unique):
-        path = self.__get_loner_temp_path__(loner_type,0,unique=\
-                                                        "-%d" % (unique,) )
+    def __get_loner_object__(self,loner_type):
+
+        path = self.__get_primary_temp_path__(loner_type)
         return path, pysam.AlignmentFile(path,"wb",header=self._header)
+
+    def __get_primary_temp_path__(self,loner_type):
+        return "%s/%s_%d_0_%s.bam" %\
+                           (self._constants.temp_dir,
+                            self.pid,
+                            self._dealt,
+                            loner_type)
 
     def __sort_loners__(self, loners):
         sorted_loners = {}
         chrm_bins = self._chrom_bins
 
-        for qname, read in loners:
+        for qname, read in loners.items():
             loner_type = self.__get_loner_type__(read, chrm_bins)
             if loner_type in sorted_loners:
                 sorted_loners[loner_type].append(read)
