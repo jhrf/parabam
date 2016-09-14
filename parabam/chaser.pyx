@@ -238,7 +238,7 @@ class Handler(parabam.core.Handler):
         self._chaser_qu.put(job)
 
     def __request_fragment_output__(self,paths):
-        if self._destroy and self._stale_count > 10:
+        if self._destroy:
             has_large_file = any([ (os.path.getsize(path) / 100) \
                                              > 1000000 for path in paths ])
             if has_large_file:
@@ -528,7 +528,7 @@ class Handler(parabam.core.Handler):
         if self._constants.verbose:
             if self._total_loners - self._rescued["total"] == 0:
                 sys.stdout.write(\
-                     "\r\t- Read pairing in progress: 100.00% complete\n")
+                     "\r\t- Read pairing in progress: 100.00%% complete\n")
                 sys.stdout.flush()
             self.__standard_output__("\t- Unpaired reads: %d" %\
                 (self._total_loners - self._rescued["total"],))
