@@ -14,15 +14,78 @@ from parabam.core import DestroyPackage
 from itertools import izip
 from collections import Counter,namedtuple
 from multiprocessing import Queue,Process
+from pprint import pprint as ppr
+
+class LonerRecord(object):
+    def __init__(self, 
+                 loner_type, 
+                 source, 
+                 target, 
+                 level, 
+                 temp_dir,
+                 salt,
+                 header):
+        
+        self.loner_type = loner_type
+        self.source = source
+        self.target = target
+        self.level = level
+        self.temp_dir = temp_dir
+        self.salt = salt
+        self.header = header
+
+        self.count = 0
+        self.path = self.__get_path__()
+        self.file_object = None
+
+    def __get_path__(self):
+        basename = "loner_%s_%s_%s-%d.bam" % (self.loner_type,
+                                            self.source,
+                                            self.salt,
+                                            self.level)
+        path = os.path.join(self.temp_dir,basename)
+        return path
+
+    def file_exists(self):
+        return os.path.exists(self.path)
+
+    def new_record(self, salt, level_mod):
+        return LonerRecord(
+            loner_type = self.loner_type,
+            source = self.source,
+            target = self.target,
+            level = self.level + level_mod,
+            temp_dir = self.temp_dir,
+            salt = salt,
+            header = self.header)
+
+    def write(self, read):
+        if self.file_object is None:
+            if os.path.exists(self.path):
+                print 'WARNING: Attempt to overwrite loner file! Data lost!'
+            self.file_object = pysam.AlignmentFile(self.path,
+                                                   "wb",
+                                                   header=self.header)
+        self.file_object.write(read)
+        self.count += 1
+
+    def read(self):
+        if self.file_object is None:
+            self.file_object = pysam.AlignmentFile(self.path,"rb")
+            self.bam_iter = self.file_object.fetch(until_eof=True)
+        return self.bam_iter.next()
+
+    def close(self):
+        if self.file_object is not None:
+            self.file_object.close()
+
+        self.file_object = None
+        self.bam_iter = None
 
 class ChaserResults(parabam.core.Package):
     def __init__(self,results,chaser_type):
         super(ChaserResults,self).__init__(results)
         self.chaser_type=chaser_type
-
-class PrimaryResults(ChaserResults):
-    def __init__(self,results,chaser_type):
-        super(PrimaryResults,self).__init__(results,chaser_type)
 
 class MatchMakerResults(ChaserResults):
     def __init__(self,loner_type,results,chaser_type,rescued,level):
@@ -32,9 +95,8 @@ class MatchMakerResults(ChaserResults):
         self.level = level
 
 class JobPackage(object):
-    def __init__(self,paths,loner_type,level,fragment_leftovers=False):
-        self.paths = paths
-        self.loner_type = loner_type 
+    def __init__(self,records,level,fragment_leftovers=False):
+        self.records = records
         self.level = level
         self.fragment_leftovers = fragment_leftovers
 
@@ -139,6 +201,16 @@ class Handler(parabam.core.Handler):
                 sys.stdout.write("\nFINISHED\n")
             sys.stdout.flush()
 
+            print "pyramid"
+            ppr(self._loner_pyramid)
+            print "--"
+            print "purgatory"
+            ppr(self._loner_purgatory)
+            print "--"
+            print "idle"
+            ppr(self._pyramid_idle_counts)
+            print "--"
+
         if iterations % 2500 == 0:
             print ""
 
@@ -190,11 +262,10 @@ class Handler(parabam.core.Handler):
         level = new_package.level
 
         #this number is by pairs to get read num we times 2
-        self._rescued["total"] += (new_package.rescued*2)    
+        self._rescued["total"] += (new_package.rescued*2)
 
         if new_package.results: #This ensures that there are leftover loners
-            self._pyramid_idle_counts[loner_type] = 0
-            
+        
             try:
                 pyramid = self._loner_pyramid[loner_type]
             except KeyError:
@@ -204,43 +275,43 @@ class Handler(parabam.core.Handler):
             if len(pyramid) >= level:
                 pyramid.append([])
 
-            for loner_level,loner_path in new_package.results:
-                self.__add_to_pyramid__(loner_type,loner_level,loner_path)
+            for loner_record in new_package.results:
+                self.__add_to_pyramid__(loner_record)
 
         if self._destroy: 
-            #TODO:should this move to new_package_action?
-            #     think carefully before doing this as this will
-            #     change the way that stale counting behaves
+            #TODO: should this move to new_package_action?
+            #      think carefully before doing this as this will
+            #      change the way that stale counting behaves
             self._stale_count += 1
 
     def __handle_origin_task__(self,new_package):
-        for loner_count, primary_paths  in new_package.results:
-            if loner_count > 0:
-                self._total_loners += loner_count
-                for loner_type,loner_path in primary_paths.items():
+        for primary_paths  in new_package.results:
+            for loner_info,record in primary_paths.items():
+                self._total_loners += record.count
 
-                    match_package = MatchMakerResults(
-                                          loner_type=loner_type,
-                                          results=((0,loner_path),),
-                                          chaser_type="match_maker",
-                                          rescued=0,
-                                          level=0)
-                    self.__handle_match_maker__(match_package)
+                match_package = MatchMakerResults(
+                                      loner_type=record.loner_type,
+                                      results=[record],
+                                      chaser_type="match_maker",
+                                      rescued=0,
+                                      level=0)
+                self.__handle_match_maker__(match_package)
 
-    def __start_matchmaker_task__(self,paths,loner_type,level):
-        self.__start_job__(paths,loner_type,level)
+    def __start_matchmaker_task__(self, records, loner_type, level):
+        self.__start_job__(records, level)
+        self._pyramid_idle_counts[loner_type] = 0
 
-    def __start_job__(self,paths,loner_type,level):
-        fragment_leftovers = self.__request_fragment_output__(paths)
+    def __start_job__(self, records, level):
+        fragment_leftovers = self.__request_fragment_output__(records)
 
-        job = JobPackage(paths,loner_type,level,fragment_leftovers)
+        job = JobPackage(records, level, fragment_leftovers)
         self._pending_jobs += 1
         self._chaser_qu.put(job)
 
-    def __request_fragment_output__(self,paths):
+    def __request_fragment_output__(self,records):
         if self._destroy:
-            has_large_file = any([ (os.path.getsize(path) / 100) \
-                                             > 1000000 for path in paths ])
+            has_large_file = any([ record.count > 1000000 \
+                                    for record in records ])
             if has_large_file:
                 if self._stale_thresh < 250:
                     self._stale_thresh = 250
@@ -292,21 +363,21 @@ class Handler(parabam.core.Handler):
         for loner_type,pyramid in self._loner_pyramid.items():
             for i,sub_pyramid in enumerate(reversed(pyramid)):
                 level = len(pyramid) - (i+1)
-                paths = self.__get_paths__(loner_type,sub_pyramid,level)
-                if len(paths) > 0:
-                    self.__start_matchmaker_task__(paths,loner_type,level)
-                    pyramid_idle_counts[loner_type] = 0
-                    for path in paths:#remove sent paths
-                        self.__remove_from_pyramid__(loner_type,level,path)
+                records = self.__get_records_for_search__(loner_type,sub_pyramid,level)
+                if len(records) > 0:
+                    self.__start_matchmaker_task__(records,loner_type,level)
+
+                    for record in records:#remove sent records
+                        self.__remove_from_pyramid__(record)
                     break
+
                 if len(sub_pyramid) > 0:
                     pyramid_idle_counts[loner_type] += 1
-                del paths
+                del records
 
             if pyramid_idle_counts[loner_type] >= idle_threshold:
                 self.__test_pyramid_idle_count__(pyramid,
-                                                  loner_type,
-                                                  pyramid_idle_counts)
+                                                 loner_type)
 
         self._print_chaser_debug(iterations)
         self.__finish_test__()
@@ -314,13 +385,13 @@ class Handler(parabam.core.Handler):
         if iterations % 100 == 0:
             gc.collect()
 
-    def __test_pyramid_idle_count__(self,pyramid,loner_type,pyramid_idle_counts):
+    def __test_pyramid_idle_count__(self, pyramid, loner_type):
         #Idle counting is the mechanism whereby loners that have no
         #match can be entered into `purgatory` thus clearing the pyramid.
         #This mechanism catches the case where there are genuinley lonerred
         #reads in the BAM file.
 
-        idle_success,idle_paths,idle_levels = \
+        idle_success,idle_records = \
                             self.__idle_routine__(pyramid,loner_type)
 
         # Delete after idle success or when 
@@ -329,17 +400,25 @@ class Handler(parabam.core.Handler):
                                      self._destroy,
                                      self._pending_jobs):
             
-            pyramid_idle_counts[loner_type]=0
-            for idle_level,idle_path in izip(idle_levels,idle_paths):
+            if loner_type not in self._loner_purgatory:
+                self._loner_purgatory[loner_type] = {}
+                if idle_records[0] == idle_records[1]:
+                    self._loner_purgatory\
+                        [loner_type][idle_records[0].source] = []
+                else:
+                    self._loner_purgatory\
+                        [loner_type][idle_records[0].source] = []
+                    self._loner_purgatory\
+                        [loner_type][idle_records[0].target] = []
+
+            for idle_record in idle_records:
+                self.__remove_from_pyramid__(idle_record)
                 if not idle_success:
-                    try:
-                        self._loner_purgatory[loner_type].\
-                                                append(idle_path)
-                    except KeyError:
-                        self._loner_purgatory[loner_type] = [idle_path]
-                self.__remove_from_pyramid__(loner_type,idle_level,idle_path)
-                    
-        del idle_paths,idle_levels
+                    #Level is zero for all purgatory loners
+                    idle_record.level = 0
+                    self._loner_purgatory[loner_type][idle_record.source]\
+                                                        .append(idle_record)
+        del idle_records
 
     def __finish_test__(self):
         if self._destroy:
@@ -382,45 +461,96 @@ class Handler(parabam.core.Handler):
     def __save_purgatory_loners__(self):
         saved = 0
         saved_keys = []
-        for loner_type,paths in self._loner_purgatory.items():
-            if len(paths) > 1:
-                saved += 1
+        for loner_type,source_dict in self._loner_purgatory.items():
+            counts = [len(records) > 0 for source,records in source_dict.items()]
+            if all(counts) > 0:
+                saved += sum(counts)
                 saved_keys.append(loner_type)
                 self._pyramid_idle_counts[loner_type] = 100
-                for path in paths:
-                    self.__add_to_pyramid__(loner_type,0,path)
+                for source,records in source_dict.items():
+                    for record in records:
+                        self.__add_to_pyramid__(record)
         for key in saved_keys:
             del self._loner_purgatory[key]
         gc.collect()
         return saved
 
-    def __add_to_pyramid__(self,loner_type,level,path):
-        self._loner_pyramid[loner_type][level].append(path)
+    def __add_to_pyramid__(self,record):
+        self._loner_pyramid[record.loner_type][record.level].append(record)
         self._files_in_pyramid += 1
 
-    def __remove_from_pyramid__(self,loner_type,level,path):
-        self._loner_pyramid[loner_type][level].remove(path)
+    def __remove_from_pyramid__(self,record):
+        self._loner_pyramid[record.loner_type][record.level].remove(record)
         self._files_in_pyramid -= 1
 
-    def __get_paths__(self,loner_type,sub_pyramid,level):
-        if not self._destroy and "UM" in loner_type:
-            return []
+    def __get_records_for_search__(self,loner_type,sub_pyramid,level):
+        records = []
+
         task_size = self.__get_task_size__(level,loner_type)
         if len(sub_pyramid) >= task_size:
-            if "XX" in loner_type and not self._destroy:
-                return sub_pyramid[:task_size] 
+            if sub_pyramid[0].source == sub_pyramid[0].target:
+                records =  sub_pyramid[:task_size]
+            elif not sub_pyramid[0].source == sub_pyramid[0].target:
+                records = self.__get_dif_type_records__(sub_pyramid, task_size)
+        return records
+
+    def __get_dif_type_records__(self, sub_pyramid, task_size):
+
+        task_records = []
+        records_by_type, type_counts, loner_types =\
+                 self.__sperate_record_by_type__(sub_pyramid)      
+
+        missing_type = 0 in type_counts.values()
+
+        if not missing_type:
+            if len(sub_pyramid) == task_size:
+                task_records = list(sub_pyramid)
             else:
-                return random.sample(sub_pyramid,task_size)
-        return []
-    
+                hi_type,lo_type = zip(*type_counts.most_common())[0]
+
+                upper_sample_limit = min(task_size - 1,
+                                         len(records_by_type[lo_type]))
+
+                lo_type_sample_n = random.randint(1,upper_sample_limit)
+                lo_sample = random.sample(records_by_type[lo_type],
+                                             lo_type_sample_n)
+                hi_sample = random.sample(records_by_type[hi_type],
+                                             task_size - lo_type_sample_n)
+
+                task_records.extend(lo_sample)
+                task_records.extend(hi_sample)
+                del lo_sample, hi_sample
+
+        if missing_type and not self._destory:
+            self._pyramid_idle_counts[sub_pyramid[0].loner_type] = 0
+
+        return task_records
+
+    def __sperate_record_by_type__(self, sub_pyramid):
+        type_1 = sub_pyramid[0].source
+        type_2 = sub_pyramid[0].target
+
+        records = {type_1:[],type_2:[]}
+        counts = Counter()
+
+        for record in sub_pyramid:
+            if record.source == type_1:
+                records[type_1].append(record)
+                counts[type_1] += 1
+            else:
+                records[type_2].append(record)
+                counts[type_2] += 1
+
+        return records, counts, (type_1, type_2)
+
     def __tidy_pyramid__(self):
         reads_found = self.__wait_for_remaining_jobs__()
 
         if not reads_found:
             for loner_type,pyramid in self._loner_pyramid.items():
                 for level,sub_pyramid in enumerate(pyramid):
-                    for path in sub_pyramid:
-                        self.__remove_from_pyramid__(loner_type,level,path)
+                    for record in sub_pyramid:
+                        self.__remove_from_pyramid__(record)
             gc.collect()
             return True
         else:
@@ -478,40 +608,55 @@ class Handler(parabam.core.Handler):
             return False
 
     def __idle_routine__(self,pyramid,loner_type):
-        if "UM" in loner_type and not self._destroy:
+        if "ccM-U" in loner_type and not self._destroy:
             #Don't conduct idle on UMs because we don't expect to see pairs
             #until after processing has finished
-            return True,[],[]
+            return True,[]
 
-        all_paths = []
+        all_records = []
         for level,sub_pyramid in enumerate(pyramid):
-            all_paths.extend(zip([level]*len(sub_pyramid),sub_pyramid))
+            all_records.extend(sub_pyramid)
 
         success = False
-        idle_paths = []
-        idle_levels = []
-        if len(all_paths) > 1:
-            path_n = random.randint(0,len(all_paths))
-            if path_n < 2:
-                #This gives 3 chances to roll a 2
-                #2 paths means a depth heavy search
-                path_n = 2
+        idle_records = []
 
-            idle_tuples = random.sample(all_paths,path_n)
-            idle_levels,idle_paths = zip( *idle_tuples )
-            self.__start_matchmaker_task__(idle_paths,loner_type,max(idle_levels))
-            success = True
-            del all_paths,idle_tuples
-        elif len(all_paths) == 1:
-            idle_levels,idle_paths = zip(*all_paths)
+        if len(all_records) > 1:
+        
+            if all_records[0].source == all_records[0].target:
+                success = True
+                path_n = random.randint(0,len(all_records))
+                if path_n < 2:
+                    #This gives 3 chances to roll a 2
+                    #2 paths means a depth heavy search
+                    path_n = 2
 
-        return success,idle_paths,idle_levels
+                idle_records = random.sample(all_records,path_n)
+            
+            else:
+                counts = Counter({all_records[0].source:0,
+                                  all_records[1].source:0})
+                for record in all_records:
+                    counts[record.source] += 1
+
+                success = 0 not in counts.values()
+                idle_records = all_records
+
+            if success:
+                self.__start_matchmaker_task__(idle_records,
+                                               loner_type,
+                                               0)
+            del all_records
+
+        elif len(all_records) == 1:
+            idle_levels = all_records
+
+        return success,idle_records
 
     def __get_task_size__(self,level,loner_type):
         if level == 0:
             task_size = 10
         elif level % 2 == 0:
-            task_size = 2
+            task_size = 4
         else:
             task_size = 3
 
@@ -573,10 +718,9 @@ class ChaserTask(Process):
             try:
                 package = self._inqu.get(False)
                 if type(package) == JobPackage:
-                    results = match_handler.run(package.paths,
-                                      package.loner_type,
-                                      package.level,
-                                      package.fragment_leftovers)
+                    results = match_handler.run(package.records,
+                                                package.level,
+                                                package.fragment_leftovers)
                     self._outqu.put(results)
 
                 elif type(package) == DestroyPackage:
@@ -601,33 +745,30 @@ class MatchMakerHandler(object):
         self._child_pack = child_pack
         self._parent_bam = self._child_pack["parent_bam"]
         self._header = self._parent_bam.header
-        self._record = 0
+        self._records_created = 0
         self.pid = pid
 
-        self.LonerInfo = namedtuple("LonerInfo","paths level loner_type")
-
-    def run(self,loner_paths,loner_type,level,fragment_leftovers):
+    def run(self, loner_records, level, fragment_leftovers):
 
         #TODO: This is pretty old code... Not sure if the memory mimimisation
         #      of the two pass system is worth it...
         #      Consider picking through and simplifying here
 
-        loner_info = self.LonerInfo(loner_paths,level,loner_type)
+        unpaired_records = self.__get_unpaired_records__(loner_records,
+                                                            level_mod=1)
         
-        loner_path = self.__get_loner_temp_path__(\
-                                    loner_info.loner_type,loner_info.level+1)
-        loner_object = self.__get_loner_object__(loner_path)
-
-        cdef dict pairs = self.__first_pass__(loner_info,fragment_leftovers)
+        cdef dict pairs = self.__first_pass__(loner_records,fragment_leftovers)
         cdef dict read_pairs = {}
         cdef dict send_pairs = {}
         cdef int rescued = 0
         cdef int written = 0
-        cdef list leftover_paths = []
+        cdef list leftover_records = []
 
-        for read in self.__read_generator__(loner_info,second_pass=True,
-                                            leftover_paths=leftover_paths,
-                                            fragment_leftovers=fragment_leftovers):
+        for read,source in self.__read_generator__(
+                                        loner_records,
+                                        second_pass=True,
+                                        leftover_records=leftover_records,
+                                        fragment_leftovers=fragment_leftovers):
             try:
                 status = pairs[read.qname]
                 try:
@@ -648,8 +789,7 @@ class MatchMakerHandler(object):
 
             except KeyError:
                 written += 1
-                loner_object.write(read)
-        loner_object.close()
+                unpaired_records[source].write(read)
 
         if len(send_pairs) > 0:
             rescued += self.__launch_child_task__(send_pairs)
@@ -657,36 +797,49 @@ class MatchMakerHandler(object):
         del read_pairs   
         del pairs
 
+        return_paths = self.__get_return_paths__\
+                            (unpaired_records, leftover_records)
+
         gc.collect()
-
-        return_paths = []
-
-        if written == 0:
-            os.remove(loner_path)
-        else:
-            return_paths.append((loner_info.level+1,loner_path))
-
-        if len(leftover_paths) > 0:
-            for leftover_path in leftover_paths:
-                return_paths.append((loner_info.level,leftover_path))
  
-        loner_pack = MatchMakerResults(loner_type=loner_info.loner_type,
+        loner_pack = MatchMakerResults(loner_type=loner_records[0].loner_type,
                                        results=return_paths,
-                                       level=loner_info.level+1,
+                                       level=level+1,
                                        chaser_type="match_maker",
                                        rescued=rescued)
         return loner_pack
 
-    def __get_loner_temp_path__(self,loner_type,level=0,unique=""):
-        self._record += 1
-        return "%s/%s_%d_%d_%s_%s.bam" %\
-            (self._constants.temp_dir,self.pid,
-             self._record,level,loner_type,unique)
+    def __get_return_paths__(self, loner_records, leftover_records):
+        return_paths = []
 
-    def __first_pass__(self,loner_info,fragment_leftovers):
+        for source, record in loner_records.items():
+            if record.count > 0:
+                return_paths.append(record)
+            record.close()
+
+        if len(leftover_records) > 0:
+            for record in leftover_records:
+                return_paths.append(record)
+
+        return return_paths
+
+    def __get_unpaired_records__(self,records, level_mod):
+        unpaired_records = {}
+        for record in records:
+            if record.source not in unpaired_records:
+                new_record = self.__get_new_record__(record, level_mod)
+                unpaired_records[record.source] = new_record
+        return unpaired_records
+
+    def __get_new_record__(self,model_record,level_mod=1):
+        self._records_created += 1
+        salt = "%s-%d" % (self.pid, self._records_created,) 
+        return model_record.new_record(salt = salt, level_mod = level_mod)
+
+    def __first_pass__(self,records, fragment_leftovers):
         cdef dict pairs = {}
-        for read in self.__read_generator__(loner_info,
-                                      fragment_leftovers=fragment_leftovers):
+        for read, source in self.__read_generator__(records,
+                                    fragment_leftovers=fragment_leftovers):
             try:
                 status = pairs[read.qname]
                 pairs[read.qname] = True
@@ -698,69 +851,58 @@ class MatchMakerHandler(object):
         return \
             dict( (qname, status,) for (qname,status) in pairs.items() if status)
 
-    def __read_generator__(self,loner_info,
-                            second_pass=False,leftover_paths=None,
+    def __read_generator__(self,records,
+                            second_pass=False,
+                            leftover_records=None,
                             fragment_leftovers=False):
 
         if not fragment_leftovers:
-            count = self._max_reads // len(loner_info.paths)
+            count = self._max_reads // len(records)
         else:
             count = 50000
 
         count_limit = False
-        for path in loner_info.paths:
-            loner_object = pysam.AlignmentFile(path,"rb")
-            bam_iterator = loner_object.fetch(until_eof=True)
-           
-            for i,read in enumerate(bam_iterator):
-                yield read
-                if i == count:
-                    count_limit = True
-                    break 
+        for record in records:
 
+            for i in range(count+1):
+                read = record.read()
+                if read:
+                    yield read, record.source
+                else:
+                    break
+
+            if second_pass and i == count:
+                self.__write_leftovers__(record,
+                                         fragment_leftovers,
+                                         leftover_records)
+            record.close()
             if second_pass:
-                if count_limit:
-                    count_limit = False
-                    self.__write_leftovers__(bam_iterator,
-                                             fragment_leftovers,
-                                             loner_info,
-                                             leftover_paths)
+                os.remove(record.path)
 
-                os.remove(path)
-            loner_object.close()
         gc.collect()
 
-    def __write_leftovers__(self,bam_iterator,fragment_leftovers,
-                                 loner_info,leftover_paths):
+    def __write_leftovers__(self,record,
+                                fragment_leftovers,
+                                leftover_records):
 
-        leftover_file = self.__get_leftover_object__(\
-                                        loner_info,len(leftover_paths))
-        leftover_count = 0
-        for read in bam_iterator:
+        leftover = self.__get_new_record__(record, level_mod=0)
+        
+        for read in record.bam_iter:
             if fragment_leftovers and\
-               leftover_count % 25000 == 0 and\
-               leftover_count > 0:
+               leftover.count % 25000 == 0 and\
+               leftover.count > 0:
                 
-                self.__add_to_leftover_paths__(leftover_file,
-                                               leftover_paths)
+                self.__add_to_leftover_records__(leftover,
+                                                 leftover_records)
+                leftover = self.__get_new_record__(record, level_mod=0)
+            leftover.write(read)
 
-                leftover_file = self.__get_leftover_object__(\
-                                        loner_info,len(leftover_paths))
- 
-            leftover_file.write(read)
-            leftover_count += 1
+        if leftover.count > 0:
+            self.__add_to_leftover_records__(leftover,leftover_records)
 
-        if leftover_count > 0:
-            self.__add_to_leftover_paths__(leftover_file,
-                                           leftover_paths)
-        else:
-            empty_leftover_path = leftover_file.filename
-            leftover_file.close()
-            os.remove(empty_leftover_path)
-
-    def __add_to_leftover_paths__(self,leftover_file,leftover_paths):
-        leftover_paths.append(leftover_file.filename)
-        leftover_file.close()
+    def __add_to_leftover_records__(self, record, leftover_records):
+        leftover_records.append(record)
+        record.close()
 
     def __launch_child_task__(self,pairs):
         child_pack = self._child_pack
@@ -769,15 +911,5 @@ class MatchMakerHandler(object):
         child_pack["queue"].put(parabam.core.Package(results=results))
         self._record += 1
         return len(pairs)
-
-    def __get_leftover_object__(self,loner_info,unique):
-        path = self.__get_loner_temp_path__(loner_info.loner_type,\
-                                        loner_info.level,"lftovr%d" % (unique,))
-        leftover = pysam.AlignmentFile(path,"wb",header=self._header)
-        return leftover
-
-    def __get_loner_object__(self,path):
-        loner_object = pysam.AlignmentFile(path,"wb",header=self._header)
-        return loner_object
 
 #.....happily ever after

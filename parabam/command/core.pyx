@@ -112,73 +112,77 @@ class PairTask(Task):
 
     def __stash_loners__(self,loners):
         sorted_loners = self.__sort_loners__(loners) #sort by loner type
-        loner_paths, loner_files = \
-                            self.__get_loner_files__(sorted_loners.keys())
+        loner_records = self.__get_loner_records__(sorted_loners)
 
-        loner_count = 0
         for loner_type, reads in sorted_loners.items():
             for read in reads:
-                loner_files[loner_type].write(read)
-                loner_count += 1
-            loner_files[loner_type].close()
+                loner_records[loner_type].write(read)
+            loner_records[loner_type].close()
 
-        self._system["chaser"] = (loner_count,loner_paths,)
+        self._system["chaser"] = loner_records
 
-    def __get_loner_files__(self, loner_types):
-        files = {}
-        paths = {}
+    def __get_loner_records__(self, sorted_loners):
+        records = {}
 
-        for loner_type in loner_types:
-            path, file_object = self.__get_loner_object__(loner_type)
-            files[loner_type] = file_object
-            paths[loner_type] = path
+        for loner_info in sorted_loners.keys():
+            loner_type, source, target = loner_info
 
-        return paths, files
+            record = parabam.chaser.LonerRecord( 
+                loner_type = loner_type, 
+                source = source, 
+                target = target, 
+                level = 0, 
+                temp_dir = self._constants.temp_dir,
+                salt = "%s_%d" % (self.pid, self._dealt),
+                header = self._header)
 
-    def __get_loner_object__(self,loner_type):
+            records[loner_info] = record
 
-        path = self.__get_primary_temp_path__(loner_type)
-        return path, pysam.AlignmentFile(path,"wb",header=self._header)
-
-    def __get_primary_temp_path__(self,loner_type):
-        return "%s/%s_%d_0_%s.bam" %\
-                           (self._constants.temp_dir,
-                            self.pid,
-                            self._dealt,
-                            loner_type)
+        return records
 
     def __sort_loners__(self, loners):
         sorted_loners = {}
         chrm_bins = self._chrom_bins
 
         for qname, read in loners.items():
-            loner_type = self.__get_loner_type__(read, chrm_bins)
-            if loner_type in sorted_loners:
-                sorted_loners[loner_type].append(read)
+            loner_info =\
+                self.__get_loner_info__(read, chrm_bins)
+            if loner_info in sorted_loners:
+                sorted_loners[loner_info].append(read)
             else:
-                sorted_loners[loner_type] = [read]
+                sorted_loners[loner_info] = [read]
 
         return sorted_loners
 
     def __get_reference_id_name__(self, read, bins):
-        if read.reference_id == read.next_reference_id:
-            return "XX%dv%d" % (read.reference_id,read.next_reference_id)
-        else:
-            sorted_chrms = sorted((read.reference_id, read.next_reference_id,))
-            class_bins = [bins[ch] for ch in sorted_chrms]
-
-            #reads on different chromosome
-            return "MM%sv%s" % tuple(class_bins)
-
-    def __get_loner_type__(self, read, bins):
         if not read.is_unmapped and not read.mate_is_unmapped:
-            return self.__get_reference_id_name__(read,bins)
-        elif read.is_unmapped and read.mate_is_unmapped:
-            #both unmapped 
-            return "UU"
+            if read.reference_id == read.next_reference_id:
+                target = "%d" % (read.reference_id,)
+                source = "%d" % (read.next_reference_id,)
+            else:
+                target = bins[read.reference_id]
+                source = bins[read.next_reference_id]
         else:
-            #one unmapped read, one mapped read
-            return "UM"
+            target = self.__unmapped_reference__(read.is_unmapped, 
+                                                 read.reference_id, 
+                                                 bins)
+            source = self.__unmapped_reference__(read.mate_is_unmapped, 
+                                                read.next_reference_id, 
+                                                bins)
+        return target, source 
+
+    def __unmapped_reference__(self, unmapped_status, reference_id, bins):
+        if unmapped_status:
+            return "U"
+        else:
+            return "M"
+
+    def __get_loner_info__(self, read, bins):
+        source_id, target_id = self.__get_reference_id_name__(read,bins)
+        sorted_ids = tuple(sorted([source_id, target_id]))
+        loner_type = "cc%s-%s" % sorted_ids
+
+        return loner_type, source_id, target_id
 
     def __query_loners__(self,read,loners):
         if self.__read_filter__(read):#Pair processing only handles primary pairs
@@ -203,6 +207,7 @@ class PairTask(Task):
         group = []
         size = 0
         uid = 0
+
         for i,name,length in chrom_info:
            group.append( (i,name,length,) )
            size += length
@@ -313,8 +318,8 @@ class Handler(parabam.core.Handler):
             self.__add_system_to_stage__(results["system"])
         
     def __add_system_to_stage__(self, system_results):
-        for subset,(count,path_dict) in system_results.items():
-             self._stage_stores[subset].append((count,path_dict))
+        for subset, records in system_results.items():
+             self._stage_stores[subset].append(records)
 
     #Child classes MUST call super
     def __periodic_action__(self, iterations):
