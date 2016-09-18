@@ -180,7 +180,14 @@ class PairTask(Task):
     def __get_loner_info__(self, read, bins):
         source_id, target_id = self.__get_reference_id_name__(read,bins)
         sorted_ids = tuple(sorted([source_id, target_id]))
-        loner_type = "cc%s-%s" % sorted_ids
+        
+        if source_id == target_id:
+            prefix = "xx"
+        else:
+            prefix = "bb"
+
+        suffix = "%s-%s" % sorted_ids
+        loner_type = prefix+suffix
 
         return loner_type, source_id, target_id
 

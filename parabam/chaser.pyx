@@ -201,16 +201,6 @@ class Handler(parabam.core.Handler):
                 sys.stdout.write("\nFINISHED\n")
             sys.stdout.flush()
 
-            print "pyramid"
-            ppr(self._loner_pyramid)
-            print "--"
-            print "purgatory"
-            ppr(self._loner_purgatory)
-            print "--"
-            print "idle"
-            ppr(self._pyramid_idle_counts)
-            print "--"
-
         if iterations % 2500 == 0:
             print ""
 
@@ -399,26 +389,89 @@ class Handler(parabam.core.Handler):
         if self.__clear_subpyramid__(idle_success, 
                                      self._destroy,
                                      self._pending_jobs):
-            
-            if loner_type not in self._loner_purgatory:
-                self._loner_purgatory[loner_type] = {}
-                if idle_records[0] == idle_records[1]:
-                    self._loner_purgatory\
-                        [loner_type][idle_records[0].source] = []
-                else:
-                    self._loner_purgatory\
-                        [loner_type][idle_records[0].source] = []
-                    self._loner_purgatory\
-                        [loner_type][idle_records[0].target] = []
 
             for idle_record in idle_records:
                 self.__remove_from_pyramid__(idle_record)
                 if not idle_success:
+                    self.__add_to_purgatory__(idle_record)
                     #Level is zero for all purgatory loners
-                    idle_record.level = 0
-                    self._loner_purgatory[loner_type][idle_record.source]\
-                                                        .append(idle_record)
+
         del idle_records
+
+    def __add_to_purgatory__(self, record):
+        self.__prepare_purgatory__(record)
+        record.level = 0
+        self._loner_purgatory[record.loner_type][record.source].append(record)
+
+    def __prepare_purgatory__(self, record):
+
+        loner_type = record.loner_type
+        if loner_type not in self._loner_purgatory:
+            self._loner_purgatory[loner_type] = {}
+            self._loner_purgatory[loner_type][record.source] = []
+            if not record.source == record.target:
+                self._loner_purgatory[loner_type][record.target] = []
+
+    def __clear_subpyramid__(self,success,destroy,running):
+        if success:
+            #If the idle task was sent, clear pyramid
+            return True
+        elif destroy and not success:
+            if running == 0:
+                #if main process has finished and no tasks run
+                #clear the pyramid
+                return True
+            else:
+                #Tasks still running. Don't clear
+                return False 
+        else:
+            #Idle task not sent, don't clear pyramid
+            return False
+
+    def __idle_routine__(self,pyramid,loner_type):
+        if "ccM-U" in loner_type and not self._destroy:
+            #Don't conduct idle on UMs because we don't expect to see pairs
+            #until after processing has finished
+            return True,[]
+
+        all_records = []
+        for level,sub_pyramid in enumerate(pyramid):
+            all_records.extend(sub_pyramid)
+
+        success = False
+        idle_records = []
+
+        if len(all_records) > 1:
+        
+            if all_records[0].source == all_records[0].target:
+                success = True
+                path_n = random.randint(0,len(all_records))
+                if path_n < 2:
+                    #This gives 3 chances to roll a 2
+                    #2 paths means a depth heavy search
+                    path_n = 2
+
+                idle_records = random.sample(all_records,path_n)
+            
+            else:
+                counts = Counter({all_records[0].source:0,
+                                  all_records[1].source:0})
+                for record in all_records:
+                    counts[record.source] += 1
+
+                success = 0 not in counts.values()
+                idle_records = all_records
+
+            if success:
+                self.__start_matchmaker_task__(idle_records,
+                                               loner_type,
+                                               0)
+            del all_records
+
+        elif len(all_records) == 1:
+            idle_levels = all_records
+
+        return success,idle_records
 
     def __finish_test__(self):
         if self._destroy:
@@ -462,8 +515,8 @@ class Handler(parabam.core.Handler):
         saved = 0
         saved_keys = []
         for loner_type,source_dict in self._loner_purgatory.items():
-            counts = [len(records) > 0 for source,records in source_dict.items()]
-            if all(counts) > 0:
+            counts = [len(records) for source,records in source_dict.items()]
+            if 0 not in counts:
                 saved += sum(counts)
                 saved_keys.append(loner_type)
                 self._pyramid_idle_counts[loner_type] = 100
@@ -591,67 +644,6 @@ class Handler(parabam.core.Handler):
         print "Saved from wait %d" % (self._rescued["total"] - prev_found)
         return prev_found < self._rescued["total"]
 
-    def __clear_subpyramid__(self,success,destroy,running):
-        if success:
-            #If the idle task was sent, clear pyramid
-            return True
-        elif destroy and not success:
-            if running == 0:
-                #if main process has finished and no tasks run
-                #clear the pyramid
-                return True
-            else:
-                #Tasks still running. Don't clear
-                return False 
-        else:
-            #Idle task not sent, don't clear pyramid
-            return False
-
-    def __idle_routine__(self,pyramid,loner_type):
-        if "ccM-U" in loner_type and not self._destroy:
-            #Don't conduct idle on UMs because we don't expect to see pairs
-            #until after processing has finished
-            return True,[]
-
-        all_records = []
-        for level,sub_pyramid in enumerate(pyramid):
-            all_records.extend(sub_pyramid)
-
-        success = False
-        idle_records = []
-
-        if len(all_records) > 1:
-        
-            if all_records[0].source == all_records[0].target:
-                success = True
-                path_n = random.randint(0,len(all_records))
-                if path_n < 2:
-                    #This gives 3 chances to roll a 2
-                    #2 paths means a depth heavy search
-                    path_n = 2
-
-                idle_records = random.sample(all_records,path_n)
-            
-            else:
-                counts = Counter({all_records[0].source:0,
-                                  all_records[1].source:0})
-                for record in all_records:
-                    counts[record.source] += 1
-
-                success = 0 not in counts.values()
-                idle_records = all_records
-
-            if success:
-                self.__start_matchmaker_task__(idle_records,
-                                               loner_type,
-                                               0)
-            del all_records
-
-        elif len(all_records) == 1:
-            idle_levels = all_records
-
-        return success,idle_records
-
     def __get_task_size__(self,level,loner_type):
         if level == 0:
             task_size = 10
@@ -764,6 +756,8 @@ class MatchMakerHandler(object):
         cdef int written = 0
         cdef list leftover_records = []
 
+        print pairs
+
         for read,source in self.__read_generator__(
                                         loner_records,
                                         second_pass=True,
@@ -840,6 +834,7 @@ class MatchMakerHandler(object):
         cdef dict pairs = {}
         for read, source in self.__read_generator__(records,
                                     fragment_leftovers=fragment_leftovers):
+            #print read, pairs
             try:
                 status = pairs[read.qname]
                 pairs[read.qname] = True
