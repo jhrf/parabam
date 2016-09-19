@@ -353,7 +353,8 @@ class Handler(parabam.core.Handler):
         for loner_type,pyramid in self._loner_pyramid.items():
             for i,sub_pyramid in enumerate(reversed(pyramid)):
                 level = len(pyramid) - (i+1)
-                records = self.__get_records_for_search__(loner_type,sub_pyramid,level)
+                records = \
+                    self.__get_records_for_search__(loner_type,sub_pyramid,level)
                 if len(records) > 0:
                     self.__start_matchmaker_task__(records,loner_type,level)
 
@@ -561,10 +562,11 @@ class Handler(parabam.core.Handler):
             else:
                 hi_type,lo_type = zip(*type_counts.most_common())[0]
 
-                upper_sample_limit = min(task_size - 1,
-                                         len(records_by_type[lo_type]))
+                upper_sample_limit = min(task_size - 1, type_counts[lo_type])
 
                 lo_type_sample_n = random.randint(1,upper_sample_limit)
+                print len(sub_pyramid), type_counts[hi_type], type_counts[lo_type]
+
                 lo_sample = random.sample(records_by_type[lo_type],
                                              lo_type_sample_n)
                 hi_sample = random.sample(records_by_type[hi_type],
@@ -737,7 +739,7 @@ class MatchMakerHandler(object):
         self._child_pack = child_pack
         self._parent_bam = self._child_pack["parent_bam"]
         self._header = self._parent_bam.header
-        self._records_created = 0
+        self._unique_tracker = 0
         self.pid = pid
 
     def run(self, loner_records, level, fragment_leftovers):
@@ -753,12 +755,9 @@ class MatchMakerHandler(object):
         cdef dict read_pairs = {}
         cdef dict send_pairs = {}
         cdef int rescued = 0
-        cdef int written = 0
         cdef list leftover_records = []
 
-        print pairs
-
-        for read,source in self.__read_generator__(
+        for read, source in self.__read_generator__(
                                         loner_records,
                                         second_pass=True,
                                         leftover_records=leftover_records,
@@ -782,7 +781,6 @@ class MatchMakerHandler(object):
                     gc.collect()
 
             except KeyError:
-                written += 1
                 unpaired_records[source].write(read)
 
         if len(send_pairs) > 0:
@@ -811,34 +809,32 @@ class MatchMakerHandler(object):
                 return_paths.append(record)
             record.close()
 
-        if len(leftover_records) > 0:
-            for record in leftover_records:
-                return_paths.append(record)
+        for record in leftover_records:
+            return_paths.append(record)
 
         return return_paths
 
     def __get_unpaired_records__(self,records, level_mod):
         unpaired_records = {}
+
         for record in records:
             if record.source not in unpaired_records:
                 new_record = self.__get_new_record__(record, level_mod)
                 unpaired_records[record.source] = new_record
         return unpaired_records
 
-    def __get_new_record__(self,model_record,level_mod=1):
-        self._records_created += 1
-        salt = "%s-%d" % (self.pid, self._records_created,) 
+    def __get_new_record__(self,model_record,level_mod):
+        self._unique_tracker += 1
+        salt = "%s-%d" % (self.pid, self._unique_tracker,) 
         return model_record.new_record(salt = salt, level_mod = level_mod)
 
     def __first_pass__(self,records, fragment_leftovers):
         cdef dict pairs = {}
         for read, source in self.__read_generator__(records,
                                     fragment_leftovers=fragment_leftovers):
-            #print read, pairs
-            try:
-                status = pairs[read.qname]
+            if read.qname in pairs:
                 pairs[read.qname] = True
-            except KeyError:
+            else:
                 pairs[read.qname] = False
         return self.__prepare_for_second_pass__(pairs)
 
@@ -856,15 +852,14 @@ class MatchMakerHandler(object):
         else:
             count = 50000
 
-        count_limit = False
         for record in records:
 
             for i in range(count+1):
-                read = record.read()
-                if read:
+                try:
+                    read = record.read()
                     yield read, record.source
-                else:
-                    break
+                except StopIteration:
+                    pass
 
             if second_pass and i == count:
                 self.__write_leftovers__(record,
@@ -902,9 +897,9 @@ class MatchMakerHandler(object):
     def __launch_child_task__(self,pairs):
         child_pack = self._child_pack
         results = child_pack["chaser_task"].handle_pair_dict(pairs,\
-                                    int("%d%d" % (self.pid,self._record,)))
+                                    int("%d%d" % (self.pid,self._unique_tracker,)))
         child_pack["queue"].put(parabam.core.Package(results=results))
-        self._record += 1
+        self._unique_tracker += 1
         return len(pairs)
 
 #.....happily ever after
