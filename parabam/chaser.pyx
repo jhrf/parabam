@@ -344,9 +344,9 @@ class Handler(parabam.core.Handler):
         self.__pause_monitor__()
 
         if not self._destroy:
-            idle_threshold = 500
+            idle_threshold = 2500
         else:
-            idle_threshold = 200
+            idle_threshold = 250
 
         pyramid_idle_counts = self._pyramid_idle_counts 
 
@@ -382,20 +382,15 @@ class Handler(parabam.core.Handler):
         #This mechanism catches the case where there are genuinley lonerred
         #reads in the BAM file.
 
-        idle_success,idle_records = \
+        idle_records, add_to_purgatory = \
                             self.__idle_routine__(pyramid,loner_type)
 
         # Delete after idle success or when 
         # processing has finished and idle fails
-        if self.__clear_subpyramid__(idle_success, 
-                                     self._destroy,
-                                     self._pending_jobs):
-
-            for idle_record in idle_records:
-                self.__remove_from_pyramid__(idle_record)
-                if not idle_success:
-                    self.__add_to_purgatory__(idle_record)
-                    #Level is zero for all purgatory loners
+        for idle_record in idle_records:
+            self.__remove_from_pyramid__(idle_record)
+            if add_to_purgatory:
+                self.__add_to_purgatory__(idle_record)
 
         del idle_records
 
@@ -413,66 +408,54 @@ class Handler(parabam.core.Handler):
             if not record.source == record.target:
                 self._loner_purgatory[loner_type][record.target] = []
 
-    def __clear_subpyramid__(self,success,destroy,running):
-        if success:
-            #If the idle task was sent, clear pyramid
-            return True
-        elif destroy and not success:
-            if running == 0:
-                #if main process has finished and no tasks run
-                #clear the pyramid
-                return True
-            else:
-                #Tasks still running. Don't clear
-                return False 
-        else:
-            #Idle task not sent, don't clear pyramid
-            return False
-
     def __idle_routine__(self,pyramid,loner_type):
-        if "ccM-U" in loner_type and not self._destroy:
-            #Don't conduct idle on UMs because we don't expect to see pairs
-            #until after processing has finished
-            return True,[]
-
+        return_records = []
         all_records = []
+
+        start_matchmaker = False
+        add_to_purgatory = False
+ 
         for level,sub_pyramid in enumerate(pyramid):
             all_records.extend(sub_pyramid)
+       
+        if all_records[0].source == all_records[0].target:
 
-        success = False
-        idle_records = []
+            if len(all_records) > 1:
 
-        if len(all_records) > 1:
-        
-            if all_records[0].source == all_records[0].target:
-                success = True
+                start_matchmaker = True
                 path_n = random.randint(0,len(all_records))
                 if path_n < 2:
                     #This gives 3 chances to roll a 2
                     #2 paths means a depth heavy search
                     path_n = 2
 
-                idle_records = random.sample(all_records,path_n)
-            
-            else:
-                counts = Counter({all_records[0].source:0,
-                                  all_records[1].source:0})
-                for record in all_records:
-                    counts[record.source] += 1
+                return_records = random.sample(all_records,path_n)
 
-                success = 0 not in counts.values()
-                idle_records = all_records
+            elif len(all_records) == 1 and self._destroy:
+                return_records = all_records
+                add_to_purgatory = True
 
-            if success:
-                self.__start_matchmaker_task__(idle_records,
-                                               loner_type,
-                                               0)
-            del all_records
+        else:
+            counts = Counter({all_records[0].source:0,
+                              all_records[0].target:0})
+            for record in all_records:
+                counts[record.source] += 1
 
-        elif len(all_records) == 1:
-            idle_levels = all_records
+            if 0 not in counts.values():
+                start_matchmaker = True
+                return_records = all_records
+            elif self._destroy:
+                add_to_purgatory = True
+                return_records = all_records
+                
+        if start_matchmaker:
+            self.__start_matchmaker_task__(return_records,
+                                           loner_type,
+                                           0)
+        else:
+            self._pyramid_idle_counts[loner_type] = 0
 
-        return success,idle_records
+        return return_records, add_to_purgatory
 
     def __finish_test__(self):
         if self._destroy:
@@ -551,33 +534,34 @@ class Handler(parabam.core.Handler):
     def __get_dif_type_records__(self, sub_pyramid, task_size):
 
         task_records = []
-        records_by_type, type_counts, loner_types =\
+        records_by_type, read_counts, file_counts =\
                  self.__sperate_record_by_type__(sub_pyramid)      
 
-        missing_type = 0 in type_counts.values()
+        missing_type = 0 in read_counts.values()
 
         if not missing_type:
-            if len(sub_pyramid) == task_size:
-                task_records = list(sub_pyramid)
-            else:
-                hi_type,lo_type = zip(*type_counts.most_common(2))[0]
+            hi_read_type, lo_read_type = zip(*read_counts.most_common(2))[0]
+            hi_file_type, lo_file_type = zip(*file_counts.most_common(2))[0]
 
-                upper_sample_limit = min(task_size - 1, type_counts[lo_type])
+            if read_counts[lo_read_type] > (read_counts[hi_read_type] * .4):
 
-                lo_type_sample_n = random.randint(1,upper_sample_limit)
-                print len(sub_pyramid), type_counts[hi_type], type_counts[lo_type]
-
-                lo_sample = random.sample(records_by_type[lo_type],
-                                             lo_type_sample_n)
-                hi_sample = random.sample(records_by_type[hi_type],
-                                             task_size - lo_type_sample_n)
+                lo_sample_n = min(task_size // 2, file_counts[lo_file_type])
+                print "\nDif:%s type1:%d(%d) type2:%d(%d) lo_samp:%d " % (
+                                            sub_pyramid[0].loner_type,
+                                            file_counts[hi_file_type],
+                                            read_counts[hi_file_type],
+                                            file_counts[lo_file_type],
+                                            read_counts[lo_file_type],
+                                            lo_sample_n)
+            
+                lo_sample = random.sample(records_by_type[lo_file_type],
+                                         lo_sample_n)
+                hi_sample = random.sample(records_by_type[hi_file_type],
+                                         task_size - lo_sample_n)
 
                 task_records.extend(lo_sample)
                 task_records.extend(hi_sample)
                 del lo_sample, hi_sample
-
-        if missing_type and not self._destory:
-            self._pyramid_idle_counts[sub_pyramid[0].loner_type] = 0
 
         return task_records
 
@@ -586,17 +570,15 @@ class Handler(parabam.core.Handler):
         type_2 = sub_pyramid[0].target
 
         records = {type_1:[],type_2:[]}
-        counts = Counter({type_1:0,type_2:0})
+        read_counts = Counter({type_1:0,type_2:0})
+        file_counts = Counter({type_1:0,type_2:0})
 
         for record in sub_pyramid:
-            if record.source == type_1:
-                records[type_1].append(record)
-                counts[type_1] += 1
-            else:
-                records[type_2].append(record)
-                counts[type_2] += 1
+            records[record.source].append(record)
+            read_counts[record.source] += record.count
+            file_counts[record.source] += 1
 
-        return records, counts, (type_1, type_2)
+        return records, read_counts, file_counts
 
     def __tidy_pyramid__(self):
         reads_found = self.__wait_for_remaining_jobs__()
@@ -648,7 +630,10 @@ class Handler(parabam.core.Handler):
 
     def __get_task_size__(self,level,loner_type):
         if level == 0:
-            task_size = 10
+            if "xx" in loner_type:
+                task_size = 10
+            elif "bb" in loner_type:
+                task_size = 120
         elif level % 2 == 0:
             task_size = 4
         else:
