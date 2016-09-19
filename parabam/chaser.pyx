@@ -560,7 +560,7 @@ class Handler(parabam.core.Handler):
             if len(sub_pyramid) == task_size:
                 task_records = list(sub_pyramid)
             else:
-                hi_type,lo_type = zip(*type_counts.most_common())[0]
+                hi_type,lo_type = zip(*type_counts.most_common(2))[0]
 
                 upper_sample_limit = min(task_size - 1, type_counts[lo_type])
 
@@ -586,7 +586,7 @@ class Handler(parabam.core.Handler):
         type_2 = sub_pyramid[0].target
 
         records = {type_1:[],type_2:[]}
-        counts = Counter()
+        counts = Counter({type_1:0,type_2:0})
 
         for record in sub_pyramid:
             if record.source == type_1:
