@@ -71,7 +71,6 @@ class LonerRecord(object):
             self.file_object = pysam.AlignmentFile(self.path,
                                                    "wb",
                                                    header=self.header)
-        
         elif open_type in ["r", "rb"]:
             self.file_object = pysam.AlignmentFile(self.path,"rb")
             self.bam_iter = self.file_object.fetch(until_eof=True)
@@ -177,8 +176,8 @@ class Handler(parabam.core.Handler):
         self._post_destroy_count = 0
         self._post_destroy_thresh = 50
 
-        #self._print_chaser_debug = (lambda iterations: False)
-        self._print_chaser_debug = self.__print_debug__
+        self._print_chaser_debug = (lambda iterations: False)
+        #self._print_chaser_debug = self.__print_debug__
 
     def __print_debug__(self,iterations):
         if iterations % 50 == 0 or iterations == -1:
@@ -809,6 +808,7 @@ class MatchMakerHandler(object):
         for record in records:
             if record.source not in unpaired_records:
                 new_record = self.__get_new_record__(record, level_mod)
+                new_record.open("w")
                 unpaired_records[record.source] = new_record
         return unpaired_records
 
@@ -843,7 +843,7 @@ class MatchMakerHandler(object):
 
         for record in records:
 
-            record.open()
+            record.open("r")
             for i in range(count+1):
                 try:
                     read = record.read()
@@ -866,7 +866,7 @@ class MatchMakerHandler(object):
                                 leftover_records):
 
         leftover = self.__get_new_record__(record, level_mod=0)
-        leftover.open()
+        leftover.open("w")
         
         for read in record.bam_iter:
             if fragment_leftovers and\
@@ -876,7 +876,7 @@ class MatchMakerHandler(object):
                 self.__add_to_leftover_records__(leftover,
                                                  leftover_records)
                 leftover = self.__get_new_record__(record, level_mod=0)
-                leftover.open()
+                leftover.open("w")
                 
             leftover.write(read)
 
