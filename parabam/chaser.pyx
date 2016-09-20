@@ -60,19 +60,23 @@ class LonerRecord(object):
             header = self.header)
 
     def write(self, read):
-        if self.file_object is None:
+        self.file_object.write(read)
+        self.count += 1
+
+    def open(self, open_type):
+
+        if open_type in ["w", "wb"]:
             if os.path.exists(self.path):
                 print 'WARNING: Attempt to overwrite loner file! Data lost!'
             self.file_object = pysam.AlignmentFile(self.path,
                                                    "wb",
                                                    header=self.header)
-        self.file_object.write(read)
-        self.count += 1
-
-    def read(self):
-        if self.file_object is None:
+        
+        elif open_type in ["r", "rb"]:
             self.file_object = pysam.AlignmentFile(self.path,"rb")
             self.bam_iter = self.file_object.fetch(until_eof=True)
+
+    def read(self):
         return self.bam_iter.next()
 
     def close(self):
@@ -839,6 +843,7 @@ class MatchMakerHandler(object):
 
         for record in records:
 
+            record.open()
             for i in range(count+1):
                 try:
                     read = record.read()
@@ -861,6 +866,7 @@ class MatchMakerHandler(object):
                                 leftover_records):
 
         leftover = self.__get_new_record__(record, level_mod=0)
+        leftover.open()
         
         for read in record.bam_iter:
             if fragment_leftovers and\
@@ -870,10 +876,14 @@ class MatchMakerHandler(object):
                 self.__add_to_leftover_records__(leftover,
                                                  leftover_records)
                 leftover = self.__get_new_record__(record, level_mod=0)
+                leftover.open()
+                
             leftover.write(read)
 
         if leftover.count > 0:
             self.__add_to_leftover_records__(leftover,leftover_records)
+        else:
+            leftover.close()
 
     def __add_to_leftover_records__(self, record, leftover_records):
         leftover_records.append(record)

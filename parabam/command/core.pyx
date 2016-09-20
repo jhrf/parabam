@@ -136,6 +136,7 @@ class PairTask(Task):
                 salt = "%s_%d" % (self.pid, self._dealt),
                 header = self._header)
 
+            record.open()
             records[loner_info] = record
 
         return records
