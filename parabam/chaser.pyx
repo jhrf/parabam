@@ -347,7 +347,7 @@ class Handler(parabam.core.Handler):
         self.__pause_monitor__()
 
         if not self._destroy:
-            idle_threshold = 2500
+            idle_threshold = 1000
         else:
             idle_threshold = 250
 

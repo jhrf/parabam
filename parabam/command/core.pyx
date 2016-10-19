@@ -115,8 +115,9 @@ class PairTask(Task):
         loner_records = self.__get_loner_records__(sorted_loners)
 
         for loner_type, reads in sorted_loners.items():
+            write = loner_records[loner_type].write
             for read in reads:
-                loner_records[loner_type].write(read)
+                write(read)
             loner_records[loner_type].close()
 
         self._system["chaser"] = loner_records
