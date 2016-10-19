@@ -274,7 +274,6 @@ class Task(Process):
     def run(self):
 
         bamfile = pysam.AlignmentFile(self._parent_path,"rb")
-        iterator = bamfile.fetch(until_eof=True)
         generate_results = self.__generate_results__
 
         while True:
@@ -283,53 +282,35 @@ class Task(Process):
                 self._idle_sent = False
                 if type(package) == DestroyPackage:
                     bamfile.close()
-                    del iterator
-                    del bamfile
                     break
-
-                seek = package                
-                bamfile.seek(seek)
-                time.sleep(.01)
-
-                results = generate_results(iterator)
+              
+                print "here", len(package), type(package)
+                results = generate_results(package)
                 
                 self._dealt += 1
                 time.sleep(0.005)
 
                 self._outqu.put(Package(results=results,sequence_id=sequence_id))
+                print "here"
+
                 #tell filereader a batch of five jobs
                 self._statusqu.put(1) 
 
             except Queue2.Empty:
                 time.sleep(5)
-            except StopIteration:
-                results = self.__handle_stop_iteration__(seek,bamfile,iterator)
-                self._dealt += 1 #Copy paste code here.
-                time.sleep(0.005) #And here
-                self.__post_run_routine__()
-                self._outqu.put(Package(results=results,sequence_id=sequence_id))
         return
 
-    def __generate_results__(self,iterator,**kwargs):
-        self.__pre_run_routine__(iterator)
-        self.__process_task_set__(iterator)
+    def __generate_results__(self, reads,**kwargs):
+        self.__pre_run_routine__(reads)
+        print "self.__pre_run_routine__(reads)"
+        self.__process_task_set__(reads)
+        print "self.__process_task_set__(reads)"
         results = self.__get_results__()
-        results["Total"] = self._task_size
+        print "results = self.__get_results__()"
+        results["Total"] = len(reads)
+        print "results total add"
         self.__post_run_routine__()
-        return results
-
-    def __handle_stop_iteration__(self,seek,bamfile,iterator):
-        results = self.__get_results__()
-         
-        cdef int count = 0 
-        bamfile.seek(seek)
-        try: #Count the amount of reads until end of file
-            for read in iterator:
-                count += 1
-        except StopIteration:
-            pass
-
-        results["Total"] = count
+        print "self.__post_run_routine__()"
         return results
 
     def __get_temp_object__(self,path):
@@ -418,9 +399,9 @@ class FileReader(Process):
         for task in tasks:
             task.start()
 
-        for i,command in enumerate(parent_generator):
+        for reads,iterations in parent_generator:
             wait_for_pause()
-            task_qu.put( (parent_bam.tell(),command) )
+            task_qu.put( (reads,iterations) )
             self._active_jobs += 1
             if i % 10 == 0:
                 check_inqu()
@@ -463,12 +444,18 @@ class FileReader(Process):
         cdef int iterations = 0
         cdef int task_size = self._task_size
 
+        reads = []
+
         while True:
             try:
                 if iterations % reader_n == proc_id:
-                    yield iterations
-                for x in xrange(task_size):
-                    parent_iter.next()
+                    reads = []
+                    for x in xrange(task_size):
+                        reads.append(parent_iter.next())
+                    yield reads, iterations
+                else:
+                    for x in xrange(task_size):
+                        parent_iter.next()
                 iterations += 1
             except StopIteration:
                 break
@@ -483,12 +470,17 @@ class FileReader(Process):
         while True:            
             try:
                 if iterations % reader_n == proc_id:
-                    yield iterations
-                for x in xrange(task_size):
-                    parent_iter.next()
+                    reads = []
+                    for x in xrange(task_size):
+                        reads.append(parent_iter.next())
+                    yield reads, iterations
+                else:
+                    for x in xrange(task_size):
+                        parent_iter.next()
+                
                 iterations += 1
 
-                if iterations == 25:
+                if iterations == 10:
                     break
 
             except StopIteration:

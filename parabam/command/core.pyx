@@ -40,16 +40,14 @@ class Task(parabam.core.Task):
     def __post_run_routine__(self,**kwargs):
         pass
 
-    def __process_task_set__(self,iterator):
+    def __process_task_set__(self, reads):
         rule = self._rule
-        next_read = iterator.next 
         parent_bam = self._parent_bam
         handle_output = self.__handle_rule_output__
         constants = self._constants
         
         #StopIteration caught in parabam.core.Task.run
-        for i in xrange(self._task_size):    
-            read = next_read()
+        for read in reads:    
             rule_output = rule(read,constants,parent_bam)
             handle_output(rule_output,read)
 
@@ -86,28 +84,37 @@ class PairTask(Task):
         self.__stash_loners__(self._loners)
         del self._loners
 
-    def __process_task_set__(self,iterator):
+    def __process_task_set__(self, reads):
+        print "processing task set"
         rule = self._rule
-        next_read = iterator.next 
+
         parent_bam = self._parent_bam
         query_loners = self.__query_loners__ 
-        cdef int size = self._task_size
         handle_output = self.__handle_rule_output__
         constants = self._constants
         counts = self._counts
 
         loners = self._loners
 
+        print "read diag", len(reads)
+
         #StopIteration caught in parabam.core.Task.run
-        for i in xrange(size):
-            read = next_read()
-            read1,read2 = query_loners(read,loners)
+        for read in reads:
+            sys.stdout.write("YEAH NOI!!!!!!!\n")
+            sys.stdout.flush()
+
+            read1,read2 = query_loners(read, loners)
+
+            sys.stdout.write("Query")
+            sys.stdout.flush()
 
             if read1:
                 rule_output = rule((read1,read2),constants,parent_bam)
                 handle_output(rule_output,(read1,read2,))
+                print "output handled"
+        print "all reads done"
 
-    def __stash_loners__(self,loners):
+    def __stash_loners__(self, loners):
         loner_count = 0
         loner_path = self.__get_temp_path__("chaser")
         loner_file = pysam.AlignmentFile(loner_path,"wb",header=self._parent_bam.header)
@@ -153,9 +160,8 @@ class ByCoordTask(Task):
     def __handle_rule_output__(self,rule_output,read):
         pass
 
-    def __process_task_set__(self,iterator):
+    def __process_task_set__(self, reads):
         rule = self._rule
-        next_read = iterator.next 
         parent_bam = self._parent_bam
 
         handle_output = self.__handle_rule_output__
@@ -169,9 +175,11 @@ class ByCoordTask(Task):
         self._task_size = 0
         current_positions = 0
 
+        read_count = 0
+
         #StopIteration caught in parabam.core.Task.run
         while current_positions <= position_max:
-            read = next_read()
+            read = reads[read_count]
             if task_pos is None:
                 task_pos = read.pos
 
@@ -187,6 +195,8 @@ class ByCoordTask(Task):
                 reads = [read]
                 task_pos = read.pos
                 current_positions += 1
+
+            read_count += 1
 
     def __filter__(self,read):
         return read.is_secondary or (read.flag & 2048 == 2048)
