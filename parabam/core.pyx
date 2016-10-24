@@ -284,7 +284,7 @@ class Task(Process):
                     bamfile.close()
                     break
               
-                print "here", len(package), type(package)
+                print "TASK %d" % (self.pid), len(package), id(package[0]), package[:5]
                 results = generate_results(package)
                 
                 self._dealt += 1
@@ -302,15 +302,15 @@ class Task(Process):
 
     def __generate_results__(self, reads,**kwargs):
         self.__pre_run_routine__(reads)
-        print "self.__pre_run_routine__(reads)"
+        #print "self.__pre_run_routine__(reads)"
         self.__process_task_set__(reads)
-        print "self.__process_task_set__(reads)"
+        #print "self.__process_task_set__(reads)"
         results = self.__get_results__()
-        print "results = self.__get_results__()"
+        #print "results = self.__get_results__()"
         results["Total"] = len(reads)
-        print "results total add"
+        #print "results total add"
         self.__post_run_routine__()
-        print "self.__post_run_routine__()"
+        #print "self.__post_run_routine__()"
         return results
 
     def __get_temp_object__(self,path):
@@ -399,9 +399,12 @@ class FileReader(Process):
         for task in tasks:
             task.start()
 
+        read_collections = []
+
         for reads,iterations in parent_generator:
             wait_for_pause()
-            task_qu.put( (reads,iterations) )
+            read_collections.append(reads)
+            task_qu.put((reads,iterations))
             self._active_jobs += 1
             if i % 10 == 0:
                 check_inqu()
