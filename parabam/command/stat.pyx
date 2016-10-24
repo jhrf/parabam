@@ -14,15 +14,14 @@ from abc import ABCMeta, abstractmethod
 
 class StatCore(object):
 
-    def __init__(self,object constants):
-        self.constants = constants
+    def __init__(self):
         self._counts = {}
         self._local_structures = {}
         self._system = {}
 
     def __pre_run_routine__(self,iterator,**kwargs):
         super(StatCore,self).__pre_run_routine__(iterator)
-        for name,structure in self.constants.structures.items():
+        for name,structure in self._constants.structures.items():
             self._local_structures[name] = structure.empty_clone()
             self._counts[name] = 0
 
@@ -61,7 +60,7 @@ class Task(StatCore,parabam.command.Task):
                                             statusqu=statusqu,
                                             task_size=task_size,
                                             constants=constants)
-        StatCore.__init__(self,constants)
+        StatCore.__init__(self)
         
 class PairTask(StatCore,parabam.command.PairTask):
 
@@ -73,7 +72,7 @@ class PairTask(StatCore,parabam.command.PairTask):
                                             statusqu=statusqu,
                                             task_size=task_size,
                                             constants=constants)
-        StatCore.__init__(self,constants)
+        StatCore.__init__(self)
 
 
 class Handler(parabam.command.Handler):

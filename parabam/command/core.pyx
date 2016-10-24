@@ -27,8 +27,8 @@ class Task(parabam.core.Task):
                                     task_size=task_size,
                                     constants=constants)
 
-        self._rule = constants.rule
-        self._constants = constants.constants
+        self._user_rule = constants.rule
+        self._user_constants = constants.constants
 
     @abstractmethod
     def __handle_rule_output__(self,rule_output,read):
@@ -41,16 +41,16 @@ class Task(parabam.core.Task):
         pass
 
     def __process_task_set__(self,iterator):
-        rule = self._rule
+        user_rule = self._user_rule
         next_read = iterator.next 
         parent_bam = self._parent_bam
         handle_output = self.__handle_rule_output__
-        constants = self._constants
+        user_constants = self._user_constants
         
         #StopIteration caught in parabam.core.Task.run
         for i in xrange(self._task_size):    
             read = next_read()
-            rule_output = rule(read,constants,parent_bam)
+            rule_output = user_rule(read,user_constants,parent_bam)
             handle_output(rule_output,read)
 
     def __get_extension__(self,path):
@@ -60,13 +60,19 @@ class Task(parabam.core.Task):
 class PairTask(Task):
     __metaclass__ = ABCMeta
 
-    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
+    def __init__(self,
+                 parent_bam,
+                 inqu,
+                 outqu,
+                 statusqu,
+                 task_size,
+                 constants):
         super(PairTask, self).__init__(parent_bam=parent_bam,
-                                    inqu=inqu,
-                                    outqu=outqu,
-                                    statusqu=statusqu,
-                                    task_size=task_size,
-                                    constants=constants)
+                                       inqu=inqu,
+                                       outqu=outqu,
+                                       statusqu=statusqu,
+                                       task_size=task_size,
+                                       constants=constants)
 
         if constants.include_duplicates:
             self.__read_filter__ = self.__filter__
@@ -87,16 +93,19 @@ class PairTask(Task):
         del self._loners
 
     def __process_task_set__(self,iterator):
-        rule = self._rule
+        
         next_read = iterator.next 
-        parent_bam = self._parent_bam
         query_loners = self.__query_loners__ 
-        cdef int size = self._task_size
         handle_output = self.__handle_rule_output__
-        constants = self._constants
-        counts = self._counts
 
+        user_rule = self._user_rule
+        user_constants = self._user_constants
+        parent_bam = self._parent_bam
+
+        counts = self._counts
         loners = self._loners
+
+        cdef int size = self._task_size
 
         #StopIteration caught in parabam.core.Task.run
         for i in xrange(size):
@@ -104,13 +113,16 @@ class PairTask(Task):
             read1,read2 = query_loners(read,loners)
 
             if read1:
-                rule_output = rule((read1,read2),constants,parent_bam)
-                handle_output(rule_output,(read1,read2,))
+                rule_output = user_rule((read1,read2), 
+                                         user_constants,
+                                         parent_bam)
+                handle_output(rule_output, (read1, read2,))
 
     def __stash_loners__(self,loners):
         loner_count = 0
         loner_path = self.__get_temp_path__("chaser")
-        loner_file = pysam.AlignmentFile(loner_path,"wb",header=self._parent_bam.header)
+        loner_file = pysam.AlignmentFile(loner_path,"wb",
+                                         header=self._parent_bam.header)
 
         for qname,read in loners.items():
             loner_count += 1
@@ -119,7 +131,8 @@ class PairTask(Task):
         loner_file.close()
 
     def __query_loners__(self,read,loners):
-        if self.__read_filter__(read):#Pair processing only handles primary pairs
+        #Pair processing only handles primary pairs
+        if self.__read_filter__(read):
             return None, None
         try:
             mate = loners[read.qname]
@@ -133,12 +146,20 @@ class PairTask(Task):
         return read.is_secondary or (read.flag & 2048 == 2048)
 
     def __filter_duplicates__(self,read):
-        return read.is_secondary or (read.flag & 2048 == 2048) or read.is_duplicate
+        return read.is_secondary or \
+                (read.flag & 2048 == 2048) \
+                    or read.is_duplicate
 
 class ByCoordTask(Task):
     __metaclass__ = ABCMeta
 
-    def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants):
+    def __init__(self,
+                 parent_bam,
+                 inqu,
+                 outqu,
+                 statusqu,
+                 task_size,
+                 constants):
         super(ByCoordTask, self).__init__(parent_bam=parent_bam,
                                     inqu=inqu,
                                     outqu=outqu,
@@ -154,12 +175,12 @@ class ByCoordTask(Task):
         pass
 
     def __process_task_set__(self,iterator):
-        rule = self._rule
+        user_rule = self._rule
         next_read = iterator.next 
         parent_bam = self._parent_bam
 
         handle_output = self.__handle_rule_output__
-        constants = self._constants
+        user_constants = self._user_constants
 
         position_max = 10000
 
@@ -179,7 +200,7 @@ class ByCoordTask(Task):
                 reads.append(read)
                 
             else:
-                rule_output = rule(reads,constants,parent_bam)        
+                rule_output = user_rule(reads,user_constants,parent_bam)        
                 handle_output(rule_output,reads)
                 self._task_size += len(reads)
                 
@@ -194,11 +215,20 @@ class ByCoordTask(Task):
 class Handler(parabam.core.Handler):
     __metaclass__=ABCMeta
 
-    def __init__(self,object parent_bam, object output_paths,object inqu,
-                object constants,object pause_qus,dict out_qu_dict,object report=True):
+    def __init__(self, 
+                object parent_bam, 
+                object output_paths,
+                object inqu,
+                object constants,
+                object pause_qus,
+                dict out_qu_dict,
+                object report=True):
         
-        super(Handler,self).__init__(parent_bam = parent_bam,output_paths = output_paths,
-                                     inqu=inqu,constants=constants,pause_qus=pause_qus,
+        super(Handler,self).__init__(parent_bam=parent_bam,
+                                     output_paths=output_paths,
+                                     inqu=inqu,
+                                     constants=constants,
+                                     pause_qus=pause_qus,
                                      out_qu_dict=out_qu_dict)
 
         self._system_subsets = constants.system_subsets

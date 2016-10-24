@@ -69,13 +69,13 @@ class Handler(parabam.core.Handler):
                 return results
 
             def __process_task_set__(self,iterator):
-                rule = self._rule
+                user_rule = self._constants.rule
                 parent_bam = self._parent_bam
                 handle_output = self.__handle_rule_output__
-                constants = self._constants
+                user_constants = self._constants.constants
 
                 for read_name,pair in iterator.items():
-                    rule_output = rule(pair,constants,parent_bam)
+                    rule_output = user_rule(pair,user_constants,parent_bam)
                     handle_output(rule_output,pair)
 
             def __get_temp_path__(self,identity):

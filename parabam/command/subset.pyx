@@ -11,12 +11,9 @@ from multiprocessing import Queue
 
 class SubsetCore(object):
 
-    def __init__(self,object constants,**kwargs):
-        self.constants = constants
-
     def __pre_run_routine__(self,iterator,**kwargs):
         super(SubsetCore,self).__pre_run_routine__(iterator)
-        self._subsets = self.constants.subsets
+        self._subsets = self._constants.subsets
         self._counts = {}
         self._temp_paths = {}
         self._temp_objects = {}
@@ -55,7 +52,7 @@ class Task(SubsetCore,parabam.command.Task):
                                     statusqu=statusqu,
                                     task_size=task_size,
                                     constants=constants)
-        SubsetCore.__init__(self,constants)
+        SubsetCore.__init__(self)
 
     def __handle_rule_output__(self,rule_output,read):             
         if type(rule_output) == bool:
@@ -76,7 +73,7 @@ class PairTask(SubsetCore,parabam.command.PairTask):
                                                 statusqu=statusqu,
                                                 task_size=task_size,
                                                 constants=constants)
-        SubsetCore.__init__(self,constants)
+        SubsetCore.__init__(self)
 
     def __handle_rule_output__(self,rule_output,read):
         for subset,cur_read in rule_output:
@@ -92,7 +89,7 @@ class ByCoordTask(SubsetCore,parabam.command.ByCoordTask):
                                     statusqu=statusqu,
                                     task_size=task_size,
                                     constants=constants)
-        SubsetCore.__init__(self,constants)
+        SubsetCore.__init__(self)
 
     def __handle_rule_output__(self,rule_output,read):     
         write_to_subset = self.__write_to_subset_bam__        
