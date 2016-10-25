@@ -199,7 +199,7 @@ class Handler(parabam.core.Handler):
         if len(merge_tuples) == 1:
             return merge_tuples[0]
         else:
-            
+
             def get_tuple_generator(merge_tuples):
                 for count,path in merge_tuples:
                     yield count,path
@@ -218,26 +218,29 @@ class Handler(parabam.core.Handler):
                 cat_paths = []
 
                 for count,path in merge_tuples_generator:
-                    if len(cat_paths) > 250:
-                        break
-
                     total_clumped += 1
                     remove_paths.append(path)
                     if count > 0:
                         cat_paths.append(path)
                         clump_count += count
+
+                    if len(cat_paths) >= 250:
+                        break
                 
-                if len(cat_paths) == 1:
+
+                if len(cat_paths) > 1:
+                    cat_paths.insert(0,"-o%s" % (clump_path,))
+                    cat_paths.insert(0,"-h%s" % (self._header_path,))
+                    pysam.cat(*cat_paths)
+                    new_tuples.append((clump_count,clump_path,))
+
+                elif len(cat_paths) == 1:
                     # Rare case where a sub-clump was comprised of empty BAM 
                     # files apart from one BAM file with reads
 
                     new_tuples.append((clump_count,cat_paths[0]),)
                     remove_paths.remove(cat_paths[0])
-                else:
-                    cat_paths.insert(0,"-o%s" % (clump_path,))
-                    cat_paths.insert(0,"-h%s" % (self._header_path,))
-                    pysam.cat(*cat_paths)
-                    new_tuples.append((clump_count,clump_path,))
+                
 
                 for path in remove_paths:
                     os.remove(path)
