@@ -49,6 +49,8 @@ class Task(parabam.core.Task):
         
         #StopIteration caught in parabam.core.Task.run
         while True:
+            self._read_count += 1
+
             read = next_read()
             rule_output = rule(read,constants,parent_bam)
             handle_output(rule_output,read)

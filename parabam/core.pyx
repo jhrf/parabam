@@ -271,6 +271,7 @@ class Task(Process):
         self._constants = constants 
         
         self._dealt = 0
+        self._read_count = 0
 
     def run(self):
 
@@ -280,9 +281,8 @@ class Task(Process):
 
         while True:
             try:
-
                 #TODO: Tidy up variables here
-                start, end, sequence_id = self._inqu.get(False)
+                start, end, sequence_id = self._inqu.get()
                 self._idle_sent = False
                 if type(start) == DestroyPackage:
                     bamfile.close()
@@ -291,19 +291,18 @@ class Task(Process):
                     break
             
                 bamfile.seek(start)
-                time.sleep(.01)
+                #time.sleep(.01)
 
                 results = generate_results(bamfile, iterator, end)
                 
                 self._dealt += 1
-                time.sleep(0.005)
+                #time.sleep(3)
 
                 self._outqu.put(Package(results=results,sequence_id=sequence_id))
                 #tell filereader a batch of five jobs
                 self._statusqu.put(1) 
 
-            except Queue2.Empty:
-                time.sleep(5)
+
             except StopIteration:
                 results = self.__handle_stop_iteration__(start,bamfile,iterator)
                 self._dealt += 1 #Copy paste code here.
@@ -316,8 +315,9 @@ class Task(Process):
         self.__pre_run_routine__(iterator)
         self.__process_task_set__(bamfile, iterator, end)
         results = self.__get_results__()
-        results["Total"] = self._task_size
         self.__post_run_routine__()
+        results["Total"] = self._read_count
+        self._read_count = 0
         return results
 
     def __handle_stop_iteration__(self,start,bamfile,iterator):
@@ -331,7 +331,9 @@ class Task(Process):
         except StopIteration:
             pass
 
-        results["Total"] = count
+        results["Total"] = self._read_count
+        self._read_count = 0
+
         return results
 
     def __get_temp_object__(self,path):
@@ -389,8 +391,8 @@ class FileReader(Process):
         else:
             self._inqu = inqu
         self._active_jobs = 0
-        self._active_jobs_thresh = ((self._task_n * 50) *\
-                                        ((1000/self._task_size)+1))
+        self._active_jobs_thresh = 16#((self._task_n * 50) *\
+                                   #     ((1000/self._task_size)+1))
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
@@ -405,16 +407,17 @@ class FileReader(Process):
 
         task_qu = Queue()
         parent_bam_mem_obj = ParentAlignmentFile(self._input_path)
-        tasks = [self._Task(parent_bam=parent_bam_mem_obj,
+
+        tasks = []
+        for i in xrange(self._task_n):
+            new_task = self._Task(parent_bam=parent_bam_mem_obj,
                       inqu=task_qu,
                       outqu=self._outqu,
                       statusqu = self._inqu,
                       task_size=self._task_size,
-                      constants=self._constants) \
-                        for i in xrange(self._task_n)]
-
-        for task in tasks:
-            task.start()
+                      constants=self._constants)
+            new_task.start()
+            tasks.append(new_task)
 
         for i, (start, end) in enumerate(parent_generator):
             wait_for_pause()
@@ -456,36 +459,35 @@ class FileReader(Process):
 
     def __bam_generator__(self):
         
-        cdef int start_index = self.__get_start_index__()
-        cdef int end_index = -1
+        start_index = self.__get_start_index__()
+        end_index = -1
 
-        cdef int chunk_start = start_index << 16
-        cdef int chunk_end = -1
+        chunk_start = start_index << 16
+        chunk_end = -1
 
         raw_binary_file = open(self._input_path,"r")
         raw_binary_file.seek(start_index)        
         cdef int iterations = 1
 
-        #sys.stdout.write("starting iteration\n")
-        sys.stdout.flush()
         while True:
-            throwaway = raw_binary_file.read(16)
-            chunk_size = raw_binary_file.read(2)
-            chunk_size = (struct.unpack("<H",chunk_size)[0] + 1) 
+            try:
+                throwaway = raw_binary_file.read(16)
+                chunk_size = raw_binary_file.read(2)
+                chunk_size = (struct.unpack("<H",chunk_size)[0] + 1) 
+            except StopIteration:
+                break
 
             end_index = start_index + chunk_size
 
-            if iterations % 500 == 0:
+            if iterations % 1000 == 0:
                 chunk_end = end_index << 16
 
-                # sys.stdout.write("%d start%d(%d) end%d(%d)\n" \
+                # sys.stdout.write("CHUNK%d: start: %d end: %d\n" \
                 #             % (iterations, 
-                #                 chunk_start,
-                #                 chunk_start >> 16, 
-                #                 chunk_end,
-                #                 chunk_end >> 16,))
-                
-                sys.stdout.flush()
+                #                chunk_start,
+                #                chunk_end))
+                # sys.stdout.flush()
+
                 yield chunk_start, chunk_end
                 chunk_start = chunk_end
 
