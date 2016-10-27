@@ -416,7 +416,7 @@ class FileReader(Process):
         for task in tasks:
             task.start()
 
-        for i, start, end in enumerate(parent_generator):
+        for i, (start, end) in enumerate(parent_generator):
             wait_for_pause()
             task_qu.put( (start, end, i, ) )
             self._active_jobs += 1
@@ -466,7 +466,7 @@ class FileReader(Process):
         raw_binary_file.seek(start_index)        
         cdef int iterations = 1
 
-        sys.stdout.write("starting iteration\n")
+        #sys.stdout.write("starting iteration\n")
         sys.stdout.flush()
         while True:
             throwaway = raw_binary_file.read(16)
@@ -478,12 +478,12 @@ class FileReader(Process):
             if iterations % 500 == 0:
                 chunk_end = end_index << 16
 
-                sys.stdout.write("%d start%d(%d) end%d(%d)\n" \
-                            % (iterations, 
-                                chunk_start,
-                                chunk_start >> 16, 
-                                chunk_end,
-                                chunk_end >> 16,))
+                # sys.stdout.write("%d start%d(%d) end%d(%d)\n" \
+                #             % (iterations, 
+                #                 chunk_start,
+                #                 chunk_start >> 16, 
+                #                 chunk_end,
+                #                 chunk_end >> 16,))
                 
                 sys.stdout.flush()
                 yield chunk_start, chunk_end

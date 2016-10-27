@@ -41,7 +41,7 @@ class Task(parabam.core.Task):
         pass
 
     def __process_task_set__(self, bamfile, iterator, end):
-        rule = self._rule
+        rule = self._user_rule
         next_read = iterator.next 
         parent_bam = self._parent_bam
         handle_output = self.__handle_rule_output__
