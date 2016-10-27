@@ -422,6 +422,7 @@ class FileReader(Process):
         for i, (start, end) in enumerate(parent_generator):
             wait_for_pause()
             task_qu.put( (start, end, i, ) )
+            time.sleep(.5)
             self._active_jobs += 1
             if i % 10 == 0:
                 check_inqu()
