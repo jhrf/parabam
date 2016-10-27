@@ -282,7 +282,7 @@ class Task(Process):
         while True:
             try:
                 #TODO: Tidy up variables here
-                start, end, sequence_id = self._inqu.get()
+                start, end, sequence_id = self._inqu.get(False)
                 self._idle_sent = False
                 if type(start) == DestroyPackage:
                     bamfile.close()
@@ -299,9 +299,12 @@ class Task(Process):
                 #time.sleep(3)
 
                 self._outqu.put(Package(results=results,sequence_id=sequence_id))
-                #tell filereader a batch of five jobs
-                self._statusqu.put(1) 
+                
+                self._statusqu.put(sequence_id) 
 
+            except Queue2.Empty:
+                #print "No job"
+                time.sleep(.5)
 
             except StopIteration:
                 results = self.__handle_stop_iteration__(start,bamfile,iterator)
@@ -390,8 +393,9 @@ class FileReader(Process):
             self._inqu = Queue()
         else:
             self._inqu = inqu
+
         self._active_jobs = 0
-        self._active_jobs_thresh = 16#((self._task_n * 50) *\
+        self._active_jobs_thresh = 32#((self._task_n * 50) *\
                                    #     ((1000/self._task_size)+1))
 
     #Find data pertaining to assocd and all reads 
@@ -419,13 +423,35 @@ class FileReader(Process):
             new_task.start()
             tasks.append(new_task)
 
-        for i, (start, end) in enumerate(parent_generator):
+        active = []
+
+        i = 0
+        while True:
+            send_count = self._active_jobs_thresh - self._active_jobs
+            print self._active_jobs, send_count
+
+            for _ in xrange(send_count):
+                start, end = parent_generator.next()
+                task_qu.put( (start, end, i, ) )
+                self._active_jobs += 1
+                active.append(i)
+                i += 1
+
+            must_see = list(active[:self._active_jobs_thresh/2])
+            while True:
+                sequence_id = self._inqu.get()
+
+                active.remove(sequence_id)
+                if sequence_id in must_see:
+                    must_see.remove(sequence_id)
+
+                self._active_jobs -= 1
+
+                if len(must_see) == 0:
+                    break
+
             wait_for_pause()
-            task_qu.put( (start, end, i, ) )
-            time.sleep(.5)
-            self._active_jobs += 1
-            if i % 10 == 0:
-                check_inqu()
+            
 
         for n in xrange(self._task_n+1):
             task_qu.put( (DestroyPackage(),-1) )
@@ -442,15 +468,15 @@ class FileReader(Process):
             except Queue2.Empty:
                 break
 
-        if self._active_jobs > self._active_jobs_thresh:
+        if self._active_jobs >= self._active_jobs_thresh:
             while True:
                 try: #Block until active jobs is less than limit
                     self._active_jobs -= self._inqu.get(False)
-                    if self._active_jobs <= self._task_n*2:
+                    if self._active_jobs < 3:
                         break
                 except Queue2.Empty:
                     self.__wait_for_pause__()
-                    time.sleep(1)
+                    time.sleep(.2)
 
     def __get_parent_iter__(self,parent_bam):
         if not self._constants.fetch_region:
@@ -480,7 +506,7 @@ class FileReader(Process):
 
             end_index = start_index + chunk_size
 
-            if iterations % 1000 == 0:
+            if iterations % 100 == 0:
                 chunk_end = end_index << 16
 
                 # sys.stdout.write("CHUNK%d: start: %d end: %d\n" \
