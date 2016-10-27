@@ -9,6 +9,7 @@ import argparse
 import tempfile
 import signal
 import traceback
+import struct
 
 import pysam
 
@@ -279,19 +280,20 @@ class Task(Process):
 
         while True:
             try:
-                package,sequence_id = self._inqu.get(False)
+
+                #TODO: Tidy up variables here
+                start, end, sequence_id = self._inqu.get(False)
                 self._idle_sent = False
-                if type(package) == DestroyPackage:
+                if type(start) == DestroyPackage:
                     bamfile.close()
                     del iterator
                     del bamfile
                     break
-
-                seek = package                
-                bamfile.seek(seek)
+            
+                bamfile.seek(start)
                 time.sleep(.01)
 
-                results = generate_results(iterator)
+                results = generate_results(bamfile, iterator, end)
                 
                 self._dealt += 1
                 time.sleep(0.005)
@@ -303,26 +305,26 @@ class Task(Process):
             except Queue2.Empty:
                 time.sleep(5)
             except StopIteration:
-                results = self.__handle_stop_iteration__(seek,bamfile,iterator)
+                results = self.__handle_stop_iteration__(start,bamfile,iterator)
                 self._dealt += 1 #Copy paste code here.
                 time.sleep(0.005) #And here
                 self.__post_run_routine__()
                 self._outqu.put(Package(results=results,sequence_id=sequence_id))
         return
 
-    def __generate_results__(self,iterator,**kwargs):
+    def __generate_results__(self, bamfile, iterator, end, **kwargs):
         self.__pre_run_routine__(iterator)
-        self.__process_task_set__(iterator)
+        self.__process_task_set__(bamfile, iterator, end)
         results = self.__get_results__()
         results["Total"] = self._task_size
         self.__post_run_routine__()
         return results
 
-    def __handle_stop_iteration__(self,seek,bamfile,iterator):
+    def __handle_stop_iteration__(self,start,bamfile,iterator):
         results = self.__get_results__()
          
         cdef int count = 0 
-        bamfile.seek(seek)
+        bamfile.seek(start)
         try: #Count the amount of reads until end of file
             for read in iterator:
                 count += 1
@@ -347,7 +349,7 @@ class Task(Process):
         pass
 
     @abstractmethod
-    def __process_task_set__(self,iterator,**kwargs):
+    def __process_task_set__(self, bam_file, iterator, end,**kwargs):
         pass
 
     @abstractmethod
@@ -394,19 +396,15 @@ class FileReader(Process):
     #and divide pertaining to the chromosome that it is aligned to
     def run(self):
 
-        parent_bam_mem_obj = ParentAlignmentFile(self._input_path)
-        parent_bam = pysam.AlignmentFile(self._input_path,"rb")
-        parent_iter = self.__get_parent_iter__(parent_bam)
-        parent_generator = self.__bam_generator__(parent_iter)
         wait_for_pause = self.__wait_for_pause__
         check_inqu = self.__check_inqu__
 
-
+        parent_generator = self.__bam_generator__()
         if self._debug:
-            parent_generator = self.__debug_generator__(parent_iter)
+            parent_generator = self.__debug_generator__()
 
         task_qu = Queue()
-
+        parent_bam_mem_obj = ParentAlignmentFile(self._input_path)
         tasks = [self._Task(parent_bam=parent_bam_mem_obj,
                       inqu=task_qu,
                       outqu=self._outqu,
@@ -418,9 +416,9 @@ class FileReader(Process):
         for task in tasks:
             task.start()
 
-        for i,command in enumerate(parent_generator):
+        for i, start, end in enumerate(parent_generator):
             wait_for_pause()
-            task_qu.put( (parent_bam.tell(),command) )
+            task_qu.put( (start, end, i, ) )
             self._active_jobs += 1
             if i % 10 == 0:
                 check_inqu()
@@ -429,7 +427,6 @@ class FileReader(Process):
             task_qu.put( (DestroyPackage(),-1) )
 
         time.sleep(2)
-        parent_bam.close()
         task_qu.close()
         return
 
@@ -457,22 +454,53 @@ class FileReader(Process):
         else:
             return parent_bam.fetch(region=self._constants.fetch_region)
 
-    def __bam_generator__(self,parent_iter):
-        cdef int proc_id = self._proc_id
-        cdef int reader_n = self._reader_n
-        cdef int iterations = 0
-        cdef int task_size = self._task_size
+    def __bam_generator__(self):
+        
+        cdef int start_index = self.__get_start_index__()
+        cdef int end_index = -1
 
+        cdef int chunk_start = start_index << 16
+        cdef int chunk_end = -1
+
+        raw_binary_file = open(self._input_path,"r")
+        raw_binary_file.seek(start_index)        
+        cdef int iterations = 1
+
+        sys.stdout.write("starting iteration\n")
+        sys.stdout.flush()
         while True:
-            try:
-                if iterations % reader_n == proc_id:
-                    yield iterations
-                for x in xrange(task_size):
-                    parent_iter.next()
-                iterations += 1
-            except StopIteration:
-                break
+            throwaway = raw_binary_file.read(16)
+            chunk_size = raw_binary_file.read(2)
+            chunk_size = (struct.unpack("<H",chunk_size)[0] + 1) 
+
+            end_index = start_index + chunk_size
+
+            if iterations % 500 == 0:
+                chunk_end = end_index << 16
+
+                sys.stdout.write("%d start%d(%d) end%d(%d)\n" \
+                            % (iterations, 
+                                chunk_start,
+                                chunk_start >> 16, 
+                                chunk_end,
+                                chunk_end >> 16,))
+                
+                sys.stdout.flush()
+                yield chunk_start, chunk_end
+                chunk_start = chunk_end
+
+            start_index = end_index
+            raw_binary_file.seek(start_index)
+
+            iterations += 1
+
         return
+
+    def __get_start_index__(self):
+        bam_file = pysam.AlignmentFile(self._input_path,"rb")
+        start_index = bam_file.tell() >> 16
+        bam_file.close()
+        return start_index
 
     def __debug_generator__(self,parent_iter):
         cdef int proc_id = self._proc_id

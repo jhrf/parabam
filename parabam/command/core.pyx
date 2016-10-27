@@ -40,18 +40,21 @@ class Task(parabam.core.Task):
     def __post_run_routine__(self,**kwargs):
         pass
 
-    def __process_task_set__(self,iterator):
-        user_rule = self._user_rule
+    def __process_task_set__(self, bamfile, iterator, end):
+        rule = self._rule
         next_read = iterator.next 
         parent_bam = self._parent_bam
         handle_output = self.__handle_rule_output__
-        user_constants = self._user_constants
+        constants = self._constants
         
         #StopIteration caught in parabam.core.Task.run
-        for i in xrange(self._task_size):    
+        while True:
             read = next_read()
-            rule_output = user_rule(read,user_constants,parent_bam)
+            rule_output = rule(read,constants,parent_bam)
             handle_output(rule_output,read)
+
+            if bamfile.tell() == end:
+                break
 
     def __get_extension__(self,path):
         root,extension = os.path.splitext(path)

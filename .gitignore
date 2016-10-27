@@ -2,6 +2,7 @@
 dist
 parabam.egg-info
 build
+.DS_Store
 
 #File Types:
 *.so
