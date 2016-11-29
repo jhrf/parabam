@@ -7,3 +7,4 @@ build
 *.so
 *.c
 *.pyc
+.DS_Store

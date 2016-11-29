@@ -794,10 +794,10 @@ class Interface(object):
         parser.add_argument('-s',type=int,nargs='?',default=250000
             ,help="The amount of reads considered by each"\
                     "distributed task. [Default: 250000]")
-        parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=2,
+        parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=1,
             help="The amount of open connections to the file being read.\n"\
                     "Conventional hard drives perform best with \n"\
-                    "the default of 2. [Default: 2]")
+                    "the default of 1. [Default: 1]")
         return parser
 
     @abstractmethod
