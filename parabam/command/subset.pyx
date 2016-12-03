@@ -41,7 +41,6 @@ class SubsetCore(object):
         for subset,fileobj in self._temp_objects.items():
             fileobj.close()
 
-
 class Task(SubsetCore,parabam.command.Task):
 
     def __init__(self,parent_bam,inqu,outqu,statusqu,task_size,constants,**kwargs):
@@ -198,7 +197,8 @@ class Subset(parabam.command.Interface):
             rule = rule,
             subsets= subsets,
             fetch_region = self.cmd_args.region,
-            output_counts= self.cmd_args.counts)
+            output_counts= self.cmd_args.counts,
+            ensure_unique_output = self.cmd_args.u)
     
     def run(self,input_paths,
             constants,
@@ -206,18 +206,17 @@ class Subset(parabam.command.Interface):
             subsets,
             fetch_region=None,
             output_counts=False,
+            ensure_unique_output=False,
             **kwargs):
 
         ''' Docstring! '''
+        
+        self.ensure_unique_output = False
+
         args = dict(locals())
         del args["self"]
         results = super(Subset,self).run(**args)
         return results
-
-    def __setup_cmd_line_run__(self):
-
-        super(Subset,self).__setup_cmd_line_run__()
-        self.ensure_unique_output = self.cmd_args.u
 
     def __get_queue_names__(self,**kwargs):
         queues = ["merge","main"]

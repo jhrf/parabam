@@ -619,11 +619,6 @@ class Interface(parabam.core.Interface):
             "specified by samtools (eg \'chr1:1000,5000\')")
         parser.add_argument('-d',action="store_false",default=True,
             help="parabam will not process reads marked duplicate.")
-        parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
-            help="Indicate the amount of information output by the program:\n"\
-            "\t0: No output [Default]\n"\
-            "\t1: Total Reads Processed\n"\
-            "\t2: Detailed output")
 
         return parser
         

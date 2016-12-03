@@ -328,6 +328,11 @@ class Stat(parabam.command.Interface):
     def __init__(self,**kwargs):
         super(Stat,self).__init__(instance_name = "parabam stat", **kwargs)
     
+    def __setup_other_cmd_args__(self):
+        # Must implement this method to satisfy
+        # inheritance
+        pass
+
     def run_cmd(self):
         module,rule,constants = \
                 self.__get_module_and_vitals__(self.cmd_args.rule)
@@ -342,6 +347,7 @@ class Stat(parabam.command.Interface):
                   fetch_region = self.cmd_args.region,
                   specified_outpath = self.cmd_args.output)
 
+    #TODO: The specified_output currently doesn't lead anywhere
     def run(self,input_paths,
                   constants,
                   rule,

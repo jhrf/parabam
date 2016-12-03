@@ -36,40 +36,35 @@ class CmdLineInterface(object):
 
         signal.signal(signal.SIGINT, self.keyboard_handler)     
         print_help_text = False
-        argument_len = len(sys.argv) >= 2
 
-        if argument_len:
+        if len(sys.argv) >= 2 and sys.argv[1] in command_map:
+            
             command = sys.argv[1]
+            #Remove command from arguments.
+            sys.argv = sys.argv[1:] 
+            interface = None
+            try:
+                #Load the command using the command line
+                interface = command_map[command](cmd_run=True)
+                interface.run_cmd()
+                
+            except SystemExit:
+                print " "
+                print "[Status] %s is quitting gracefully\n" \
+                                                % (self.program_name,)
+            except BaseException as exception:
+                print " "
+                print "[Error] %s stopped unexpecedtly, sorry!" \
+                                                % (self.program_name,)
 
-            if command in command_map:
-                #Remove command from arguments.
-                sys.argv = sys.argv[1:] 
-                interface = None
-                try:
-                    #Load the command using the command line
-                    interface = command_map[command](cmd_run=True)
-                    interface.run_cmd()
-                    
-                except SystemExit:
-                    print " "
-                    print "[Status] %s is quitting gracefully\n" \
-                                                    % (self.program_name,)
-                except BaseException as exception:
-                    print " "
-                    print "[Error] %s stopped unexpecedtly, sorry!" \
-                                                    % (self.program_name,)
-
-                    traceback.print_exception(*sys.exc_info())
-                    self.die_gracefully(interface)
-                    raise
-            else:
-                print "\nCommand not recognised. Refer to manual below:\n"
-                print_help_text = True
-            self.die_gracefully(interface)
-        else:
-            print_help_text = True
-
-        if print_help_text:
+                traceback.print_exception(*sys.exc_info())
+            finally:
+                self.die_gracefully(interface)
+        
+        else: 
+            if len(sys.argv) >= 2 and sys.argv[1] not in command_map:
+                print "\nUnrecognised command: `%s`." % (sys.argv[1])
+                print "Refer to manual below for a list of valid commands\n"
             print help_text
 
 cdef class Handler:
@@ -713,7 +708,7 @@ class Interface(object):
 
         self.cmd_run = cmd_run
         if cmd_run:
-            self.__setup_cmd_line_run__()
+            self.__cmd_args_to_class_vars__()
 
         else:
             self.task_size = task_size
@@ -734,7 +729,7 @@ class Interface(object):
         prefix = "%s-" % (sanitised_name,)
         return tempfile.mkdtemp(prefix=prefix,dir=".")
 
-    def __setup_cmd_line_run__(self):
+    def __cmd_args_to_class_vars__(self):
         parser = self.get_parser()
         cmd_args = parser.parse_args()
 
@@ -751,7 +746,7 @@ class Interface(object):
     def __introduce__(self):
         if self.verbose and self.announce:
             intro =  "%s has started. Start Time: %s" \
-                             % (self.instance_name,self.__get_date_time__())
+                        % (self.instance_name,self.__get_date_time__())
             underline = ("-" * len(intro))
 
             sys.stdout.write(intro+"\n")
@@ -760,12 +755,12 @@ class Interface(object):
     
     def __get_date_time__(self):
         return datetime.datetime.fromtimestamp(
-                                    time.time()).strftime('%Y-%m-%d %H:%M:%S')
+                            time.time()).strftime('%Y-%m-%d %H:%M:%S')
 
     def __goodbye__(self):
         if self.verbose and self.announce:
             outro = "%s has finished.  End Time: %s" \
-                            % (self.instance_name,self.__get_date_time__())
+                        % (self.instance_name,self.__get_date_time__())
 
             sys.stdout.write(("-" * len(outro)) + "\n")
             sys.stdout.write(outro + "\n")
@@ -788,20 +783,27 @@ class Interface(object):
                     formatter_class=argparse.RawTextHelpFormatter)
 
         parser.add_argument('-p',type=int,nargs='?',default=4
-            ,help="The maximum amount of processes you wish parabam to use.\n"\
-                  "This should be less than or equal to the amount of processor\n"\
-                  "cores in your machine [Default: 4].")
+            ,help=('The maximum amount of processes you wish\n' 
+                   'parabam to use. This should be less than or\n'
+                   'equal to the amount of processor cores in\n'
+                   'your machine [Default: 4].'))
         parser.add_argument('-s',type=int,nargs='?',default=250000
-            ,help="The amount of reads considered by each"\
+            ,help="The amount of reads considered by each\n"\
                     "distributed task. [Default: 250000]")
         parser.add_argument('-f',type=int,metavar="READERS",nargs='?',default=1,
             help="The amount of open connections to the file being read.\n"\
                     "Conventional hard drives perform best with \n"\
                     "the default of 1. [Default: 1]")
+        parser.add_argument('-v', choices=[0,1,2],default=0,type=int,
+            help=("The amount of information output by the program:\n"
+                 "\t0: No output [Default]\n"
+                 "\t1: Total Reads Processed\n"
+                 "\t2: Detailed output"))
+        
         return parser
 
     @abstractmethod
-    def run_cmd(self,parser):
+    def run_cmd(self):
         #This is usualy just a function that
         #takes an argparse parser and turns 
         #passes the functions to the run function
