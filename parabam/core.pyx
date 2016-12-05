@@ -698,13 +698,7 @@ class Interface(object):
                   cmd_run = False):
 
         self.instance_name = instance_name
-
-        if temp_dir is None:
-            self.temp_dir = self.__get_unique_tempdir__()
-            self.control_temp_dir = True
-        else:
-            self.temp_dir = temp_dir
-            self.control_temp_dir = False
+        self.header_line = "-" * 77
 
         self.cmd_run = cmd_run
         if cmd_run:
@@ -720,6 +714,13 @@ class Interface(object):
                 self.announce = False
             else:
                 self.announce = announce
+
+        if temp_dir is None:
+            self.temp_dir = self.__get_unique_tempdir__()
+            self.control_temp_dir = True
+        else:
+            self.temp_dir = temp_dir
+            self.control_temp_dir = False
 
     def get_temp_dir_path(self):
         return self.temp_dir
@@ -784,9 +785,9 @@ class Interface(object):
 
         parser.add_argument('-p',type=int,nargs='?',default=4
             ,help=('The maximum amount of processes you wish\n' 
-                   'parabam to use. This should be less than or\n'
-                   'equal to the amount of processor cores in\n'
-                   'your machine [Default: 4].'))
+                   '%s to use. This should be less \n'
+                   'than or equal to the amount of processor\n'
+                   'cores in your machine [Default: 4].') % self.instance_name)
         parser.add_argument('-s',type=int,nargs='?',default=250000
             ,help="The amount of reads considered by each\n"\
                     "distributed task. [Default: 250000]")
