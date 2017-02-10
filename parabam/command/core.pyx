@@ -526,8 +526,11 @@ class Interface(parabam.core.Interface):
         handler_bundle = self.__get_handler_bundle__(**kwargs)
 
         if constants.pair_process:
-            self.__prepare_for_pair_processing__(handler_bundle,handler_order,
-                                                 queue_names,constants,task_class)
+            self.__prepare_for_pair_processing__(handler_bundle,
+                                                 handler_order,
+                                                 queue_names,
+                                                 constants,
+                                                 task_class)
         
         update_interval = self.__get_update_interval__(constants.verbose)
 
@@ -541,7 +544,10 @@ class Interface(parabam.core.Interface):
         final_output_paths = self.__instalise_final_output__(**kwargs)
 
         for input_path in input_paths:
-            output_paths = self.__get_output_paths__(input_path,final_output_paths,**kwargs)
+            output_paths = self.__get_output_paths__(input_path,
+                                                     final_output_paths,
+                                                     **kwargs)
+
             self.__update_final_output_paths__(input_path,output_paths,
                                                final_output_paths)
 
