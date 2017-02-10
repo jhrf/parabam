@@ -715,15 +715,21 @@ class Interface(object):
             else:
                 self.announce = announce
 
-        if temp_dir is None:
-            self.temp_dir = self.__get_unique_tempdir__()
-            self.control_temp_dir = True
-        else:
-            self.temp_dir = temp_dir
-            self.control_temp_dir = False
+        self.temp_dir = temp_dir
+        self.temp_dir, self.control_temp_dir = self.__temp_dir_instalise__()
 
     def get_temp_dir_path(self):
         return self.temp_dir
+
+    def __temp_dir_instalise__(self):
+        if self.temp_dir is None:
+            temp_dir_path = self.__get_unique_tempdir__()
+            control_temp_dir = True
+        else:
+            temp_dir_path = self.temp_dir
+            control_temp_dir = False
+
+        return temp_dir_path, control_temp_dir
 
     def __get_unique_tempdir__(self):
         sanitised_name = self.instance_name.replace(" ","_")
