@@ -399,9 +399,9 @@ class Interface(parabam.core.Interface):
 
         return module,rule,constants
 
-    def __setup_cmd_line_run__(self):
+    def __cmd_args_to_class_vars__(self):
 
-        super(Interface,self).__setup_cmd_line_run__()
+        super(Interface,self).__cmd_args_to_class_vars__()
         
         self.pair_process = self.cmd_args.pair
         self.coord_process = False
