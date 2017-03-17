@@ -866,7 +866,7 @@ class ParentAlignmentFile(object):
             self.header = parent.header
         except ValueError as e:
             sys.stdout.write("[Warning]: BAM header has an error:\n")
-            sys.stdout.write("\t%s\n" % (e,))
+            sys.stdout.write("\t\t``%s``\n" % (e,))
             sys.stdout.write("\tProcesseing will continue but user will not\n")
             sys.stdout.write("\thave access to header. If you require header \n")
             sys.stdout.write("\taccess, fix the error and rerun parabam\n")
