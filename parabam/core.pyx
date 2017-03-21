@@ -858,7 +858,7 @@ class ParentAlignmentFile(object):
     
     def __init__(self, path):
         try:
-            self.load_parent_vars(path, check_header=False, check_sq=False)
+            self.load_parent_vars(path, check_header=True, check_sq=True)
         except ValueError as e:
             sys.stdout.write("[Warning]: BAM header has an error:\n")
             sys.stdout.write("\t\t``%s``\n" % (e,))
@@ -867,7 +867,7 @@ class ParentAlignmentFile(object):
             sys.stdout.write("\tBAM header and restarting analysis\n")
             sys.stdout.flush()
 
-            self.load_parent_vars(path, check_header=True, check_sq=True)
+            self.load_parent_vars(path, check_header=False, check_sq=False)
 
     def load_parent_vars(self, path, check_header, check_sq):
         has_index = os.path.exists(os.path.join("%s%s" % (path,".bai")))
