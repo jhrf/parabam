@@ -856,28 +856,24 @@ class EndProcPackage(Package):
 
 class ParentAlignmentFile(object):
     
-    def __init__(self, path):
+    def __init__(self,path):
+        has_index = os.path.exists(os.path.join("%s%s" % (path,".bai")))
+
         try:
-            self.load_parent_vars(path, check_header=True, check_sq=True)
+            parent = pysam.AlignmentFile(path,"rb")
+            self.filename = parent.filename
+            self.references = parent.references
+            self.header = parent.header
+            self.lengths = parent.lengths
+
         except ValueError as e:
             sys.stdout.write("[Warning]: BAM header has an error:\n")
-            sys.stdout.write("\t\t``%s``\n" % (e,))
+            sys.stdout.write("\t\t``  %s  ``\n" % (e,))
             sys.stdout.write("\tProcesseing will continue using the\n")
-            sys.stdout.write("\tcorrupted header. Consider fixing the\n")
+            sys.stdout.write("\tunverified header. Consider fixing the\n")
             sys.stdout.write("\tBAM header and restarting analysis\n")
             sys.stdout.flush()
-
-            self.load_parent_vars(path, check_header=False, check_sq=False)
-
-    def load_parent_vars(self, path, check_header, check_sq):
-        has_index = os.path.exists(os.path.join("%s%s" % (path,".bai")))
-        parent = pysam.AlignmentFile(path,"rb", 
-                                         check_header=check_header, 
-                                         check_sq=check_sq)
-        self.filename = parent.filename
-        self.references = parent.references
-        self.header = parent.header
-        self.lengths = parent.lengths
+            self.header = self.get_sanitised_header(parent)
 
         if has_index:
             self.nocoordinate = parent.nocoordinate
@@ -890,6 +886,52 @@ class ParentAlignmentFile(object):
             self.unmapped = 0
 
         parent.close()
+
+    def get_sanitised_header(self, parent):
+        new_header = {}
+        header_list = parent.text.split("\n")
+
+        for header_entry in header_list:
+
+            header_entry_type = header_entry[1:3]
+            if header_entry_type in pysam.libcalignmentfile.VALID_HEADERS:
+
+                entry_split = header_entry.split("\t")
+
+                data_type = \
+                 pysam.libcalignmentfile.VALID_HEADER_TYPES[header_entry_type]
+                if not header_entry_type in new_header:
+                    new_header[header_entry_type] = data_type()
+
+                if data_type == list:
+                    new_header[header_entry_type].append({})
+
+                for field in entry_split[1:]:
+                    self.handle_field(new_header, 
+                                      header_entry_type, 
+                                      field)      
+
+        return new_header          
+
+    def handle_field(self, new_header, header_entry_type, field):
+        if ":" in field:
+            known_fields = pysam.libcalignmentfile.KNOWN_HEADER_FIELDS
+
+            field_type, colon,field_data = field.partition(":")
+            is_valid_field = \
+                field_type in known_fields[header_entry_type]
+
+            if is_valid_field:
+                field_data_type = known_fields[header_entry_type][field_type]
+                try:
+                    if type(new_header[header_entry_type]) == dict:
+                        new_header[header_entry_type][field_type] = \
+                            field_data_type(field_data)
+                    elif type(new_header[header_entry_type]) == list:
+                        new_header[header_entry_type][-1][field_type] = \
+                            field_data_type(field_data)
+                except ValueError:
+                    pass
 
     def getrname(self,tid):
         return self.references[tid]
