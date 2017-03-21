@@ -857,22 +857,26 @@ class EndProcPackage(Package):
 class ParentAlignmentFile(object):
     
     def __init__(self,path):
-        has_index = os.path.exists(os.path.join("%s%s" % (path,".bai")))
-
-        parent = pysam.AlignmentFile(path,"rb")
-        self.filename = parent.filename
-        self.references = parent.references
         try:
-            self.header = parent.header
+            self.load_parent_vars(check_header=False, check_sq=False)
         except ValueError as e:
             sys.stdout.write("[Warning]: BAM header has an error:\n")
             sys.stdout.write("\t\t``%s``\n" % (e,))
-            sys.stdout.write("\tProcesseing will continue but user will not\n")
-            sys.stdout.write("\thave access to header. If you require header \n")
-            sys.stdout.write("\taccess, fix the error and rerun parabam\n")
+            sys.stdout.write("\tProcesseing will continue using the\n")
+            sys.stdout.write("\tcorrupted header. Consider fixing the\n")
+            sys.stdout.write("\tBAM header and restarting analysis\n")
             sys.stdout.flush()
-            self.header = {}
 
+            self.load_parent_vars(check_header=True, check_sq=True)
+
+    def load_parent_vars(self, check_header, check_sq):
+        has_index = os.path.exists(os.path.join("%s%s" % (path,".bai")))
+        parent = pysam.AlignmentFile(path,"rb", 
+                                         check_header=check_header, 
+                                         check_sq=check_sq)
+        self.filename = parent.filename
+        self.references = parent.references
+        self.header = parent.header
         self.lengths = parent.lengths
 
         if has_index:
