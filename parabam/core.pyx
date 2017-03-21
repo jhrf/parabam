@@ -856,9 +856,9 @@ class EndProcPackage(Package):
 
 class ParentAlignmentFile(object):
     
-    def __init__(self,path):
+    def __init__(self, path):
         try:
-            self.load_parent_vars(check_header=False, check_sq=False)
+            self.load_parent_vars(path, check_header=False, check_sq=False)
         except ValueError as e:
             sys.stdout.write("[Warning]: BAM header has an error:\n")
             sys.stdout.write("\t\t``%s``\n" % (e,))
@@ -867,9 +867,9 @@ class ParentAlignmentFile(object):
             sys.stdout.write("\tBAM header and restarting analysis\n")
             sys.stdout.flush()
 
-            self.load_parent_vars(check_header=True, check_sq=True)
+            self.load_parent_vars(path, check_header=True, check_sq=True)
 
-    def load_parent_vars(self, check_header, check_sq):
+    def load_parent_vars(self, path, check_header, check_sq):
         has_index = os.path.exists(os.path.join("%s%s" % (path,".bai")))
         parent = pysam.AlignmentFile(path,"rb", 
                                          check_header=check_header, 
