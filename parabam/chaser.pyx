@@ -230,26 +230,32 @@ class Handler(parabam.core.Handler):
         loner_type = new_package.loner_type
         level = new_package.level
 
-        #this number is by pairs to get read num we times 2
-        self._rescued["total"] += (new_package.rescued*2)    
+        if loner_type == "NP":
+            self._rescued["total"] += new_package.rescued
+            self._rescued["unpaired"] += new_package.rescued
+            for loner_level, loner_path in new_package.results:
+                os.remove(loner_path)
+        else:
 
-        if new_package.results: #This ensures that there are leftover loners
-            self._pyramid_idle_counts[loner_type] = 0
-            
-            try:
-                pyramid = self._loner_pyramid[loner_type]
-            except KeyError:
-                self._loner_pyramid[loner_type] = [[]]
-                pyramid = self._loner_pyramid[loner_type]
+            #this number is by pairs to get read num we times 2
+            self._rescued["total"] += (new_package.rescued*2)  
+            if new_package.results: #This ensures that there are leftover loners
+                self._pyramid_idle_counts[loner_type] = 0
+                
+                try:
+                    pyramid = self._loner_pyramid[loner_type]
+                except KeyError:
+                    self._loner_pyramid[loner_type] = [[]]
+                    pyramid = self._loner_pyramid[loner_type]
 
-            if len(pyramid) >= level:
-                pyramid.append([])
+                if len(pyramid) >= level:
+                    pyramid.append([])
 
-            for loner_level,loner_path in new_package.results:
-                self.__add_to_pyramid__(loner_type,loner_level,loner_path)
+                for loner_level,loner_path in new_package.results:
+                    self.__add_to_pyramid__(loner_type,loner_level,loner_path)
 
-        if self._destroy: #TODO:should this move to new_package_action?
-            self._stale_count += 1
+            if self._destroy: #TODO:should this move to new_package_action?
+                self._stale_count += 1
 
     def __handle_primary_task__(self,new_package):
         for match_package in new_package.results:
@@ -503,7 +509,7 @@ class Handler(parabam.core.Handler):
             sys.stdout.write("\n")
             sys.stdout.flush()
 
-        print "Saved from wait %d" % (self._rescued["total"] - prev_found)
+        #print "Saved from wait %d" % (self._rescued["total"] - prev_found)
         return prev_found < self._rescued["total"]
 
     def __clear_subpyramid__(self,success,destroy,running):
@@ -568,12 +574,21 @@ class Handler(parabam.core.Handler):
         del self._chaser_tasks
         
         if self._constants.verbose:
-            if self._total_loners - self._rescued["total"] == 0:
+            remaining_reads = self._total_loners - self._rescued["total"]
+
+            if remaining_reads == 0:
                 sys.stdout.write(\
                      "\r\t- Read pairing in progress: 100.00% complete\n")
                 sys.stdout.flush()
-            self.__standard_output__("\t- Unpaired reads: %d" %\
-                (self._total_loners - self._rescued["total"],))
+            else:
+                self.__standard_output__("\n\t- Unpaired reads: %d" %\
+                    (self._total_loners - self._rescued["total"],))
+
+            if self._rescued["unpaired"] > 0:
+                self.__standard_output__(\
+                  "\t- Reads flagged as unpaired excluded from analysis: %d" %\
+                    (self._rescued["unpaired"],))
+
         for qu in self._pause_qus:
             qu.close()
 
@@ -586,7 +601,7 @@ class Handler(parabam.core.Handler):
                         "\r\t- Read pairing in progress: %.2f%% complete  " %\
                           ((float(self._rescued["total"]+1) / (self._total_loners+1))*100,))
                     sys.stdout.flush()
-                elif self._post_destroy_count % 1000 == 0 and\
+                elif self._post_destroy_count % 2500 == 0 and\
                      self._constants.verbose ==1:
                     sys.stdout.write(\
                         "\n\t- Read pairing in progress: %.2f%% complete" %\
@@ -686,11 +701,32 @@ class PrimaryHandler(ChaserHandler):
         match_maker_results = []
         for loner_type,paths in loner_paths.items():
             for path in paths:
-                match_maker_results.append(\
-                        self.__start_matchmaker_task__([path],loner_type,-1))
+                if loner_type == "NP":
+                    matchmaker_result = \
+                        self.__handle_unpaired_reads__(loner_type, path)
+                else:                    
+                    matchmaker_result = \
+                        self.__start_matchmaker_task__([path],loner_type,-1)
+
+                match_maker_results.append(matchmaker_result)
 
         del loner_paths,loner_file_counts,loner_holder
         return PrimaryResults(match_maker_results,"primary")
+
+    def __handle_unpaired_reads__(self, loner_type, path):
+        read_count = 0
+
+        bam_file = pysam.AlignmentFile(path, "rb")
+        for r in bam_file.fetch(until_eof=True):
+            read_count += 1
+        bam_file.close()
+
+        loner_pack = MatchMakerResults(loner_type=loner_type,
+                                       results=[(-1,path,),],
+                                       level=-1,
+                                       chaser_type="match_maker",
+                                       rescued=read_count)
+        return loner_pack
 
     def __start_matchmaker_task__(self,paths,loner_type,level):
         return self.match_handler.run(paths,loner_type,
@@ -715,14 +751,19 @@ class PrimaryHandler(ChaserHandler):
             return "MM%sv%s" % tuple(class_bins)
 
     def __get_loner_type__(self,read,bins):
-        if not read.is_unmapped and not read.mate_is_unmapped:
-            return self.__get_reference_id_name__(read,bins)
+        if not read.is_paired:
+            #read is not paired!
+            loner_type = "NP"
+        elif not read.is_unmapped and not read.mate_is_unmapped:
+            loner_type = self.__get_reference_id_name__(read,bins)
         elif read.is_unmapped and read.mate_is_unmapped:
             #both unmapped 
-            return "UU"
+            loner_type = "UU"
         else:
             #one unmapped read, one mapped read
-            return "UM"
+            loner_type = "UM"
+
+        return loner_type
             
     def __get_loner_holder__(self):
         holder = {}
