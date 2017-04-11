@@ -507,12 +507,13 @@ class FileReader(Process):
         except Queue2.Empty:
             return
 
-        self._pause_debug("FileReader:%d || PAUSE RECEIVED" % \
-                                    (self._proc_id, ))
-        pause_qu = self._pause_qu
-        self.__send_ack__(pause_qu)
-
         if pause_signal == 1:
+
+            self._pause_debug("FileReader:%d || PAUSE RECEIVED" % \
+                                    (self._proc_id, ))
+            pause_qu = self._pause_qu
+            self.__send_ack__(pause_qu)
+
             while True:
                 try:
                     new_signal = pause_qu.get(False)
@@ -544,6 +545,12 @@ class FileReader(Process):
                 "           FileReader. Processing will continue. However\n"+
                             "there is a chance Parabam could freeze...\n"))
             sys.stderr.flush()
+
+        elif pause_signal == 2:
+            self._pause_debug("FileReader:%d || ACK BOOMERANG" \
+                                         % (self._proc_id,))
+            pause_qu.put(pause_signal)
+
 
 
 class Leviathan(object):
