@@ -121,7 +121,7 @@ class Handler(parabam.core.Handler):
         self._pause_debug = self.__pause_debug__
 
     def __pause_debug__(self, message):
-        print "PRINT_DEBUG: ", messsage
+        print "PAUSE DEBUG:: ", message
 
     def __print_debug__(self,iterations):
         if iterations % 50 == 0 or iterations == -1:
@@ -319,20 +319,19 @@ class Handler(parabam.core.Handler):
                 self._file_readers_paused = False
 
     def __wait_for_ack__(self,qu):
-        count = 0
+        self._pause_debug("Chaser || WAITNG FOR ACK")
         while True:
-            if count > 10:
-                return
             try:
                 ack = qu.get(False)
                 if ack == 2:
+                    self._pause_debug("Chaser || RECEIVED ACK")
                     return
                 else:
+                    self._pause_debug("Chaser || (UN)PAUSE BOOMERANG")
                     qu.put(ack)
-                    time.sleep(1)
+                    time.sleep(3)
             except Queue2.Empty:
-                time.sleep(1)
-            count += 1
+                time.sleep(2)
 
     def __periodic_action__(self,iterations):
 

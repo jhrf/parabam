@@ -292,7 +292,6 @@ class Task(Process):
                 time.sleep(0.005)
 
                 self._outqu.put(Package(results=results,sequence_id=sequence_id))
-                #tell filereader a batch of five jobs
                 self._statusqu.put(1) 
 
             except Queue2.Empty:
@@ -389,7 +388,7 @@ class FileReader(Process):
         self._pause_debug = self.__pause_debug__
 
     def __pause_debug__(self, message):
-        print "PRINT_DEBUG: ", messsage
+        print "PAUSE DEBUG:: ", message
 
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
@@ -498,43 +497,53 @@ class FileReader(Process):
 
     def __send_ack__(self,qu):
         qu.put(2)
+        self._pause_debug("FileReader:%d || PAUSE ACK SENT" \
+                                             % (self._proc_id,))
         time.sleep(1)
 
     def __wait_for_pause__(self):
         try: #pre clause for speed
-            pause = self._pause_qu.get(False)
+            pause_signal = self._pause_qu.get(False)
         except Queue2.Empty:
             return
 
-        self._pause_debug("FileReader:%d || PAUSE SIGNAL:%d " % (self._proc_id,
-                                                                 pause))
+        self._pause_debug("FileReader:%d || PAUSE RECEIVED:%d "% (self._proc_id,
+                                                                 pause_signal))
         pause_qu = self._pause_qu
-        while True:
-            try:#get most recent signal
-                attempt = pause_qu.get(False)
-                pause = attempt
-                self._pause_debug("FileReader:%d || PAUSE SIGNAL:%d " \
-                                            % (self._proc_id,pause,))
-            except Queue2.Empty:
-                break
-        
-        if pause == 1:
-            self.__send_ack__(pause_qu)
-            self._pause_debug("FileReader:%d || PAUSE ACK SENT" \
-                                             % (self._proc_id,))
+        self.__send_ack__(pause_qu)
+
+        if pause_signal == 1:
             while True:
                 try:
-                    pause = pause_qu.get(False)
-                    if pause == 0: #Unpause signal recieved
+                    new_signal = pause_qu.get(False)
+                    if new_signal == 0: #Unpause signal recieved
                         self._pause_debug("FileReader:%d || UNPAUSE RECEIVED" \
-                                             % (self._proc_id,))
+                                         % (self._proc_id,))
                         self.__send_ack__(pause_qu)
-                        self._pause_debug("FileReader:%d || UNPAUSE ACK SENT" \
-                                             % (self._proc_id,))
-                        return
+                    elif new_signal == 2:
+                        self._pause_debug("FileReader:%d || ACK BOOMERANG" \
+                                         % (self._proc_id,))
+                        pause_qu.put(new_signal)
+
+                    elif new_signal == 1:
+                        sys.stderr.write((
+                "[Warning]: Pause signal detected while waiting for unpause \n"+
+                "           in Parabam FileReader. Processing will continue.\n"+
+                            "However there is a chance Parabam could freeze.\n")
+                        sys.stderr.flush()
+                        self.__send_ack__(pause_qu)
+
                 except Queue2.Empty:
-                    time.sleep(.5)
- 
+                    time.sleep(1)
+
+        elif pause_signal == 0:
+            sys.stderr.write((
+                "[Warning]: Unpause signal detected before pause in Parabam\n"+
+                "           FileReader. Processing will continue. However\n"+
+                            "there is a chance Parabam could freeze...\n")
+            sys.stderr.flush()
+
+
 class Leviathan(object):
     #Leviathon takes objects of file_readers and handlers and
     #chains them together.
