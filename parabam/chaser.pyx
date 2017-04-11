@@ -347,10 +347,16 @@ class Handler(parabam.core.Handler):
         collected_packs = []
         destroy_found = False
         while True:
-            package = self._inqu.get()
-            if type(package) == DestroyPackage:
-                destroy_found = True
-            collected_packs.append(package)
+            try:
+                package = self._inqu.get(False)
+                if type(package) == DestroyPackage:
+                    destroy_found = True
+                    collected_packs.append(package)
+                    
+            except except Queue2.Empty:
+                pass
+
+            
 
         if not destroy_found:
             sys.stderr.write((
@@ -358,7 +364,7 @@ class Handler(parabam.core.Handler):
                 "              Parabam coming to abrupt halt, sorry!\n"))
             sys.stderr.flush()
             sys.exit(1)
-            
+
         else:
             self._destroy = True
             for pack in collected_packs:
