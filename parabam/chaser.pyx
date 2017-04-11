@@ -322,6 +322,8 @@ class Handler(parabam.core.Handler):
 
     def __wait_for_ack__(self, qu):
         self._pause_debug("Chaser || WAITNG FOR ACK")
+
+        boomerang_count = 0
         while True:
             try:
                 ack = qu.get(False)
@@ -330,10 +332,35 @@ class Handler(parabam.core.Handler):
                     return
                 else:
                     self._pause_debug("Chaser || (UN)PAUSE BOOMERANG")
+                    boomerang_count += 1
                     qu.put(ack)
                     time.sleep(3)
+
+                    if boomerang_count >= 20:
+                        check_pass = self.__fatal_check__()
+                        if check_pass:
+                            break
             except Queue2.Empty:
                 time.sleep(2)
+
+    def __fatal_check__(self):
+        collected_packs = []
+        destroy_found = False
+        while True:
+            package = self._inqu.get()
+            if type(package) == DestroyPackage
+                destroy_found = True
+            collected_packs.append(package)
+
+        if not destroy_found:
+            sys.stderr.write((
+                "[Fatal Error] Process communication failure.\n"+
+                "              Parabam coming to abrupt halt, sorry!\n"))
+            sys.stderr.flush()
+            sys.exit(1)
+        else:
+            for pack in collected_packs:
+                self._inqu.put(pack)
 
     def __periodic_action__(self,iterations):
 
