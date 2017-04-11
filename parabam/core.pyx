@@ -385,6 +385,12 @@ class FileReader(Process):
         self._active_jobs_thresh = ((self._task_n * 50) *\
                                         ((1000/self._task_size)+1))
 
+        #self._pause_debug = (lambda x: False)
+        self._pause_debug = self.__pause_debug__
+
+    def __pause_debug__(self, message):
+        print "PRINT_DEBUG: ", messsage
+
     #Find data pertaining to assocd and all reads 
     #and divide pertaining to the chromosome that it is aligned to
     def run(self):
@@ -500,21 +506,31 @@ class FileReader(Process):
         except Queue2.Empty:
             return
 
+        self._pause_debug("FileReader:%d || PAUSE SIGNAL:%d " % (self._proc_id,
+                                                                 pause))
         pause_qu = self._pause_qu
         while True:
             try:#get most recent signal
                 attempt = pause_qu.get(False)
                 pause = attempt
+                self._pause_debug("FileReader:%d || PAUSE SIGNAL:%d " \
+                                            % (self._proc_id,pause,))
             except Queue2.Empty:
                 break
         
         if pause == 1:
             self.__send_ack__(pause_qu)
+            self._pause_debug("FileReader:%d || PAUSE ACK SENT" \
+                                             % (self._proc_id,))
             while True:
                 try:
-                    pause = pause_qu.get(False) 
+                    pause = pause_qu.get(False)
                     if pause == 0: #Unpause signal recieved
+                        self._pause_debug("FileReader:%d || UNPAUSE RECEIVED" \
+                                             % (self._proc_id,))
                         self.__send_ack__(pause_qu)
+                        self._pause_debug("FileReader:%d || UNPAUSE ACK SENT" \
+                                             % (self._proc_id,))
                         return
                 except Queue2.Empty:
                     time.sleep(.5)

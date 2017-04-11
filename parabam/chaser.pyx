@@ -114,8 +114,14 @@ class Handler(parabam.core.Handler):
 
         self._primary_store = self.__instalise_primary_store__()
 
-        self._print_chaser_debug = (lambda iterations: False)
-        #self._print_chaser_debug = self.__print_debug__
+        #self._print_chaser_debug = (lambda iterations: False)
+        #self._pause_debug = (lambda message: False)
+        
+        self._print_chaser_debug = self.__print_debug__
+        self._pause_debug = self.__pause_debug__
+
+    def __pause_debug__(self, message):
+        print "PRINT_DEBUG: ", messsage
 
     def __print_debug__(self,iterations):
         if iterations % 50 == 0 or iterations == -1:
@@ -300,12 +306,14 @@ class Handler(parabam.core.Handler):
             max_jobs = self._max_jobs
             if self._pending_jobs >= max_jobs and not self._file_readers_paused:
                 for qu in self._pause_qus:
+                    self._pause_debug("Chaser || PAUSE SENT")
                     qu.put(1) #pause
                     self.__wait_for_ack__(qu)
                 self._file_readers_paused = True
 
             elif self._pending_jobs < max_jobs and self._file_readers_paused:
                 for qu in self._pause_qus:
+                    self._pause_debug("Chaser || UNPAUSE SENT")
                     qu.put(0) #unpause
                     self.__wait_for_ack__(qu)
                 self._file_readers_paused = False
