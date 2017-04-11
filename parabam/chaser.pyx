@@ -337,9 +337,9 @@ class Handler(parabam.core.Handler):
                     time.sleep(3)
 
                     if boomerang_count >= 20:
-                        check_pass = self.__fatal_check__()
-                        if check_pass:
-                            break
+                        self.__fatal_check__()
+                        break
+
             except Queue2.Empty:
                 time.sleep(2)
 
@@ -348,7 +348,7 @@ class Handler(parabam.core.Handler):
         destroy_found = False
         while True:
             package = self._inqu.get()
-            if type(package) == DestroyPackage
+            if type(package) == DestroyPackage:
                 destroy_found = True
             collected_packs.append(package)
 
@@ -358,9 +358,13 @@ class Handler(parabam.core.Handler):
                 "              Parabam coming to abrupt halt, sorry!\n"))
             sys.stderr.flush()
             sys.exit(1)
+            
         else:
+            self._destroy = True
             for pack in collected_packs:
                 self._inqu.put(pack)
+
+        return True
 
     def __periodic_action__(self,iterations):
 
