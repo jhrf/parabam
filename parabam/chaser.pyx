@@ -112,7 +112,7 @@ class Handler(parabam.core.Handler):
         self._post_destroy_count = 0
         self._post_destroy_thresh = 50
 
-        self._post_destory_tasks_added = False
+        self._post_destroy_tasks_added = False
 
         self._primary_store = self.__instalise_primary_store__()
 
@@ -425,13 +425,13 @@ class Handler(parabam.core.Handler):
                 self._finished = True
 
     def __add_post_destory_chaser_tasks__(self):
-        if self._destroy and not self._post_destory_tasks_added:
-            self._post_destory_tasks_added = True
+        if self._destroy and not self._post_destroy_tasks_added:
+            self._post_destroy_tasks_added = True
             
             self._max_jobs = self._max_jobs * 2
-            post_destory_tasks = self.__create_chaser_tasks__(\
+            post_destroy_tasks = self.__create_chaser_tasks__(\
                                                 self._constants.total_procs)
-            self._chaser_tasks.extend(post_destory_tasks)
+            self._chaser_tasks.extend(post_destroy_tasks)
 
     def __pyramid_is_empty__(self,saved):
         return (self._files_in_pyramid == 0 and \
