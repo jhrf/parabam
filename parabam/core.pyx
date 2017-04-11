@@ -521,7 +521,7 @@ class FileReader(Process):
                                          % (self._proc_id,))
                         self.__send_ack__(pause_qu)
                         break
-                        
+
                     elif new_signal == 2:
                         self._pause_debug("FileReader:%d || ACK BOOMERANG" \
                                          % (self._proc_id,))
@@ -531,7 +531,7 @@ class FileReader(Process):
                         sys.stderr.write((
                 "[Warning]: Pause signal detected while waiting for unpause \n"+
                 "           in Parabam FileReader. Processing will continue.\n"+
-                            "However there is a chance Parabam could freeze.\n")
+                            "However there is a chance Parabam could freeze.\n"))
                         sys.stderr.flush()
                         self.__send_ack__(pause_qu)
 
@@ -542,7 +542,7 @@ class FileReader(Process):
             sys.stderr.write((
                 "[Warning]: Unpause signal detected before pause in Parabam\n"+
                 "           FileReader. Processing will continue. However\n"+
-                            "there is a chance Parabam could freeze...\n")
+                            "there is a chance Parabam could freeze...\n"))
             sys.stderr.flush()
 
 
