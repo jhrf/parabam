@@ -497,7 +497,7 @@ class FileReader(Process):
 
     def __send_ack__(self,qu):
         qu.put(2)
-        self._pause_debug("FileReader:%d || PAUSE ACK SENT" \
+        self._pause_debug("FileReader:%d || ACK SENT" \
                                              % (self._proc_id,))
         time.sleep(1)
 
@@ -507,8 +507,8 @@ class FileReader(Process):
         except Queue2.Empty:
             return
 
-        self._pause_debug("FileReader:%d || PAUSE RECEIVED:%d "% (self._proc_id,
-                                                                 pause_signal))
+        self._pause_debug("FileReader:%d || PAUSE RECEIVED" % \
+                                    (self._proc_id, ))
         pause_qu = self._pause_qu
         self.__send_ack__(pause_qu)
 
@@ -518,7 +518,7 @@ class FileReader(Process):
                     new_signal = pause_qu.get(False)
                     if new_signal == 0: #Unpause signal recieved
                         self._pause_debug("FileReader:%d || UNPAUSE RECEIVED" \
-                                         % (self._proc_id,))
+                            % (self._proc_id,))
                         self.__send_ack__(pause_qu)
                         break
 
