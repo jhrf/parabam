@@ -507,37 +507,13 @@ class FileReader(Process):
         except Queue2.Empty:
             return
 
+        pause_qu = self._pause_qu
+
         if pause_signal == 1:
-
             self._pause_debug("FileReader:%d || PAUSE RECEIVED" % \
-                                    (self._proc_id, ))
-            pause_qu = self._pause_qu
+                            (self._proc_id, ))
             self.__send_ack__(pause_qu)
-
-            while True:
-                try:
-                    new_signal = pause_qu.get(False)
-                    if new_signal == 0: #Unpause signal recieved
-                        self._pause_debug("FileReader:%d || UNPAUSE RECEIVED" \
-                            % (self._proc_id,))
-                        self.__send_ack__(pause_qu)
-                        break
-
-                    elif new_signal == 2:
-                        self._pause_debug("FileReader:%d || ACK BOOMERANG" \
-                                         % (self._proc_id,))
-                        pause_qu.put(new_signal)
-
-                    elif new_signal == 1:
-                        sys.stderr.write((
-                "[Warning]: Pause signal detected while waiting for unpause \n"+
-                "           in Parabam FileReader. Processing will continue.\n"+
-                            "However there is a chance Parabam could freeze.\n"))
-                        sys.stderr.flush()
-                        self.__send_ack__(pause_qu)
-
-                except Queue2.Empty:
-                    time.sleep(1)
+            self.__wait_for_unpause__(pause_qu)
 
         elif pause_signal == 0:
             sys.stderr.write((
@@ -551,6 +527,33 @@ class FileReader(Process):
                                          % (self._proc_id,))
             pause_qu.put(pause_signal)
 
+    def __wait_for_unpause__(self, pause_qu):
+        
+        while True:
+            try:
+                new_signal = pause_qu.get(False)
+                if new_signal == 0: #Unpause signal recieved
+                    self._pause_debug("FileReader:%d || UNPAUSE RECEIVED" \
+                        % (self._proc_id,))
+                    self.__send_ack__(pause_qu)
+                    break
+
+                elif new_signal == 2:
+                    self._pause_debug("FileReader:%d || ACK BOOMERANG" \
+                                     % (self._proc_id,))
+                    pause_qu.put(new_signal)
+                    time.sleep(1)
+
+                elif new_signal == 1:
+                    sys.stderr.write((
+            "[Warning]: Pause signal detected while waiting for unpause \n"+
+            "           in Parabam FileReader. Processing will continue.\n"+
+                        "However there is a chance Parabam could freeze.\n"))
+                    sys.stderr.flush()
+                    self.__send_ack__(pause_qu)
+
+            except Queue2.Empty:
+                time.sleep(1)
 
 
 class Leviathan(object):
