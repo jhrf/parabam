@@ -318,7 +318,7 @@ class Handler(parabam.core.Handler):
                     self.__wait_for_ack__(qu)
                 self._file_readers_paused = False
 
-    def __wait_for_ack__(self,qu):
+    def __wait_for_ack__(self, qu):
         self._pause_debug("Chaser || WAITNG FOR ACK")
         while True:
             try:

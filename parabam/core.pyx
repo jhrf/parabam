@@ -520,6 +520,8 @@ class FileReader(Process):
                         self._pause_debug("FileReader:%d || UNPAUSE RECEIVED" \
                                          % (self._proc_id,))
                         self.__send_ack__(pause_qu)
+                        break
+                        
                     elif new_signal == 2:
                         self._pause_debug("FileReader:%d || ACK BOOMERANG" \
                                          % (self._proc_id,))
