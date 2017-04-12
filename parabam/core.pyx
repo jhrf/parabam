@@ -499,7 +499,7 @@ class FileReader(Process):
         qu.put(2)
         self._pause_debug("FileReader:%d || ACK SENT" \
                                              % (self._proc_id,))
-        time.sleep(1)
+        time.sleep(3)
 
     def __wait_for_pause__(self):
         try: #pre clause for speed
@@ -553,7 +553,7 @@ class FileReader(Process):
                     self.__send_ack__(pause_qu)
 
             except Queue2.Empty:
-                time.sleep(1)
+                time.sleep(.5)
 
 
 class Leviathan(object):
