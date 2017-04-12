@@ -116,11 +116,11 @@ class Handler(parabam.core.Handler):
 
         self._primary_store = self.__instalise_primary_store__()
 
-        #self._print_chaser_debug = (lambda iterations: False)
-        #self._pause_debug = (lambda message: False)
+        self._print_chaser_debug = (lambda iterations: False)
+        self._pause_debug = (lambda message: False)
         
-        self._print_chaser_debug = self.__print_debug__
-        self._pause_debug = self.__pause_debug__
+        #self._print_chaser_debug = self.__print_debug__
+        #self._pause_debug = self.__pause_debug__
 
     def __pause_debug__(self, message):
         print "PAUSE DEBUG:: ", message

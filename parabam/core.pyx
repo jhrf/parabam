@@ -384,8 +384,8 @@ class FileReader(Process):
         self._active_jobs_thresh = ((self._task_n * 50) *\
                                         ((1000/self._task_size)+1))
 
-        #self._pause_debug = (lambda x: False)
-        self._pause_debug = self.__pause_debug__
+        self._pause_debug = (lambda x: False)
+        #self._pause_debug = self.__pause_debug__
 
     def __pause_debug__(self, message):
         print "PAUSE DEBUG:: ", message
