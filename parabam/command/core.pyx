@@ -380,16 +380,16 @@ class Interface(parabam.core.Interface):
         if os.getcwd not in sys.path:
             sys.path.append(os.getcwd())
 
-        code_path = code_path.replace(".py","")
-
+    
         # TODO: I've seen an error where a bug in the imported package
         #       causes parabam to throw this message. Needs further
         #       exploration
         try:
-            module = __import__(code_path, fromlist=[''])
-        except ImportError: 
-            sys.stderr.write("[Error] parabam can't find user specified instructions\n"\
-                              "\tEnsure instruction code is in current working directory\n")
+            module = self.__import_user_instructions__(code_path)
+        except ImportError  as e: 
+            sys.stderr.write("[Error] Error importing user instruction:\n")
+            sys.stderr.write("\tImportError: " + e.message + "\n")
+            sys.stderr.write("\n")
             raise SystemExit
 
         rule = module.rule
@@ -398,6 +398,30 @@ class Interface(parabam.core.Interface):
             module.set_constants(constants)
 
         return module,rule,constants
+
+    def __import_user_instructions__(self, code_path):
+
+        modulename = os.path.splitext(os.path.basename(code_path))[0]
+        print modulename
+
+        if not os.path.exists(os.path.join("./",modulename)):
+            # Tthe code is not in the current dir and so
+            # the user has provided an absolute path
+            # What follows is a bit hacky...
+            os.chdir(os.path.join(".",self.temp_dir))
+            shutil.copy(code_path, "./")
+            module = self.__import_module__(modulename)
+            os.chdir("../")
+
+        else:
+            module = self.__import_module__(code_path)
+
+        return module
+
+    def __import_module__(self, code_path):
+        code_path = code_path.replace(".py","")
+        module = __import__(code_path, fromlist=[''])
+        return module
 
     def __cmd_args_to_class_vars__(self):
 
