@@ -521,7 +521,6 @@ class Interface(parabam.core.Interface):
                 sys.stdout.write("\t\t+ %s\n" % (name,))            
 
     def run(self,input_paths,**kwargs):
-        self.__temp_dir_instalise__()
         self.__introduce__()
 
         const_args = self.__get_const_args__(**kwargs)
