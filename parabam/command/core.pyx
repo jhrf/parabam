@@ -8,6 +8,8 @@ import gzip
 import pysam
 import parabam
 
+import imp
+
 import Queue as Queue2
 
 from itertools import izip
@@ -401,26 +403,8 @@ class Interface(parabam.core.Interface):
 
     def __import_user_instructions__(self, code_path):
 
-        modulename = os.path.splitext(os.path.basename(code_path))[0]
-        print modulename
-
-        if not os.path.exists(os.path.join("./",modulename)):
-            # Tthe code is not in the current dir and so
-            # the user has provided an absolute path
-            # What follows is a bit hacky...
-            os.chdir(os.path.join(".",self.temp_dir))
-            shutil.copy(code_path, "./")
-            module = self.__import_module__(modulename)
-            os.chdir("../")
-
-        else:
-            module = self.__import_module__(code_path)
-
-        return module
-
-    def __import_module__(self, code_path):
-        code_path = code_path.replace(".py","")
-        module = __import__(code_path, fromlist=[''])
+        module = imp.load_source("instruc", 
+                                 code_path)
         return module
 
     def __cmd_args_to_class_vars__(self):
