@@ -53,7 +53,11 @@ class Task(SubsetCore,parabam.command.Task):
                                     constants=constants)
         SubsetCore.__init__(self)
 
-    def __handle_rule_output__(self,rule_output,read):             
+    def __handle_rule_output__(self,rule_output,read):
+        if type(rule_output) == dict:
+            for subset, reads in rule_output.items():
+                for read in reads:
+                    self.__write_to_subset_bam__(subset, read)
         if type(rule_output) == bool:
             if rule_output:
                 self.__write_to_subset_bam__(self._constants.subsets[0],read)          
